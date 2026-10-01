@@ -130,20 +130,12 @@ END$$
 
 DROP PROCEDURE IF EXISTS `sp_create_pesanan`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_create_pesanan` (IN `p_id_pelanggan` INT, IN `p_tgl_kirim` DATE, IN `p_waktu_kirim` TIME, IN `p_metode_bayar` VARCHAR(20), IN `p_catatan` TEXT, OUT `p_id_pesanan` INT)   BEGIN
-    DECLARE v_ongkir DECIMAL(10,2);
-    
-    -- Get ongkir based on pelanggan zona
-    SELECT COALESCE(z.ongkir, 0) INTO v_ongkir
-    FROM pelanggan pel
-    LEFT JOIN zona z ON pel.id_zona = z.id_zona
-    WHERE pel.id_pelanggan = p_id_pelanggan;
     
     INSERT INTO pesanan (
         id_pelanggan, 
         tgl_pesan, 
         tgl_kirim, 
         waktu_kirim,
-        ongkir,
         metode_bayar, 
         catatan
     ) VALUES (
@@ -151,7 +143,6 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_create_pesanan` (IN `p_id_pe
         CURDATE(),
         p_tgl_kirim,
         p_waktu_kirim,
-        v_ongkir,
         p_metode_bayar,
         p_catatan
     );
@@ -833,16 +824,8 @@ DROP TRIGGER IF EXISTS `trg_before_insert_pesanan`$$
 CREATE TRIGGER `trg_before_insert_pesanan` BEFORE INSERT ON `pesanan` FOR EACH ROW BEGIN
     DECLARE next_num INT;
     DECLARE today_date VARCHAR(8);
-    DECLARE v_ongkir DECIMAL(10,2);
     
     SET today_date = DATE_FORMAT(NEW.tgl_pesan, '%Y%m%d');
-
-    SELECT COALESCE(z.ongkir, 0) INTO v_ongkir
-    FROM pelanggan pel
-    LEFT JOIN zona z ON pel.id_zona = z.id_zona
-    WHERE pel.id_pelanggan = NEW.id_pelanggan;
-
-    SET NEW.ongkir = COALESCE(v_ongkir, 0);
     
     SELECT COALESCE(MAX(CAST(SUBSTRING(no_invoice, -4) AS UNSIGNED)), 0) + 1
     INTO next_num
@@ -1109,7 +1092,6 @@ CREATE TABLE `v_pesanan_lengkap` (
 ,`tgl_kirim` date
 ,`waktu_kirim` time
 ,`total_harga` decimal(15,2)
-,`ongkir` decimal(10,2)
 ,`grand_total` decimal(15,2)
 ,`status` enum('pending','proses','kirim','selesai','batal')
 ,`status_bayar` enum('belum_bayar','dp','hutang','lunas')
@@ -1120,7 +1102,6 @@ CREATE TABLE `v_pesanan_lengkap` (
 ,`alamat` text
 ,`no_wa` varchar(20)
 ,`tipe_pelanggan` enum('retail','reseller')
-,`nama_zona` varchar(100)
 ,`status_pengiriman` enum('menunggu','dalam_perjalanan','sampai','gagal')
 ,`driver` varchar(100)
 );
@@ -1157,15 +1138,6 @@ CREATE TABLE `v_ringkasan_kas` (
 -- --------------------------------------------------------
 
 
---
--- Dumping data for table `zona`
---
-
-INSERT INTO `zona` (`id_zona`, `nama_zona`, `deskripsi`, `ongkir`, `created_at`, `updated_at`) VALUES
-(1, 'Kota Malang', 'Wilayah Kota Malang dan sekitarnya', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 'Kabupaten Malang', 'Wilayah Kabupaten Malang', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 'Kota Batu', 'Wilayah Kota Batu', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 'Luar Malang Raya', 'Wilayah di luar Malang Raya', 15000.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
 
 --
 -- Indexes for dumped tables
@@ -1192,7 +1164,6 @@ ALTER TABLE `kategori`
 --
 ALTER TABLE `pelanggan`
   ADD PRIMARY KEY (`id_pelanggan`),
-  ADD KEY `idx_zona` (`id_zona`),
   ADD KEY `idx_tipe` (`tipe`),
   ADD KEY `idx_no_wa` (`no_wa`);
 
@@ -1291,11 +1262,6 @@ ALTER TABLE `varian_produk`
   ADD PRIMARY KEY (`id_varian`),
   ADD KEY `idx_produk` (`id_produk`);
 
---
--- Indexes for table `zona`
---
-ALTER TABLE `zona`
-  ADD PRIMARY KEY (`id_zona`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1379,11 +1345,6 @@ ALTER TABLE `transaksi_kas`
 ALTER TABLE `varian_produk`
   MODIFY `id_varian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
---
--- AUTO_INCREMENT for table `zona`
---
-ALTER TABLE `zona`
-  MODIFY `id_zona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 -- --------------------------------------------------------
 
@@ -1403,7 +1364,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 DROP TABLE IF EXISTS `v_katalog`;
 
 DROP VIEW IF EXISTS `v_katalog`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_katalog`  AS SELECT `p`.`id_produk` AS `id_produk`, `k`.`nama_kategori` AS `nama_kategori`, `p`.`nama_produk` AS `nama_produk`, `p`.`deskripsi` AS `deskripsi`, `p`.`gambar` AS `gambar`, `p`.`shelf_life` AS `shelf_life`, `p`.`status` AS `status`, `v`.`id_varian` AS `id_varian`, `v`.`nama_varian` AS `nama_varian`, `v`.`harga` AS `harga`, `v`.`min_order` AS `min_order`, `v`.`stok` AS `stok` FROM ((`produk` `p` join `kategori` `k` on(`p`.`id_kategori` = `k`.`id_kategori`)) left join `varian_produk` `v` on(`p`.`id_produk` = `v`.`id_produk`)) WHERE `p`.`status` = 'tersedia' ORDER BY `k`.`nama_kategori` ASC, `p`.`nama_produk` ASC, `v`.`harga` ASC ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_katalog`  AS SELECT `p`.`id_produk` AS `id_produk`, `k`.`nama_kategori` AS `nama_kategori`, `p`.`nama_produk` AS `nama_produk`, `p`.`deskripsi` AS `deskripsi`, `p`.`shelf_life` AS `shelf_life`, `p`.`status` AS `status`, `v`.`id_varian` AS `id_varian`, `v`.`nama_varian` AS `nama_varian`, `v`.`harga` AS `harga`, `v`.`min_order` AS `min_order`, `v`.`stok` AS `stok` FROM ((`produk` `p` join `kategori` `k` on(`p`.`id_kategori` = `k`.`id_kategori`)) left join `varian_produk` `v` on(`p`.`id_produk` = `v`.`id_produk`)) WHERE `p`.`status` = 'tersedia' ORDER BY `k`.`nama_kategori` ASC, `p`.`nama_produk` ASC, `v`.`harga` ASC ;
 
 -- --------------------------------------------------------
 
@@ -1433,7 +1394,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 DROP TABLE IF EXISTS `v_pesanan_lengkap`;
 
 DROP VIEW IF EXISTS `v_pesanan_lengkap`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_pesanan_lengkap`  AS SELECT `p`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `p`.`tgl_pesan` AS `tgl_pesan`, `p`.`tgl_kirim` AS `tgl_kirim`, `p`.`waktu_kirim` AS `waktu_kirim`, `p`.`total_harga` AS `total_harga`, `p`.`ongkir` AS `ongkir`, `p`.`grand_total` AS `grand_total`, `p`.`status` AS `status`, `p`.`status_bayar` AS `status_bayar`, `p`.`metode_bayar` AS `metode_bayar`, `p`.`catatan` AS `catatan`, `pel`.`id_pelanggan` AS `id_pelanggan`, `pel`.`nama` AS `nama_pelanggan`, `pel`.`alamat` AS `alamat`, `pel`.`no_wa` AS `no_wa`, `pel`.`tipe` AS `tipe_pelanggan`, `z`.`nama_zona` AS `nama_zona`, `pg`.`status` AS `status_pengiriman`, `pg`.`driver` AS `driver` FROM (((`pesanan` `p` join `pelanggan` `pel` on(`p`.`id_pelanggan` = `pel`.`id_pelanggan`)) left join `zona` `z` on(`pel`.`id_zona` = `z`.`id_zona`)) left join `pengiriman` `pg` on(`p`.`id_pesanan` = `pg`.`id_pesanan`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_pesanan_lengkap`  AS SELECT `p`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `p`.`tgl_pesan` AS `tgl_pesan`, `p`.`tgl_kirim` AS `tgl_kirim`, `p`.`waktu_kirim` AS `waktu_kirim`, `p`.`total_harga` AS `total_harga`, `p`.`grand_total` AS `grand_total`, `p`.`status` AS `status`, `p`.`status_bayar` AS `status_bayar`, `p`.`metode_bayar` AS `metode_bayar`, `p`.`catatan` AS `catatan`, `pel`.`id_pelanggan` AS `id_pelanggan`, `pel`.`nama` AS `nama_pelanggan`, `pel`.`alamat` AS `alamat`, `pel`.`no_wa` AS `no_wa`, `pel`.`tipe` AS `tipe_pelanggan`, `pg`.`status` AS `status_pengiriman`, `pg`.`driver` AS `driver` FROM ((`pesanan` `p` join `pelanggan` `pel` on(`p`.`id_pelanggan` = `pel`.`id_pelanggan`)) left join `pengiriman` `pg` on(`p`.`id_pesanan` = `pg`.`id_pesanan`)) ;
 
 -- --------------------------------------------------------
 
@@ -1476,8 +1437,7 @@ ALTER TABLE `kategori`
 --
 -- Constraints for table `pelanggan`
 --
-ALTER TABLE `pelanggan`
-  ADD CONSTRAINT `fk_pelanggan_zona` FOREIGN KEY (`id_zona`) REFERENCES `zona` (`id_zona`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 
 --
 -- Constraints for table `pembayaran`

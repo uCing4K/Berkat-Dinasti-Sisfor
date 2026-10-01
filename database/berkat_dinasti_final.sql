@@ -25,6 +25,7 @@ DELIMITER $$
 --
 -- Procedures
 --
+DROP PROCEDURE IF EXISTS `sp_add_detail_pesanan`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_add_detail_pesanan` (IN `p_id_pesanan` INT, IN `p_id_varian` INT, IN `p_qty` INT)   BEGIN
     DECLARE v_harga DECIMAL(10,2);
     DECLARE v_min_order INT;
@@ -65,6 +66,7 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_add_detail_pesanan` (IN `p_i
     VALUES (p_id_pesanan, p_id_varian, p_qty, v_harga, p_qty * v_harga);
 END$$
 
+DROP PROCEDURE IF EXISTS `sp_bayar`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_bayar` (IN `p_id_pesanan` INT, IN `p_jumlah` DECIMAL(15,2), IN `p_metode` VARCHAR(20), IN `p_bukti` VARCHAR(255), IN `p_keterangan` TEXT, IN `p_received_by` INT)   BEGIN
     DECLARE v_status VARCHAR(20);
     DECLARE v_status_bayar VARCHAR(20);
@@ -126,6 +128,7 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_bayar` (IN `p_id_pesanan` IN
     );
 END$$
 
+DROP PROCEDURE IF EXISTS `sp_create_pesanan`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_create_pesanan` (IN `p_id_pelanggan` INT, IN `p_tgl_kirim` DATE, IN `p_waktu_kirim` TIME, IN `p_metode_bayar` VARCHAR(20), IN `p_catatan` TEXT, OUT `p_id_pesanan` INT)   BEGIN
     DECLARE v_ongkir DECIMAL(10,2);
     
@@ -156,6 +159,7 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_create_pesanan` (IN `p_id_pe
     SET p_id_pesanan = LAST_INSERT_ID();
 END$$
 
+DROP PROCEDURE IF EXISTS `sp_laporan_penjualan`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_laporan_penjualan` (IN `p_start_date` DATE, IN `p_end_date` DATE)   BEGIN
     SELECT 
         DATE(tgl_pesan) AS tanggal,
@@ -170,6 +174,7 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_laporan_penjualan` (IN `p_st
     ORDER BY tanggal;
 END$$
 
+DROP PROCEDURE IF EXISTS `sp_update_status`$$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_update_status` (IN `p_id_pesanan` INT, IN `p_status` VARCHAR(20))   BEGIN
     DECLARE v_status_saat_ini VARCHAR(20);
 
@@ -250,6 +255,7 @@ INSERT INTO `detail_pesanan` (`id_detail`, `id_pesanan`, `id_varian`, `qty`, `ha
 -- Triggers `detail_pesanan`
 --
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_delete_detail`$$
 CREATE TRIGGER `trg_after_delete_detail` AFTER DELETE ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE total DECIMAL(15,2);
 
@@ -269,6 +275,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_insert_detail`$$
 CREATE TRIGGER `trg_after_insert_detail` AFTER INSERT ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE total DECIMAL(15,2);
 
@@ -288,6 +295,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_update_detail`$$
 CREATE TRIGGER `trg_after_update_detail` AFTER UPDATE ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE total DECIMAL(15,2);
 
@@ -317,6 +325,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_before_insert_detail`$$
 CREATE TRIGGER `trg_before_insert_detail` BEFORE INSERT ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE v_stok INT;
 
@@ -345,6 +354,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_before_update_detail`$$
 CREATE TRIGGER `trg_before_update_detail` BEFORE UPDATE ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE v_stok_baru INT;
     DECLARE v_delta INT;
@@ -468,6 +478,7 @@ INSERT INTO `pembayaran` (`id_pembayaran`, `id_pesanan`, `jumlah`, `tgl_bayar`, 
 -- Triggers `pembayaran`
 --
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_insert_pembayaran`$$
 CREATE TRIGGER `trg_after_insert_pembayaran` AFTER INSERT ON `pembayaran` FOR EACH ROW BEGIN
     DECLARE total_dibayar DECIMAL(15,2);
     DECLARE grand DECIMAL(15,2);
@@ -511,6 +522,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_before_insert_pembayaran`$$
 CREATE TRIGGER `trg_before_insert_pembayaran` BEFORE INSERT ON `pembayaran` FOR EACH ROW BEGIN
     DECLARE v_status VARCHAR(20);
     DECLARE v_status_bayar VARCHAR(20);
@@ -583,6 +595,7 @@ INSERT INTO `pengeluaran` (`id_pengeluaran`, `tanggal`, `kategori`, `deskripsi`,
 -- Triggers `pengeluaran`
 --
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_insert_pengeluaran`$$
 CREATE TRIGGER `trg_after_insert_pengeluaran` AFTER INSERT ON `pengeluaran` FOR EACH ROW BEGIN
     INSERT INTO transaksi_kas (
         tanggal,
@@ -697,6 +710,7 @@ INSERT INTO `pesanan` (`id_pesanan`, `id_pelanggan`, `no_invoice`, `tgl_pesan`, 
 -- Triggers `pesanan`
 --
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_insert_pesanan`$$
 CREATE TRIGGER `trg_after_insert_pesanan` AFTER INSERT ON `pesanan` FOR EACH ROW BEGIN
     INSERT INTO pengiriman (id_pesanan, status)
     VALUES (NEW.id_pesanan, 'menunggu');
@@ -707,6 +721,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_pesanan_selesai`$$
 CREATE TRIGGER `trg_after_pesanan_selesai` AFTER UPDATE ON `pesanan` FOR EACH ROW BEGIN
     DECLARE sisa_hutang DECIMAL(15,2);
     DECLARE total_bayar DECIMAL(15,2);
@@ -732,6 +747,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_update_pesanan`$$
 CREATE TRIGGER `trg_after_update_pesanan` AFTER UPDATE ON `pesanan` FOR EACH ROW BEGIN
     IF OLD.status != NEW.status THEN
         INSERT INTO tracking_log (id_pesanan, status, keterangan)
@@ -754,6 +770,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_after_update_pesanan_batal`$$
 CREATE TRIGGER `trg_after_update_pesanan_batal` AFTER UPDATE ON `pesanan` FOR EACH ROW BEGIN
     DECLARE total_refund DECIMAL(15,2);
     DECLARE total_bayar DECIMAL(15,2);
@@ -812,6 +829,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_before_insert_pesanan`$$
 CREATE TRIGGER `trg_before_insert_pesanan` BEFORE INSERT ON `pesanan` FOR EACH ROW BEGIN
     DECLARE next_num INT;
     DECLARE today_date VARCHAR(8);
@@ -836,6 +854,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+DROP TRIGGER IF EXISTS `trg_before_update_pesanan`$$
 CREATE TRIGGER `trg_before_update_pesanan` BEFORE UPDATE ON `pesanan` FOR EACH ROW BEGIN
     DECLARE total_dibayar DECIMAL(15,2);
 
@@ -1373,6 +1392,7 @@ ALTER TABLE `zona`
 --
 DROP TABLE IF EXISTS `v_detail_pesanan_produk`;
 
+DROP VIEW IF EXISTS `v_detail_pesanan_produk`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_detail_pesanan_produk`  AS SELECT `dp`.`id_detail` AS `id_detail`, `dp`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `pr`.`nama_produk` AS `nama_produk`, `vp`.`nama_varian` AS `nama_varian`, `dp`.`qty` AS `qty`, `dp`.`harga_satuan` AS `harga_satuan`, `dp`.`subtotal` AS `subtotal` FROM (((`detail_pesanan` `dp` join `pesanan` `p` on(`dp`.`id_pesanan` = `p`.`id_pesanan`)) join `varian_produk` `vp` on(`dp`.`id_varian` = `vp`.`id_varian`)) join `produk` `pr` on(`vp`.`id_produk` = `pr`.`id_produk`)) ;
 
 -- --------------------------------------------------------
@@ -1382,6 +1402,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_katalog`;
 
+DROP VIEW IF EXISTS `v_katalog`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_katalog`  AS SELECT `p`.`id_produk` AS `id_produk`, `k`.`nama_kategori` AS `nama_kategori`, `p`.`nama_produk` AS `nama_produk`, `p`.`deskripsi` AS `deskripsi`, `p`.`gambar` AS `gambar`, `p`.`shelf_life` AS `shelf_life`, `p`.`status` AS `status`, `v`.`id_varian` AS `id_varian`, `v`.`nama_varian` AS `nama_varian`, `v`.`harga` AS `harga`, `v`.`min_order` AS `min_order`, `v`.`stok` AS `stok` FROM ((`produk` `p` join `kategori` `k` on(`p`.`id_kategori` = `k`.`id_kategori`)) left join `varian_produk` `v` on(`p`.`id_produk` = `v`.`id_produk`)) WHERE `p`.`status` = 'tersedia' ORDER BY `k`.`nama_kategori` ASC, `p`.`nama_produk` ASC, `v`.`harga` ASC ;
 
 -- --------------------------------------------------------
@@ -1391,6 +1412,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_laporan_harian`;
 
+DROP VIEW IF EXISTS `v_laporan_harian`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_laporan_harian`  AS SELECT cast(`pesanan`.`tgl_pesan` as date) AS `tanggal`, count(`pesanan`.`id_pesanan`) AS `total_order`, sum(case when `pesanan`.`status` = 'selesai' then `pesanan`.`grand_total` else 0 end) AS `total_penjualan`, sum(case when `pesanan`.`status_bayar` = 'lunas' then `pesanan`.`grand_total` else 0 end) AS `total_lunas`, sum(case when `pesanan`.`status_bayar` <> 'lunas' then `pesanan`.`grand_total` else 0 end) AS `total_piutang` FROM `pesanan` WHERE `pesanan`.`status` <> 'batal' GROUP BY cast(`pesanan`.`tgl_pesan` as date) ORDER BY cast(`pesanan`.`tgl_pesan` as date) DESC ;
 
 -- --------------------------------------------------------
@@ -1400,6 +1422,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_laporan_kas_harian`;
 
+DROP VIEW IF EXISTS `v_laporan_kas_harian`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_laporan_kas_harian`  AS SELECT cast(`transaksi_kas`.`tanggal` as date) AS `tanggal`, sum(case when `transaksi_kas`.`jenis` = 'masuk' then `transaksi_kas`.`nominal` else 0 end) AS `pemasukan`, sum(case when `transaksi_kas`.`jenis` = 'keluar' then `transaksi_kas`.`nominal` else 0 end) AS `pengeluaran`, sum(case when `transaksi_kas`.`jenis` = 'masuk' then `transaksi_kas`.`nominal` else -`transaksi_kas`.`nominal` end) AS `saldo_harian` FROM `transaksi_kas` GROUP BY cast(`transaksi_kas`.`tanggal` as date) ORDER BY cast(`transaksi_kas`.`tanggal` as date) DESC ;
 
 -- --------------------------------------------------------
@@ -1409,6 +1432,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_pesanan_lengkap`;
 
+DROP VIEW IF EXISTS `v_pesanan_lengkap`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_pesanan_lengkap`  AS SELECT `p`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `p`.`tgl_pesan` AS `tgl_pesan`, `p`.`tgl_kirim` AS `tgl_kirim`, `p`.`waktu_kirim` AS `waktu_kirim`, `p`.`total_harga` AS `total_harga`, `p`.`ongkir` AS `ongkir`, `p`.`grand_total` AS `grand_total`, `p`.`status` AS `status`, `p`.`status_bayar` AS `status_bayar`, `p`.`metode_bayar` AS `metode_bayar`, `p`.`catatan` AS `catatan`, `pel`.`id_pelanggan` AS `id_pelanggan`, `pel`.`nama` AS `nama_pelanggan`, `pel`.`alamat` AS `alamat`, `pel`.`no_wa` AS `no_wa`, `pel`.`tipe` AS `tipe_pelanggan`, `z`.`nama_zona` AS `nama_zona`, `pg`.`status` AS `status_pengiriman`, `pg`.`driver` AS `driver` FROM (((`pesanan` `p` join `pelanggan` `pel` on(`p`.`id_pelanggan` = `pel`.`id_pelanggan`)) left join `zona` `z` on(`pel`.`id_zona` = `z`.`id_zona`)) left join `pengiriman` `pg` on(`p`.`id_pesanan` = `pg`.`id_pesanan`)) ;
 
 -- --------------------------------------------------------
@@ -1418,6 +1442,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_piutang`;
 
+DROP VIEW IF EXISTS `v_piutang`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_piutang`  AS SELECT `pel`.`id_pelanggan` AS `id_pelanggan`, `pel`.`nama` AS `nama`, `pel`.`no_wa` AS `no_wa`, `pel`.`total_hutang` AS `total_hutang`, count(`p`.`id_pesanan`) AS `jumlah_pesanan_belum_lunas`, sum(`p`.`grand_total`) AS `total_pesanan`, sum(coalesce(`pb`.`total_bayar`,0)) AS `total_terbayar`, sum(`p`.`grand_total`) - sum(coalesce(`pb`.`total_bayar`,0)) AS `sisa_hutang` FROM ((`pelanggan` `pel` join `pesanan` `p` on(`pel`.`id_pelanggan` = `p`.`id_pelanggan`)) left join (select `pembayaran`.`id_pesanan` AS `id_pesanan`,sum(`pembayaran`.`jumlah`) AS `total_bayar` from `pembayaran` group by `pembayaran`.`id_pesanan`) `pb` on(`p`.`id_pesanan` = `pb`.`id_pesanan`)) WHERE `p`.`status_bayar` <> 'lunas' AND `p`.`status` <> 'batal' GROUP BY `pel`.`id_pelanggan`, `pel`.`nama`, `pel`.`no_wa`, `pel`.`total_hutang` HAVING `sisa_hutang` > 0 ;
 
 -- --------------------------------------------------------
@@ -1427,6 +1452,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER V
 --
 DROP TABLE IF EXISTS `v_ringkasan_kas`;
 
+DROP VIEW IF EXISTS `v_ringkasan_kas`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_ringkasan_kas`  AS SELECT coalesce(sum(case when `transaksi_kas`.`jenis` = 'masuk' then `transaksi_kas`.`nominal` else 0 end),0) AS `total_masuk`, coalesce(sum(case when `transaksi_kas`.`jenis` = 'keluar' then `transaksi_kas`.`nominal` else 0 end),0) AS `total_keluar`, coalesce(sum(case when `transaksi_kas`.`jenis` = 'masuk' then `transaksi_kas`.`nominal` else -`transaksi_kas`.`nominal` end),0) AS `saldo_akhir` FROM `transaksi_kas` ;
 
 --

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted">Total Pelanggan</div>
+            <div class="metric">{{ stats.total_pelanggan }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted">Total Produk</div>
+            <div class="metric">{{ stats.total_produk }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted">Total Pesanan</div>
+            <div class="metric">{{ stats.total_pesanan }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="text-muted">Pesanan Pending</div>
+            <div class="metric">{{ stats.pesanan_pending }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5 class="section-title">Kas Masuk</h5>
+            <h4>Rp {{ '{:,.0f}'.format(kas.total_masuk or 0).replace(',', '.') }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5 class="section-title">Kas Keluar</h5>
+            <h4>Rp {{ '{:,.0f}'.format(kas.total_keluar or 0).replace(',', '.') }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5 class="section-title">Saldo Akhir</h5>
+            <h4>Rp {{ '{:,.0f}'.format(kas.saldo_akhir or 0).replace(',', '.') }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card p-3">
+            <h5 class="section-title">10 Pesanan Terakhir</h5>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Pelanggan</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Bayar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in latest_orders %}
+                        <tr>
+                            <td>{{ row.no_invoice }}</td>
+                            <td>{{ row.nama_pelanggan }}</td>
+                            <td>Rp {{ '{:,.0f}'.format(row.grand_total or 0).replace(',', '.') }}</td>
+                            <td>{{ row.status }}</td>
+                            <td>{{ row.status_bayar }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="text-center text-muted">Belum ada data</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <h5 class="section-title">10 Pembayaran Terakhir</h5>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Jumlah</th>
+                        <th>Metode</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in latest_payments %}
+                        <tr>
+                            <td>{{ row.no_invoice }}</td>
+                            <td>Rp {{ '{:,.0f}'.format(row.jumlah or 0).replace(',', '.') }}</td>
+                            <td>{{ row.metode }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="3" class="text-center text-muted">Belum ada data</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

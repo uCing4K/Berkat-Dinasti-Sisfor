@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-3 mb-3">
+    <h5 class="section-title">Tambah Kategori</h5>
+    <form method="post" action="{{ url_for('kategori_add') }}" class="row g-2">
+        <div class="col-md-4"><input name="nama_kategori" class="form-control" placeholder="Nama kategori" required></div>
+        <div class="col-md-6"><input name="deskripsi" class="form-control" placeholder="Deskripsi"></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Simpan</button></div>
+    </form>
+</div>
+
+<div class="card p-3">
+    <h5 class="section-title">Data Kategori</h5>
+    <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Nama</th><th>Deskripsi</th><th>Aksi</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.id_kategori }}</td>
+                <td>{{ row.nama_kategori }}</td>
+                <td>{{ row.deskripsi }}</td>
+                <td>
+                    <details>
+                        <summary>Edit</summary>
+                        <form method="post" action="{{ url_for('kategori_edit', kategori_id=row.id_kategori) }}" class="mt-2">
+                            <input class="form-control mb-1" name="nama_kategori" value="{{ row.nama_kategori }}" required>
+                            <input class="form-control mb-1" name="deskripsi" value="{{ row.deskripsi or '' }}">
+                            <button class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    </details>
+                    <form method="post" action="{{ url_for('kategori_delete', kategori_id=row.id_kategori) }}" class="mt-1" onsubmit="return confirm('Yakin hapus?')">
+                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4" class="text-center text-muted">Belum ada data</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

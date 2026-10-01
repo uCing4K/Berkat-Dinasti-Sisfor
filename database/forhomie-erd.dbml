@@ -1,0 +1,280 @@
+// ForHomie Database Schema - ERD
+// Sistem Manajemen Pesanan Roti
+// Docs: https://dbml.dbdiagram.io/docs
+
+Enum status_produk {
+  tersedia
+  tidak_tersedia
+}
+
+Enum tipe_pelanggan {
+  retail
+  reseller
+}
+
+Enum status_pesanan {
+  pending
+  proses
+  kirim
+  selesai
+  batal
+}
+
+Enum enum_status_bayar {
+  belum_bayar
+  dp
+  lunas
+}
+
+Enum enum_metode_bayar {
+  cash
+  transfer
+}
+
+Enum status_pengiriman {
+  menunggu
+  dalam_perjalanan
+  sampai
+  gagal
+}
+
+Enum role_user {
+  admin
+  kasir
+  driver
+}
+
+Enum status_user {
+  aktif
+  nonaktif
+}
+
+Enum kategori_pengeluaran {
+  bahan_baku
+  operasional
+  gaji
+  transportasi
+  lainnya
+}
+
+Enum jenis_kas {
+  masuk
+  keluar
+}
+
+Enum sumber_kas {
+  pembayaran
+  pengeluaran
+  penyesuaian
+}
+
+Table pengguna {
+  id_user integer [pk, increment]
+  username varchar(50) [not null, unique, note: 'Username untuk login']
+  password varchar(255) [not null, note: 'Password hashed']
+  nama_lengkap varchar(150) [not null]
+  email varchar(100)
+  no_hp varchar(20)
+  role role_user [default: 'kasir']
+  status status_user [default: 'aktif']
+  last_login datetime
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Tabel user admin/kasir/driver untuk login sistem'
+}
+
+Table kategori {
+  id_kategori integer [pk, increment]
+  nama_kategori varchar(100) [not null]
+  deskripsi text
+  created_by integer
+  updated_by integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Tabel kategori produk roti'
+}
+
+Table produk {
+  id_produk integer [pk, increment]
+  id_kategori integer [not null]
+  nama_produk varchar(150) [not null]
+  deskripsi text
+  gambar varchar(255)
+  shelf_life integer [default: 7, note: 'Masa kedaluwarsa dalam hari']
+  status status_produk [default: 'tersedia']
+  created_by integer
+  updated_by integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Tabel produk utama'
+}
+
+Table varian_produk {
+  id_varian integer [pk, increment]
+  id_produk integer [not null]
+  nama_varian varchar(100) [not null, note: 'Contoh: Kardus, Mika, Satuan']
+  harga decimal(10,2) [not null]
+  min_order integer [default: 1]
+  stok integer [default: 0]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Varian kemasan dan harga tiap produk'
+}
+
+Table zona {
+  id_zona integer [pk, increment]
+  nama_zona varchar(100) [not null]
+  deskripsi text
+  ongkir decimal(10,2) [default: 0.00]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Zona pengiriman'
+}
+
+Table pelanggan {
+  id_pelanggan integer [pk, increment]
+  id_zona integer
+  nama varchar(150) [not null]
+  alamat text [not null]
+  no_wa varchar(20) [not null]
+  tipe tipe_pelanggan [default: 'retail']
+  total_transaksi decimal(15,2) [default: 0.00]
+  total_hutang decimal(15,2) [default: 0.00]
+  catatan text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Data pelanggan retail dan reseller'
+}
+
+Table pesanan {
+  id_pesanan integer [pk, increment]
+  id_pelanggan integer [not null]
+  no_invoice varchar(50) [not null, unique, note: 'Format INV-YYYYMMDD-XXXX']
+  tgl_pesan date [not null]
+  tgl_kirim date
+  waktu_kirim time
+  total_harga decimal(15,2) [default: 0.00]
+  ongkir decimal(10,2) [default: 0.00]
+  grand_total decimal(15,2) [default: 0.00]
+  status status_pesanan [default: 'pending']
+  status_bayar enum_status_bayar [default: 'belum_bayar']
+  metode_bayar enum_metode_bayar [default: 'cash']
+  catatan text
+  created_by integer
+  updated_by integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Header pesanan atau order'
+}
+
+Table detail_pesanan {
+  id_detail integer [pk, increment]
+  id_pesanan integer [not null]
+  id_varian integer [not null]
+  qty integer [not null]
+  harga_satuan decimal(10,2) [not null]
+  subtotal decimal(15,2) [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Detail item pesanan'
+}
+
+Table pembayaran {
+  id_pembayaran integer [pk, increment]
+  id_pesanan integer [not null]
+  jumlah decimal(15,2) [not null]
+  tgl_bayar datetime [not null]
+  metode enum_metode_bayar [not null]
+  bukti varchar(255)
+  keterangan text
+  received_by integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Pembayaran bisa lebih dari satu kali per pesanan'
+}
+
+Table pengiriman {
+  id_pengiriman integer [pk, increment]
+  id_pesanan integer [not null, unique]
+  tgl_kirim datetime
+  tgl_sampai datetime
+  status status_pengiriman [default: 'menunggu']
+  driver varchar(100)
+  catatan text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Data pengiriman satu pesanan satu pengiriman'
+}
+
+Table tracking_log {
+  id_log integer [pk, increment]
+  id_pesanan integer [not null]
+  status varchar(50) [not null]
+  keterangan text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Riwayat perubahan status pesanan'
+}
+
+Table pengeluaran {
+  id_pengeluaran integer [pk, increment]
+  tanggal date [not null]
+  kategori kategori_pengeluaran [not null]
+  deskripsi text [not null]
+  jumlah decimal(15,2) [not null]
+  created_by integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Biaya operasional yang keluar dari kas'
+}
+
+Table transaksi_kas {
+  id_transaksi integer [pk, increment]
+  tanggal datetime [not null, default: `CURRENT_TIMESTAMP`]
+  jenis jenis_kas [not null]
+  sumber_tipe sumber_kas [not null]
+  sumber_id integer
+  nominal decimal(15,2) [not null]
+  keterangan text
+  dibuat_oleh integer
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Buku kas pemasukan dan pengeluaran'
+}
+
+Table setting {
+  id_setting integer [pk, increment]
+  setting_key varchar(100) [not null, unique]
+  setting_value text
+  deskripsi text
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Note: 'Konfigurasi aplikasi'
+}
+
+Ref: produk.id_kategori > kategori.id_kategori
+Ref: varian_produk.id_produk > produk.id_produk
+Ref: pelanggan.id_zona > zona.id_zona
+Ref: pesanan.id_pelanggan > pelanggan.id_pelanggan
+Ref: detail_pesanan.id_pesanan > pesanan.id_pesanan
+Ref: detail_pesanan.id_varian > varian_produk.id_varian
+Ref: pembayaran.id_pesanan > pesanan.id_pesanan
+Ref: pengiriman.id_pesanan - pesanan.id_pesanan
+Ref: tracking_log.id_pesanan > pesanan.id_pesanan
+Ref: pengeluaran.created_by > pengguna.id_user
+Ref: transaksi_kas.dibuat_oleh > pengguna.id_user
+Ref: pembayaran.received_by > pengguna.id_user
+Ref: kategori.created_by > pengguna.id_user
+Ref: kategori.updated_by > pengguna.id_user
+Ref: produk.created_by > pengguna.id_user
+Ref: produk.updated_by > pengguna.id_user
+Ref: pesanan.created_by > pengguna.id_user
+Ref: pesanan.updated_by > pengguna.id_user

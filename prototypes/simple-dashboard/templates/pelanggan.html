@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-3 mb-3">
+    <h5 class="section-title">Tambah Pelanggan</h5>
+    <form method="post" action="{{ url_for('pelanggan_add') }}" class="row g-2">
+        <div class="col-md-3"><input name="nama" class="form-control" placeholder="Nama" required></div>
+        <div class="col-md-2"><input name="no_wa" class="form-control" placeholder="No WA" required></div>
+        <div class="col-md-2">
+            <select name="tipe" class="form-select">
+                <option value="retail">retail</option>
+                <option value="reseller">reseller</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="id_zona" class="form-select">
+                <option value="">Pilih Zona</option>
+                {% for z in zones %}<option value="{{ z.id_zona }}">{{ z.nama_zona }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3"><input name="alamat" class="form-control" placeholder="Alamat" required></div>
+        <div class="col-12"><textarea name="catatan" class="form-control" placeholder="Catatan"></textarea></div>
+        <div class="col-12"><button class="btn btn-primary">Simpan</button></div>
+    </form>
+</div>
+
+<div class="card p-3">
+    <h5 class="section-title">Data Pelanggan</h5>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr><th>ID</th><th>Nama</th><th>WA</th><th>Tipe</th><th>Zona</th><th>Alamat</th><th>Aksi</th></tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.id_pelanggan }}</td>
+                    <td>{{ row.nama }}</td>
+                    <td>{{ row.no_wa }}</td>
+                    <td>{{ row.tipe }}</td>
+                    <td>{{ row.nama_zona or '-' }}</td>
+                    <td>{{ row.alamat }}</td>
+                    <td>
+                        <details>
+                            <summary>Edit</summary>
+                            <form method="post" action="{{ url_for('pelanggan_edit', pelanggan_id=row.id_pelanggan) }}" class="mt-2">
+                                <input class="form-control mb-1" name="nama" value="{{ row.nama }}" required>
+                                <input class="form-control mb-1" name="no_wa" value="{{ row.no_wa }}" required>
+                                <input class="form-control mb-1" name="alamat" value="{{ row.alamat }}" required>
+                                <select name="tipe" class="form-select mb-1">
+                                    <option value="retail" {% if row.tipe=='retail' %}selected{% endif %}>retail</option>
+                                    <option value="reseller" {% if row.tipe=='reseller' %}selected{% endif %}>reseller</option>
+                                </select>
+                                <select name="id_zona" class="form-select mb-1">
+                                    <option value="">Pilih Zona</option>
+                                    {% for z in zones %}
+                                        <option value="{{ z.id_zona }}" {% if row.nama_zona==z.nama_zona %}selected{% endif %}>{{ z.nama_zona }}</option>
+                                    {% endfor %}
+                                </select>
+                                <textarea name="catatan" class="form-control mb-1" placeholder="Catatan"></textarea>
+                                <button class="btn btn-sm btn-primary">Update</button>
+                            </form>
+                        </details>
+                        <form method="post" action="{{ url_for('pelanggan_delete', pelanggan_id=row.id_pelanggan) }}" class="mt-1" onsubmit="return confirm('Yakin hapus data?')">
+                            <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="text-center text-muted">Belum ada data</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

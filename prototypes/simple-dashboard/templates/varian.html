@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card p-3 mb-3">
+    <h5 class="section-title">Tambah Varian</h5>
+    <form method="post" action="{{ url_for('varian_add') }}" class="row g-2">
+        <div class="col-md-3">
+            <select name="id_produk" class="form-select" required>
+                <option value="">Pilih Produk</option>
+                {% for p in products %}<option value="{{ p.id_produk }}">{{ p.nama_produk }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3"><input name="nama_varian" class="form-control" placeholder="Nama varian" required></div>
+        <div class="col-md-2"><input name="harga" class="form-control" type="number" step="0.01" min="0" placeholder="Harga" required></div>
+        <div class="col-md-2"><input name="min_order" class="form-control" type="number" min="1" value="1"></div>
+        <div class="col-md-1"><input name="stok" class="form-control" type="number" min="0" value="0"></div>
+        <div class="col-md-1"><button class="btn btn-primary w-100">Simpan</button></div>
+    </form>
+</div>
+
+<div class="card p-3">
+    <h5 class="section-title">Data Varian</h5>
+    <table class="table table-striped">
+        <thead><tr><th>ID</th><th>Produk</th><th>Varian</th><th>Harga</th><th>Min</th><th>Stok</th><th>Aksi</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.id_varian }}</td>
+                <td>{{ row.nama_produk }}</td>
+                <td>{{ row.nama_varian }}</td>
+                <td>{{ row.harga }}</td>
+                <td>{{ row.min_order }}</td>
+                <td>{{ row.stok }}</td>
+                <td>
+                    <details>
+                        <summary>Edit</summary>
+                        <form method="post" action="{{ url_for('varian_edit', varian_id=row.id_varian) }}" class="mt-2">
+                            <select name="id_produk" class="form-select mb-1">
+                                {% for p in products %}
+                                    <option value="{{ p.id_produk }}" {% if p.id_produk == row.id_produk %}selected{% endif %}>{{ p.nama_produk }}</option>
+                                {% endfor %}
+                            </select>
+                            <input class="form-control mb-1" name="nama_varian" value="{{ row.nama_varian }}" required>
+                            <input class="form-control mb-1" type="number" step="0.01" name="harga" value="{{ row.harga }}" required>
+                            <input class="form-control mb-1" type="number" min="1" name="min_order" value="{{ row.min_order }}">
+                            <input class="form-control mb-1" type="number" min="0" name="stok" value="{{ row.stok }}">
+                            <button class="btn btn-sm btn-primary">Update</button>
+                        </form>
+                    </details>
+                    <form method="post" action="{{ url_for('varian_delete', varian_id=row.id_varian) }}" class="mt-1" onsubmit="return confirm('Yakin hapus?')">
+                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7" class="text-center text-muted">Belum ada data</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

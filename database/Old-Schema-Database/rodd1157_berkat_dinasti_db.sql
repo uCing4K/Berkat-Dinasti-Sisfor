@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 01, 2026 at 08:59 PM
--- Server version: 11.4.13-MariaDB-cll-lve
--- PHP Version: 8.4.25
+-- Generation Time: Apr 24, 2026 at 05:46 PM
+-- Server version: 11.4.10-MariaDB-cll-lve
+-- PHP Version: 8.4.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,37 +28,16 @@ DELIMITER $$
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_add_detail_pesanan` (IN `p_id_pesanan` INT, IN `p_id_varian` INT, IN `p_qty` INT)   BEGIN
     DECLARE v_harga DECIMAL(10,2);
     DECLARE v_min_order INT;
-    DECLARE v_stok INT;
     
     -- Get price and min_order from varian
     SELECT harga, min_order INTO v_harga, v_min_order
     FROM varian_produk
     WHERE id_varian = p_id_varian;
-
-    IF v_harga IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Varian tidak ditemukan';
-    END IF;
-
-    IF p_qty <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Quantity harus lebih dari 0';
-    END IF;
     
     -- Check minimum order
     IF p_qty < v_min_order THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Quantity kurang dari minimum order';
-    END IF;
-
-    SELECT stok INTO v_stok
-    FROM varian_produk
-    WHERE id_varian = p_id_varian
-    FOR UPDATE;
-
-    IF v_stok < p_qty THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Stok tidak mencukupi';
     END IF;
     
     INSERT INTO detail_pesanan (id_pesanan, id_varian, qty, harga_satuan, subtotal)
@@ -66,47 +45,6 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_add_detail_pesanan` (IN `p_i
 END$$
 
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_bayar` (IN `p_id_pesanan` INT, IN `p_jumlah` DECIMAL(15,2), IN `p_metode` VARCHAR(20), IN `p_bukti` VARCHAR(255), IN `p_keterangan` TEXT, IN `p_received_by` INT)   BEGIN
-    DECLARE v_status VARCHAR(20);
-    DECLARE v_status_bayar VARCHAR(20);
-    DECLARE v_grand_total DECIMAL(15,2);
-    DECLARE v_total_dibayar DECIMAL(15,2);
-
-    IF p_jumlah <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Jumlah pembayaran harus lebih dari 0';
-    END IF;
-
-    SELECT status, status_bayar, grand_total
-    INTO v_status, v_status_bayar, v_grand_total
-    FROM pesanan
-    WHERE id_pesanan = p_id_pesanan
-    FOR UPDATE;
-
-    IF v_status IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pesanan tidak ditemukan';
-    END IF;
-
-    IF v_status = 'batal' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Tidak dapat membayar pesanan yang dibatalkan';
-    END IF;
-
-    IF v_status_bayar = 'lunas' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pesanan sudah lunas';
-    END IF;
-
-    SELECT COALESCE(SUM(jumlah), 0)
-    INTO v_total_dibayar
-    FROM pembayaran
-    WHERE id_pesanan = p_id_pesanan;
-
-    IF v_total_dibayar + p_jumlah > v_grand_total THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pembayaran melebihi sisa tagihan';
-    END IF;
-
     INSERT INTO pembayaran (
         id_pesanan, 
         jumlah, 
@@ -171,40 +109,8 @@ CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_laporan_penjualan` (IN `p_st
 END$$
 
 CREATE DEFINER=`rodd1157`@`localhost` PROCEDURE `sp_update_status` (IN `p_id_pesanan` INT, IN `p_status` VARCHAR(20))   BEGIN
-    DECLARE v_status_saat_ini VARCHAR(20);
-
-    SELECT status
-    INTO v_status_saat_ini
-    FROM pesanan
-    WHERE id_pesanan = p_id_pesanan;
-
-    IF v_status_saat_ini IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pesanan tidak ditemukan';
-    END IF;
-
-    IF v_status_saat_ini = 'pending' AND p_status NOT IN ('proses', 'batal') THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Transisi status tidak valid dari pending';
-    END IF;
-
-    IF v_status_saat_ini = 'proses' AND p_status NOT IN ('kirim', 'batal') THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Transisi status tidak valid dari proses';
-    END IF;
-
-    IF v_status_saat_ini = 'kirim' AND p_status NOT IN ('selesai', 'batal') THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Transisi status tidak valid dari kirim';
-    END IF;
-
-    IF v_status_saat_ini IN ('selesai', 'batal') THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Status pesanan final tidak dapat diubah';
-    END IF;
-
-    UPDATE pesanan
-    SET status = p_status
+    UPDATE pesanan 
+    SET status = p_status 
     WHERE id_pesanan = p_id_pesanan;
     
     -- Also update pengiriman status if needed
@@ -242,9 +148,8 @@ CREATE TABLE `detail_pesanan` (
 --
 
 INSERT INTO `detail_pesanan` (`id_detail`, `id_pesanan`, `id_varian`, `qty`, `harga_satuan`, `subtotal`, `created_at`) VALUES
-(3, 3, 5, 60, 3000.00, 180000.00, '2026-04-25 03:36:08'),
-(4, 4, 5, 90, 3000.00, 270000.00, '2026-04-25 03:46:41'),
-(5, 5, 5, 50, 3000.00, 150000.00, '2026-04-25 03:54:13');
+(1, 1, 6, 2, 10000.00, 20000.00, '2026-04-24 10:31:51'),
+(2, 1, 7, 1, 15000.00, 15000.00, '2026-04-24 10:31:51');
 
 --
 -- Triggers `detail_pesanan`
@@ -253,10 +158,6 @@ DELIMITER $$
 CREATE TRIGGER `trg_after_delete_detail` AFTER DELETE ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE total DECIMAL(15,2);
     DECLARE ongkir_val DECIMAL(10,2);
-
-    UPDATE varian_produk
-    SET stok = stok + OLD.qty
-    WHERE id_varian = OLD.id_varian;
     
     SELECT COALESCE(SUM(subtotal), 0) INTO total 
     FROM detail_pesanan 
@@ -277,10 +178,6 @@ DELIMITER $$
 CREATE TRIGGER `trg_after_insert_detail` AFTER INSERT ON `detail_pesanan` FOR EACH ROW BEGIN
     DECLARE total DECIMAL(15,2);
     DECLARE ongkir_val DECIMAL(10,2);
-
-    UPDATE varian_produk
-    SET stok = stok - NEW.qty
-    WHERE id_varian = NEW.id_varian;
     
     SELECT SUM(subtotal) INTO total 
     FROM detail_pesanan 
@@ -298,107 +195,7 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `trg_after_update_detail` AFTER UPDATE ON `detail_pesanan` FOR EACH ROW BEGIN
-    DECLARE total DECIMAL(15,2);
-    DECLARE ongkir_val DECIMAL(10,2);
-
-    IF NEW.id_varian = OLD.id_varian THEN
-        UPDATE varian_produk
-        SET stok = stok - (NEW.qty - OLD.qty)
-        WHERE id_varian = NEW.id_varian;
-    ELSE
-        UPDATE varian_produk
-        SET stok = stok + OLD.qty
-        WHERE id_varian = OLD.id_varian;
-
-        UPDATE varian_produk
-        SET stok = stok - NEW.qty
-        WHERE id_varian = NEW.id_varian;
-    END IF;
-
-    SELECT COALESCE(SUM(subtotal), 0) INTO total
-    FROM detail_pesanan
-    WHERE id_pesanan = NEW.id_pesanan;
-
-    SELECT ongkir INTO ongkir_val
-    FROM pesanan
-    WHERE id_pesanan = NEW.id_pesanan;
-
-    UPDATE pesanan
-    SET total_harga = total,
-        grand_total = total + COALESCE(ongkir_val, 0)
-    WHERE id_pesanan = NEW.id_pesanan;
-END
-$$
-DELIMITER ;
-DELIMITER $$
 CREATE TRIGGER `trg_before_insert_detail` BEFORE INSERT ON `detail_pesanan` FOR EACH ROW BEGIN
-    DECLARE v_stok INT;
-
-    IF NEW.qty <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Quantity harus lebih dari 0';
-    END IF;
-
-    SELECT stok INTO v_stok
-    FROM varian_produk
-    WHERE id_varian = NEW.id_varian
-    FOR UPDATE;
-
-    IF v_stok IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Varian tidak ditemukan';
-    END IF;
-
-    IF v_stok < NEW.qty THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Stok tidak mencukupi';
-    END IF;
-
-    SET NEW.subtotal = NEW.qty * NEW.harga_satuan;
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_before_update_detail` BEFORE UPDATE ON `detail_pesanan` FOR EACH ROW BEGIN
-    DECLARE v_stok_baru INT;
-    DECLARE v_delta INT;
-
-    IF NEW.qty <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Quantity harus lebih dari 0';
-    END IF;
-
-    IF NEW.id_varian = OLD.id_varian THEN
-        SET v_delta = NEW.qty - OLD.qty;
-        IF v_delta > 0 THEN
-            SELECT stok INTO v_stok_baru
-            FROM varian_produk
-            WHERE id_varian = NEW.id_varian
-            FOR UPDATE;
-
-            IF v_stok_baru < v_delta THEN
-                SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'Stok tidak mencukupi untuk update qty';
-            END IF;
-        END IF;
-    ELSE
-        SELECT stok INTO v_stok_baru
-        FROM varian_produk
-        WHERE id_varian = NEW.id_varian
-        FOR UPDATE;
-
-        IF v_stok_baru IS NULL THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Varian tujuan tidak ditemukan';
-        END IF;
-
-        IF v_stok_baru < NEW.qty THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Stok varian tujuan tidak mencukupi';
-        END IF;
-    END IF;
-
     SET NEW.subtotal = NEW.qty * NEW.harga_satuan;
 END
 $$
@@ -425,8 +222,9 @@ CREATE TABLE `kategori` (
 --
 
 INSERT INTO `kategori` (`id_kategori`, `nama_kategori`, `deskripsi`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(1, 'Roti Hajatan', 'Roti untuk acara hajatan, syukuran, dan acara spesial', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 'Roti Manis', 'Berbagai macam roti manis untuk konsumsi sehari-hari', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 'Roti Hajatan', 'Roti untuk acara hajatan, syukuran, dan acara spesial', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(2, 'Roti Manis', 'Berbagai macam roti manis untuk konsumsi sehari-hari', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(3, 'Kategori UJI_20260423', 'Kategori dummy integrasi', 2, 2, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -453,7 +251,7 @@ CREATE TABLE `pelanggan` (
 --
 
 INSERT INTO `pelanggan` (`id_pelanggan`, `id_zona`, `nama`, `alamat`, `no_wa`, `tipe`, `total_transaksi`, `total_hutang`, `catatan`, `created_at`, `updated_at`) VALUES
-(1, 4, 'suwanto', 'Jl. Terusan Metro, Dsn. Santrean, Ds. Sumberejo,    Kec. Batu – Kota Batu', '08964988289342', 'retail', 480000.00, 185000.00, NULL, '2026-04-24 23:11:11', '2026-04-25 03:46:41');
+(1, 5, 'Pelanggan UJI_20260423', 'Jl. Uji Integrasi No. 1', '6281166359549', 'retail', 47000.00, 47000.00, 'Data dummy UJI_20260423', '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -478,7 +276,8 @@ CREATE TABLE `pembayaran` (
 --
 
 INSERT INTO `pembayaran` (`id_pembayaran`, `id_pesanan`, `jumlah`, `tgl_bayar`, `metode`, `bukti`, `keterangan`, `received_by`, `created_at`) VALUES
-(3, 3, 195000.00, '2026-04-25 10:36:08', 'transfer', 'AUTO-TEST', 'Pembayaran otomatis untuk order test', 1, '2026-04-25 03:36:08');
+(1, 1, 10000.00, '2026-04-24 17:31:51', 'transfer', NULL, 'DP UJI_20260423', 2, '2026-04-24 10:31:51'),
+(2, 1, 100000.00, '2026-04-24 17:31:51', 'transfer', NULL, 'Pelunasan UJI_20260423', 2, '2026-04-24 10:31:51');
 
 --
 -- Triggers `pembayaran`
@@ -526,51 +325,6 @@ CREATE TRIGGER `trg_after_insert_pembayaran` AFTER INSERT ON `pembayaran` FOR EA
 END
 $$
 DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_before_insert_pembayaran` BEFORE INSERT ON `pembayaran` FOR EACH ROW BEGIN
-    DECLARE v_status VARCHAR(20);
-    DECLARE v_status_bayar VARCHAR(20);
-    DECLARE v_grand_total DECIMAL(15,2);
-    DECLARE v_total_dibayar DECIMAL(15,2);
-
-    IF NEW.jumlah <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Jumlah pembayaran harus lebih dari 0';
-    END IF;
-
-    SELECT status, status_bayar, grand_total
-    INTO v_status, v_status_bayar, v_grand_total
-    FROM pesanan
-    WHERE id_pesanan = NEW.id_pesanan
-    FOR UPDATE;
-
-    IF v_status IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pesanan tidak ditemukan';
-    END IF;
-
-    IF v_status = 'batal' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Tidak dapat membayar pesanan yang sudah dibatalkan';
-    END IF;
-
-    IF v_status_bayar = 'lunas' THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pesanan sudah lunas';
-    END IF;
-
-    SELECT COALESCE(SUM(jumlah), 0)
-    INTO v_total_dibayar
-    FROM pembayaran
-    WHERE id_pesanan = NEW.id_pesanan;
-
-    IF v_total_dibayar + NEW.jumlah > v_grand_total THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Pembayaran melebihi sisa tagihan';
-    END IF;
-END
-$$
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -593,7 +347,7 @@ CREATE TABLE `pengeluaran` (
 --
 
 INSERT INTO `pengeluaran` (`id_pengeluaran`, `tanggal`, `kategori`, `deskripsi`, `jumlah`, `created_by`, `created_at`) VALUES
-(1, '2026-04-25', 'transportasi', 'buat beli bensin', 20000.00, 1, '2026-04-25 05:53:26');
+(1, '2026-04-24', 'operasional', 'Pengeluaran uji UJI_20260423', 2500.00, 2, '2026-04-24 10:31:51');
 
 --
 -- Triggers `pengeluaran`
@@ -646,7 +400,8 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_user`, `username`, `password`, `nama_lengkap`, `email`, `no_hp`, `role`, `status`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$8K1p5s1VvqHqYL1YQs7xKOzR6h7L8P3n4Q5w6E7r8T9y0U1i2O3p4', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 'admin', '$2y$10$8K1p5s1VvqHqYL1YQs7xKOzR6h7L8P3n4Q5w6E7r8T9y0U1i2O3p4', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(2, 'kasir_UJI_20260423', '$2y$10$dummyhashforintegrationtest0000000000000000000000000000000', 'Kasir UJI_20260423', NULL, NULL, 'kasir', 'aktif', NULL, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -671,9 +426,7 @@ CREATE TABLE `pengiriman` (
 --
 
 INSERT INTO `pengiriman` (`id_pengiriman`, `id_pesanan`, `tgl_kirim`, `tgl_sampai`, `status`, `driver`, `catatan`, `created_at`, `updated_at`) VALUES
-(3, 3, '2026-04-25 10:36:08', '2026-04-25 10:36:08', 'sampai', NULL, NULL, '2026-04-25 03:36:08', '2026-04-25 03:36:08'),
-(4, 4, '2026-04-25 10:46:41', '2026-04-25 10:46:41', 'sampai', NULL, NULL, '2026-04-25 03:46:41', '2026-04-25 03:46:41'),
-(5, 5, NULL, NULL, 'menunggu', NULL, NULL, '2026-04-25 03:54:13', '2026-04-25 03:54:13');
+(1, 1, '2026-04-24 17:31:51', '2026-04-24 17:31:51', 'sampai', NULL, NULL, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -692,7 +445,7 @@ CREATE TABLE `pesanan` (
   `ongkir` decimal(10,2) DEFAULT 0.00,
   `grand_total` decimal(15,2) NOT NULL DEFAULT 0.00,
   `status` enum('pending','proses','kirim','selesai','batal') DEFAULT 'pending',
-  `status_bayar` enum('belum_bayar','dp','hutang','lunas') DEFAULT 'belum_bayar',
+  `status_bayar` enum('belum_bayar','dp','lunas') DEFAULT 'belum_bayar',
   `metode_bayar` enum('cash','transfer') DEFAULT 'cash',
   `catatan` text DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
@@ -706,9 +459,7 @@ CREATE TABLE `pesanan` (
 --
 
 INSERT INTO `pesanan` (`id_pesanan`, `id_pelanggan`, `no_invoice`, `tgl_pesan`, `tgl_kirim`, `waktu_kirim`, `total_harga`, `ongkir`, `grand_total`, `status`, `status_bayar`, `metode_bayar`, `catatan`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(3, 1, 'INV-20260425-0001', '2026-04-25', '2026-04-25', '09:00:00', 180000.00, 15000.00, 195000.00, 'selesai', 'lunas', 'transfer', 'test 8', NULL, NULL, '2026-04-25 03:36:08', '2026-04-25 03:36:08'),
-(4, 1, 'INV-20260425-0002', '2026-04-25', '2026-04-25', '09:00:00', 270000.00, 15000.00, 285000.00, 'selesai', 'hutang', 'cash', 'test menggunakan dp', NULL, NULL, '2026-04-25 03:46:41', '2026-04-25 03:46:41'),
-(5, 1, 'INV-20260425-0003', '2026-04-25', '2026-04-25', '09:00:00', 150000.00, 15000.00, 165000.00, 'pending', 'belum_bayar', 'cash', 'test 10', NULL, NULL, '2026-04-25 03:54:13', '2026-04-25 03:54:13');
+(1, 1, 'INV-20260424-0001', '2026-04-24', '2026-04-25', '10:00:00', 35000.00, 12000.00, 47000.00, 'selesai', 'lunas', 'transfer', 'Catatan UJI_20260423', NULL, NULL, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 --
 -- Triggers `pesanan`
@@ -771,77 +522,11 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `trg_after_update_pesanan_batal` AFTER UPDATE ON `pesanan` FOR EACH ROW BEGIN
-    DECLARE total_refund DECIMAL(15,2);
-    DECLARE total_bayar DECIMAL(15,2);
-    DECLARE piutang_dikurangi DECIMAL(15,2);
-
-    IF NEW.status = 'batal' AND OLD.status != 'batal' THEN
-        UPDATE varian_produk vp
-        JOIN detail_pesanan dp ON dp.id_varian = vp.id_varian
-        SET vp.stok = vp.stok + dp.qty
-        WHERE dp.id_pesanan = NEW.id_pesanan;
-
-        SELECT COALESCE(SUM(jumlah), 0)
-        INTO total_refund
-        FROM pembayaran
-        WHERE id_pesanan = NEW.id_pesanan;
-
-        IF total_refund > 0 THEN
-            INSERT INTO transaksi_kas (
-                tanggal,
-                jenis,
-                sumber_tipe,
-                sumber_id,
-                nominal,
-                keterangan,
-                created_by
-            ) VALUES (
-                NOW(),
-                'keluar',
-                'penyesuaian',
-                NEW.id_pesanan,
-                total_refund,
-                CONCAT('Refund pembatalan pesanan #', NEW.id_pesanan),
-                NEW.updated_by
-            );
-        END IF;
-
-        IF OLD.status = 'selesai' THEN
-            UPDATE pelanggan
-            SET total_transaksi = GREATEST(total_transaksi - OLD.grand_total, 0)
-            WHERE id_pelanggan = OLD.id_pelanggan;
-        END IF;
-
-        IF OLD.status = 'selesai' AND OLD.status_bayar != 'lunas' THEN
-            SELECT COALESCE(SUM(jumlah), 0) INTO total_bayar
-            FROM pembayaran
-            WHERE id_pesanan = OLD.id_pesanan;
-
-            SET piutang_dikurangi = GREATEST(OLD.grand_total - total_bayar, 0);
-
-            UPDATE pelanggan
-            SET total_hutang = GREATEST(total_hutang - piutang_dikurangi, 0)
-            WHERE id_pelanggan = OLD.id_pelanggan;
-        END IF;
-    END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
 CREATE TRIGGER `trg_before_insert_pesanan` BEFORE INSERT ON `pesanan` FOR EACH ROW BEGIN
     DECLARE next_num INT;
     DECLARE today_date VARCHAR(8);
-    DECLARE v_ongkir DECIMAL(10,2);
     
     SET today_date = DATE_FORMAT(NEW.tgl_pesan, '%Y%m%d');
-
-    SELECT COALESCE(z.ongkir, 0) INTO v_ongkir
-    FROM pelanggan pel
-    LEFT JOIN zona z ON pel.id_zona = z.id_zona
-    WHERE pel.id_pelanggan = NEW.id_pelanggan;
-
-    SET NEW.ongkir = COALESCE(v_ongkir, 0);
     
     SELECT COALESCE(MAX(CAST(SUBSTRING(no_invoice, -4) AS UNSIGNED)), 0) + 1
     INTO next_num
@@ -849,46 +534,6 @@ CREATE TRIGGER `trg_before_insert_pesanan` BEFORE INSERT ON `pesanan` FOR EACH R
     WHERE no_invoice LIKE CONCAT('INV-', today_date, '%');
     
     SET NEW.no_invoice = CONCAT('INV-', today_date, '-', LPAD(next_num, 4, '0'));
-END
-$$
-DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `trg_before_update_pesanan` BEFORE UPDATE ON `pesanan` FOR EACH ROW BEGIN
-    DECLARE total_dibayar DECIMAL(15,2);
-
-    IF OLD.status != NEW.status THEN
-        IF OLD.status = 'pending' AND NEW.status NOT IN ('proses', 'batal') THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Status dari pending hanya boleh ke proses atau batal';
-        END IF;
-
-        IF OLD.status = 'proses' AND NEW.status NOT IN ('kirim', 'batal') THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Status dari proses hanya boleh ke kirim atau batal';
-        END IF;
-
-        IF OLD.status = 'kirim' AND NEW.status NOT IN ('selesai', 'batal') THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Status dari kirim hanya boleh ke selesai atau batal';
-        END IF;
-
-        IF OLD.status IN ('selesai', 'batal') THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Status pesanan final tidak dapat diubah lagi';
-        END IF;
-    END IF;
-
-    IF NEW.status = 'batal' THEN
-        SET NEW.status_bayar = 'belum_bayar';
-    ELSEIF NEW.status = 'selesai' AND NEW.status_bayar != 'lunas' THEN
-        SELECT COALESCE(SUM(jumlah), 0) INTO total_dibayar
-        FROM pembayaran
-        WHERE id_pesanan = NEW.id_pesanan;
-
-        IF total_dibayar < NEW.grand_total THEN
-            SET NEW.status_bayar = 'hutang';
-        END IF;
-    END IF;
 END
 $$
 DELIMITER ;
@@ -918,10 +563,11 @@ CREATE TABLE `produk` (
 --
 
 INSERT INTO `produk` (`id_produk`, `id_kategori`, `nama_produk`, `deskripsi`, `gambar`, `shelf_life`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Roti Hajatan Isi 6 Rasa', 'Paket roti hajatan berisi 6 varian rasa dalam satu kemasan', NULL, 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 2, 'Roti Kopi', 'Roti dengan topping kopi yang lezat', NULL, 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 2, 'Roti Bijian Besar', 'Roti bijian ukuran besar, cocok untuk sarapan', NULL, 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 2, 'Roti Bijian Kecil', 'Roti bijian ukuran kecil, praktis dibawa', NULL, 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 1, 'Roti Hajatan Isi 6 Rasa', 'Paket roti hajatan berisi 6 varian rasa dalam satu kemasan', NULL, 7, 'tersedia', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(2, 2, 'Roti Kopi', 'Roti dengan topping kopi yang lezat', NULL, 7, 'tersedia', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(3, 2, 'Roti Bijian Besar', 'Roti bijian ukuran besar, cocok untuk sarapan', NULL, 7, 'tersedia', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(4, 2, 'Roti Bijian Kecil', 'Roti bijian ukuran kecil, praktis dibawa', NULL, 7, 'tersedia', 1, 1, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(5, 3, 'Produk UJI_20260423', 'Produk dummy untuk uji integrasi database', NULL, 7, 'tersedia', 2, 2, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -942,11 +588,11 @@ CREATE TABLE `setting` (
 --
 
 INSERT INTO `setting` (`id_setting`, `setting_key`, `setting_value`, `deskripsi`, `updated_at`) VALUES
-(1, 'nama_toko', 'Berkat Dinasti', 'Nama toko/usaha', '2026-04-24 23:10:43'),
-(2, 'alamat_toko', 'Malang, Jawa Timur', 'Alamat toko', '2026-04-24 23:10:43'),
-(3, 'no_wa_toko', '6285122997946', 'Nomor WhatsApp toko', '2026-04-24 23:10:43'),
-(4, 'kapasitas_angkut', '150', 'Kapasitas angkut per trip (pcs)', '2026-04-24 23:10:43'),
-(5, 'jam_operasional', '07:00 - 17:00', 'Jam operasional toko', '2026-04-24 23:10:43');
+(1, 'nama_toko', 'Berkat Dinasti', 'Nama toko/usaha', '2026-04-24 10:30:56'),
+(2, 'alamat_toko', 'Malang, Jawa Timur', 'Alamat toko', '2026-04-24 10:30:56'),
+(3, 'no_wa_toko', '6285122997946', 'Nomor WhatsApp toko', '2026-04-24 10:30:56'),
+(4, 'kapasitas_angkut', '150', 'Kapasitas angkut per trip (pcs)', '2026-04-24 10:30:56'),
+(5, 'jam_operasional', '07:00 - 17:00', 'Jam operasional toko', '2026-04-24 10:30:56');
 
 -- --------------------------------------------------------
 
@@ -967,13 +613,11 @@ CREATE TABLE `tracking_log` (
 --
 
 INSERT INTO `tracking_log` (`id_log`, `id_pesanan`, `status`, `keterangan`, `created_at`) VALUES
-(13, 4, 'pending', 'Pesanan baru dibuat', '2026-04-25 03:46:41'),
-(14, 4, 'bayar_dp', 'Status pembayaran berubah dari \"belum_bayar\" ke \"dp\"', '2026-04-25 03:46:41'),
-(15, 4, 'proses', 'Status berubah dari \"pending\" ke \"proses\"', '2026-04-25 03:46:41'),
-(16, 4, 'kirim', 'Status berubah dari \"proses\" ke \"kirim\"', '2026-04-25 03:46:41'),
-(17, 4, 'selesai', 'Status berubah dari \"kirim\" ke \"selesai\"', '2026-04-25 03:46:41'),
-(18, 4, 'bayar_hutang', 'Status pembayaran berubah dari \"dp\" ke \"hutang\"', '2026-04-25 03:46:41'),
-(19, 5, 'pending', 'Pesanan baru dibuat', '2026-04-25 03:54:13');
+(1, 1, 'pending', 'Pesanan baru dibuat', '2026-04-24 10:31:51'),
+(2, 1, 'kirim', 'Status berubah dari \"pending\" ke \"kirim\"', '2026-04-24 10:31:51'),
+(3, 1, 'selesai', 'Status berubah dari \"kirim\" ke \"selesai\"', '2026-04-24 10:31:51'),
+(4, 1, 'bayar_dp', 'Status pembayaran berubah dari \"belum_bayar\" ke \"dp\"', '2026-04-24 10:31:51'),
+(5, 1, 'bayar_lunas', 'Status pembayaran berubah dari \"dp\" ke \"lunas\"', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -989,6 +633,7 @@ CREATE TABLE `transaksi_kas` (
   `sumber_id` int(11) DEFAULT NULL,
   `nominal` decimal(15,2) NOT NULL,
   `keterangan` text DEFAULT NULL,
+  `dibuat_oleh` int(11) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
@@ -997,10 +642,10 @@ CREATE TABLE `transaksi_kas` (
 -- Dumping data for table `transaksi_kas`
 --
 
-INSERT INTO `transaksi_kas` (`id_transaksi`, `tanggal`, `jenis`, `sumber_tipe`, `sumber_id`, `nominal`, `keterangan`, `created_by`, `created_at`) VALUES
-(3, '2026-04-25 10:36:08', 'masuk', 'pembayaran', 3, 195000.00, 'Pembayaran untuk pesanan #3', 1, '2026-04-25 03:36:08'),
-(4, '2026-04-25 10:46:41', 'masuk', 'pembayaran', 4, 100000.00, 'Pembayaran untuk pesanan #4', 1, '2026-04-25 03:46:41'),
-(5, '2026-04-25 00:00:00', 'keluar', 'pengeluaran', 1, 20000.00, 'buat beli bensin', 1, '2026-04-25 05:53:26');
+INSERT INTO `transaksi_kas` (`id_transaksi`, `tanggal`, `jenis`, `sumber_tipe`, `sumber_id`, `nominal`, `keterangan`, `dibuat_oleh`, `created_by`, `created_at`) VALUES
+(1, '2026-04-24 17:31:51', 'masuk', 'pembayaran', 1, 10000.00, 'Pembayaran untuk pesanan #1', NULL, 2, '2026-04-24 10:31:51'),
+(2, '2026-04-24 17:31:51', 'masuk', 'pembayaran', 2, 100000.00, 'Pembayaran untuk pesanan #1', NULL, 2, '2026-04-24 10:31:51'),
+(3, '2026-04-24 00:00:00', 'keluar', 'pengeluaran', 1, 2500.00, 'Pengeluaran uji UJI_20260423', NULL, 2, '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -1024,11 +669,13 @@ CREATE TABLE `varian_produk` (
 --
 
 INSERT INTO `varian_produk` (`id_varian`, `id_produk`, `nama_varian`, `harga`, `min_order`, `stok`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Kardus Biasa', 9000.00, 1, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 1, 'Mika', 10000.00, 1, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 2, 'Satuan', 4000.00, 50, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 3, 'Satuan', 4000.00, 20, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(5, 4, 'Satuan', 3000.00, 50, 0, '2026-04-24 23:10:43', '2026-04-25 03:54:13');
+(1, 1, 'Kardus Biasa', 9000.00, 1, 0, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(2, 1, 'Mika', 10000.00, 1, 0, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(3, 2, 'Satuan', 4000.00, 50, 0, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(4, 3, 'Satuan', 4000.00, 20, 0, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(5, 4, 'Satuan', 3000.00, 50, 0, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(6, 5, 'Varian A UJI_20260423', 10000.00, 1, 50, '2026-04-24 10:31:51', '2026-04-24 10:31:51'),
+(7, 5, 'Varian B UJI_20260423', 15000.00, 1, 50, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 -- --------------------------------------------------------
 
@@ -1111,7 +758,7 @@ CREATE TABLE `v_pesanan_lengkap` (
 ,`ongkir` decimal(10,2)
 ,`grand_total` decimal(15,2)
 ,`status` enum('pending','proses','kirim','selesai','batal')
-,`status_bayar` enum('belum_bayar','dp','hutang','lunas')
+,`status_bayar` enum('belum_bayar','dp','lunas')
 ,`metode_bayar` enum('cash','transfer')
 ,`catatan` text
 ,`id_pelanggan` int(11)
@@ -1173,10 +820,11 @@ CREATE TABLE `zona` (
 --
 
 INSERT INTO `zona` (`id_zona`, `nama_zona`, `deskripsi`, `ongkir`, `created_at`, `updated_at`) VALUES
-(1, 'Kota Malang', 'Wilayah Kota Malang dan sekitarnya', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 'Kabupaten Malang', 'Wilayah Kabupaten Malang', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 'Kota Batu', 'Wilayah Kota Batu', 0.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 'Luar Malang Raya', 'Wilayah di luar Malang Raya', 15000.00, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 'Kota Malang', 'Wilayah Kota Malang dan sekitarnya', 0.00, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(2, 'Kabupaten Malang', 'Wilayah Kabupaten Malang', 0.00, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(3, 'Kota Batu', 'Wilayah Kota Batu', 0.00, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(4, 'Luar Malang Raya', 'Wilayah di luar Malang Raya', 15000.00, '2026-04-24 10:30:56', '2026-04-24 10:30:56'),
+(5, 'Zona UJI_20260423', 'Zona uji UJI_20260423', 12000.00, '2026-04-24 10:31:51', '2026-04-24 10:31:51');
 
 --
 -- Indexes for dumped tables
@@ -1316,13 +964,13 @@ ALTER TABLE `zona`
 -- AUTO_INCREMENT for table `detail_pesanan`
 --
 ALTER TABLE `detail_pesanan`
-  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `kategori`
 --
 ALTER TABLE `kategori`
-  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pelanggan`
@@ -1334,7 +982,7 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT for table `pembayaran`
 --
 ALTER TABLE `pembayaran`
-  MODIFY `id_pembayaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_pembayaran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `pengeluaran`
@@ -1346,25 +994,25 @@ ALTER TABLE `pengeluaran`
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `pengiriman`
 --
 ALTER TABLE `pengiriman`
-  MODIFY `id_pengiriman` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pengiriman` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `pesanan`
 --
 ALTER TABLE `pesanan`
-  MODIFY `id_pesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_pesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_produk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `setting`
@@ -1376,25 +1024,25 @@ ALTER TABLE `setting`
 -- AUTO_INCREMENT for table `tracking_log`
 --
 ALTER TABLE `tracking_log`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `transaksi_kas`
 --
 ALTER TABLE `transaksi_kas`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `varian_produk`
 --
 ALTER TABLE `varian_produk`
-  MODIFY `id_varian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_varian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `zona`
 --
 ALTER TABLE `zona`
-  MODIFY `id_zona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_zona` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 -- --------------------------------------------------------
 

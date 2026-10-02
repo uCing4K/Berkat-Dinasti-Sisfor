@@ -1,0 +1,235 @@
+{
+  "main": {
+    "id": "fd7a1394f3fbda73",
+    "type": "split",
+    "children": [
+      {
+        "id": "fd3c7f3d237ab02f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8f6aaa7b9253ac64",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "f8bb5785fb8d7257",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "72cc05f09cfe0d98",
+    "type": "split",
+    "children": [
+      {
+        "id": "fb0014032e334597",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e25cbd9177028dbe",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "c59d84a4f599bd50",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "28b174160fef4838",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ab158341deb66896",
+    "type": "split",
+    "children": [
+      {
+        "id": "32d3087ad4e14195",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0731738d9f4fda6e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "e80c8780e8d605b6",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "cacbe8275c60d714",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "648245f10edfdba4",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "c1dbc9b12bedfb2f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "f8bb5785fb8d7257",
+  "lastOpenFiles": [
+    "database/fix_zona.py",
+    "database/fix_dummy.py",
+    "database/create_final_db.py",
+    "database/add_drops.py",
+    "database/berkat_dinasti_final.sql",
+    "database/fix_db.py",
+    "database/rodd1157_berkat_dinasti_db.sql",
+    "database/Old-Schema-Database/contoh-erd.txt",
+    "database/Old-Schema-Database/BACKUP DONT TOUCHIT.sql",
+    "database/Old-Schema-Database/forhomie-erd.dbml",
+    "database/Old-Schema-Database/dummy.sql",
+    "database/Old-Schema-Database/perbaikan_pada_manual_book.md",
+    "database/Old-Schema-Database/penjelasan_source_code_manual_book_v2.md",
+    "database/Old-Schema-Database/PERBANDINGAN_SCHEMA_vs_EXPORT.md",
+    "docs/00_Berkat_Dinasti_Index.md",
+    "docs/04-Changelogs/README.md",
+    "docs/03-UI-UX-Guidelines/README.md",
+    "docs/02-Features/README.md",
+    "docs/01-Architecture/README.md",
+    "docs/Rancangan Final/Kelompok 5_Laporan UI_UX_Final.md",
+    "docs/Rancangan Final/Kelompok 5_Laporan DFD_Final.md",
+    "docs/DATA/erd.png",
+    "docs/DATA/PANDUAN_PRESENTASI_SLIDE.md",
+    "docs/DATA/DFD_Berkat_Dinasti.md",
+    "docs/DATA/dfd_docs_per_bab/05_Bab_4_Ringkasan_dan_Validasi_Mitra.md",
+    "docs/DATA/dfd_docs_per_bab/04_Bab_3_DFD_Level_2_Proses_4_sd_7.md",
+    "docs/DATA/dfd_docs_per_bab/03_Bab_3_DFD_Level_2_Proses_1_sd_3.md",
+    "docs/DATA/dfd_docs_per_bab/02_Bab_2_DFD_Level_1_Overview.md",
+    "docs/DATA/dfd_docs_per_bab/01_Bab_1_Pendahuluan_dan_DFD_Level_0.md",
+    "docs/DATA/MERMAID_DFD_DIAGRAMS.md",
+    "docs/DATA/UI UX/STITCH_PROMPTS.md",
+    "docs/DATA/UI UX/DESIGN.md",
+    "docs/DATA/Kelompok 5_Laporan DFD.md",
+    "docs/DATA/Kelompok 5_Laporan UI_UX.md",
+    "docs/DATA/Mermaid_Diagrams_Berkat_Dinasti.md",
+    "docs/DATA/Kelompok 5_Laporan UI_UX (FINAL).md",
+    "docs/DATA/00_Berkat_Dinasti_Index.md"
+  ]
+}

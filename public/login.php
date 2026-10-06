@@ -1,7 +1,10 @@
 <?php
 session_start();
-// Hapus atau komen include config jika belum ada koneksi db di halaman ini
-// require_once "../config/config.php"; 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_SESSION['user'] = $_POST['username'] ?? 'Admin';
+    header("Location: beranda.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -149,7 +152,7 @@ session_start();
                         <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#767676] text-brand-orange focus:ring-brand-orange">
                         <span class="text-[12px] text-[#4F4F4F]">Ingat saya</span>
                     </label>
-                    <a href="#" class="text-[14px] font-medium text-brand-orange hover:text-brand-orangeHover transition-colors">Lupa Password?</a>
+                    <a href="reset-password.php" class="text-[14px] font-medium text-brand-orange hover:text-brand-orangeHover transition-colors">Lupa Password?</a>
                 </div>
 
                 <!-- Submit Button -->

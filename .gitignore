@@ -3,3 +3,9 @@ vendor/
 node_modules/
 .vscode/
 .DS_Store
+.agents/
+*.json
+!composer.json
+!package.json
+data/
+scripts/__pycache__/

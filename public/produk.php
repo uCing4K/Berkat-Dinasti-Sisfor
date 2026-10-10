@@ -7,18 +7,23 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Coba koneksi database jika config tersedia
+// Inisialisasi Database Connection (PDO) & Handler Backend
+$db_connected = false;
+$pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
-    require_once $configFile;
-}
-
-$db_connected = false;
-if (defined('DB_HOST') && defined('DB_USER') && defined('DB_PASS') && defined('DB_NAME')) {
-    mysqli_report(MYSQLI_REPORT_OFF);
-    $koneksi = @mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    if ($koneksi) {
-        $db_connected = true;
+    try {
+        @require_once $configFile;
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER')) {
+            $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_TIMEOUT => 2
+            ]);
+            $db_connected = true;
+        }
+    } catch (Exception $e) {
+        $db_connected = false;
     }
 }
 
@@ -34,6 +39,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
         'packaging_icon' => 'satuan',
         'min_order' => '5 pcs',
+        'moq_num' => 5,
+        'isi' => 1,
         'price' => 5000,
         'price_unit' => 'pcs',
         'status' => 'Aktif',
@@ -49,6 +56,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
         'packaging_icon' => 'mika',
         'min_order' => '1 mika (12 pcs)',
+        'moq_num' => 1,
+        'isi' => 12,
         'price' => 45000,
         'price_unit' => 'mika',
         'status' => 'Aktif',
@@ -64,6 +73,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
         'packaging_icon' => 'kardus',
         'min_order' => '1 kardus',
+        'moq_num' => 1,
+        'isi' => 20,
         'price' => 80000,
         'price_unit' => 'kardus',
         'status' => 'Aktif',
@@ -79,6 +90,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
         'packaging_icon' => 'satuan',
         'min_order' => '10 pcs',
+        'moq_num' => 10,
+        'isi' => 1,
         'price' => 8500,
         'price_unit' => 'pcs',
         'status' => 'Nonaktif',
@@ -94,6 +107,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
         'packaging_icon' => 'mika',
         'min_order' => '2 box',
+        'moq_num' => 2,
+        'isi' => 1,
         'price' => 45000,
         'price_unit' => 'box',
         'status' => 'Aktif',
@@ -109,6 +124,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
         'packaging_icon' => 'kardus',
         'min_order' => '2 kardus',
+        'moq_num' => 2,
+        'isi' => 10,
         'price' => 65000,
         'price_unit' => 'kardus',
         'status' => 'Aktif',
@@ -124,6 +141,8 @@ $initial_products = [
         'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
         'packaging_icon' => 'satuan',
         'min_order' => '15 pcs',
+        'moq_num' => 15,
+        'isi' => 1,
         'price' => 12000,
         'price_unit' => 'pcs',
         'status' => 'Aktif',
@@ -131,13 +150,47 @@ $initial_products = [
     ]
 ];
 
-// Inisialisasi ke session agar produk yang baru ditambah dapat langsung muncul
+// Inisialisasi ke session jika belum ada
 if (!isset($_SESSION['product_list'])) {
     $_SESSION['product_list'] = $initial_products;
 }
 
-// Handle Form POST Tambah Produk
-$toast_message = '';
+// -------------------------------------------------------------
+// 1. BACKEND HANDLER: EXPORT KATALOG PRODUK KE CSV / EXCEL
+// -------------------------------------------------------------
+if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
+    $filename = "katalog-produk-berkat-dinasti-" . date('Y-m-d') . ".csv";
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    
+    // Output UTF-8 BOM for Microsoft Excel compatibility
+    echo "\xEF\xBB\xBF";
+    $output = fopen('php://output', 'w');
+    fputcsv($output, ['No', 'SKU', 'Nama Produk', 'Kategori', 'Tipe Kemasan', 'Label Kemasan', 'Minimal Order (MOQ)', 'Harga Jual (Rp)', 'Status', 'Deskripsi']);
+    
+    $exportList = $_SESSION['product_list'];
+    foreach ($exportList as $idx => $p) {
+        fputcsv($output, [
+            $idx + 1,
+            $p['sku'],
+            $p['name'],
+            $p['category'],
+            $p['packaging_type'],
+            $p['packaging_label'],
+            $p['min_order'],
+            'Rp ' . number_format($p['price'], 0, ',', '.'),
+            $p['status'],
+            $p['description'] ?? ''
+        ]);
+    }
+    
+    fclose($output);
+    exit();
+}
+
+// -------------------------------------------------------------
+// 2. BACKEND HANDLER: TAMBAH PRODUK BARU
+// -------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_product') {
     $nama = trim($_POST['nama_produk'] ?? '');
     $kategori = trim($_POST['kategori'] ?? 'Roti');
@@ -166,9 +219,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $unit = 'kardus';
     }
 
+    $skuPrefix = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $kategori), 0, 2));
+    if (empty($skuPrefix)) $skuPrefix = 'BD';
+    $newId = count($_SESSION['product_list']) + 1;
+    $sku = 'BD-' . $skuPrefix . '-' . sprintf('%02d', $newId);
+
+    // Sync ke DB jika terkoneksi
+    if ($db_connected && $pdo) {
+        try {
+            $stmtK = $pdo->prepare("SELECT id_kategori FROM kategori WHERE nama_kategori = ? LIMIT 1");
+            $stmtK->execute([$kategori]);
+            $katId = $stmtK->fetchColumn();
+            if (!$katId) {
+                $stmtNewK = $pdo->prepare("INSERT INTO kategori (nama_kategori) VALUES (?)");
+                $stmtNewK->execute([$kategori]);
+                $katId = $pdo->lastInsertId();
+            }
+
+            $statusDb = ($status === 'Aktif') ? 'tersedia' : 'tidak_tersedia';
+            $stmtProd = $pdo->prepare("INSERT INTO produk (id_kategori, nama_produk, deskripsi, status) VALUES (?, ?, ?, ?)");
+            $stmtProd->execute([$katId, $nama, $deskripsi, $statusDb]);
+            $dbProdId = $pdo->lastInsertId();
+            $newId = $dbProdId;
+            $sku = 'BD-' . $skuPrefix . '-' . sprintf('%02d', $dbProdId);
+
+            $stmtVar = $pdo->prepare("INSERT INTO varian_produk (id_produk, nama_varian, harga, min_order) VALUES (?, ?, ?, ?)");
+            $stmtVar->execute([$dbProdId, $packaging_label, $harga, $moq]);
+        } catch (Exception $e) {}
+    }
+
     $new_item = [
-        'id' => count($_SESSION['product_list']) + 1,
-        'sku' => 'BD-' . strtoupper(substr($kategori, 0, 2)) . '-' . sprintf('%02d', count($_SESSION['product_list']) + 1),
+        'id' => $newId,
+        'sku' => $sku,
         'name' => $nama,
         'category' => $kategori,
         'packaging_type' => $kemasan,
@@ -176,18 +258,225 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         'packaging_badge_class' => $packaging_badge_class,
         'packaging_icon' => $packaging_icon,
         'min_order' => $moq . ' ' . $unit,
+        'moq_num' => $moq,
+        'isi' => $isi,
         'price' => $harga,
         'price_unit' => $unit,
         'status' => $status,
         'description' => $deskripsi
     ];
 
-    // Tambah di awal list
     array_unshift($_SESSION['product_list'], $new_item);
-    $toast_message = 'Produk "' . htmlspecialchars($nama) . '" berhasil ditambahkan ke katalog!';
+    $_SESSION['toast_msg'] = 'Produk "' . htmlspecialchars($nama) . '" berhasil ditambahkan ke katalog!';
+    header("Location: produk.php");
+    exit();
 }
 
+// -------------------------------------------------------------
+// 3. BACKEND HANDLER: EDIT / UPDATE PRODUK
+// -------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_product') {
+    $prod_id = intval($_POST['product_id'] ?? 0);
+    $nama = trim($_POST['nama_produk'] ?? '');
+    $kategori = trim($_POST['kategori'] ?? 'Roti');
+    $harga_raw = str_replace(['.', ',', ' '], '', $_POST['harga'] ?? '0');
+    $harga = (float)$harga_raw;
+    $kemasan = trim($_POST['kemasan'] ?? 'Mika');
+    $isi = (int)($_POST['isi'] ?? 1);
+    $moq = (int)($_POST['moq'] ?? 1);
+    $status = isset($_POST['status']) && $_POST['status'] === 'on' ? 'Aktif' : 'Nonaktif';
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+
+    $packaging_label = $kemasan;
+    $packaging_badge_class = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
+    $packaging_icon = 'satuan';
+    $unit = 'pcs';
+
+    if ($kemasan === 'Mika') {
+        $packaging_label = "Mika ({$isi} pcs)";
+        $packaging_badge_class = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
+        $packaging_icon = 'mika';
+        $unit = 'mika';
+    } elseif ($kemasan === 'Kardus') {
+        $packaging_label = "Kardus ({$isi} pcs)";
+        $packaging_badge_class = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
+        $packaging_icon = 'kardus';
+        $unit = 'kardus';
+    }
+
+    // Sync ke DB
+    if ($db_connected && $pdo && $prod_id > 0) {
+        try {
+            $statusDb = ($status === 'Aktif') ? 'tersedia' : 'tidak_tersedia';
+            $stmtUp = $pdo->prepare("UPDATE produk SET nama_produk = ?, deskripsi = ?, status = ? WHERE id_produk = ?");
+            $stmtUp->execute([$nama, $deskripsi, $statusDb, $prod_id]);
+
+            $stmtUpV = $pdo->prepare("UPDATE varian_produk SET nama_varian = ?, harga = ?, min_order = ? WHERE id_produk = ?");
+            $stmtUpV->execute([$packaging_label, $harga, $moq, $prod_id]);
+        } catch (Exception $e) {}
+    }
+
+    // Update di session
+    foreach ($_SESSION['product_list'] as &$item) {
+        if ($item['id'] == $prod_id) {
+            $item['name'] = $nama;
+            $item['category'] = $kategori;
+            $item['packaging_type'] = $kemasan;
+            $item['packaging_label'] = $packaging_label;
+            $item['packaging_badge_class'] = $packaging_badge_class;
+            $item['packaging_icon'] = $packaging_icon;
+            $item['min_order'] = $moq . ' ' . $unit;
+            $item['moq_num'] = $moq;
+            $item['isi'] = $isi;
+            $item['price'] = $harga;
+            $item['price_unit'] = $unit;
+            $item['status'] = $status;
+            $item['description'] = $deskripsi;
+            break;
+        }
+    }
+
+    $_SESSION['toast_msg'] = 'Perubahan data produk "' . htmlspecialchars($nama) . '" berhasil disimpan!';
+    header("Location: produk.php");
+    exit();
+}
+
+// -------------------------------------------------------------
+// 4. BACKEND HANDLER: HAPUS PRODUK
+// -------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
+    $prod_id = intval($_POST['product_id'] ?? 0);
+    $deleted_name = 'Produk';
+
+    // Sync ke DB
+    if ($db_connected && $pdo && $prod_id > 0) {
+        try {
+            $stmtDelV = $pdo->prepare("DELETE FROM varian_produk WHERE id_produk = ?");
+            $stmtDelV->execute([$prod_id]);
+            $stmtDelP = $pdo->prepare("DELETE FROM produk WHERE id_produk = ?");
+            $stmtDelP->execute([$prod_id]);
+        } catch (Exception $e) {}
+    }
+
+    // Hapus dari session
+    $_SESSION['product_list'] = array_values(array_filter($_SESSION['product_list'], function($item) use ($prod_id, &$deleted_name) {
+        if ($item['id'] == $prod_id) {
+            $deleted_name = $item['name'];
+            return false;
+        }
+        return true;
+    }));
+
+    $_SESSION['toast_msg'] = 'Produk "' . htmlspecialchars($deleted_name) . '" berhasil dihapus dari katalog!';
+    header("Location: produk.php");
+    exit();
+}
+
+// -------------------------------------------------------------
+// 5. BACKEND HANDLER: QUICK TOGGLE STATUS PRODUK
+// -------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_status') {
+    $prod_id = intval($_POST['product_id'] ?? 0);
+    $new_status_label = 'Aktif';
+
+    foreach ($_SESSION['product_list'] as &$item) {
+        if ($item['id'] == $prod_id) {
+            $item['status'] = ($item['status'] === 'Aktif') ? 'Nonaktif' : 'Aktif';
+            $new_status_label = $item['status'];
+            break;
+        }
+    }
+
+    if ($db_connected && $pdo && $prod_id > 0) {
+        try {
+            $statusDb = ($new_status_label === 'Aktif') ? 'tersedia' : 'tidak_tersedia';
+            $stmtTog = $pdo->prepare("UPDATE produk SET status = ? WHERE id_produk = ?");
+            $stmtTog->execute([$statusDb, $prod_id]);
+        } catch (Exception $e) {}
+    }
+
+    $_SESSION['toast_msg'] = 'Status produk berhasil diubah menjadi ' . $new_status_label . '!';
+    header("Location: produk.php");
+    exit();
+}
+
+// -------------------------------------------------------------
+// 6. SINKRONISASI DATA DARI DATABASE (JIKA TERSEDIA)
+// -------------------------------------------------------------
 $products = $_SESSION['product_list'];
+if ($db_connected && $pdo) {
+    try {
+        $stmtLoad = $pdo->query("
+            SELECT p.id_produk as id, p.nama_produk as name, p.deskripsi as description,
+                   p.status as p_status, k.nama_kategori as category,
+                   vp.id_varian, vp.nama_varian, vp.harga as price, vp.min_order
+            FROM produk p
+            LEFT JOIN kategori k ON p.id_kategori = k.id_kategori
+            LEFT JOIN varian_produk vp ON p.id_produk = vp.id_produk
+            ORDER BY p.id_produk DESC
+        ");
+        $dbRows = $stmtLoad->fetchAll();
+        if (!empty($dbRows)) {
+            $loadedProducts = [];
+            foreach ($dbRows as $dp) {
+                $cat = !empty($dp['category']) ? $dp['category'] : 'Roti';
+                $st = ($dp['p_status'] === 'tersedia') ? 'Aktif' : 'Nonaktif';
+                $nv = !empty($dp['nama_varian']) ? $dp['nama_varian'] : 'Satuan';
+                
+                $pack_type = 'Satuan';
+                $pack_badge = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
+                $pack_icon = 'satuan';
+                $unit = 'pcs';
+                $isi = 1;
+
+                if (stripos($nv, 'mika') !== false) {
+                    $pack_type = 'Mika';
+                    $pack_badge = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
+                    $pack_icon = 'mika';
+                    $unit = 'mika';
+                    if (preg_match('/\((\d+)\s*pcs\)/i', $nv, $m)) $isi = (int)$m[1];
+                } elseif (stripos($nv, 'kardus') !== false) {
+                    $pack_type = 'Kardus';
+                    $pack_badge = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
+                    $pack_icon = 'kardus';
+                    $unit = 'kardus';
+                    if (preg_match('/\((\d+)\s*pcs\)/i', $nv, $m)) $isi = (int)$m[1];
+                }
+
+                $skuPrefix = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $cat), 0, 2));
+                if (empty($skuPrefix)) $skuPrefix = 'BD';
+                $sku = 'BD-' . $skuPrefix . '-' . sprintf('%02d', $dp['id']);
+
+                $loadedProducts[] = [
+                    'id' => $dp['id'],
+                    'sku' => $sku,
+                    'name' => $dp['name'],
+                    'category' => $cat,
+                    'packaging_type' => $pack_type,
+                    'packaging_label' => $nv,
+                    'packaging_badge_class' => $pack_badge,
+                    'packaging_icon' => $pack_icon,
+                    'min_order' => ($dp['min_order'] ?? 1) . ' ' . $unit,
+                    'moq_num' => (int)($dp['min_order'] ?? 1),
+                    'isi' => $isi,
+                    'price' => (float)$dp['price'],
+                    'price_unit' => $unit,
+                    'status' => $st,
+                    'description' => $dp['description'] ?? ''
+                ];
+            }
+            $products = $loadedProducts;
+            $_SESSION['product_list'] = $products;
+        }
+    } catch (Exception $e) {}
+}
+
+// Flash Toast Message
+$toast_message = '';
+if (isset($_SESSION['toast_msg'])) {
+    $toast_message = $_SESSION['toast_msg'];
+    unset($_SESSION['toast_msg']);
+}
 
 // Hitung data ringkasan KPI
 $total_katalog = count($products);
@@ -505,11 +794,12 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
 
                     <!-- Right Buttons: Ekspor Data & Tambah Produk -->
                     <div class="flex items-center gap-3 shrink-0">
-                        <!-- Ekspor Data -->
-                        <button onclick="handleExportData()" class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
+                        <!-- Ekspor Data (Live CSV Export) -->
+                        <a href="produk.php?action=export_csv" title="Unduh katalog produk format CSV/Excel" 
+                            class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
                             <img src="assets/icons/download.svg" alt="Ekspor" class="w-4 h-4">
                             <span>Ekspor Data</span>
-                        </button>
+                        </a>
 
                         <!-- Tambah Produk Button (Triggers Modal) -->
                         <button onclick="openProductModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
@@ -598,19 +888,14 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                                             <span class="text-[#828282] text-xs">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                         </td>
 
-                                        <!-- Status -->
-                                        <td class="px-5 py-4 whitespace-nowrap">
-                                            <?php if ($prod['status'] === 'Aktif'): ?>
-                                                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#27AE60]">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#27AE60]"></span>
-                                                    Aktif
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#828282]">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#828282]"></span>
-                                                    Nonaktif
-                                                </span>
-                                            <?php endif; ?>
+                                        <!-- Status dengan Quick Interactive Toggle -->
+                                        <td class="px-5 py-4 text-center whitespace-nowrap">
+                                            <button type="button" onclick="toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
+                                                title="Klik untuk ubah status ke <?= $prod['status'] === 'Aktif' ? 'Nonaktif' : 'Aktif' ?>"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#828282]/15 text-[#828282] hover:bg-[#828282]/25' ?>">
+                                                <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#828282]' ?>"></span>
+                                                <span><?= htmlspecialchars($prod['status']) ?></span>
+                                            </button>
                                         </td>
 
                                         <!-- Aksi (Edit & Delete) -->
@@ -620,14 +905,30 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                                                 <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#FF9B45] hover:bg-[#FF9B45]/10 rounded-md transition-colors" title="Edit Produk">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                 </button>
-                                                <!-- Delete Button -->
-                                                <button onclick="deleteProductRow(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" class="p-1.5 text-[#EB5757] hover:bg-[#EB5757]/10 rounded-md transition-colors" title="Hapus Produk">
+                                                <!-- Delete Button (Custom Modal Confirmation) -->
+                                                <button onclick="confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" class="p-1.5 text-[#EB5757] hover:bg-[#EB5757]/10 rounded-md transition-colors" title="Hapus Produk">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
+
+                                <!-- Empty State Row (Muncul saat filter / pencarian tidak menemukan hasil) -->
+                                <tr id="emptyStateRow" class="hidden">
+                                    <td colspan="8" class="py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center max-w-sm mx-auto text-center">
+                                            <div class="w-12 h-12 rounded-full bg-[#FFF8F2] text-[#FF9B45] flex items-center justify-center mb-3">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                            </div>
+                                            <h4 class="text-sm font-bold text-[#1C1C1C]">Tidak Ada Produk Ditemukan</h4>
+                                            <p class="text-xs text-[#828282] mt-1 mb-4">Coba sesuaikan kata kunci pencarian atau ganti pilihan filter kategori / status Anda.</p>
+                                            <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-[#FF9B45] hover:text-[#E88C3D] underline">
+                                                Reset Semua Filter
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -697,8 +998,9 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             </div>
 
             <!-- Form -->
-            <form action="" method="POST" class="space-y-4">
-                <input type="hidden" name="action" value="add_product">
+            <form id="productForm" action="produk.php" method="POST" class="space-y-4">
+                <input type="hidden" name="action" id="productModalFormAction" value="add_product">
+                <input type="hidden" name="product_id" id="editProductId" value="">
 
                 <!-- Nama Produk -->
                 <div>
@@ -817,7 +1119,7 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                     <button type="submit" 
                         class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span>Simpan Produk</span>
+                        <span id="submitProductBtnText">Simpan Produk</span>
                     </button>
                 </div>
             </form>
@@ -874,6 +1176,57 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: KONFIRMASI HAPUS PRODUK                          -->
+    <!-- ============================================================== -->
+    <div id="deleteConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop with blur -->
+        <div onclick="closeDeleteModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+
+        <!-- Modal Card Container -->
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
+            <!-- Top Trash Icon -->
+            <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Hapus Produk Katalog?</h3>
+            
+            <!-- Description -->
+            <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
+                Apakah Anda yakin ingin menghapus <span id="deleteProductName" class="font-bold text-[#1C1C1C]"></span>? Tindakan ini tidak dapat dibatalkan.
+            </p>
+
+            <!-- Action Buttons -->
+            <form action="produk.php" method="POST" class="space-y-2.5">
+                <input type="hidden" name="action" value="delete_product">
+                <input type="hidden" name="product_id" id="deleteProductId" value="">
+                
+                <button type="submit" 
+                    class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span>Ya, Hapus Produk</span>
+                </button>
+
+                <button type="button" onclick="closeDeleteModal()" 
+                    class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors cursor-pointer">
+                    Batal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Form untuk Quick Toggle Status -->
+    <form id="quickToggleStatusForm" action="produk.php" method="POST" class="hidden">
+        <input type="hidden" name="action" value="toggle_status">
+        <input type="hidden" name="product_id" id="toggleProductId" value="">
+    </form>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Toggle Sidebar Mobile
@@ -891,10 +1244,26 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
 
         // Modal Popout Open / Close
         function openProductModal() {
+            // Reset ke mode Tambah Produk Baru
+            document.getElementById('modalTitle').textContent = 'Tambah Produk Baru';
+            document.getElementById('productModalFormAction').value = 'add_product';
+            document.getElementById('editProductId').value = '';
+            document.getElementById('submitProductBtnText').textContent = 'Simpan Produk';
+            
+            document.getElementById('productForm').reset();
+            document.getElementById('prod_isi').value = '12';
+            document.getElementById('prod_moq').value = '1';
+            
+            // Set status default Aktif
+            const chk = document.getElementById('prod_status');
+            chk.checked = true;
+            handleStatusToggle(chk);
+            handleKemasanChange();
+
             const modal = document.getElementById('productModal');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            document.getElementById('prod_nama').focus();
+            setTimeout(() => document.getElementById('prod_nama').focus(), 50);
         }
 
         function closeProductModal() {
@@ -902,13 +1271,6 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             modal.classList.add('hidden');
             document.body.style.overflow = '';
         }
-
-        // Keyboard ESC untuk tutup modal
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeProductModal();
-            }
-        });
 
         // Dynamic Kemasan Unit Handling
         function handleKemasanChange() {
@@ -919,11 +1281,11 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             if (kemasan === 'Mika') {
                 moqUnit.textContent = 'mika';
                 isiInput.disabled = false;
-                isiInput.value = isiInput.value > 1 ? isiInput.value : 12;
+                if (!isiInput.value || isiInput.value < 1) isiInput.value = 12;
             } else if (kemasan === 'Kardus') {
                 moqUnit.textContent = 'kardus';
                 isiInput.disabled = false;
-                isiInput.value = isiInput.value > 1 ? isiInput.value : 20;
+                if (!isiInput.value || isiInput.value < 1) isiInput.value = 20;
             } else {
                 moqUnit.textContent = 'pcs';
                 isiInput.disabled = true;
@@ -956,6 +1318,62 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             input.value = new Intl.NumberFormat('id-ID').format(val);
         }
 
+        // Edit row (Pre-fill modal untuk mode Edit)
+        function editProductRow(prod) {
+            document.getElementById('modalTitle').textContent = 'Edit Produk: ' + prod.name;
+            document.getElementById('productModalFormAction').value = 'edit_product';
+            document.getElementById('editProductId').value = prod.id;
+            document.getElementById('submitProductBtnText').textContent = 'Perbarui Data Produk';
+
+            document.getElementById('prod_nama').value = prod.name;
+            document.getElementById('prod_kategori').value = prod.category;
+            document.getElementById('prod_harga').value = new Intl.NumberFormat('id-ID').format(prod.price);
+            document.getElementById('prod_kemasan').value = prod.packaging_type;
+            
+            handleKemasanChange();
+            
+            document.getElementById('prod_isi').value = prod.isi || (prod.packaging_type === 'Mika' ? 12 : (prod.packaging_type === 'Kardus' ? 20 : 1));
+            document.getElementById('prod_moq').value = prod.moq_num || 1;
+            
+            const chk = document.getElementById('prod_status');
+            chk.checked = (prod.status === 'Aktif');
+            handleStatusToggle(chk);
+
+            document.getElementById('prod_deskripsi').value = prod.description || '';
+
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => document.getElementById('prod_nama').focus(), 50);
+        }
+
+        // Custom Delete Confirmation Modal
+        function confirmDeleteProduct(id, name) {
+            document.getElementById('deleteProductId').value = id;
+            document.getElementById('deleteProductName').textContent = `"${name}"`;
+            
+            const modal = document.getElementById('deleteConfirmModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteConfirmModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Quick Toggle Status via POST form
+        function toggleProductStatus(id, currentStatus) {
+            const nextStatus = currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif';
+            document.getElementById('toggleProductId').value = id;
+            document.getElementById('quickToggleStatusForm').submit();
+        }
+
         // Live Filter Function (Search, Category, Status)
         function filterProducts() {
             const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -965,11 +1383,11 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             const rows = document.querySelectorAll('.product-row');
             let visibleCount = 0;
 
-            rows.forEach((row, index) => {
-                const name = row.getAttribute('data-name');
-                const sku = row.getAttribute('data-sku');
-                const category = row.getAttribute('data-category');
-                const status = row.getAttribute('data-status');
+            rows.forEach((row) => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                const sku = (row.getAttribute('data-sku') || '').toLowerCase();
+                const category = row.getAttribute('data-category') || '';
+                const status = row.getAttribute('data-status') || '';
 
                 const matchesSearch = !searchVal || name.includes(searchVal) || sku.includes(searchVal);
                 const matchesCategory = !categoryVal || category === categoryVal;
@@ -978,42 +1396,34 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                 if (matchesSearch && matchesCategory && matchesStatus) {
                     row.style.display = '';
                     visibleCount++;
-                    row.querySelector('.row-number').textContent = visibleCount;
+                    const numCell = row.querySelector('.row-number');
+                    if (numCell) numCell.textContent = visibleCount;
                 } else {
                     row.style.display = 'none';
                 }
             });
 
-            document.getElementById('visibleCount').textContent = visibleCount;
-        }
+            // Update visible count summary
+            const visibleCountEl = document.getElementById('visibleCount');
+            if (visibleCountEl) visibleCountEl.textContent = visibleCount;
 
-        // Edit row (Pre-fill modal)
-        function editProductRow(prod) {
-            openProductModal();
-            document.getElementById('modalTitle').textContent = 'Edit Produk: ' + prod.name;
-            document.getElementById('prod_nama').value = prod.name;
-            document.getElementById('prod_kategori').value = prod.category;
-            document.getElementById('prod_harga').value = new Intl.NumberFormat('id-ID').format(prod.price);
-            document.getElementById('prod_kemasan').value = prod.packaging_type;
-            document.getElementById('prod_deskripsi').value = prod.description || '';
-            handleKemasanChange();
-        }
-
-        // Delete row
-        function deleteProductRow(id, name) {
-            if (confirm(`Apakah Anda yakin ingin menghapus produk "${name}" dari katalog?`)) {
-                // Sederhana: sembunyikan baris atau request hapus
-                const row = event.target.closest('tr');
-                if (row) {
-                    row.remove();
-                    filterProducts();
+            // Show or hide empty state row
+            const emptyStateRow = document.getElementById('emptyStateRow');
+            if (emptyStateRow) {
+                if (visibleCount === 0) {
+                    emptyStateRow.classList.remove('hidden');
+                } else {
+                    emptyStateRow.classList.add('hidden');
                 }
             }
         }
 
-        // Ekspor data
-        function handleExportData() {
-            alert('Fitur Ekspor Data: Mengunduh katalog produk dalam format CSV/Excel...');
+        // Reset Filter function
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            filterProducts();
         }
 
         // Logout Modal Open / Close
@@ -1038,8 +1448,18 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             if (e.key === 'Escape') {
                 closeLogoutModal();
                 closeProductModal();
+                closeDeleteModal();
             }
         });
+
+        // Auto-dismiss toast notification after 5 seconds
+        const toastEl = document.getElementById('toastNotification');
+        if (toastEl) {
+            setTimeout(() => {
+                toastEl.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                setTimeout(() => toastEl.remove(), 500);
+            }, 5000);
+        }
     </script>
 </body>
 </html>

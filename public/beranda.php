@@ -259,7 +259,7 @@ if (file_exists("../config/config.php")) {
                     </a>
 
                     <!-- Produk -->
-                    <a href="#" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
+                    <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5 opacity-90">
                         <span>Produk</span>
                     </a>

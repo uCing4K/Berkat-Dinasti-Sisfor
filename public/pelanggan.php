@@ -368,9 +368,9 @@ $pelanggan_list = [
                             <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
                         </div>
                     </div>
-                    <a href="logout.php" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
                         <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
-                    </a>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -828,6 +828,56 @@ $pelanggan_list = [
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
+    <!-- ============================================================== -->
+    <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop with blur -->
+        <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+
+        <!-- Modal Card Container -->
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
+            <!-- Top Icon -->
+            <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
+            
+            <!-- Description -->
+            <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
+                Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2.5">
+                <a href="logout.php" 
+                    class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span>Ya, Keluar</span>
+                </a>
+
+                <button type="button" onclick="closeLogoutModal()" 
+                    class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
+                    Batal
+                </button>
+            </div>
+
+            <!-- Encrypted Session Note -->
+            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A0A0A0]">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <span>Sesi login terenkripsi Berkat Dinasti</span>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Master Dataset in JavaScript
@@ -997,9 +1047,27 @@ $pelanggan_list = [
         // ESC Close
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                closeLogoutModal();
                 closeCustomerModal();
             }
         });
+
+        // Logout Modal Open / Close
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
 
         // Save Customer Form Handler
         function handleSaveCustomer(e) {

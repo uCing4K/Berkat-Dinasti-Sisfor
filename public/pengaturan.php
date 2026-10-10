@@ -241,9 +241,9 @@ $users_list = [
                             <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
                         </div>
                     </div>
-                    <a href="logout.php" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
                         <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
-                    </a>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -336,6 +336,13 @@ $users_list = [
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span>Manajemen User</span>
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full <?= $active_tab === 'user' ? 'bg-white/20 text-white' : 'bg-[#E0E0E0] text-[#544337]' ?>">3 User</span>
+                    </button>
+
+                    <!-- Tab 3: Keamanan & Sesi (Logout Sesi) -->
+                    <button onclick="switchSettingTab('keamanan')" id="tabBtnKeamanan" 
+                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'keamanan' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <span>Keamanan & Sesi</span>
                     </button>
                 </div>
 
@@ -847,6 +854,147 @@ $users_list = [
 
                 </div>
 
+                <!-- ============================================================== -->
+                <!-- TAB 3 CONTENT: KEAMANAN & SESI (MATCHING FIGMA SCREENSHOT 3)   -->
+                <!-- ============================================================== -->
+                <div id="tabContentKeamanan" class="<?= $active_tab !== 'keamanan' ? 'hidden' : '' ?>">
+                    
+                    <!-- TOP 4 METRICS CARDS (SESUAI BACKGROUND FIGMA LOGOUT) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                        
+                        <!-- Card 1: Sesi Aktif -->
+                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-[#828282] font-semibold">Sesi Aktif</span>
+                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Admin Utama') ?></h3>
+                                <p class="text-xs text-[#924C00] font-medium mt-1">Login sejak 07:45 WIB</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00] shrink-0">
+                                <svg class="w-5 h-5 text-[#FF9B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Status Toko -->
+                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-[#828282] font-semibold">Status Toko</span>
+                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1">Buka Terjadwal</h3>
+                                <p class="text-xs text-[#828282] mt-1">07:00 - 17:00 WIB</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#E2B93B]/20 flex items-center justify-center text-[#886C12] shrink-0">
+                                <span>🏪</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Pesanan Berjalan -->
+                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-[#828282] font-semibold">Pesanan Berjalan</span>
+                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1">12 Pesanan</h3>
+                                <p class="text-xs text-[#828282] mt-1">8 siap kirim</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00] shrink-0">
+                                <span>🛍️</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Sinkronisasi Cloud -->
+                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-[#828282] font-semibold">Sinkronisasi Cloud</span>
+                                <h3 class="text-base font-bold text-[#27AE60] mt-1">Tersimpan</h3>
+                                <p class="text-xs text-[#828282] mt-1">Terakhir 2 menit lalu</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#27AE60]/15 flex items-center justify-center text-[#1B7A43] shrink-0">
+                                <svg class="w-5 h-5 text-[#27AE60]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 2 COLUMNS: PROFIL & AKSES TOKO VS KEAMANAN KASIR -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        <!-- Left: Profil & Akses Toko -->
+                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
+                            <div>
+                                <div class="pb-4 border-b border-[#F0ECE9] mb-5">
+                                    <h3 class="text-base font-bold text-[#1C1C1C]">Profil & Akses Toko</h3>
+                                    <p class="text-xs text-[#828282] mt-0.5">Pengaturan operasional akun kasir dan pengamanan sesi login</p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#828282] mb-1.5">Nama Penanggung Jawab</label>
+                                        <input type="text" value="Budi Santoso (Admin)" readonly 
+                                            class="w-full bg-[#FBF9F7] border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#828282] mb-1.5">Email Terdaftar</label>
+                                        <input type="text" value="admin@berkatdinasti.id" readonly 
+                                            class="w-full bg-[#FBF9F7] border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C]">
+                                    </div>
+
+                                    <!-- Auto-Logout Card -->
+                                    <div class="bg-[#FBF9F7] border border-[#F0ECE9] rounded-xl p-4 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-base">🔒</span>
+                                            <div>
+                                                <h4 class="text-xs font-bold text-[#1C1C1C]">Auto-Logout Keamanan</h4>
+                                                <p class="text-[11px] text-[#828282] mt-0.5">Kunci otomatis setelah 30 menit tidak aktif</p>
+                                            </div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked class="sr-only peer">
+                                            <div class="w-11 h-6 bg-[#E0E0E0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tombol Keluar dari Akun (Logout) -->
+                            <div class="pt-6 mt-6 border-t border-[#F0ECE9]">
+                                <button type="button" onclick="openLogoutModal()" 
+                                    class="w-full bg-[#FFF0F0] hover:bg-[#FFE0E0] text-[#EB5757] border border-[#EB5757]/30 text-xs md:text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-2xs">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    <span>Keluar dari Akun (Logout)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right: Keamanan Kasir -->
+                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
+                            <div>
+                                <div class="pb-4 border-b border-[#F0ECE9] mb-5">
+                                    <h3 class="text-base font-bold text-[#1C1C1C]">Keamanan Kasir</h3>
+                                    <p class="text-xs text-[#828282] mt-0.5 leading-relaxed">
+                                        Pastikan pergantian shift telah direkapitulasi sebelum meninggalkan dasbor operasional.
+                                    </p>
+                                </div>
+
+                                <div class="space-y-3.5 mb-5">
+                                    <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex items-center justify-between">
+                                        <span class="text-xs text-[#544337] font-semibold">Total Kas Tunai Sesi Ini</span>
+                                        <span class="text-sm font-bold text-[#1C1C1C]">Rp 3.450.000</span>
+                                    </div>
+
+                                    <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex items-center justify-between">
+                                        <span class="text-xs text-[#544337] font-semibold">Total QRIS / Transfer</span>
+                                        <span class="text-sm font-bold text-[#1C1C1C]">Rp 5.820.000</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-[#F5F3F1] rounded-xl text-center text-xs text-[#544337] font-semibold border border-[#EBE8E5]">
+                                Shift Pagi: 07:00 - 15:00 WIB
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
             </main>
         </div>
     </div>
@@ -947,6 +1095,56 @@ $users_list = [
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
+    <!-- ============================================================== -->
+    <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop with blur -->
+        <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+
+        <!-- Modal Card Container -->
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
+            <!-- Top Icon -->
+            <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
+            
+            <!-- Description -->
+            <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
+                Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2.5">
+                <a href="logout.php" 
+                    class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span>Ya, Keluar</span>
+                </a>
+
+                <button type="button" onclick="closeLogoutModal()" 
+                    class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
+                    Batal
+                </button>
+            </div>
+
+            <!-- Encrypted Session Note -->
+            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A0A0A0]">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <span>Sesi login terenkripsi Berkat Dinasti</span>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Toggle Sidebar Mobile
@@ -962,33 +1160,59 @@ $users_list = [
             }
         }
 
-        // Switch Setting Tabs (Profil vs Manajemen User)
+        // Switch Setting Tabs (Profil vs Manajemen User vs Keamanan & Sesi)
         function switchSettingTab(tab) {
             const tabContentProfil = document.getElementById('tabContentProfil');
             const tabContentUser = document.getElementById('tabContentUser');
+            const tabContentKeamanan = document.getElementById('tabContentKeamanan');
             const tabBtnProfil = document.getElementById('tabBtnProfil');
             const tabBtnUser = document.getElementById('tabBtnUser');
+            const tabBtnKeamanan = document.getElementById('tabBtnKeamanan');
             const headerBreadcrumb = document.getElementById('headerBreadcrumb');
             const headerTitle = document.getElementById('headerTitle');
 
+            // Hide all tab contents
+            tabContentProfil.classList.add('hidden');
+            tabContentUser.classList.add('hidden');
+            tabContentKeamanan.classList.add('hidden');
+
+            // Reset buttons
+            [tabBtnProfil, tabBtnUser, tabBtnKeamanan].forEach(btn => {
+                btn.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
+            });
+
             if (tab === 'user') {
-                tabContentProfil.classList.add('hidden');
                 tabContentUser.classList.remove('hidden');
-
                 tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
-
                 headerBreadcrumb.textContent = 'Pengaturan';
                 headerTitle.textContent = 'Manajemen User';
+            } else if (tab === 'keamanan') {
+                tabContentKeamanan.classList.remove('hidden');
+                tabBtnKeamanan.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
+                headerBreadcrumb.textContent = 'Pengaturan';
+                headerTitle.textContent = 'Keamanan & Sesi Kasir';
             } else {
-                tabContentUser.classList.add('hidden');
                 tabContentProfil.classList.remove('hidden');
-
                 tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
-
                 headerBreadcrumb.textContent = 'Pengaturan';
                 headerTitle.textContent = 'Pengaturan Toko';
+            }
+        }
+
+        // Logout Modal Open / Close
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
             }
         }
 
@@ -1094,6 +1318,14 @@ $users_list = [
                 alert(`Pengguna "${nama}" berhasil dihapus dari sistem.`);
             }
         }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLogoutModal();
+                closeUserModal();
+            }
+        });
     </script>
 </body>
 </html>

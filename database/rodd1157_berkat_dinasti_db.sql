@@ -646,7 +646,7 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_user`, `username`, `password`, `nama_lengkap`, `email`, `no_hp`, `role`, `status`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$8K1p5s1VvqHqYL1YQs7xKOzR6h7L8P3n4Q5w6E7r8T9y0U1i2O3p4', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 'admin', '$2y$10$ZXTnSmkxhA/90O3bJnjame2j6WU5.WgNzRgNUJaupBc.cbsmVWT8q', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
 
 -- --------------------------------------------------------
 

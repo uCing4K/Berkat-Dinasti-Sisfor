@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+// Proteksi Autentikasi: Hanya user yang sudah login yang diizinkan mengakses Beranda
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
 // Coba koneksi database jika config tersedia
 $db_connected = false;
 $kpi_data = [
@@ -292,11 +298,11 @@ if (file_exists("../config/config.php")) {
                             BD
                         </div>
                         <div class="truncate">
-                            <p class="text-white font-semibold text-sm leading-tight truncate">Admin</p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5">Pemilik</p>
+                            <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
+                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <a href="login.php" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <a href="logout.php" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
                         <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
                     </a>
                 </div>

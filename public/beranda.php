@@ -265,7 +265,7 @@ if (file_exists("../config/config.php")) {
                     </a>
 
                     <!-- Pesanan -->
-                    <a href="#" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
+                    <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5 opacity-90">
                         <span>Pesanan</span>
                     </a>

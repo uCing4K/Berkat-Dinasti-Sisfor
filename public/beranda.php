@@ -356,7 +356,7 @@ if (file_exists("../config/config.php")) {
             </header>
 
             <!-- MAIN CONTENT CONTAINER -->
-            <main class="flex-1 p-4 md:p-8 max-w-[1040px] w-full mx-auto">
+            <main class="flex-1 p-4 md:p-8 w-full min-w-0">
                 
                 <!-- TOP BANNER: Greeting & Operational Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

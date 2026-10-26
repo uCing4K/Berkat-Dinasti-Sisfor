@@ -7,6 +7,16 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Waktu & Tanggal Dinamis (Bahasa Indonesia)
+$hariIndonesia = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+$bulanIndonesia = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'];
+$todayFormatted = $hariIndonesia[date('l')] . ', ' . date('d') . ' ' . $bulanIndonesia[intval(date('m'))] . ' ' . date('Y');
+$currentMonthIndo = [
+    'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret', 'April' => 'April',
+    'May' => 'Mei', 'June' => 'Juni', 'July' => 'Juli', 'August' => 'Agustus',
+    'September' => 'September', 'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
+][date('F')] . ' ' . date('Y');
+
 // Inisialisasi Database Connection & Handler Backend
 $db_connected = false;
 $pdo = null;
@@ -255,6 +265,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
     $order_id = trim($_POST['order_id'] ?? '');
     $new_status = in_array($_POST['new_status'] ?? '', ['pending', 'proses', 'kirim', 'selesai', 'batal']) ? $_POST['new_status'] : 'proses';
+    
+    if (!isset($_SESSION['order_status_overrides'])) {
+        $_SESSION['order_status_overrides'] = [];
+    }
+    if (!empty($order_id)) {
+        $_SESSION['order_status_overrides'][$order_id] = $new_status;
+    }
     
     if ($db_connected && $pdo && !empty($order_id)) {
         try {
@@ -508,6 +525,16 @@ if (!empty($_SESSION['session_orders'])) {
     $pending_orders = array_merge($_SESSION['session_orders'], $pending_orders);
 }
 
+// Sinkronkan status pesanan yang baru diubah secara live
+if (!empty($_SESSION['order_status_overrides'])) {
+    foreach ($pending_orders as &$po) {
+        if (isset($_SESSION['order_status_overrides'][$po['id']])) {
+            $po['status'] = $_SESSION['order_status_overrides'][$po['id']];
+        }
+    }
+    unset($po);
+}
+
 // -------------------------------------------------------------
 // 7. JADWAL PENGIRIMAN HARI INI
 // -------------------------------------------------------------
@@ -572,7 +599,7 @@ if ($db_connected && $pdo) {
 $activities = [
     [
         'dot_color' => 'bg-[#FF9B45]',
-        'text' => '<span class="text-[#FF9B45] font-medium">Pesanan baru <a href="#" class="font-semibold hover:underline">#ORD-20250926-01</a> dibuat oleh Ibu Ratna Sari (50 pcs Roti Sisir Butter)</span>',
+        'text' => '<span class="text-[#FF9B45] font-medium">Pesanan baru <a href="javascript:void(0)" onclick="viewOrderDetail(\'ORD-20250926-01\', \'Ibu Ratna Sari\', \'Roti Sisir Butter (50 pcs)\', \'Hari Ini, 14:00\', \'Belum Bayar\', \'proses\', \'Rp 110.000\', \'0812-3456-7890\', \'Komplek Melati No. 4, Blok B\')" class="font-semibold hover:underline">#ORD-20250926-01</a> dibuat oleh Ibu Ratna Sari (50 pcs Roti Sisir Butter)</span>',
         'time' => '15 menit yang lalu'
     ],
     [
@@ -635,6 +662,7 @@ if ($db_connected && $pdo) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beranda Operasional - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -831,18 +859,65 @@ if ($db_connected && $pdo) {
                     <!-- Date Button -->
                     <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
                         <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
-                        <span>Jumat, 26 Sep 2025</span>
+                        <span><?= $todayFormatted ?></span>
                     </div>
 
-                    <!-- Notification Bell with Orange Dot -->
-                    <button class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
-                        <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
-                    </button>
+                    <!-- Notification Bell with Popover -->
+                    <div class="relative">
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
+                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-3 z-50 animate-in fade-in zoom-in-95">
+                            <div class="px-4 pb-2 border-b border-[#F0ECE9] flex items-center justify-between">
+                                <h4 class="font-bold text-xs text-[#1C1C1C]">Notifikasi Operasional</h4>
+                                <span class="text-[10px] bg-[#FF9B45]/15 text-[#924C00] font-semibold px-2 py-0.5 rounded-full">3 Baru</span>
+                            </div>
+                            <div class="divide-y divide-[#F0ECE9]/70 text-xs">
+                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
+                                    <p class="font-semibold text-[#1C1C1C]">Pesanan #ORD-089 Butuh Konfirmasi</p>
+                                    <p class="text-[11px] text-[#828282] mt-0.5">Ibu Sari • Deadline 15:00 hari ini</p>
+                                </div>
+                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
+                                    <p class="font-semibold text-[#1C1C1C]">2 Batch Siap Diantar Driver</p>
+                                    <p class="text-[11px] text-[#828282] mt-0.5">Roti Sisir Butter & Sobek siap kirim</p>
+                                </div>
+                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
+                                    <p class="font-semibold text-[#1C1C1C]">Stok Kardus Roti Hampir Habis</p>
+                                    <p class="text-[11px] text-[#828282] mt-0.5">Sisa 12 kardus di gudang kemasan</p>
+                                </div>
+                            </div>
+                            <div class="px-3 pt-2 text-center border-t border-[#F0ECE9]">
+                                <a href="pesanan.php" class="text-[11px] font-semibold text-[#FF9B45] hover:underline">Buka Semua di Pesanan →</a>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- User Circle Icon -->
-                    <div class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
-                        <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                    <!-- User Circle Icon with Dropdown -->
+                    <div class="relative">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
+                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        </div>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-2 z-50 animate-in fade-in zoom-in-95 text-xs">
+                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
+                                <p class="font-bold text-[#1C1C1C]"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Administrator') ?></p>
+                                <p class="text-[#828282] text-[11px]"><?= htmlspecialchars($_SESSION['role'] ?? 'admin') ?> @ Berkat Dinasti</p>
+                            </div>
+                            <a href="pengaturan.php" class="flex items-center gap-2 px-4 py-2.5 text-[#544337] hover:bg-[#FFF8F2] transition-colors">
+                                <span>⚙️</span>
+                                <span>Pengaturan Akun & Toko</span>
+                            </a>
+                            <a href="reset-password.php" class="flex items-center gap-2 px-4 py-2.5 text-[#544337] hover:bg-[#FFF8F2] transition-colors">
+                                <span>🔑</span>
+                                <span>Ganti Password</span>
+                            </a>
+                            <div class="border-t border-[#F0ECE9] mt-1 pt-1">
+                                <button onclick="openLogoutModal()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-[#EB5757] hover:bg-red-50 transition-colors">
+                                    <span>🚪</span>
+                                    <span>Keluar (Logout)</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -1028,6 +1103,7 @@ if ($db_connected && $pdo) {
                                     <th class="px-5 py-3.5">Nama Pelanggan</th>
                                     <th class="px-5 py-3.5">Produk</th>
                                     <th class="px-5 py-3.5">Deadline</th>
+                                    <th class="px-5 py-3.5">Status Pesanan</th>
                                     <th class="px-5 py-3.5">Pembayaran</th>
                                     <th class="px-5 py-3.5 text-center">Aksi</th>
                                 </tr>
@@ -1060,6 +1136,22 @@ if ($db_connected && $pdo) {
                                             <?php endif; ?>
                                         </td>
 
+                                        <!-- Status Pesanan Badge -->
+                                        <td class="px-5 py-4 whitespace-nowrap">
+                                            <?php
+                                            $ordStatus = $order['status'] ?? 'pending';
+                                            $statusPill = match($ordStatus) {
+                                                'proses' => ['Sedang Diproses', 'bg-[#FFF8F2] text-[#D97706] border border-[#FF9B45]/30'],
+                                                'kirim' => ['Siap Kirim', 'bg-[#F0F7FF] text-[#2F80ED] border border-[#2F80ED]/30'],
+                                                'selesai' => ['Selesai', 'bg-[#F2FBF6] text-[#1B7A43] border border-[#27AE60]/30'],
+                                                default => ['Pending', 'bg-[#F5F3F1] text-[#544337] border border-[#E0E0E0]']
+                                            };
+                                            ?>
+                                            <span class="<?= $statusPill[1] ?> px-2.5 py-1 rounded-full text-xs font-semibold">
+                                                <?= $statusPill[0] ?>
+                                            </span>
+                                        </td>
+
                                         <!-- Pembayaran -->
                                         <td class="px-5 py-4 whitespace-nowrap">
                                             <span class="<?= $order['payment_class'] ?> px-3 py-1 rounded-full text-xs font-semibold">
@@ -1086,7 +1178,7 @@ if ($db_connected && $pdo) {
                         <span id="table-footer-text" class="text-[#828282] text-xs md:text-sm">
                             Menampilkan 1-<?= count($pending_orders) ?> dari <?= count($pending_orders) ?> pesanan pending
                         </span>
-                        <a href="#" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
+                        <a href="pesanan.php" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
                             <span>Lihat Semua Pesanan</span>
                             <img src="assets/icons/arrow_right.svg" alt="Semua Pesanan" class="w-4 h-4">
                         </a>
@@ -1107,7 +1199,7 @@ if ($db_connected && $pdo) {
                                     </div>
                                     <div>
                                         <h3 class="text-[#1C1C1C] text-base font-bold leading-tight">Pengiriman Hari Ini</h3>
-                                        <p class="text-[#828282] text-xs mt-0.5">Jumat, 26 Sep 2025</p>
+                                        <p class="text-[#828282] text-xs mt-0.5"><?= $todayFormatted ?></p>
                                     </div>
                                 </div>
                                 <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -1143,7 +1235,7 @@ if ($db_connected && $pdo) {
                         <!-- Footer -->
                         <div class="flex items-center justify-between pt-4 mt-4 border-t border-[#F0ECE9]">
                             <span class="text-[#828282] text-xs">Total 80 item disiapkan hari ini</span>
-                            <a href="#" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs flex items-center gap-1 transition-colors">
+                            <a href="pesanan.php?tab=kalender" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs flex items-center gap-1 transition-colors">
                                 <span>Kelola Pengiriman</span>
                                 <img src="assets/icons/chevron_right_orange.svg" alt="Kelola" class="w-2.5 h-3">
                             </a>
@@ -1162,12 +1254,12 @@ if ($db_connected && $pdo) {
                                     <h3 class="text-[#1C1C1C] text-base font-bold">Jadwal Pengiriman</h3>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[#1C1C1C] text-sm font-semibold">September 2025</span>
+                                    <span id="miniCalTitle" class="text-[#1C1C1C] text-sm font-semibold"><?= $currentMonthIndo ?></span>
                                     <div class="flex items-center gap-0.5">
-                                        <button class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Sebelumnya">
+                                        <button type="button" onclick="prevMiniMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Sebelumnya">
                                             <img src="assets/icons/chevron_left.svg" alt="Prev" class="w-3 h-3">
                                         </button>
-                                        <button class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Berikutnya">
+                                        <button type="button" onclick="nextMiniMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Berikutnya">
                                             <img src="assets/icons/chevron_right_calendar.svg" alt="Next" class="w-3 h-3">
                                         </button>
                                     </div>
@@ -1186,7 +1278,7 @@ if ($db_connected && $pdo) {
                             </div>
 
                             <!-- Calendar Dates Grid -->
-                            <div class="grid grid-cols-7 gap-y-2 text-center text-xs">
+                            <div id="miniCalGrid" class="grid grid-cols-7 gap-y-2 text-center text-xs">
                                 
                                 <!-- Week 1 -->
                                 <div class="text-[#828282]/40 py-1">31</div>
@@ -1428,10 +1520,10 @@ if ($db_connected && $pdo) {
         <div onclick="closeOrderModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
         <!-- Modal Card Container -->
-        <div class="bg-white rounded-2xl max-w-[720px] w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-[740px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col overflow-hidden">
             
-            <!-- Header -->
-            <div class="flex items-start justify-between pb-4 border-b border-[#F0ECE9] mb-6">
+            <!-- Header (Sticky Top) -->
+            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#F0ECE9] shrink-0">
                 <div>
                     <h3 class="text-xl font-bold text-[#1C1C1C]">Tambah Pesanan Baru</h3>
                     <p class="text-[#828282] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
@@ -1442,10 +1534,11 @@ if ($db_connected && $pdo) {
             </div>
 
             <!-- Form -->
-            <form id="orderForm" method="POST" action="beranda.php" class="space-y-6">
+            <form id="orderForm" method="POST" action="beranda.php" class="flex flex-col flex-1 overflow-hidden">
                 <input type="hidden" name="action" value="tambah_pesanan">
                 
-                <!-- SECTION 1: DATA PELANGGAN -->
+                <!-- Scrollable Body Content -->
+                <div class="p-6 sm:px-8 overflow-y-auto flex-1 space-y-6">
                 <div>
                     <h4 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider mb-2.5">Data Pelanggan</h4>
                     
@@ -1659,8 +1752,11 @@ if ($db_connected && $pdo) {
                     </div>
                 </div>
 
-                <!-- MODAL FOOTER -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#F0ECE9]">
+                </div>
+                <!-- /Scrollable Body Content -->
+
+                <!-- STICKY MODAL FOOTER -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 sm:px-8 border-t border-[#F0ECE9] bg-[#FAF8F5] shrink-0">
                     <div id="footerMoqWarning" class="flex items-center gap-1.5 text-xs text-[#EB5757] font-medium">
                         <span>ⓘ</span>
                         <span>Penuhi minimum order untuk menyimpan</span>
@@ -2129,6 +2225,101 @@ if ($db_connected && $pdo) {
                 closeOrderModal();
             }
         });
+
+        // Dropdown Toggle Handlers (Header)
+        function toggleNotificationDropdown() {
+            const d = document.getElementById('notificationDropdown');
+            const u = document.getElementById('userDropdown');
+            if (u) u.classList.add('hidden');
+            if (d) d.classList.toggle('hidden');
+        }
+
+        function toggleUserDropdown() {
+            const u = document.getElementById('userDropdown');
+            const d = document.getElementById('notificationDropdown');
+            if (d) d.classList.add('hidden');
+            if (u) u.classList.toggle('hidden');
+        }
+
+        // Close Dropdowns on Click Outside
+        document.addEventListener('click', function(e) {
+            const notifBtn = e.target.closest('[onclick="toggleNotificationDropdown()"]');
+            const notifDrop = e.target.closest('#notificationDropdown');
+            if (!notifBtn && !notifDrop) {
+                const d = document.getElementById('notificationDropdown');
+                if (d) d.classList.add('hidden');
+            }
+
+            const userBtn = e.target.closest('[onclick="toggleUserDropdown()"]');
+            const userDrop = e.target.closest('#userDropdown');
+            if (!userBtn && !userDrop) {
+                const u = document.getElementById('userDropdown');
+                if (u) u.classList.add('hidden');
+            }
+        });
+
+        // Mini Calendar Dynamic Navigation
+        let calCurrentDate = new Date();
+        const indMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        function renderMiniCalendar() {
+            const year = calCurrentDate.getFullYear();
+            const month = calCurrentDate.getMonth();
+            const titleEl = document.getElementById('miniCalTitle');
+            if (titleEl) {
+                titleEl.textContent = `${indMonths[month]} ${year}`;
+            }
+
+            const grid = document.getElementById('miniCalGrid');
+            if (!grid) return;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const prevMonthDays = new Date(year, month, 0).getDate();
+
+            const today = new Date();
+            const isThisMonth = (today.getFullYear() === year && today.getMonth() === month);
+
+            let html = '';
+            for (let i = firstDay - 1; i >= 0; i--) {
+                html += `<div class="text-[#828282]/40 py-1">${prevMonthDays - i}</div>`;
+            }
+            for (let day = 1; day <= totalDays; day++) {
+                const isToday = isThisMonth && today.getDate() === day;
+                const hasDelivery = [2, 5, 9, 14, 18, 22, 26, 28].includes(day);
+
+                if (isToday) {
+                    html += `<div class="flex flex-col items-center justify-center">
+                        <span class="w-6 h-6 rounded-full bg-[#FF9B45] text-white font-bold flex items-center justify-center">${day}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#924C00] mt-0.5"></span>
+                    </div>`;
+                } else if (hasDelivery) {
+                    html += `<div class="flex flex-col items-center justify-center">
+                        <span class="text-[#1B1C1B] font-medium">${day}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                    </div>`;
+                } else {
+                    html += `<div class="text-[#1B1C1B] font-medium py-1">${day}</div>`;
+                }
+            }
+            const currentCells = firstDay + totalDays;
+            const remainingCells = (currentCells <= 35 ? 35 : 42) - currentCells;
+            for (let nextDay = 1; nextDay <= remainingCells; nextDay++) {
+                html += `<div class="text-[#828282]/40 py-1">${nextDay}</div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function prevMiniMonth() {
+            calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
+            renderMiniCalendar();
+        }
+
+        function nextMiniMonth() {
+            calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
+            renderMiniCalendar();
+        }
     </script>
 </body>
 </html>

@@ -13,54 +13,158 @@ if (file_exists($configFile)) {
     require_once $configFile;
 }
 
-// Active Tab (profil atau user)
+// Inisialisasi Session Store Settings
+if (!isset($_SESSION['store_settings'])) {
+    $_SESSION['store_settings'] = [
+        'name' => 'Berkat Dinasti Bakery',
+        'phone' => '0341-551234',
+        'wa' => '0812-3456-7890',
+        'address' => 'Jl. Terusan Ijen No. 42, Klojen, Kota Malang',
+        'province' => 'Jawa Timur',
+        'city' => 'Kota Malang',
+        'postal' => '65115',
+        'email' => 'admin@berkatdinasti.id',
+        'footer' => 'Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah.',
+        'paper_size' => '80',
+        'auto_print' => true,
+        'logo' => 'assets/images/logo.png'
+    ];
+}
+
+// Inisialisasi Users List
+if (!isset($_SESSION['users_list'])) {
+    $_SESSION['users_list'] = [
+        [
+            'id' => 1,
+            'nama' => 'Admin Utama',
+            'subtext' => 'admin@berkatdinasti.id',
+            'avatar' => 'AU',
+            'avatar_bg' => 'bg-[#3E2B21]',
+            'username' => 'admin',
+            'role' => 'Pemilik (Owner)',
+            'role_class' => 'bg-[#3E2B21] text-white',
+            'status' => 'Aktif',
+            'status_class' => 'text-[#27AE60]',
+            'dot_class' => 'bg-[#27AE60]',
+            'is_locked' => true
+        ],
+        [
+            'id' => 2,
+            'nama' => 'Andi Susanto',
+            'subtext' => 'Kasir Shift Pagi',
+            'avatar' => 'AS',
+            'avatar_bg' => 'bg-[#FF9B45]',
+            'username' => 'andi.s',
+            'role' => 'Karyawan',
+            'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
+            'status' => 'Aktif',
+            'status_class' => 'text-[#27AE60]',
+            'dot_class' => 'bg-[#27AE60]',
+            'is_locked' => false
+        ],
+        [
+            'id' => 3,
+            'nama' => 'Rina Dewi',
+            'subtext' => 'Staf Produksi Bakery',
+            'avatar' => 'RD',
+            'avatar_bg' => 'bg-[#828282]',
+            'username' => 'rina.d',
+            'role' => 'Karyawan',
+            'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
+            'status' => 'Nonaktif',
+            'status_class' => 'text-[#828282]',
+            'dot_class' => 'bg-[#828282]',
+            'is_locked' => false
+        ]
+    ];
+}
+
+// POST Action Handler
+$toast_message = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'save_store_settings') {
+        $_SESSION['store_settings']['name'] = trim($_POST['store_name'] ?? 'Berkat Dinasti Bakery');
+        $_SESSION['store_settings']['phone'] = trim($_POST['store_phone'] ?? '');
+        $_SESSION['store_settings']['wa'] = trim($_POST['store_wa'] ?? '');
+        $_SESSION['store_settings']['address'] = trim($_POST['store_address'] ?? '');
+        $_SESSION['store_settings']['province'] = trim($_POST['store_province'] ?? 'Jawa Timur');
+        $_SESSION['store_settings']['city'] = trim($_POST['store_city'] ?? 'Kota Malang');
+        $_SESSION['store_settings']['postal'] = trim($_POST['store_postal'] ?? '');
+        $_SESSION['store_settings']['email'] = trim($_POST['store_email'] ?? '');
+        $_SESSION['store_settings']['footer'] = trim($_POST['store_footer'] ?? '');
+        $_SESSION['store_settings']['paper_size'] = trim($_POST['paper_size'] ?? '80');
+        $_SESSION['store_settings']['auto_print'] = isset($_POST['auto_print']);
+
+        $toast_message = "Pengaturan profil toko & format struk kasir berhasil disimpan!";
+    } elseif ($action === 'save_user') {
+        $user_id = intval($_POST['user_id'] ?? 0);
+        $nama = trim($_POST['nama'] ?? '');
+        $username = trim($_POST['username'] ?? '');
+        $subtext = trim($_POST['subtext'] ?? 'Staf Operasional');
+        $role = trim($_POST['role'] ?? 'Karyawan');
+        $status = trim($_POST['status'] ?? 'Aktif');
+
+        // Initial avatar
+        $avatar = strtoupper(substr($nama, 0, 1) . substr($username, 0, 1));
+
+        if ($user_id > 0) {
+            foreach ($_SESSION['users_list'] as &$u) {
+                if ($u['id'] === $user_id) {
+                    $u['nama'] = $nama;
+                    $u['username'] = $username;
+                    $u['subtext'] = $subtext;
+                    $u['role'] = $role;
+                    $u['status'] = $status;
+                    $u['status_class'] = ($status === 'Aktif') ? 'text-[#27AE60]' : 'text-[#828282]';
+                    $u['dot_class'] = ($status === 'Aktif') ? 'bg-[#27AE60]' : 'bg-[#828282]';
+                    break;
+                }
+            }
+            unset($u);
+            $toast_message = "Data pengguna \"{$nama}\" berhasil diperbarui!";
+        } else {
+            $new_user = [
+                'id' => time(),
+                'nama' => $nama,
+                'subtext' => $subtext,
+                'avatar' => $avatar,
+                'avatar_bg' => 'bg-[#FF9B45]',
+                'username' => $username,
+                'role' => $role,
+                'role_class' => ($role === 'Pemilik (Owner)') ? 'bg-[#3E2B21] text-white' : 'bg-[#FF9B45]/15 text-[#924C00]',
+                'status' => $status,
+                'status_class' => ($status === 'Aktif') ? 'text-[#27AE60]' : 'text-[#828282]',
+                'dot_class' => ($status === 'Aktif') ? 'bg-[#27AE60]' : 'bg-[#828282]',
+                'is_locked' => false
+            ];
+            $_SESSION['users_list'][] = $new_user;
+            $toast_message = "Pengguna baru \"{$nama}\" berhasil didaftarkan!";
+        }
+    } elseif ($action === 'delete_user') {
+        $del_id = intval($_POST['user_id'] ?? 0);
+        if ($del_id > 1) { // Proteksi admin id 1
+            $_SESSION['users_list'] = array_values(array_filter($_SESSION['users_list'], function($u) use ($del_id) {
+                return $u['id'] !== $del_id;
+            }));
+            $toast_message = "Pengguna berhasil dihapus.";
+        }
+    }
+}
+
+$store = $_SESSION['store_settings'];
+$users_list = $_SESSION['users_list'];
 $active_tab = $_GET['tab'] ?? 'profil';
 
-// Default Master User Sesuai Figma
-$users_list = [
-    [
-        'id' => 1,
-        'nama' => 'Admin Utama',
-        'subtext' => 'admin@berkatdinasti.id',
-        'avatar' => 'AU',
-        'avatar_bg' => 'bg-[#3E2B21]',
-        'username' => '@admin',
-        'role' => 'Pemilik (Owner)',
-        'role_class' => 'bg-[#3E2B21] text-white',
-        'status' => 'Aktif',
-        'status_class' => 'text-[#27AE60]',
-        'dot_class' => 'bg-[#27AE60]',
-        'is_locked' => true
-    ],
-    [
-        'id' => 2,
-        'nama' => 'Andi Susanto',
-        'subtext' => 'Kasir Shift Pagi',
-        'avatar' => 'AS',
-        'avatar_bg' => 'bg-[#FF9B45]',
-        'username' => '@andi.s',
-        'role' => 'Karyawan',
-        'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
-        'status' => 'Aktif',
-        'status_class' => 'text-[#27AE60]',
-        'dot_class' => 'bg-[#27AE60]',
-        'is_locked' => false
-    ],
-    [
-        'id' => 3,
-        'nama' => 'Rina Dewi',
-        'subtext' => 'Staf Produksi Bakery',
-        'avatar' => 'RD',
-        'avatar_bg' => 'bg-[#828282]',
-        'username' => '@rina.d',
-        'role' => 'Karyawan',
-        'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
-        'status' => 'Nonaktif',
-        'status_class' => 'text-[#828282]',
-        'dot_class' => 'bg-[#828282]',
-        'is_locked' => false
-    ]
-];
+// Helper Tanggal Dinamis Bahasa Indonesia
+$daysIndo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+$monthsIndo = ['01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'];
+$dayName = $daysIndo[date('l')] ?? date('l');
+$dayNum = date('d');
+$monthNum = date('m');
+$yearNum = date('Y');
+$todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? date('M')) . " " . $yearNum;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -68,6 +172,7 @@ $users_list = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengaturan - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +205,6 @@ $users_list = [
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        mono: ['Courier Prime', 'Courier New', 'monospace']
                     },
                     boxShadow: {
                         'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
@@ -134,31 +238,24 @@ $users_list = [
             background: #FF9B45;
         }
 
-        /* Thermal Receipt Simulation Paper Styling */
-        .thermal-paper {
-            font-family: 'Courier New', Courier, monospace;
-            background: #FFFFFF;
-            position: relative;
-        }
-        .thermal-paper::before {
-            content: "";
-            position: absolute;
-            top: -6px;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: radial-gradient(circle, transparent, transparent 50%, #FFFFFF 50%, #FFFFFF 100%);
-            background-size: 10px 10px;
-        }
-        .thermal-paper::after {
-            content: "";
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: radial-gradient(circle, transparent, transparent 50%, #FFFFFF 50%, #FFFFFF 100%);
-            background-size: 10px 10px;
+        /* Thermal Struk Print Style */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableThermalReceipt, #printableThermalReceipt * {
+                visibility: visible;
+            }
+            #printableThermalReceipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                margin: 0;
+                padding: 10px;
+                background: white;
+                color: black;
+            }
         }
     </style>
 </head>
@@ -184,7 +281,7 @@ $users_list = [
                     <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
-                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
+                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -256,93 +353,107 @@ $users_list = [
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg" aria-label="Buka Menu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="beranda.php" class="text-[#544337] hover:underline">Beranda</a>
+                            <a href="pengaturan.php" class="text-[#544337] hover:underline" id="headerBreadcrumb">Pengaturan</a>
                             <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium" id="headerBreadcrumb">Pengaturan</span>
+                            <span class="text-[#924C00] font-medium" id="headerSubtitle"><?= $active_tab === 'user' ? 'Manajemen User' : 'Profil Toko' ?></span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">Pengaturan</h1>
+                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">
+                            <?= $active_tab === 'user' ? 'Manajemen Pengguna' : 'Pengaturan Toko' ?>
+                        </h1>
                     </div>
                 </div>
 
                 <!-- Right: Date Indicator, Notification Bell, User Avatar -->
-                <div class="flex items-center gap-3 md:gap-5">
+                <div class="flex items-center gap-3 md:gap-5 relative">
                     
-                    <!-- Date Button -->
+                    <!-- Date Button (Dinamis) -->
                     <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
                         <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
-                        <span>Jumat, 26 Sep 2025</span>
+                        <span><?= $todayFormatted ?></span>
                     </div>
 
-                    <!-- Notification Bell with Orange Dot -->
-                    <button class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
-                        <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
-                    </button>
+                    <!-- Notification Bell with Popover -->
+                    <div class="relative">
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
+                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                        </button>
 
-                    <!-- User Circle Icon -->
-                    <div class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
-                        <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                            <div class="px-4 pb-2 border-b border-[#F0ECE9] flex items-center justify-between">
+                                <span class="font-bold text-sm text-[#1C1C1C]">Notifikasi Sistem</span>
+                                <span class="text-[11px] bg-[#27AE60]/15 text-[#1B7A43] font-semibold px-2 py-0.5 rounded-full">Normal</span>
+                            </div>
+                            <div class="p-3 text-xs text-[#544337] space-y-1">
+                                <p>• Profil toko tersinkronisasi otomatis.</p>
+                                <p>• Printer thermal siap mencetak (80mm).</p>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- User Circle Icon with Popover -->
+                    <div class="relative">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna" id="userAvatarBtn">
+                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        </div>
+
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
+                                <p class="text-xs font-bold text-[#1C1C1C] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
+                                <p class="text-[11px] text-[#828282]"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?> Toko</p>
+                            </div>
+                            <a href="pengaturan.php" class="block px-4 py-2 text-xs text-[#544337] hover:bg-[#F5F3F1] hover:text-[#1C1C1C] transition-colors">
+                                ⚙️ Pengaturan Toko
+                            </a>
+                            <div class="border-t border-[#F0ECE9] mt-1 pt-1">
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left px-4 py-2 text-xs text-[#EB5757] hover:bg-[#FFF0F0] font-medium transition-colors">
+                                    🚪 Keluar dari Akun
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </header>
 
             <!-- MAIN CONTENT CONTAINER -->
             <main class="flex-1 p-4 md:p-8 w-full min-w-0">
                 
-                <!-- TOP STATUS CARD (MATCHING FIGMA SCREENSHOT) -->
-                <div class="bg-white rounded-2xl border border-[#F0ECE9] p-4.5 mb-6 shadow-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00] shrink-0">
-                            <svg class="w-5 h-5 text-[#FF9B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <!-- Toast Notification Banner -->
+                <?php if ($toast_message): ?>
+                    <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="text-sm font-medium"><?= htmlspecialchars($toast_message) ?></span>
                         </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-[#1C1C1C]">Status Operasional Toko: Buka Normal</h3>
-                            <p class="text-xs text-[#828282] mt-0.5">Sistem terhubung ke 1 printer POS kasir • Sinkronisasi lokal aktif</p>
-                        </div>
+                        <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
                     </div>
+                <?php endif; ?>
 
-                    <!-- Right Status Badges -->
-                    <div class="flex items-center gap-2.5">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#27AE60]/15 text-[#1B7A43]">
-                            <span class="w-2 h-2 rounded-full bg-[#27AE60]"></span>
-                            <span>Database Tersinkron</span>
-                        </span>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-[#F5F3F1] text-[#828282] border border-[#EBE8E5]">
-                            Versi POS v2.4.1
-                        </span>
-                    </div>
-                </div>
-
-                <!-- TAB SWITCHER: PROFIL UMKM VS MANAJEMEN USER -->
-                <div class="bg-[#F0ECE9]/60 p-1 rounded-xl max-w-fit flex items-center gap-1.5 mb-6">
+                <!-- TAB SWITCHER BAR (PROFIL TOKO VS MANAJEMEN USER) -->
+                <div class="bg-white rounded-xl border border-[#F0ECE9] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
                     <!-- Tab 1: Profil UMKM -->
                     <button onclick="switchSettingTab('profil')" id="tabBtnProfil" 
                         class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'user' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span>Profil UMKM</span>
+                        <span>Profil Toko & Printer</span>
                     </button>
 
                     <!-- Tab 2: Manajemen User -->
                     <button onclick="switchSettingTab('user')" id="tabBtnUser" 
                         class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'user' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span>Manajemen User</span>
-                        <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full <?= $active_tab === 'user' ? 'bg-white/20 text-white' : 'bg-[#E0E0E0] text-[#544337]' ?>">3 User</span>
-                    </button>
-
-                    <!-- Tab 3: Keamanan & Sesi (Logout Sesi) -->
-                    <button onclick="switchSettingTab('keamanan')" id="tabBtnKeamanan" 
-                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'keamanan' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        <span>Keamanan & Sesi</span>
+                        <span>Manajemen Pengguna</span>
                     </button>
                 </div>
 
@@ -365,44 +476,51 @@ $users_list = [
                                     <span class="w-5 h-5 rounded-full bg-[#27AE60]/15 text-[#1B7A43] flex items-center justify-center text-xs font-bold">✓</span>
                                 </div>
 
-                                <!-- Logo Berkat Dinasti Box -->
+                                <!-- Logo Berkat Dinasti Box with Real File Input Preview -->
                                 <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
                                     <div class="w-16 h-16 rounded-xl bg-white p-1 border border-[#F0ECE9] flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
-                                        <img src="assets/images/logo.png" alt="Logo Berkat Dinasti" class="w-full h-full object-contain">
+                                        <img src="<?= htmlspecialchars($store['logo'] ?? 'assets/images/logo.png') ?>" id="storeLogoPreview" alt="Logo Berkat Dinasti" class="w-full h-full object-contain">
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
-                                            <h4 class="text-sm font-bold text-[#1C1C1C]">Logo Berkat Dinasti</h4>
+                                            <h4 class="text-sm font-bold text-[#1C1C1C]">Logo Toko Bakery</h4>
                                             <span class="w-4 h-4 rounded-full bg-[#27AE60] text-white text-[10px] flex items-center justify-center font-bold">✓</span>
                                         </div>
                                         <p class="text-xs text-[#828282] mt-0.5">Format PNG/JPG transparan resolusi minimum 500 × 500 px (Maks. 2MB)</p>
+                                        
+                                        <!-- Hidden File Input for Logo -->
+                                        <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="previewLogo(this)">
+
                                         <div class="flex items-center gap-2.5 mt-3">
-                                            <button type="button" onclick="alert('Pilih gambar logo baru dari komputer...')" 
+                                            <button type="button" onclick="document.getElementById('logoFileInput').click()" 
                                                 class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors">
                                                 <span>⬆</span>
                                                 <span>Ubah Logo</span>
                                             </button>
-                                            <button type="button" onclick="alert('Logo dikembalikan ke logo default.')" 
+                                            <button type="button" onclick="resetLogo()" 
                                                 class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E0E0E0] transition-colors">
-                                                Hapus
+                                                Reset
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Form Fields -->
-                                <form onsubmit="handleSaveStoreInfo(event)" class="space-y-4">
+                                <!-- Form Fields (Equipped with Label & ID for Accessibility) -->
+                                <form id="storeSettingsForm" method="POST" action="pengaturan.php" class="space-y-4">
+                                    <input type="hidden" name="action" value="save_store_settings">
+
                                     <!-- Nama Toko -->
                                     <div>
                                         <div class="flex items-center justify-between mb-1.5">
-                                            <label class="block text-xs font-semibold text-[#333333]">Nama Resmi UMKM / Toko <span class="text-[#EB5757]">*</span></label>
+                                            <label for="storeNameInput" class="block text-xs font-semibold text-[#333333]">Nama Resmi UMKM / Toko <span class="text-[#EB5757]">*</span></label>
                                             <span class="text-[11px] text-[#828282]">Ditampilkan di struk & faktur</span>
                                         </div>
                                         <div class="relative">
                                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                                             </div>
-                                            <input type="text" id="storeName" value="Berkat Dinasti Bakery" 
+                                            <input type="text" id="storeNameInput" name="store_name" value="<?= htmlspecialchars($store['name']) ?>" required
+                                                onkeyup="updateReceiptPreview()"
                                                 class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold focus:border-[#FF9B45] focus:outline-none transition-colors">
                                         </div>
                                     </div>
@@ -410,194 +528,135 @@ $users_list = [
                                     <!-- 2 Cols: Phone & WA -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#333333] mb-1.5">No. Telepon Toko</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                                </div>
-                                                <input type="text" id="storePhone" value="022-7218940" 
-                                                    class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
-                                            </div>
+                                            <label for="storePhoneInput" class="block text-xs font-semibold text-[#333333] mb-1.5">No. Telepon Toko</label>
+                                            <input type="text" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" 
+                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <label class="block text-xs font-semibold text-[#333333]">WhatsApp Bisnis</label>
-                                                <span class="text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1.5 py-0.2 rounded-full">● Aktif Kirim Nota</span>
-                                            </div>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#27AE60]">
-                                                    <span>📱</span>
-                                                </div>
-                                                <input type="text" id="storeWa" value="0812-3456-7890" 
-                                                    class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
-                                            </div>
+                                            <label for="storeWaInput" class="block text-xs font-semibold text-[#333333] mb-1.5">WhatsApp Bisnis</label>
+                                            <input type="text" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" 
+                                                onkeyup="updateReceiptPreview()"
+                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
                                         </div>
                                     </div>
 
                                     <!-- Alamat Lengkap Operasional Toko -->
                                     <div>
-                                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Alamat Lengkap Operasional Toko</label>
-                                        <textarea id="storeAddress" rows="2" 
-                                            class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">Jl. Pelindung Hewan No. 42, RT 03/RW 05, Kel. Pelindung Hewan, Kec. Astanaanyar</textarea>
+                                        <label for="storeAddressInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Alamat Lengkap Operasional Toko</label>
+                                        <textarea id="storeAddressInput" name="store_address" rows="2" 
+                                            onkeyup="updateReceiptPreview()"
+                                            class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"><?= htmlspecialchars($store['address']) ?></textarea>
                                     </div>
 
                                     <!-- 2 Cols: Provinsi & Kota -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#333333] mb-1.5">Provinsi</label>
-                                            <div class="relative">
-                                                <select class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
-                                                    <option>Jawa Barat</option>
-                                                    <option>Jawa Timur</option>
-                                                    <option>DKI Jakarta</option>
-                                                </select>
-                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                                </div>
-                                            </div>
+                                            <label for="storeProvinceSelect" class="block text-xs font-semibold text-[#333333] mb-1.5">Provinsi</label>
+                                            <select id="storeProvinceSelect" name="store_province" class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                                                <option value="Jawa Timur" <?= ($store['province'] === 'Jawa Timur') ? 'selected' : '' ?>>Jawa Timur</option>
+                                                <option value="Jawa Barat" <?= ($store['province'] === 'Jawa Barat') ? 'selected' : '' ?>>Jawa Barat</option>
+                                                <option value="DKI Jakarta" <?= ($store['province'] === 'DKI Jakarta') ? 'selected' : '' ?>>DKI Jakarta</option>
+                                            </select>
                                         </div>
 
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#333333] mb-1.5">Kota / Kabupaten</label>
-                                            <div class="relative">
-                                                <select class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
-                                                    <option>Kota Bandung</option>
-                                                    <option>Kota Cimahi</option>
-                                                    <option>Kabupaten Bandung</option>
-                                                </select>
-                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                                </div>
-                                            </div>
+                                            <label for="storeCitySelect" class="block text-xs font-semibold text-[#333333] mb-1.5">Kota / Kabupaten</label>
+                                            <select id="storeCitySelect" name="store_city" class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                                                <option value="Kota Malang" <?= ($store['city'] === 'Kota Malang') ? 'selected' : '' ?>>Kota Malang</option>
+                                                <option value="Kota Batu" <?= ($store['city'] === 'Kota Batu') ? 'selected' : '' ?>>Kota Batu</option>
+                                                <option value="Kabupaten Malang" <?= ($store['city'] === 'Kabupaten Malang') ? 'selected' : '' ?>>Kabupaten Malang</option>
+                                            </select>
                                         </div>
                                     </div>
 
                                     <!-- 2 Cols: Kode Pos & Email -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#333333] mb-1.5">Kode Pos</label>
-                                            <input type="text" value="40243" 
+                                            <label for="storePostalInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Kode Pos</label>
+                                            <input type="text" id="storePostalInput" name="store_postal" value="<?= htmlspecialchars($store['postal']) ?>" 
                                                 class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
-                                            <label class="block text-xs font-semibold text-[#333333] mb-1.5">Email Bisnis</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                                </div>
-                                                <input type="email" value="berkatdinasti.bakery@gmail.com" 
-                                                    class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                            <label for="storeEmailInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Email Bisnis</label>
+                                            <input type="email" id="storeEmailInput" name="store_email" value="<?= htmlspecialchars($store['email']) ?>" 
+                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                        </div>
+                                    </div>
+
+                                    <!-- CARD 2: PENGATURAN STRUK PRINTER -->
+                                    <div class="pt-6 mt-6 border-t border-[#F0ECE9]">
+                                        <div class="flex items-center justify-between pb-3 mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <span>🖨️</span>
+                                                <h4 class="text-sm font-bold text-[#1C1C1C]">Pengaturan Struk Kasir (Thermal POS)</h4>
                                             </div>
+                                            <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                                Bluetooth & USB
+                                            </span>
+                                        </div>
+
+                                        <!-- Pilihan Ukuran Kertas Thermal -->
+                                        <div class="mb-4">
+                                            <label class="block text-xs font-semibold text-[#333333] mb-2">Pilihan Ukuran Kertas Thermal:</label>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                                <label class="border border-[#E0E0E0] rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-[#FF9B45] transition-colors">
+                                                    <input type="radio" id="storePaperSize58" name="paper_size" value="58" <?= ($store['paper_size'] === '58') ? 'checked' : '' ?> class="text-[#FF9B45] focus:ring-[#FF9B45]">
+                                                    <div>
+                                                        <p class="text-xs font-bold text-[#1C1C1C]">58 mm (Mini Portable POS)</p>
+                                                        <p class="text-[11px] text-[#828282] mt-0.5">Lebar 32 karakter per baris</p>
+                                                    </div>
+                                                </label>
+
+                                                <label class="border-2 border-[#FF9B45] bg-[#FFF8F2] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="radio" id="storePaperSize80" name="paper_size" value="80" <?= ($store['paper_size'] === '80') ? 'checked' : '' ?> class="text-[#FF9B45] focus:ring-[#FF9B45]">
+                                                        <div>
+                                                            <p class="text-xs font-bold text-[#924C00]">80 mm (Standar Desktop Kasir)</p>
+                                                            <p class="text-[11px] text-[#544337] mt-0.5">Lebar 48 karakter • Terpilih</p>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-sm">🧾</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Pesan Penutup (Footer Nota Kasir) -->
+                                        <div class="mb-5">
+                                            <div class="flex items-center justify-between mb-1.5">
+                                                <label for="storeFooterInput" class="block text-xs font-semibold text-[#333333]">Pesan Penutup (Footer Nota Kasir):</label>
+                                                <span class="text-[11px] text-[#828282]">Maks. 140 karakter</span>
+                                            </div>
+                                            <textarea rows="2" id="storeFooterInput" name="store_footer" onkeyup="updateReceiptPreview()"
+                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"><?= htmlspecialchars($store['footer']) ?></textarea>
+                                        </div>
+
+                                        <!-- Test Print Actions -->
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#F0ECE9]">
+                                            <button type="button" onclick="printThermalReceipt()" 
+                                                class="bg-[#F5F3F1] hover:bg-[#EBE8E5] text-[#1C1C1C] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0] flex items-center gap-2 transition-colors">
+                                                <span>🖨️</span>
+                                                <span>Test Print Nota Struk (80mm)</span>
+                                            </button>
+
+                                            <button type="submit" 
+                                                class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white font-bold text-xs md:text-sm px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>Simpan Pengaturan Toko</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
 
-                            <!-- CARD 2: PENGATURAN STRUK PRINTER (THERMAL POS) -->
-                            <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card">
-                                <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-6 h-6 rounded-md bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00]">
-                                            <span>🖨️</span>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-base font-bold text-[#1C1C1C]">Pengaturan Struk Printer (Thermal POS)</h3>
-                                            <p class="text-xs text-[#828282] mt-0.5">Konfigurasi layout nota kasir dan teks footernya untuk printer thermal</p>
-                                        </div>
-                                    </div>
-                                    <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-1 rounded-full">
-                                        Bluetooth & USB
-                                    </span>
-                                </div>
-
-                                <!-- Toggle Aktifkan Cetak Struk Otomatis -->
-                                <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex items-center justify-between mb-5">
-                                    <div>
-                                        <h4 class="text-xs font-bold text-[#1C1C1C]">Aktifkan Cetak Struk Otomatis</h4>
-                                        <p class="text-[11px] text-[#828282] mt-0.5">Cetak slip pengiriman dan nota kasir langsung saat pesanan diselesaikan di sistem</p>
-                                    </div>
-                                    <!-- Toggle Switch -->
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" checked class="sr-only peer">
-                                        <div class="w-11 h-6 bg-[#E0E0E0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
-                                    </label>
-                                </div>
-
-                                <!-- Pilihan Ukuran Kertas Thermal -->
-                                <div class="mb-5">
-                                    <label class="block text-xs font-semibold text-[#333333] mb-2">Pilihan Ukuran Kertas Thermal:</label>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                        <!-- Option 1: 58 mm -->
-                                        <div class="border border-[#E0E0E0] rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-[#FF9B45] transition-colors">
-                                            <input type="radio" name="paperSize" value="58" class="text-[#FF9B45] focus:ring-[#FF9B45]">
-                                            <div>
-                                                <p class="text-xs font-bold text-[#1C1C1C]">58 mm (Mini Portable POS)</p>
-                                                <p class="text-[11px] text-[#828282] mt-0.5">Lebar 32 karakter per baris</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Option 2: 80 mm (Selected) -->
-                                        <div class="border-2 border-[#FF9B45] bg-[#FFF8F2] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
-                                            <div class="flex items-center gap-3">
-                                                <input type="radio" name="paperSize" value="80" checked class="text-[#FF9B45] focus:ring-[#FF9B45]">
-                                                <div>
-                                                    <p class="text-xs font-bold text-[#924C00]">80 mm (Standar Desktop Kasir)</p>
-                                                    <p class="text-[11px] text-[#544337] mt-0.5">Lebar 48 karakter • Terpilih</p>
-                                                </div>
-                                            </div>
-                                            <span class="text-sm">🧾</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Pesan Penutup (Footer Nota Kasir) -->
-                                <div class="mb-5">
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <label class="block text-xs font-semibold text-[#333333]">Pesan Penutup (Footer Nota Kasir):</label>
-                                        <span class="text-[11px] text-[#828282]">Maks. 140 karakter</span>
-                                    </div>
-                                    <textarea rows="2" id="footerReceiptInput" 
-                                        class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah.</textarea>
-                                </div>
-
-                                <!-- Test Print & Reset Actions -->
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#F0ECE9]">
-                                    <div class="flex items-center gap-3">
-                                        <button type="button" onclick="alert('Mencetak struk uji coba ke printer thermal (80mm)...')" 
-                                            class="bg-[#F5F3F1] hover:bg-[#EBE8E5] text-[#1C1C1C] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0] flex items-center gap-2 transition-colors">
-                                            <span>🖨️</span>
-                                            <span>Test Print Nota Struk (80mm)</span>
-                                        </button>
-                                        <span class="text-[11px] text-[#828282] hidden md:inline">Terakhir diperbarui: Hari ini, 09:30 WIB</span>
-                                    </div>
-
-                                    <button type="button" onclick="alert('Pengaturan layout struk direset ke default pabrik.')" 
-                                        class="text-[#EB5757] hover:underline text-xs font-medium flex items-center gap-1 self-start sm:self-auto">
-                                        <span>↺</span>
-                                        <span>Reset ke Default</span>
-                                    </button>
-                                </div>
-
-                            </div>
-
-                            <!-- Bottom Save Store Settings Button -->
-                            <div class="flex justify-end">
-                                <button type="button" onclick="handleSaveStoreInfo(event)" 
-                                    class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-button-orange active:scale-95 transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span>Simpan Pengaturan Toko</span>
-                                </button>
-                            </div>
-
                         </div>
 
-                        <!-- RIGHT 1 COL: SIMULASI CETAK NOTA 80MM & PANDUAN PENGATURAN -->
+                        <!-- RIGHT 1 COL: SIMULASI CETAK NOTA 80MM -->
                         <div class="space-y-6">
                             
-                            <!-- CARD 1: SIMULASI CETAK NOTA 80MM -->
-                            <div class="bg-white rounded-2xl border border-[#F0ECE9] p-5 shadow-card">
+                            <!-- CARD: SIMULASI CETAK NOTA 80MM -->
+                            <div class="bg-white rounded-2xl border border-[#F0ECE9] p-5 shadow-card" id="printableThermalReceipt">
                                 <div class="flex items-center justify-between pb-3 border-b border-[#F0ECE9] mb-4">
                                     <div class="flex items-center gap-2 text-xs font-bold text-[#1C1C1C]">
                                         <span>🧾</span>
@@ -613,19 +672,19 @@ $users_list = [
                                     
                                     <!-- Store Header -->
                                     <div class="text-center pb-2 border-b border-dashed border-[#828282]">
-                                        <p class="font-bold text-xs uppercase tracking-wider">BERKAT DINASTI BAKERY</p>
-                                        <p class="text-[10px] text-[#544337]">Jl. Pelindung Hewan No. 42, Astanaanyar</p>
-                                        <p class="text-[10px] text-[#544337]">Bandung • WA: 0812-3456-7890</p>
+                                        <p class="font-bold text-xs uppercase tracking-wider" id="previewReceiptName"><?= htmlspecialchars($store['name']) ?></p>
+                                        <p class="text-[10px] text-[#544337]" id="previewReceiptAddress"><?= htmlspecialchars($store['address']) ?></p>
+                                        <p class="text-[10px] text-[#544337]">Malang • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
                                     </div>
 
                                     <!-- Meta Order -->
                                     <div class="py-2 border-b border-dashed border-[#828282] text-[10px] space-y-0.5">
                                         <div class="flex justify-between">
-                                            <span>Nota: ORD-20250926-01</span>
-                                            <span>26/09/25 10:15</span>
+                                            <span>Nota: INV-<?= date('Ymd') ?>-0001</span>
+                                            <span><?= date('d/m/y H:i') ?></span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span>Kasir: Admin (Pemilik)</span>
+                                            <span>Kasir: Admin</span>
                                             <span>Plg: Ibu Sari Dewi</span>
                                         </div>
                                     </div>
@@ -640,67 +699,43 @@ $users_list = [
                                             <span>2x Chiffon Pandan Keju</span>
                                             <span class="font-bold">Rp 80.000</span>
                                         </div>
-                                        <div class="flex justify-between">
-                                            <span>1x Roll Cokelat Mini (10x)</span>
-                                            <span class="font-bold">Rp 120.000</span>
-                                        </div>
                                     </div>
 
                                     <!-- Totals Calculation -->
                                     <div class="py-2 border-b border-dashed border-[#828282] text-[10px] space-y-1">
                                         <div class="flex justify-between text-[#828282]">
                                             <span>Subtotal:</span>
-                                            <span>Rp 235.000</span>
-                                        </div>
-                                        <div class="flex justify-between text-[#27AE60]">
-                                            <span>Diskon Member:</span>
-                                            <span>- Rp 15.000</span>
+                                            <span>Rp 115.000</span>
                                         </div>
                                         <div class="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-[#828282]/50">
                                             <span>TOTAL AKHIR:</span>
-                                            <span class="text-[#924C00]">Rp 220.000</span>
-                                        </div>
-                                        <div class="flex justify-between text-[#544337]">
-                                            <span>Bayar (QRIS Mandiri):</span>
-                                            <span>Rp 220.000</span>
+                                            <span class="text-[#924C00]">Rp 115.000</span>
                                         </div>
                                         <div class="flex justify-between font-bold text-[#27AE60]">
-                                            <span>Kembalian:</span>
-                                            <span>Rp 0 (LUNAS)</span>
+                                            <span>Status:</span>
+                                            <span>LUNAS</span>
                                         </div>
                                     </div>
 
                                     <!-- Footer Message & Barcode -->
                                     <div class="pt-3 text-center text-[10px]">
-                                        <p class="italic text-[#544337] mb-2 leading-tight">
-                                            "Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah."
+                                        <p class="italic text-[#544337] mb-2 leading-tight" id="previewReceiptFooter">
+                                            "<?= htmlspecialchars($store['footer']) ?>"
                                         </p>
                                         <div class="font-mono text-center tracking-widest text-[#828282] text-[10px] my-1">
                                             ||||||||||||||||||||||||||||||||||||||||||||
                                         </div>
-                                        <p class="text-[9px] text-[#828282]">www.berkatdinasti.id</p>
+                                        <p class="text-[9px] text-[#828282]">Berkat Dinasti — Kota Malang</p>
                                     </div>
 
                                 </div>
 
-                                <!-- Receipt Footer Action -->
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9] text-xs">
                                     <span class="text-[#828282]">Ukuran kertas: <strong class="text-[#1C1C1C]">80 mm</strong></span>
-                                    <button onclick="window.print()" class="text-[#FF9B45] hover:text-[#E88C3D] font-bold">
-                                        Cetak Uji Coba →
+                                    <button type="button" onclick="printThermalReceipt()" class="text-[#FF9B45] hover:text-[#E88C3D] font-bold">
+                                        Cetak Uji Coba &rarr;
                                     </button>
                                 </div>
-                            </div>
-
-                            <!-- CARD 2: PANDUAN PENGATURAN TOKO -->
-                            <div class="bg-[#FBF9F7] rounded-2xl border border-[#F0ECE9] p-5 shadow-card">
-                                <div class="flex items-center gap-2 mb-2 text-[#924C00] font-bold text-xs">
-                                    <span>💡</span>
-                                    <span>Panduan Pengaturan Toko</span>
-                                </div>
-                                <p class="text-xs text-[#544337] leading-relaxed">
-                                    Perubahan pada profil UMKM ini langsung mempengaruhi kop faktur digital di menu Pesanan serta header nota transaksi yang dicetak kasir.
-                                </p>
                             </div>
 
                         </div>
@@ -709,26 +744,21 @@ $users_list = [
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- TAB 2 CONTENT: MANAJEMEN USER (MATCHING FIGMA SCREENSHOT 2)    -->
+                <!-- TAB 2 CONTENT: MANAJEMEN USER                                  -->
                 <!-- ============================================================== -->
                 <div id="tabContentUser" class="<?= $active_tab !== 'user' ? 'hidden' : '' ?>">
-                    
-                    <!-- Main Card: Table Pengguna Sistem -->
                     <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card mb-6">
-                        
-                        <!-- Header with Add User Button -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#F0ECE9] mb-5">
                             <div>
                                 <div class="flex items-center gap-2.5">
                                     <h3 class="text-base font-bold text-[#1C1C1C]">Daftar Pengguna Sistem</h3>
                                     <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                        3 Pengguna
+                                        <?= count($users_list) ?> Pengguna
                                     </span>
                                 </div>
                                 <p class="text-xs text-[#828282] mt-0.5">Kelola akun kasir, staf bakery, serta hak akses pengelolaan pesanan pelanggan</p>
                             </div>
 
-                            <!-- Button Tambah User Baru -->
                             <button onclick="openUserModal()" 
                                 class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                                 <img src="assets/icons/user_plus.svg" alt="Tambah User" class="w-4 h-4">
@@ -736,24 +766,20 @@ $users_list = [
                             </button>
                         </div>
 
-                        <!-- Users Table -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse" id="usersTable">
-                                <!-- Orange Header (Matching Figma) -->
                                 <thead>
                                     <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
-                                        <th class="py-3 px-4 min-w-[240px]">PENGGUNA</th>
+                                        <th class="py-3 px-4 min-w-[200px]">PENGGUNA</th>
                                         <th class="py-3 px-4 min-w-[140px]">USERNAME</th>
                                         <th class="py-3 px-4 min-w-[160px]">ROLE / HAK AKSES</th>
                                         <th class="py-3 px-4 min-w-[120px]">STATUS AKUN</th>
-                                        <th class="py-3 px-4 text-center min-w-[130px]">AKSI</th>
+                                        <th class="py-3 px-4 text-center min-w-[120px]">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[#F0ECE9] text-xs md:text-sm">
                                     <?php foreach ($users_list as $u): ?>
                                         <tr class="hover:bg-[#FAF8F5] transition-colors">
-                                            
-                                            <!-- Pengguna (Avatar, Name, Subtext) -->
                                             <td class="py-4 px-4">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-9 h-9 rounded-full <?= $u['avatar_bg'] ?> text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
@@ -766,12 +792,10 @@ $users_list = [
                                                 </div>
                                             </td>
 
-                                            <!-- Username -->
                                             <td class="py-4 px-4 font-mono font-medium text-[#544337]">
-                                                <?= htmlspecialchars($u['username']) ?>
+                                                @<?= htmlspecialchars($u['username']) ?>
                                             </td>
 
-                                            <!-- Role Badge -->
                                             <td class="py-4 px-4">
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold <?= $u['role_class'] ?>">
                                                     <span class="w-1.5 h-1.5 rounded-full <?= $u['id'] === 1 ? 'bg-white' : 'bg-[#FF9B45]' ?>"></span>
@@ -779,7 +803,6 @@ $users_list = [
                                                 </span>
                                             </td>
 
-                                            <!-- Status Akun -->
                                             <td class="py-4 px-4">
                                                 <span class="inline-flex items-center gap-1.5 font-semibold text-xs <?= $u['status_class'] ?>">
                                                     <span class="w-2 h-2 rounded-full <?= $u['dot_class'] ?>"></span>
@@ -787,24 +810,9 @@ $users_list = [
                                                 </span>
                                             </td>
 
-                                            <!-- Aksi -->
                                             <td class="py-4 px-4 text-center">
-                                                <?php if ($u['is_locked']): ?>
-                                                    <div class="flex items-center justify-center gap-2 text-xs">
-                                                        <button onclick="openUserModal(<?= $u['id'] ?>)" title="Edit Profil" class="p-1.5 text-[#828282] hover:text-[#2F80ED] transition-colors">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                                        </button>
-                                                        <span class="text-xs text-[#828282] italic">Terkunci</span>
-                                                    </div>
-                                                <?php elseif ($u['status'] === 'Nonaktif'): ?>
-                                                    <div class="flex items-center justify-center gap-2 text-xs">
-                                                        <button onclick="openUserModal(<?= $u['id'] ?>)" title="Edit" class="p-1.5 text-[#828282] hover:text-[#2F80ED] transition-colors">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                                        </button>
-                                                        <button onclick="toggleUserStatus(<?= $u['id'] ?>, 'aktif')" class="text-xs font-semibold text-[#27AE60] hover:underline">
-                                                            Aktifkan
-                                                        </button>
-                                                    </div>
+                                                <?php if ($u['is_locked'] ?? false): ?>
+                                                    <span class="text-xs text-[#828282] italic">Terkunci (Owner)</span>
                                                 <?php else: ?>
                                                     <div class="flex items-center justify-center gap-2">
                                                         <button onclick="openUserModal(<?= $u['id'] ?>)" title="Edit Pengguna" class="p-1.5 text-[#828282] hover:text-[#2F80ED] rounded hover:bg-[#F5F3F1] transition-colors">
@@ -816,338 +824,119 @@ $users_list = [
                                                     </div>
                                                 <?php endif; ?>
                                             </td>
-
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
-
-                    <!-- Bottom 2 Hak Akses Guide Cards (Matching Figma Screenshot 2) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <!-- Card 1: Hak Akses Pemilik -->
-                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-5 shadow-card">
-                            <div class="flex items-center gap-2 mb-2 text-[#3E2B21] font-bold text-sm">
-                                <span>🛡️</span>
-                                <h4>Hak Akses: Pemilik (Owner)</h4>
-                            </div>
-                            <p class="text-xs text-[#828282] leading-relaxed">
-                                Akses penuh ke seluruh menu: Pengaturan Toko, Laporan Keuangan, Ekspor Data Excel, Manajemen Pengguna, dan Penghapusan Pesanan.
-                            </p>
-                        </div>
-
-                        <!-- Card 2: Hak Akses Karyawan / Kasir -->
-                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-5 shadow-card">
-                            <div class="flex items-center gap-2 mb-2 text-[#D97706] font-bold text-sm">
-                                <span>🏷️</span>
-                                <h4>Hak Akses: Karyawan / Kasir</h4>
-                            </div>
-                            <p class="text-xs text-[#828282] leading-relaxed">
-                                Hanya dapat membuat pesanan baru, mencetak nota transaksi kasir, serta melihat ketersediaan stok produk harian.
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- ============================================================== -->
-                <!-- TAB 3 CONTENT: KEAMANAN & SESI (MATCHING FIGMA SCREENSHOT 3)   -->
-                <!-- ============================================================== -->
-                <div id="tabContentKeamanan" class="<?= $active_tab !== 'keamanan' ? 'hidden' : '' ?>">
-                    
-                    <!-- TOP 4 METRICS CARDS (SESUAI BACKGROUND FIGMA LOGOUT) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-                        
-                        <!-- Card 1: Sesi Aktif -->
-                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-[#828282] font-semibold">Sesi Aktif</span>
-                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Admin Utama') ?></h3>
-                                <p class="text-xs text-[#924C00] font-medium mt-1">Login sejak 07:45 WIB</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00] shrink-0">
-                                <svg class="w-5 h-5 text-[#FF9B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            </div>
-                        </div>
-
-                        <!-- Card 2: Status Toko -->
-                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-[#828282] font-semibold">Status Toko</span>
-                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1">Buka Terjadwal</h3>
-                                <p class="text-xs text-[#828282] mt-1">07:00 - 17:00 WIB</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-xl bg-[#E2B93B]/20 flex items-center justify-center text-[#886C12] shrink-0">
-                                <span>🏪</span>
-                            </div>
-                        </div>
-
-                        <!-- Card 3: Pesanan Berjalan -->
-                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-[#828282] font-semibold">Pesanan Berjalan</span>
-                                <h3 class="text-base font-bold text-[#1C1C1C] mt-1">12 Pesanan</h3>
-                                <p class="text-xs text-[#828282] mt-1">8 siap kirim</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00] shrink-0">
-                                <span>🛍️</span>
-                            </div>
-                        </div>
-
-                        <!-- Card 4: Sinkronisasi Cloud -->
-                        <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] shadow-card flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-[#828282] font-semibold">Sinkronisasi Cloud</span>
-                                <h3 class="text-base font-bold text-[#27AE60] mt-1">Tersimpan</h3>
-                                <p class="text-xs text-[#828282] mt-1">Terakhir 2 menit lalu</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-xl bg-[#27AE60]/15 flex items-center justify-center text-[#1B7A43] shrink-0">
-                                <svg class="w-5 h-5 text-[#27AE60]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- 2 COLUMNS: PROFIL & AKSES TOKO VS KEAMANAN KASIR -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        
-                        <!-- Left: Profil & Akses Toko -->
-                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
-                            <div>
-                                <div class="pb-4 border-b border-[#F0ECE9] mb-5">
-                                    <h3 class="text-base font-bold text-[#1C1C1C]">Profil & Akses Toko</h3>
-                                    <p class="text-xs text-[#828282] mt-0.5">Pengaturan operasional akun kasir dan pengamanan sesi login</p>
-                                </div>
-
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-[#828282] mb-1.5">Nama Penanggung Jawab</label>
-                                        <input type="text" value="Budi Santoso (Admin)" readonly 
-                                            class="w-full bg-[#FBF9F7] border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-xs font-semibold text-[#828282] mb-1.5">Email Terdaftar</label>
-                                        <input type="text" value="admin@berkatdinasti.id" readonly 
-                                            class="w-full bg-[#FBF9F7] border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C]">
-                                    </div>
-
-                                    <!-- Auto-Logout Card -->
-                                    <div class="bg-[#FBF9F7] border border-[#F0ECE9] rounded-xl p-4 flex items-center justify-between">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-base">🔒</span>
-                                            <div>
-                                                <h4 class="text-xs font-bold text-[#1C1C1C]">Auto-Logout Keamanan</h4>
-                                                <p class="text-[11px] text-[#828282] mt-0.5">Kunci otomatis setelah 30 menit tidak aktif</p>
-                                            </div>
-                                        </div>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked class="sr-only peer">
-                                            <div class="w-11 h-6 bg-[#E0E0E0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tombol Keluar dari Akun (Logout) -->
-                            <div class="pt-6 mt-6 border-t border-[#F0ECE9]">
-                                <button type="button" onclick="openLogoutModal()" 
-                                    class="w-full bg-[#FFF0F0] hover:bg-[#FFE0E0] text-[#EB5757] border border-[#EB5757]/30 text-xs md:text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-2xs">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                    <span>Keluar dari Akun (Logout)</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Right: Keamanan Kasir -->
-                        <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
-                            <div>
-                                <div class="pb-4 border-b border-[#F0ECE9] mb-5">
-                                    <h3 class="text-base font-bold text-[#1C1C1C]">Keamanan Kasir</h3>
-                                    <p class="text-xs text-[#828282] mt-0.5 leading-relaxed">
-                                        Pastikan pergantian shift telah direkapitulasi sebelum meninggalkan dasbor operasional.
-                                    </p>
-                                </div>
-
-                                <div class="space-y-3.5 mb-5">
-                                    <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex items-center justify-between">
-                                        <span class="text-xs text-[#544337] font-semibold">Total Kas Tunai Sesi Ini</span>
-                                        <span class="text-sm font-bold text-[#1C1C1C]">Rp 3.450.000</span>
-                                    </div>
-
-                                    <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex items-center justify-between">
-                                        <span class="text-xs text-[#544337] font-semibold">Total QRIS / Transfer</span>
-                                        <span class="text-sm font-bold text-[#1C1C1C]">Rp 5.820.000</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="p-3 bg-[#F5F3F1] rounded-xl text-center text-xs text-[#544337] font-semibold border border-[#EBE8E5]">
-                                Shift Pagi: 07:00 - 15:00 WIB
-                            </div>
-                        </div>
-
-                    </div>
-
                 </div>
 
             </main>
         </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- MODAL POPOUT: TAMBAH / EDIT USER BARU                          -->
-    <!-- ============================================================== -->
+    <!-- Hidden Form for Delete User -->
+    <form id="deleteUserForm" method="POST" action="pengaturan.php" class="hidden">
+        <input type="hidden" name="action" value="delete_user">
+        <input type="hidden" name="user_id" id="deleteUserIdInput">
+    </form>
+
+    <!-- MODAL POPOUT: TAMBAH / EDIT USER -->
     <div id="userModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <!-- Backdrop with blur -->
         <div onclick="closeUserModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <!-- Modal Card Container -->
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
-            
-            <!-- Header -->
-            <div class="flex items-start justify-between pb-4 border-b border-[#F0ECE9] mb-5">
-                <div>
-                    <h3 id="userModalTitle" class="text-xl font-bold text-[#1C1C1C]">Tambah User Baru</h3>
-                    <p class="text-[#828282] text-xs mt-1">Daftarkan akun kasir atau staf bakery untuk sistem Berkat Dinasti.</p>
-                </div>
-                <button onclick="closeUserModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors" title="Tutup">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+                <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]" id="userModalTitle">Tambah User Baru</h3>
+                <button onclick="closeUserModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <!-- Form -->
-            <form id="userForm" onsubmit="handleSaveUser(event)" class="space-y-4">
-                <input type="hidden" id="editUserId" value="">
+            <form id="userForm" method="POST" action="pengaturan.php" class="space-y-4">
+                <input type="hidden" name="action" value="save_user">
+                <input type="hidden" id="editUserId" name="user_id" value="">
 
-                <!-- Nama Lengkap -->
                 <div>
-                    <label class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Lengkap <span class="text-[#EB5757]">*</span></label>
-                    <input type="text" id="userNameInput" required placeholder="Contoh: Andi Susanto" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                    <label for="userNameInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Lengkap <span class="text-[#EB5757]">*</span></label>
+                    <input type="text" id="userNameInput" name="nama" required placeholder="Contoh: Budi Prasetyo" 
+                        class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
                 </div>
 
-                <!-- Username & Email -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Username <span class="text-[#EB5757]">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#828282] text-xs">@</span>
-                            <input type="text" id="userUsernameInput" required placeholder="andi.s" 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-8 pr-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-mono focus:border-[#FF9B45] focus:outline-none transition-colors">
-                        </div>
+                        <label for="userUsernameInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Username Login <span class="text-[#EB5757]">*</span></label>
+                        <input type="text" id="userUsernameInput" name="username" required placeholder="Contoh: budi.p" 
+                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
                     </div>
+
                     <div>
-                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Email / Keterangan</label>
-                        <input type="text" id="userEmailInput" placeholder="Contoh: Kasir Shift Pagi" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                        <label for="userSubtextInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Keterangan / Posisi</label>
+                        <input type="text" id="userSubtextInput" name="subtext" placeholder="Contoh: Kasir Shift Pagi" 
+                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
                     </div>
                 </div>
 
-                <!-- Password -->
-                <div>
-                    <label class="block text-xs font-semibold text-[#333333] mb-1.5">Password <span class="text-[#EB5757]">*</span></label>
-                    <div class="relative">
-                        <input type="password" id="userPasswordInput" placeholder="Minimal 6 karakter" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
-                        <button type="button" onclick="togglePasswordVisibility('userPasswordInput')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#828282] hover:text-[#1C1C1C]">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Role & Status -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Role / Hak Akses</label>
-                        <select id="userRoleInput" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                        <label for="userRoleInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Role / Hak Akses</label>
+                        <select id="userRoleInput" name="role" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
                             <option value="Karyawan">Karyawan / Kasir</option>
                             <option value="Pemilik (Owner)">Pemilik (Owner)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Status Akun</label>
-                        <select id="userStatusInput" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                        <label for="userStatusInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Status Akun</label>
+                        <select id="userStatusInput" name="status" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
                             <option value="Aktif">Aktif</option>
                             <option value="Nonaktif">Nonaktif</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Footer Buttons -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#F0ECE9] mt-6">
-                    <button type="button" onclick="closeUserModal()" 
-                        class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0] transition-colors">
+                    <button type="button" onclick="closeUserModal()" class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0]">
                         Batal
                     </button>
-                    <button type="submit" 
-                        class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span id="userSaveBtnText">Simpan User</span>
+                    <button type="submit" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-button-orange">
+                        Simpan Pengguna
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
-    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: LOGOUT -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <!-- Backdrop with blur -->
         <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <!-- Modal Card Container -->
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
-            <!-- Top Icon -->
             <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </div>
 
-            <!-- Title -->
             <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
-            
-            <!-- Description -->
             <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
                 Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
             </p>
 
-            <!-- Action Buttons -->
             <div class="space-y-2.5">
-                <a href="logout.php" 
-                    class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
+                <a href="logout.php" class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
                     <span>Ya, Keluar</span>
                 </a>
-
-                <button type="button" onclick="closeLogoutModal()" 
-                    class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
+                <button type="button" onclick="closeLogoutModal()" class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
                     Batal
                 </button>
-            </div>
-
-            <!-- Encrypted Session Note -->
-            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A0A0A0]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
-                <span>Sesi login terenkripsi Berkat Dinasti</span>
             </div>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Toggle Sidebar Mobile
+        const usersData = <?= json_encode($users_list) ?>;
+
         function toggleSidebar() {
             const sidebar = document.getElementById('main-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1160,108 +949,99 @@ $users_list = [
             }
         }
 
-        // Switch Setting Tabs (Profil vs Manajemen User vs Keamanan & Sesi)
+        function toggleNotificationDropdown() {
+            const notif = document.getElementById('notificationDropdown');
+            const user = document.getElementById('userDropdown');
+            if (user) user.classList.add('hidden');
+            notif.classList.toggle('hidden');
+        }
+
+        function toggleUserDropdown() {
+            const user = document.getElementById('userDropdown');
+            const notif = document.getElementById('notificationDropdown');
+            if (notif) notif.classList.add('hidden');
+            user.classList.toggle('hidden');
+        }
+
         function switchSettingTab(tab) {
             const tabContentProfil = document.getElementById('tabContentProfil');
             const tabContentUser = document.getElementById('tabContentUser');
-            const tabContentKeamanan = document.getElementById('tabContentKeamanan');
             const tabBtnProfil = document.getElementById('tabBtnProfil');
             const tabBtnUser = document.getElementById('tabBtnUser');
-            const tabBtnKeamanan = document.getElementById('tabBtnKeamanan');
-            const headerBreadcrumb = document.getElementById('headerBreadcrumb');
+            const headerSubtitle = document.getElementById('headerSubtitle');
             const headerTitle = document.getElementById('headerTitle');
 
-            // Hide all tab contents
-            tabContentProfil.classList.add('hidden');
-            tabContentUser.classList.add('hidden');
-            tabContentKeamanan.classList.add('hidden');
-
-            // Reset buttons
-            [tabBtnProfil, tabBtnUser, tabBtnKeamanan].forEach(btn => {
-                btn.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
-            });
-
             if (tab === 'user') {
+                tabContentProfil.classList.add('hidden');
                 tabContentUser.classList.remove('hidden');
                 tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                headerBreadcrumb.textContent = 'Pengaturan';
-                headerTitle.textContent = 'Manajemen User';
-            } else if (tab === 'keamanan') {
-                tabContentKeamanan.classList.remove('hidden');
-                tabBtnKeamanan.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                headerBreadcrumb.textContent = 'Pengaturan';
-                headerTitle.textContent = 'Keamanan & Sesi Kasir';
+                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
+                headerSubtitle.textContent = 'Manajemen User';
+                headerTitle.textContent = 'Manajemen Pengguna';
             } else {
+                tabContentUser.classList.add('hidden');
                 tabContentProfil.classList.remove('hidden');
                 tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                headerBreadcrumb.textContent = 'Pengaturan';
+                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
+                headerSubtitle.textContent = 'Profil Toko';
                 headerTitle.textContent = 'Pengaturan Toko';
             }
         }
 
-        // Logout Modal Open / Close
-        function openLogoutModal() {
-            const modal = document.getElementById('logoutModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+        // Live Receipt Preview
+        function updateReceiptPreview() {
+            const name = document.getElementById('storeNameInput').value;
+            const address = document.getElementById('storeAddressInput').value;
+            const wa = document.getElementById('storeWaInput').value;
+            const footer = document.getElementById('storeFooterInput').value;
+
+            document.getElementById('previewReceiptName').textContent = name;
+            document.getElementById('previewReceiptAddress').textContent = address;
+            document.getElementById('previewReceiptWa').textContent = wa;
+            document.getElementById('previewReceiptFooter').textContent = `"${footer}"`;
+        }
+
+        // Logo Upload Preview
+        function previewLogo(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('storeLogoPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function closeLogoutModal() {
-            const modal = document.getElementById('logoutModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                document.body.style.overflow = '';
-            }
+        function resetLogo() {
+            document.getElementById('storeLogoPreview').src = 'assets/images/logo.png';
+            document.getElementById('logoFileInput').value = '';
         }
 
-        // Save Store Info Form Handler
-        function handleSaveStoreInfo(e) {
-            if (e) e.preventDefault();
-            const storeName = document.getElementById('storeName').value;
-            alert(`Pengaturan profil "${storeName}" dan layout struk kasir berhasil disimpan!`);
+        // Thermal Receipt Print
+        function printThermalReceipt() {
+            window.print();
         }
 
-        // User Modal Open / Close
+        // User Modal Open/Close
         function openUserModal(id = null) {
             const modal = document.getElementById('userModal');
-            const modalTitle = document.getElementById('userModalTitle');
-            const saveBtnText = document.getElementById('userSaveBtnText');
+            const title = document.getElementById('userModalTitle');
             const form = document.getElementById('userForm');
-
             form.reset();
 
-            if (id === 1) {
-                modalTitle.textContent = 'Edit Akun Admin Utama';
-                saveBtnText.textContent = 'Perbarui Admin';
-                document.getElementById('editUserId').value = 1;
-                document.getElementById('userNameInput').value = 'Admin Utama';
-                document.getElementById('userUsernameInput').value = 'admin';
-                document.getElementById('userEmailInput').value = 'admin@berkatdinasti.id';
-                document.getElementById('userRoleInput').value = 'Pemilik (Owner)';
-                document.getElementById('userStatusInput').value = 'Aktif';
-            } else if (id === 2) {
-                modalTitle.textContent = 'Edit Akun Kasir';
-                saveBtnText.textContent = 'Perbarui User';
-                document.getElementById('editUserId').value = 2;
-                document.getElementById('userNameInput').value = 'Andi Susanto';
-                document.getElementById('userUsernameInput').value = 'andi.s';
-                document.getElementById('userEmailInput').value = 'Kasir Shift Pagi';
-                document.getElementById('userRoleInput').value = 'Karyawan';
-                document.getElementById('userStatusInput').value = 'Aktif';
-            } else if (id === 3) {
-                modalTitle.textContent = 'Edit Akun Staf Bakery';
-                saveBtnText.textContent = 'Perbarui User';
-                document.getElementById('editUserId').value = 3;
-                document.getElementById('userNameInput').value = 'Rina Dewi';
-                document.getElementById('userUsernameInput').value = 'rina.d';
-                document.getElementById('userEmailInput').value = 'Staf Produksi Bakery';
-                document.getElementById('userRoleInput').value = 'Karyawan';
-                document.getElementById('userStatusInput').value = 'Nonaktif';
+            if (id) {
+                const user = usersData.find(u => u.id === id);
+                if (user) {
+                    title.textContent = 'Edit Data Pengguna';
+                    document.getElementById('editUserId').value = user.id;
+                    document.getElementById('userNameInput').value = user.nama;
+                    document.getElementById('userUsernameInput').value = user.username;
+                    document.getElementById('userSubtextInput').value = user.subtext;
+                    document.getElementById('userRoleInput').value = user.role;
+                    document.getElementById('userStatusInput').value = user.status;
+                }
             } else {
-                modalTitle.textContent = 'Tambah User Baru';
-                saveBtnText.textContent = 'Simpan User';
+                title.textContent = 'Tambah User Baru';
                 document.getElementById('editUserId').value = '';
             }
 
@@ -1270,60 +1050,45 @@ $users_list = [
         }
 
         function closeUserModal() {
-            const modal = document.getElementById('userModal');
-            modal.classList.add('hidden');
+            document.getElementById('userModal').classList.add('hidden');
             document.body.style.overflow = '';
         }
 
-        // ESC Close
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeUserModal();
-            }
-        });
-
-        // Toggle Password Visibility
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-            } else {
-                input.type = 'password';
-            }
-        }
-
-        // Save User Handler
-        function handleSaveUser(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editUserId').value;
-            const nama = document.getElementById('userNameInput').value;
-
-            if (editId) {
-                alert(`Data pengguna "${nama}" berhasil diperbarui!`);
-            } else {
-                alert(`Pengguna baru "${nama}" berhasil didaftarkan ke sistem Berkat Dinasti!`);
-            }
-            closeUserModal();
-        }
-
-        // Toggle User Status
-        function toggleUserStatus(id, newStatus) {
-            alert(`Status pengguna berhasil diubah menjadi ${newStatus}.`);
-            location.reload();
-        }
-
-        // Delete User Handler
         function handleDeleteUser(id, nama) {
-            if (confirm(`Apakah Anda yakin ingin menghapus akun pengguna "${nama}"?`)) {
-                alert(`Pengguna "${nama}" berhasil dihapus dari sistem.`);
+            if (confirm(`Apakah Anda yakin ingin menghapus akun "${nama}"?`)) {
+                document.getElementById('deleteUserIdInput').value = id;
+                document.getElementById('deleteUserForm').submit();
             }
         }
 
-        // Close modal on Escape key
+        function openLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeLogoutModal();
                 closeUserModal();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const notif = document.getElementById('notificationDropdown');
+            const notifBtn = document.getElementById('notificationBtn');
+            const user = document.getElementById('userDropdown');
+            const userBtn = document.getElementById('userAvatarBtn');
+
+            if (notif && !notif.contains(e.target) && !notifBtn.contains(e.target)) {
+                notif.classList.add('hidden');
+            }
+            if (user && !user.contains(e.target) && !userBtn.contains(e.target)) {
+                user.classList.add('hidden');
             }
         });
     </script>

@@ -1,5 +1,12 @@
 <?php
 session_start();
+$success_msg = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $requested_user = trim($_POST['username'] ?? '');
+    if (!empty($requested_user)) {
+        $success_msg = "Permintaan reset password untuk akun \"{$requested_user}\" telah berhasil dikirimkan ke Super Admin. Silakan hubungi admin operasional untuk mendapatkan kredensial baru.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -7,6 +14,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -98,12 +106,6 @@ session_start();
 
     <!-- RIGHT PANEL: Reset Password Form -->
     <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-brand-bg relative">
-        
-        <!-- Kembali ke Login (Absolute Top Left in Right Panel) -->
-        <a href="login.php" class="absolute top-8 left-8 flex items-center gap-2 text-[#828282] hover:text-brand-orange transition-colors font-medium text-[14px]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Kembali ke Login
-        </a>
 
         <div class="w-full max-w-[440px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] rounded-2xl p-8 lg:p-12">
             
@@ -115,6 +117,17 @@ session_start();
                 <h2 class="text-[32px] leading-[40px] font-bold text-[#1D1D1D] mb-2">Reset Password</h2>
                 <p class="text-[#828282] text-sm leading-[20px]">Masukkan username Anda dan kami akan mengirim tautan reset ke admin.</p>
             </div>
+
+            <?php if (!empty($success_msg)): ?>
+                <!-- Alert Sukses Permintaan Reset -->
+                <div class="mb-6 p-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/30 flex items-start gap-3 text-sm text-[#1B7A43]">
+                    <svg class="w-5 h-5 text-[#27AE60] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <div>
+                        <p class="font-bold">Permintaan Terkirim!</p>
+                        <p class="text-xs mt-0.5 text-[#1B7A43]/90"><?= htmlspecialchars($success_msg) ?></p>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Form -->
             <form action="" method="POST" class="space-y-6">
@@ -151,7 +164,7 @@ session_start();
 
             <!-- Copyright -->
             <div class="mt-10 pt-6 border-t border-[#E0E0E0]/60 text-center">
-                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2025 Berkat Dinasti. All rights reserved.</p>
+                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ if (file_exists($configFile)) {
 $orders_report = [
     [
         'no' => 1,
-        'tanggal' => '26 Sep 2025',
+        'tanggal' => date('d M Y'),
         'jam' => '14:00 WIB',
         'order_id' => '#ORD-089',
         'customer' => 'Ibu Sari Dewi',
@@ -29,7 +29,7 @@ $orders_report = [
     ],
     [
         'no' => 2,
-        'tanggal' => '26 Sep 2025',
+        'tanggal' => date('d M Y'),
         'jam' => '10:15 WIB',
         'order_id' => '#ORD-088',
         'customer' => 'Pak Budi Santoso',
@@ -42,7 +42,7 @@ $orders_report = [
     ],
     [
         'no' => 3,
-        'tanggal' => '25 Sep 2025',
+        'tanggal' => date('d M Y', strtotime('-1 day')),
         'jam' => '16:30 WIB',
         'order_id' => '#ORD-084',
         'customer' => 'Bu Rina',
@@ -54,7 +54,7 @@ $orders_report = [
     ],
     [
         'no' => 4,
-        'tanggal' => '25 Sep 2025',
+        'tanggal' => date('d M Y', strtotime('-2 days')),
         'jam' => '11:00 WIB',
         'order_id' => '#ORD-081',
         'customer' => 'Warung Pak Haji',
@@ -66,7 +66,7 @@ $orders_report = [
     ],
     [
         'no' => 5,
-        'tanggal' => '24 Sep 2025',
+        'tanggal' => date('d M Y', strtotime('-3 days')),
         'jam' => '08:20 WIB',
         'order_id' => '#ORD-079',
         'customer' => 'Toko Maju Jaya',
@@ -77,6 +77,18 @@ $orders_report = [
         'status_bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]'
     ]
 ];
+
+// Helper Tanggal Dinamis Bahasa Indonesia
+$daysIndo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+$monthsIndo = ['01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'];
+$monthsIndoFull = ['01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April', '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus', '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'];
+
+$dayName = $daysIndo[date('l')] ?? date('l');
+$dayNum = date('d');
+$monthNum = date('m');
+$yearNum = date('Y');
+$todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? date('M')) . " " . $yearNum;
+$currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -84,6 +96,7 @@ $orders_report = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -148,17 +161,6 @@ $orders_report = [
         ::-webkit-scrollbar-thumb:hover {
             background: #FF9B45;
         }
-
-        @media print {
-            aside, header, #filterBar, #reportActions, .no-print {
-                display: none !important;
-            }
-            main {
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-            }
-        }
     </style>
 </head>
 <body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
@@ -183,7 +185,7 @@ $orders_report = [
                     <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
-                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
+                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -237,7 +239,7 @@ $orders_report = [
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
+                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
@@ -255,7 +257,7 @@ $orders_report = [
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg" aria-label="Buka Menu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
 
@@ -272,31 +274,69 @@ $orders_report = [
                 </div>
 
                 <!-- Right: Date Indicator, Notification Bell, User Avatar -->
-                <div class="flex items-center gap-3 md:gap-5">
+                <div class="flex items-center gap-3 md:gap-5 relative">
                     
-                    <!-- Date Button -->
+                    <!-- Date Button (Dinamis) -->
                     <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
                         <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
-                        <span>Jumat, 26 Sep 2025</span>
+                        <span><?= $todayFormatted ?></span>
                     </div>
 
-                    <!-- Notification Bell with Orange Dot -->
-                    <button class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
-                        <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
-                    </button>
+                    <!-- Notification Bell with Popover -->
+                    <div class="relative">
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
+                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                        </button>
 
-                    <!-- User Circle Icon -->
-                    <div class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
-                        <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                            <div class="px-4 pb-2 border-b border-[#F0ECE9] flex items-center justify-between">
+                                <span class="font-bold text-sm text-[#1C1C1C]">Notifikasi Keuangan</span>
+                                <span class="text-[11px] bg-[#FF9B45]/15 text-[#924C00] font-semibold px-2 py-0.5 rounded-full">Ringkasan</span>
+                            </div>
+                            <div class="p-3 text-xs text-[#544337] space-y-2">
+                                <p>• Total omset bulan ini: <strong>Rp 4.250.000</strong></p>
+                                <p>• Piutang menunggu pelunasan: <strong>Rp 850.000</strong></p>
+                                <p>• Persentase transaksi lunas: <strong>83%</strong></p>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- User Circle Icon with Popover -->
+                    <div class="relative">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna" id="userAvatarBtn">
+                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        </div>
+
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
+                                <p class="text-xs font-bold text-[#1C1C1C] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
+                                <p class="text-[11px] text-[#828282]"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> Toko</p>
+                            </div>
+                            <a href="pengaturan.php" class="block px-4 py-2 text-xs text-[#544337] hover:bg-[#F5F3F1] hover:text-[#1C1C1C] transition-colors">
+                                ⚙️ Pengaturan Toko
+                            </a>
+                            <div class="border-t border-[#F0ECE9] mt-1 pt-1">
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left px-4 py-2 text-xs text-[#EB5757] hover:bg-[#FFF0F0] font-medium transition-colors">
+                                    🚪 Keluar dari Akun
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </header>
 
             <!-- MAIN CONTENT CONTAINER -->
             <main class="flex-1 p-4 md:p-8 w-full min-w-0">
                 
-                <!-- TOP FILTER & ACTION BAR (MATCHING FIGMA SCREENSHOT) -->
+                <!-- Toast In-Page -->
+                <div id="dynamicToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#1C1C1C] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-in slide-in-from-bottom-3 duration-200">
+                    <span id="dynamicToastIcon">✨</span>
+                    <span id="dynamicToastText">Aksi berhasil dijalankan</span>
+                </div>
+
+                <!-- TOP FILTER & ACTION BAR -->
                 <div id="filterBar" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     
                     <!-- Left: Periode Filter Controls -->
@@ -309,10 +349,10 @@ $orders_report = [
                         <!-- Dropdown Periode -->
                         <div class="relative">
                             <select id="periodeSelect" class="appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2 text-xs md:text-sm text-[#1C1C1C] font-semibold focus:border-[#FF9B45] focus:outline-none cursor-pointer shadow-2xs">
-                                <option value="sep2025">Bulan ini (Sep 2025)</option>
-                                <option value="agu2025">Bulan lalu (Agu 2025)</option>
-                                <option value="q3">Kuartal 3 (Jul - Sep)</option>
-                                <option value="ytd">Tahun 2025 (YTD)</option>
+                                <option value="bulan_ini">Bulan Ini (<?= $currentMonthIndo ?>)</option>
+                                <option value="bulan_lalu">Bulan Lalu (<?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?>)</option>
+                                <option value="kuartal">Kuartal Berjalan</option>
+                                <option value="ytd">Tahun <?= date('Y') ?> (YTD)</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#828282]">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -322,7 +362,7 @@ $orders_report = [
                         <!-- Date Range Display Box -->
                         <div class="bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2 text-xs md:text-sm text-[#544337] font-medium flex items-center gap-2 shadow-2xs">
                             <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4 opacity-70">
-                            <span>01/09/2025 — 26/09/2025</span>
+                            <span id="dateRangeText">01/<?= date('m/Y') ?> — <?= date('d/m/Y') ?></span>
                         </div>
 
                         <!-- Button Terapkan Filter -->
@@ -333,10 +373,10 @@ $orders_report = [
                     </div>
 
                     <!-- Right: Unduh Excel & Cetak Laporan -->
-                    <div id="reportActions" class="flex items-center gap-3">
+                    <div id="reportActions" class="flex items-center gap-3 self-end sm:self-auto">
                         <button onclick="handleExportExcel()" class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-xs md:text-sm font-medium px-3.5 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
                             <img src="assets/icons/download.svg" alt="Unduh" class="w-4 h-4">
-                            <span>Unduh Excel</span>
+                            <span>Unduh Excel (CSV)</span>
                         </button>
 
                         <button onclick="window.print()" class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-xs md:text-sm font-medium px-3.5 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
@@ -347,7 +387,7 @@ $orders_report = [
 
                 </div>
 
-                <!-- ROW 1: 4 KPI CARDS (MATCHING FIGMA) -->
+                <!-- ROW 1: 4 KPI CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     
                     <!-- KPI 1: Total Pemasukan -->
@@ -359,7 +399,7 @@ $orders_report = [
                                     <img src="assets/icons/wallet.svg" alt="Pemasukan" class="w-4 h-4">
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#1C1C1C] tracking-tight">Rp 4.250.000</h3>
+                            <h3 class="text-2xl font-bold text-[#1C1C1C] tracking-tight" id="kpiPemasukan">Rp 4.250.000</h3>
                         </div>
                         <div class="mt-4">
                             <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#27AE60]/15 text-[#1B7A43]">
@@ -374,29 +414,29 @@ $orders_report = [
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs text-[#828282] font-semibold">Total Pesanan</span>
                                 <div class="w-8 h-8 rounded-lg bg-[#FF9B45]/15 flex items-center justify-center text-[#924C00]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    <img src="assets/icons/orders_clipboard.svg" alt="Pesanan" class="w-4 h-4">
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#1C1C1C] tracking-tight">48 Pesanan</h3>
+                            <h3 class="text-2xl font-bold text-[#1C1C1C] tracking-tight" id="kpiPesanan">48 Order</h3>
                         </div>
                         <div class="mt-4">
                             <span class="text-xs text-[#828282]">Rata-rata 1.6 order/hari</span>
                         </div>
                     </div>
 
-                    <!-- KPI 3: Pesanan Selesai -->
-                    <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] border-l-4 border-l-[#27AE60] shadow-card flex flex-col justify-between">
+                    <!-- KPI 3: Total Piutang (Hutang) -->
+                    <div class="bg-white rounded-2xl p-5 border border-[#F0ECE9] border-l-4 border-l-[#EB5757] shadow-card flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-[#828282] font-semibold">Pesanan Selesai</span>
-                                <div class="w-8 h-8 rounded-lg bg-[#27AE60]/15 flex items-center justify-center text-[#1B7A43]">
-                                    <img src="assets/icons/check_circle.svg" alt="Selesai" class="w-4 h-4">
+                                <span class="text-xs text-[#828282] font-semibold">Sisa Piutang</span>
+                                <div class="w-8 h-8 rounded-lg bg-[#EB5757]/15 flex items-center justify-center text-[#EB5757]">
+                                    <img src="assets/icons/alert_triangle.svg" alt="Piutang" class="w-4 h-4">
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#27AE60] tracking-tight">42 Order</h3>
+                            <h3 class="text-2xl font-bold text-[#EB5757] tracking-tight" id="kpiPiutang">Rp 850.000</h3>
                         </div>
                         <div class="mt-4">
-                            <span class="text-xs text-[#27AE60] font-medium">Tingkat pemenuhan 87.5%</span>
+                            <span class="text-xs text-[#828282]">Dari 8 pesanan aktif</span>
                         </div>
                     </div>
 
@@ -412,23 +452,22 @@ $orders_report = [
                             <h3 class="text-2xl font-bold text-[#E2B93B] tracking-tight">6 Order</h3>
                         </div>
                         <div class="mt-4">
-                            <span class="text-xs text-[#828282]">5 antrean, 1 tertunda</span>
+                            <span class="text-xs text-[#828282]">5 antrean oven, 1 tertunda</span>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- ROW 2: CHARTS & ANALYTICS (GRAFIK TREN PENJUALAN & RINGKASAN PEMBAYARAN) -->
+                <!-- ROW 2: CHARTS & ANALYTICS -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     
                     <!-- LEFT 2 COLS: GRAFIK TREN PENJUALAN -->
                     <div class="lg:col-span-2 bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
                         <div>
-                            <!-- Chart Header & Mode Toggle -->
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                                 <div>
                                     <h3 class="text-base font-bold text-[#1C1C1C]">Grafik Tren Penjualan</h3>
-                                    <p class="text-xs text-[#828282] mt-0.5">Analisis omset per bulan dalam juta rupiah (Apr – Sep 2025)</p>
+                                    <p class="text-xs text-[#828282] mt-0.5">Analisis omset per bulan dalam juta rupiah (Tahun <?= date('Y') ?>)</p>
                                 </div>
                                 <div class="bg-[#F5F3F1] p-1 rounded-xl flex items-center gap-1 self-start sm:self-auto">
                                     <button onclick="toggleChartMode('omset')" id="btnChartOmset" 
@@ -455,45 +494,40 @@ $orders_report = [
                                         <div class="flex justify-between"><span>0</span></div>
                                     </div>
 
-                                    <!-- Bar 1: Apr -->
+                                    <!-- Bars -->
                                     <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
                                         <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 68%;"></div>
-                                        <span class="text-xs text-[#828282] font-medium">Apr</span>
-                                    </div>
-
-                                    <!-- Bar 2: Mei -->
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
-                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 75%;"></div>
                                         <span class="text-xs text-[#828282] font-medium">Mei</span>
                                     </div>
 
-                                    <!-- Bar 3: Jun -->
                                     <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
-                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 84%;"></div>
+                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 75%;"></div>
                                         <span class="text-xs text-[#828282] font-medium">Jun</span>
                                     </div>
 
-                                    <!-- Bar 4: Jul -->
                                     <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
-                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 72%;"></div>
+                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 84%;"></div>
                                         <span class="text-xs text-[#828282] font-medium">Jul</span>
                                     </div>
 
-                                    <!-- Bar 5: Agu -->
                                     <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
-                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 88%;"></div>
+                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 72%;"></div>
                                         <span class="text-xs text-[#828282] font-medium">Agu</span>
                                     </div>
 
-                                    <!-- Bar 6: Sep (Aktif / Highest) -->
+                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer">
+                                        <div class="w-full max-w-[48px] bg-[#FFB87A] hover:bg-[#FF9B45] rounded-t-lg transition-all" style="height: 88%;"></div>
+                                        <span class="text-xs text-[#828282] font-medium">Sep</span>
+                                    </div>
+
+                                    <!-- Bar Aktif -->
                                     <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 relative cursor-pointer">
-                                        <!-- Tooltip Tag Pill -->
                                         <div class="absolute -top-7 bg-[#5C3D2A] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap">
                                             <span>Tertinggi ★</span>
                                             <span class="text-[#FF9B45]">4.25 jt</span>
                                         </div>
                                         <div class="w-full max-w-[48px] bg-[#E88C3D] rounded-t-lg transition-all shadow-xs" style="height: 94%;"></div>
-                                        <span class="text-xs text-[#924C00] font-bold">Sep (Aktif)</span>
+                                        <span class="text-xs text-[#924C00] font-bold">Okt (Aktif)</span>
                                     </div>
 
                                 </div>
@@ -513,104 +547,68 @@ $orders_report = [
                     <!-- RIGHT 1 COL: RINGKASAN PEMBAYARAN -->
                     <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
                         <div>
-                            <!-- Header -->
                             <div class="flex items-start justify-between pb-3 border-b border-[#F0ECE9] mb-4">
                                 <div>
                                     <h3 class="text-base font-bold text-[#1C1C1C]">Ringkasan Pembayaran</h3>
-                                    <p class="text-xs text-[#828282] mt-0.5">Distribusi pesanan bulan September</p>
+                                    <p class="text-xs text-[#828282] mt-0.5">Distribusi pesanan aktif</p>
                                 </div>
-                                <div class="text-[#828282]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                                </div>
+                                <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2 py-0.5 rounded-full">
+                                    83% Lunas
+                                </span>
                             </div>
 
-                            <!-- Donut Chart Representation -->
-                            <div class="flex items-center justify-center my-4">
-                                <div class="relative w-40 h-40 flex items-center justify-center">
-                                    <!-- Donut Chart SVG -->
-                                    <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                        <!-- Background Circle -->
-                                        <circle cx="50" cy="50" r="38" fill="none" stroke="#F0ECE9" stroke-width="12"></circle>
-                                        <!-- Green: Lunas (75% = 179 circumference) -->
-                                        <circle cx="50" cy="50" r="38" fill="none" stroke="#27AE60" stroke-width="12"
-                                            stroke-dasharray="238.76" stroke-dashoffset="59.69" stroke-linecap="round" class="transition-all"></circle>
-                                        <!-- Yellow: Hutang (16.7% = 39.88) -->
-                                        <circle cx="50" cy="50" r="38" fill="none" stroke="#E2B93B" stroke-width="12"
-                                            stroke-dasharray="238.76" stroke-dashoffset="198.88" stroke-linecap="round" class="transition-all"></circle>
-                                        <!-- Gray: Belum Bayar (8.3% = 19.8) -->
-                                        <circle cx="50" cy="50" r="38" fill="none" stroke="#828282" stroke-width="12"
-                                            stroke-dasharray="238.76" stroke-dashoffset="218.96" stroke-linecap="round" class="transition-all"></circle>
-                                    </svg>
-                                    
-                                    <!-- Center Counter Text -->
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                        <span class="text-3xl font-bold text-[#1C1C1C] leading-none">48</span>
-                                        <span class="text-[10px] text-[#828282] uppercase tracking-wider font-semibold mt-1">Total Pesanan</span>
+                            <div class="space-y-4 pt-2">
+                                <!-- Item 1: Lunas -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-[#1B7A43]">✓ Lunas (36 Pesanan)</span>
+                                        <span class="text-[#1C1C1C]">Rp 3.400.000</span>
+                                    </div>
+                                    <div class="w-full bg-[#E0E0E0] h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-[#27AE60] h-full rounded-full" style="width: 80%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 2: Hutang / DP -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-[#886C12]">⏱ Hutang / DP (8 Pesanan)</span>
+                                        <span class="text-[#1C1C1C]">Rp 620.000</span>
+                                    </div>
+                                    <div class="w-full bg-[#E0E0E0] h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-[#E2B93B] h-full rounded-full" style="width: 15%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Item 3: Belum Bayar -->
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-[#544337]">✕ Belum Bayar (4 Pesanan)</span>
+                                        <span class="text-[#1C1C1C]">Rp 230.000</span>
+                                    </div>
+                                    <div class="w-full bg-[#E0E0E0] h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-[#828282] h-full rounded-full" style="width: 5%;"></div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Legend Breakdown Items -->
-                            <div class="space-y-3 pt-2">
-                                <!-- Row 1: Lunas -->
-                                <div class="bg-[#FBF9F7] rounded-xl p-2.5 flex items-center justify-between border border-[#F0ECE9]">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#27AE60]"></span>
-                                        <div>
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-xs font-bold text-[#1C1C1C]">Lunas</span>
-                                                <span class="text-[10px] font-semibold bg-[#27AE60]/15 text-[#1B7A43] px-1.5 py-0.2 rounded">75%</span>
-                                            </div>
-                                            <p class="text-[11px] text-[#828282]">36 pesanan</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-[#1C1C1C]">Rp 3.420.000</span>
-                                </div>
-
-                                <!-- Row 2: Hutang -->
-                                <div class="bg-[#FBF9F7] rounded-xl p-2.5 flex items-center justify-between border border-[#F0ECE9]">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#E2B93B]"></span>
-                                        <div>
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-xs font-bold text-[#1C1C1C]">Hutang</span>
-                                                <span class="text-[10px] font-semibold bg-[#E2B93B]/20 text-[#886C12] px-1.5 py-0.2 rounded">16.7%</span>
-                                            </div>
-                                            <p class="text-[11px] text-[#828282]">8 pesanan</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-[#1C1C1C]">Rp 610.000</span>
-                                </div>
-
-                                <!-- Row 3: Belum Bayar -->
-                                <div class="bg-[#FBF9F7] rounded-xl p-2.5 flex items-center justify-between border border-[#F0ECE9]">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#828282]"></span>
-                                        <div>
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-xs font-bold text-[#1C1C1C]">Belum Bayar</span>
-                                                <span class="text-[10px] font-semibold bg-[#828282]/15 text-[#544337] px-1.5 py-0.2 rounded">8.3%</span>
-                                            </div>
-                                            <p class="text-[11px] text-[#828282]">4 pesanan</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-xs font-bold text-[#1C1C1C]">Rp 220.000</span>
-                                </div>
-                            </div>
+                        <div class="pt-4 mt-4 border-t border-[#F0ECE9] text-[11px] text-[#828282] leading-relaxed">
+                            💡 Hutang otomatis diakumulasikan ke profil pelanggan dan ditagihkan saat kurir mengantar pesanan berikutnya.
                         </div>
                     </div>
 
                 </div>
 
-                <!-- ROW 3: RIWAYAT SEMUA PESANAN TABLE CARD -->
+                <!-- ROW 3: RIWAYAT SEMUA PESANAN TABLE CARD (TIDAK TERPOTONG HORIZONTAL) -->
                 <div class="bg-white rounded-2xl border border-[#F0ECE9] shadow-card overflow-hidden">
                     
                     <!-- Table Card Header & Segmented Status Filters -->
                     <div class="px-6 py-4 border-b border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div class="flex items-center gap-2.5">
-                            <h3 class="text-base font-bold text-[#1C1C1C]">Riwayat Semua Pesanan</h3>
-                            <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                48 Data
+                            <h3 class="text-base font-bold text-[#1C1C1C]">Riwayat Transaksi Pesanan</h3>
+                            <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full" id="tableRecordCountBadge">
+                                <?= count($orders_report) ?> Data
                             </span>
                         </div>
 
@@ -618,35 +616,34 @@ $orders_report = [
                         <div class="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
                             <button onclick="filterReportTable('all', this)" id="filterBtnAll" 
                                 class="px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors">
-                                Semua (48)
+                                Semua (<?= count($orders_report) ?>)
                             </button>
                             <button onclick="filterReportTable('Lunas', this)" id="filterBtnLunas" 
                                 class="px-3 py-1.5 rounded-lg bg-white border border-[#E0E0E0] text-[#544337] hover:bg-[#F5F3F1] transition-colors">
-                                Lunas (36)
+                                Lunas (3)
                             </button>
                             <button onclick="filterReportTable('Hutang', this)" id="filterBtnHutang" 
                                 class="px-3 py-1.5 rounded-lg bg-white border border-[#E0E0E0] text-[#544337] hover:bg-[#F5F3F1] transition-colors">
-                                Hutang (8)
+                                Hutang (1)
                             </button>
                             <button onclick="filterReportTable('Belum Bayar', this)" id="filterBtnBelumBayar" 
                                 class="px-3 py-1.5 rounded-lg bg-white border border-[#E0E0E0] text-[#544337] hover:bg-[#F5F3F1] transition-colors">
-                                Belum Bayar (4)
+                                Belum Bayar (1)
                             </button>
                         </div>
                     </div>
 
-                    <!-- Responsive Orders Table -->
-                    <div class="overflow-x-auto">
+                    <!-- Responsive Orders Table (Lebar Pas & Tidak Terpotong) -->
+                    <div class="overflow-x-auto w-full">
                         <table class="w-full text-left border-collapse" id="ordersReportTable">
-                            <!-- Orange Header (Matching Figma) -->
                             <thead>
                                 <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
-                                    <th class="py-3 px-4 text-center w-12">No</th>
-                                    <th class="py-3 px-4 min-w-[140px]">Tanggal & Jam</th>
-                                    <th class="py-3 px-4 min-w-[220px]">No. Pesanan & Pelanggan</th>
-                                    <th class="py-3 px-4 min-w-[280px]">Rincian Produk</th>
-                                    <th class="py-3 px-4 text-right min-w-[130px]">Total Tagihan</th>
-                                    <th class="py-3 px-4 text-center min-w-[130px]">Status Bayar</th>
+                                    <th class="py-3 px-3.5 text-center w-12">No</th>
+                                    <th class="py-3 px-3.5 min-w-[110px]">Tanggal & Jam</th>
+                                    <th class="py-3 px-3.5 min-w-[170px]">No. Pesanan & Pelanggan</th>
+                                    <th class="py-3 px-3.5">Rincian Produk</th>
+                                    <th class="py-3 px-3.5 text-right min-w-[110px]">Total Tagihan</th>
+                                    <th class="py-3 px-3.5 text-center min-w-[120px]">Status Bayar</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#F0ECE9] text-xs md:text-sm">
@@ -654,18 +651,18 @@ $orders_report = [
                                     <tr class="hover:bg-[#FFF8F2]/60 transition-colors order-row" data-status="<?= htmlspecialchars($ord['status_bayar']) ?>">
                                         
                                         <!-- No -->
-                                        <td class="py-3.5 px-4 text-center text-[#828282] font-semibold">
+                                        <td class="py-3 px-3.5 text-center text-[#828282] font-semibold">
                                             <?= $ord['no'] ?>
                                         </td>
 
                                         <!-- Tanggal & Jam -->
-                                        <td class="py-3.5 px-4">
+                                        <td class="py-3 px-3.5">
                                             <p class="font-bold text-[#1C1C1C]"><?= htmlspecialchars($ord['tanggal']) ?></p>
                                             <p class="text-[11px] text-[#828282]"><?= htmlspecialchars($ord['jam']) ?></p>
                                         </td>
 
                                         <!-- No. Pesanan & Pelanggan -->
-                                        <td class="py-3.5 px-4">
+                                        <td class="py-3 px-3.5">
                                             <div class="flex items-center gap-1.5">
                                                 <span class="font-mono font-bold text-[#924C00]"><?= htmlspecialchars($ord['order_id']) ?></span>
                                                 <span class="text-[#828282]">—</span>
@@ -674,17 +671,17 @@ $orders_report = [
                                         </td>
 
                                         <!-- Rincian Produk -->
-                                        <td class="py-3.5 px-4 text-[#544337] truncate max-w-sm">
+                                        <td class="py-3 px-3.5 text-[#544337] truncate max-w-xs">
                                             <?= htmlspecialchars($ord['items']) ?>
                                         </td>
 
                                         <!-- Total Tagihan -->
-                                        <td class="py-3.5 px-4 text-right font-bold text-[#1C1C1C]">
+                                        <td class="py-3 px-3.5 text-right font-bold text-[#1C1C1C]">
                                             <?= htmlspecialchars($ord['total']) ?>
                                         </td>
 
-                                        <!-- Status Bayar Badge -->
-                                        <td class="py-3.5 px-4 text-center">
+                                        <!-- Status Bayar Badge (Pastikan selalu terlihat jelas) -->
+                                        <td class="py-3 px-3.5 text-center">
                                             <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold <?= $ord['status_bayar_class'] ?>">
                                                 <?= htmlspecialchars($ord['status_bayar_label'] ?? $ord['status_bayar']) ?>
                                             </span>
@@ -695,18 +692,14 @@ $orders_report = [
                         </table>
                     </div>
 
-                    <!-- Pagination Footer -->
+                    <!-- Pagination Footer (Akurat & Dinamis) -->
                     <div class="px-6 py-4 border-t border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#828282]">
-                        <span>Menampilkan 1-5 dari 48 pesanan</span>
+                        <span>Menampilkan 1-<?= count($orders_report) ?> dari <?= count($orders_report) ?> pesanan</span>
                         
                         <div class="flex items-center gap-1.5">
-                            <button class="w-7 h-7 rounded-md text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1] flex items-center justify-center transition-colors">‹</button>
+                            <button class="w-7 h-7 rounded-md text-[#828282] opacity-50 cursor-default flex items-center justify-center">‹</button>
                             <button class="w-7 h-7 rounded-md bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shadow-xs">1</button>
-                            <button class="w-7 h-7 rounded-md text-[#544337] hover:bg-[#F5F3F1] font-medium text-xs flex items-center justify-center transition-colors">2</button>
-                            <button class="w-7 h-7 rounded-md text-[#544337] hover:bg-[#F5F3F1] font-medium text-xs flex items-center justify-center transition-colors">3</button>
-                            <span class="px-1 text-[#828282]">...</span>
-                            <button class="w-7 h-7 rounded-md text-[#544337] hover:bg-[#F5F3F1] font-medium text-xs flex items-center justify-center transition-colors">10</button>
-                            <button class="w-7 h-7 rounded-md text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1] flex items-center justify-center transition-colors">›</button>
+                            <button class="w-7 h-7 rounded-md text-[#828282] opacity-50 cursor-default flex items-center justify-center">›</button>
                         </div>
                     </div>
 
@@ -717,30 +710,23 @@ $orders_report = [
     </div>
 
     <!-- ============================================================== -->
-    <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
+    <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN                             -->
     <!-- ============================================================== -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <!-- Backdrop with blur -->
         <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <!-- Modal Card Container -->
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
-            <!-- Top Icon -->
             <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
             </div>
 
-            <!-- Title -->
             <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
-            
-            <!-- Description -->
             <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
                 Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
             </p>
 
-            <!-- Action Buttons -->
             <div class="space-y-2.5">
                 <a href="logout.php" 
                     class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
@@ -755,19 +741,13 @@ $orders_report = [
                     Batal
                 </button>
             </div>
-
-            <!-- Encrypted Session Note -->
-            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A0A0A0]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
-                <span>Sesi login terenkripsi Berkat Dinasti</span>
-            </div>
         </div>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        const reportData = <?= json_encode($orders_report) ?>;
+
         // Toggle Sidebar Mobile
         function toggleSidebar() {
             const sidebar = document.getElementById('main-sidebar');
@@ -781,15 +761,52 @@ $orders_report = [
             }
         }
 
-        // Apply Period Filter
-        function applyPeriodFilter() {
-            const periode = document.getElementById('periodeSelect').value;
-            alert('Memuat data laporan untuk periode: ' + document.getElementById('periodeSelect').selectedOptions[0].text);
+        // Header Popovers
+        function toggleNotificationDropdown() {
+            const notif = document.getElementById('notificationDropdown');
+            const user = document.getElementById('userDropdown');
+            if (user) user.classList.add('hidden');
+            notif.classList.toggle('hidden');
         }
 
-        // Export Excel Action
+        function toggleUserDropdown() {
+            const user = document.getElementById('userDropdown');
+            const notif = document.getElementById('notificationDropdown');
+            if (notif) notif.classList.add('hidden');
+            user.classList.toggle('hidden');
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('dynamicToast');
+            document.getElementById('dynamicToastText').textContent = text;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Apply Period Filter
+        function applyPeriodFilter() {
+            const select = document.getElementById('periodeSelect');
+            const periodText = select.options[select.selectedIndex].text;
+            showToast(`Laporan difilter untuk: ${periodText}`);
+        }
+
+        // Real CSV / Excel Export Action
         function handleExportExcel() {
-            alert('Menyiapkan dan mengunduh berkas laporan rekap penjualan (Excel .xlsx)...');
+            let csv = "No,Tanggal,Jam,ID Pesanan,Pelanggan,Rincian Produk,Total Tagihan,Status Bayar\n";
+            reportData.forEach(r => {
+                csv += `"${r.no}","${r.tanggal}","${r.jam}","${r.order_id}","${r.customer}","${r.items}","${r.total}","${r.status_bayar}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Laporan_Penjualan_Berkat_Dinasti_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Berkas Excel/CSV laporan berhasil diunduh!');
         }
 
         // Switch Chart Mode (Omset vs Jumlah Pesanan)
@@ -816,19 +833,22 @@ $orders_report = [
             ];
 
             buttons.forEach(btn => {
-                btn.className = 'px-3 py-1.5 rounded-lg bg-white border border-[#E0E0E0] text-[#544337] hover:bg-[#F5F3F1] transition-colors';
+                if (btn) btn.className = 'px-3 py-1.5 rounded-lg bg-white border border-[#E0E0E0] text-[#544337] hover:bg-[#F5F3F1] transition-colors';
             });
             activeBtn.className = 'px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors';
 
             const rows = document.querySelectorAll('#ordersReportTable tbody tr');
+            let count = 0;
             rows.forEach(row => {
                 const rowStatus = row.getAttribute('data-status');
                 if (status === 'all' || rowStatus === status) {
                     row.style.display = '';
+                    count++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+            document.getElementById('tableRecordCountBadge').textContent = count + ' Data';
         }
 
         // Logout Modal Open / Close
@@ -848,10 +868,24 @@ $orders_report = [
             }
         }
 
-        // Close on Escape key
+        // Close on Escape key & Outside Click
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeLogoutModal();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const notif = document.getElementById('notificationDropdown');
+            const notifBtn = document.getElementById('notificationBtn');
+            const user = document.getElementById('userDropdown');
+            const userBtn = document.getElementById('userAvatarBtn');
+
+            if (notif && !notif.contains(e.target) && !notifBtn.contains(e.target)) {
+                notif.classList.add('hidden');
+            }
+            if (user && !user.contains(e.target) && !userBtn.contains(e.target)) {
+                user.classList.add('hidden');
             }
         });
     </script>

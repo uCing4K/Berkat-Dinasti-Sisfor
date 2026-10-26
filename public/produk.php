@@ -482,6 +482,11 @@ if (isset($_SESSION['toast_msg'])) {
 $total_katalog = count($products);
 $produk_aktif = count(array_filter($products, fn($p) => $p['status'] === 'Aktif'));
 $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')));
+
+// Dynamic Indonesian date helper
+$hariArr = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+$bulanArr = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+$todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)date('n')] . ' ' . date('Y');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -489,6 +494,8 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Produk - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -671,18 +678,46 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                     <!-- Date Button -->
                     <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
                         <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
-                        <span>Jumat, 26 Sep 2025</span>
+                        <span><?= $todayFormatted ?></span>
                     </div>
 
-                    <!-- Notification Bell with Orange Dot -->
-                    <button class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
-                        <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
-                    </button>
+                    <!-- Notification Bell with Popover -->
+                    <div class="relative">
+                        <button onclick="toggleNotifPopover()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors cursor-pointer" title="Notifikasi">
+                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <div id="notifPopover" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-3 z-50">
+                            <div class="px-4 py-2 border-b border-[#F0ECE9] flex items-center justify-between">
+                                <span class="font-bold text-sm text-[#1C1C1C]">Notifikasi Sistem</span>
+                                <span class="text-[11px] bg-[#FF9B45]/15 text-[#FF9B45] font-semibold px-2 py-0.5 rounded-full">2 Baru</span>
+                            </div>
+                            <div class="divide-y divide-[#F0ECE9] max-h-60 overflow-y-auto">
+                                <div class="p-3 hover:bg-[#FBF9F7] transition-colors cursor-pointer">
+                                    <p class="text-xs font-semibold text-[#1C1C1C]">Pembaruan Stok Katalog</p>
+                                    <p class="text-[11px] text-[#828282] mt-0.5">Semua data varian kemasan produk sinkron dengan dapur.</p>
+                                </div>
+                                <div class="p-3 hover:bg-[#FBF9F7] transition-colors cursor-pointer">
+                                    <p class="text-xs font-semibold text-[#1C1C1C]">Kapasitas Armada Kurir</p>
+                                    <p class="text-[11px] text-[#828282] mt-0.5">Batas 150 pcs/trip obrok motor aktif untuk rute Malang & Batu.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- User Circle Icon -->
-                    <div class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
-                        <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                    <!-- User Circle Icon with Dropdown -->
+                    <div class="relative">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
+                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        </div>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-2 z-50">
+                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
+                                <p class="text-xs font-bold text-[#1C1C1C] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
+                                <p class="text-[11px] text-[#828282] capitalize"><?= htmlspecialchars($_SESSION['role'] ?? 'Admin') ?></p>
+                            </div>
+                            <a href="pengaturan.php" class="block px-4 py-2 text-xs text-[#544337] hover:bg-[#FBF9F7] font-medium">Pengaturan Akun</a>
+                            <button onclick="openLogoutModal()" class="w-full text-left px-4 py-2 text-xs text-[#EB5757] hover:bg-rose-50 font-medium">Keluar / Logout</button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -815,17 +850,17 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                         <table class="w-full text-left border-collapse" id="productsTable">
                             <thead>
                                 <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
-                                    <th class="px-5 py-4 w-14 text-center">NO</th>
-                                    <th class="px-5 py-4">NAMA PRODUK</th>
-                                    <th class="px-5 py-4">KATEGORI</th>
-                                    <th class="px-5 py-4">KEMASAN</th>
-                                    <th class="px-5 py-4">MINIMAL ORDER</th>
-                                    <th class="px-5 py-4">HARGA JUAL</th>
-                                    <th class="px-5 py-4">STATUS</th>
-                                    <th class="px-5 py-4 text-center">AKSI</th>
+                                    <th class="px-3.5 py-3 w-12 text-center">NO</th>
+                                    <th class="px-3.5 py-3">NAMA PRODUK</th>
+                                    <th class="px-3.5 py-3">KATEGORI</th>
+                                    <th class="px-3.5 py-3">KEMASAN</th>
+                                    <th class="px-3.5 py-3">MINIMAL ORDER</th>
+                                    <th class="px-3.5 py-3">HARGA JUAL</th>
+                                    <th class="px-3.5 py-3 text-center">STATUS</th>
+                                    <th class="px-3.5 py-3 text-center">AKSI</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#F0ECE9] text-sm" id="productsTableBody">
+                            <tbody class="divide-y divide-[#F0ECE9] text-xs sm:text-sm" id="productsTableBody">
                                 <?php foreach ($products as $idx => $prod): ?>
                                     <tr class="<?= $idx % 2 === 1 ? 'bg-[#FFF8F2]' : 'bg-white' ?> hover:bg-[#FFF0E0] transition-colors product-row"
                                         data-name="<?= strtolower(htmlspecialchars($prod['name'])) ?>"
@@ -834,38 +869,39 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                                         data-status="<?= htmlspecialchars($prod['status']) ?>">
                                         
                                         <!-- No -->
-                                        <td class="px-5 py-4 text-center text-[#828282] font-medium row-number">
+                                        <td class="px-3.5 py-3 text-center text-[#828282] font-medium row-number">
                                             <?= $idx + 1 ?>
                                         </td>
 
                                         <!-- Nama Produk -->
-                                        <td class="px-5 py-4 text-[#1B1C1B] font-semibold whitespace-nowrap">
-                                            <?= htmlspecialchars($prod['name']) ?>
+                                        <td class="px-3.5 py-3 text-[#1B1C1B] font-semibold max-w-[200px]">
+                                            <div class="truncate font-semibold text-[#1C1C1C]" title="<?= htmlspecialchars($prod['name']) ?>"><?= htmlspecialchars($prod['name']) ?></div>
+                                            <span class="text-[11px] text-[#828282] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
                                         </td>
 
                                         <!-- Kategori -->
-                                        <td class="px-5 py-4 text-[#544337] whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-[#544337] whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
                                                 <?php if ($prod['category'] === 'Roti'): ?>
                                                     <!-- Icon Bakery / Roti -->
-                                                    <svg class="w-4 h-4 text-[#B86B28]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7 19H17M7 22H17"></path></svg>
+                                                    <svg class="w-4 h-4 text-[#B86B28] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7 19H17M7 22H17"></path></svg>
                                                 <?php elseif ($prod['category'] === 'Donat'): ?>
                                                     <!-- Icon Donat -->
-                                                    <svg class="w-4 h-4 text-[#D97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                                                    <svg class="w-4 h-4 text-[#D97706] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
                                                 <?php elseif ($prod['category'] === 'Kue & Pastry'): ?>
                                                     <!-- Icon Cake -->
-                                                    <svg class="w-4 h-4 text-[#C05621]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M12 7V4"></path></svg>
+                                                    <svg class="w-4 h-4 text-[#C05621] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M12 7V4"></path></svg>
                                                 <?php else: ?>
                                                     <!-- Icon Box -->
-                                                    <svg class="w-4 h-4 text-[#828282]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
+                                                    <svg class="w-4 h-4 text-[#828282] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
                                                 <?php endif; ?>
                                                 <span class="font-medium"><?= htmlspecialchars($prod['category']) ?></span>
                                             </div>
                                         </td>
 
                                         <!-- Kemasan Badge -->
-                                        <td class="px-5 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border <?= $prod['packaging_badge_class'] ?>">
+                                        <td class="px-3.5 py-3 whitespace-nowrap">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border <?= $prod['packaging_badge_class'] ?>">
                                                 <?php if ($prod['packaging_icon'] === 'mika'): ?>
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke-width="2"></rect><path d="M3 10h18" stroke-width="2"></path></svg>
                                                 <?php elseif ($prod['packaging_icon'] === 'kardus'): ?>
@@ -878,35 +914,35 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                                         </td>
 
                                         <!-- Minimal Order -->
-                                        <td class="px-5 py-4 text-[#333333] font-medium whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-[#333333] font-medium whitespace-nowrap">
                                             <?= htmlspecialchars($prod['min_order']) ?>
                                         </td>
 
                                         <!-- Harga Jual -->
-                                        <td class="px-5 py-4 whitespace-nowrap">
+                                        <td class="px-3.5 py-3 whitespace-nowrap">
                                             <span class="text-[#1B1C1B] font-bold">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
                                             <span class="text-[#828282] text-xs">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                         </td>
 
                                         <!-- Status dengan Quick Interactive Toggle -->
-                                        <td class="px-5 py-4 text-center whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-center whitespace-nowrap">
                                             <button type="button" onclick="toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
                                                 title="Klik untuk ubah status ke <?= $prod['status'] === 'Aktif' ? 'Nonaktif' : 'Aktif' ?>"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#828282]/15 text-[#828282] hover:bg-[#828282]/25' ?>">
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#828282]/15 text-[#828282] hover:bg-[#828282]/25' ?>">
                                                 <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#828282]' ?>"></span>
                                                 <span><?= htmlspecialchars($prod['status']) ?></span>
                                             </button>
                                         </td>
 
                                         <!-- Aksi (Edit & Delete) -->
-                                        <td class="px-5 py-4 text-center whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-center whitespace-nowrap">
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- Edit Button -->
-                                                <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#FF9B45] hover:bg-[#FF9B45]/10 rounded-md transition-colors" title="Edit Produk">
+                                                <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#FF9B45] hover:bg-[#FF9B45]/10 rounded-md transition-colors cursor-pointer" title="Edit Produk">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                 </button>
                                                 <!-- Delete Button (Custom Modal Confirmation) -->
-                                                <button onclick="confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" class="p-1.5 text-[#EB5757] hover:bg-[#EB5757]/10 rounded-md transition-colors" title="Hapus Produk">
+                                                <button onclick="confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" class="p-1.5 text-[#EB5757] hover:bg-[#EB5757]/10 rounded-md transition-colors cursor-pointer" title="Hapus Produk">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
                                             </div>
@@ -923,7 +959,7 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                                             </div>
                                             <h4 class="text-sm font-bold text-[#1C1C1C]">Tidak Ada Produk Ditemukan</h4>
                                             <p class="text-xs text-[#828282] mt-1 mb-4">Coba sesuaikan kata kunci pencarian atau ganti pilihan filter kategori / status Anda.</p>
-                                            <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-[#FF9B45] hover:text-[#E88C3D] underline">
+                                            <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-[#FF9B45] hover:text-[#E88C3D] underline cursor-pointer">
                                                 Reset Semua Filter
                                             </button>
                                         </div>
@@ -941,13 +977,14 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
 
                         <!-- Pagination Buttons -->
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] hover:bg-[#F5F3F1] transition-colors" title="Sebelumnya">
+                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] bg-gray-50 cursor-not-allowed opacity-60" title="Sebelumnya" disabled>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
                             <button class="w-8 h-8 rounded-lg bg-[#FF9B45] text-white flex items-center justify-center shadow-xs">1</button>
+                            <?php if (count($products) > 10): ?>
                             <button class="w-8 h-8 rounded-lg text-[#1C1C1C] hover:bg-[#F5F3F1] flex items-center justify-center transition-colors">2</button>
-                            <button class="w-8 h-8 rounded-lg text-[#1C1C1C] hover:bg-[#F5F3F1] flex items-center justify-center transition-colors">3</button>
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] hover:bg-[#F5F3F1] transition-colors" title="Berikutnya">
+                            <?php endif; ?>
+                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] bg-gray-50 cursor-not-allowed opacity-60" title="Berikutnya" disabled>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             </button>
                         </div>
@@ -966,7 +1003,7 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                             <p class="text-[#828282] text-xs mt-0.5">Pesanan dari pelanggan di kasir atau WhatsApp akan otomatis diverifikasi sesuai batas minimal per varian kemasan ini.</p>
                         </div>
                     </div>
-                    <a href="#" class="text-[#924C00] hover:text-[#FF9B45] font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0">
+                    <a href="javascript:void(0)" onclick="openWorkflowModal()" class="text-[#924C00] hover:text-[#FF9B45] font-semibold text-xs flex items-center gap-1.5 transition-colors shrink-0">
                         <span>Pelajari Alur Produksi</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
@@ -983,146 +1020,203 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
         <!-- Backdrop with blur -->
         <div onclick="closeProductModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <!-- Modal Card Container -->
-        <div class="bg-white rounded-2xl max-w-[560px] w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+        <!-- Modal Card Container with sticky header & footer -->
+        <div class="bg-white rounded-2xl max-w-[560px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden">
             
-            <!-- Header -->
-            <div class="flex items-start justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+            <!-- Sticky Header -->
+            <div class="flex items-start justify-between px-6 py-5 border-b border-[#F0ECE9] shrink-0 bg-white">
                 <div>
                     <h3 class="text-xl font-bold text-[#1C1C1C]" id="modalTitle">Tambah Produk Baru</h3>
                     <p class="text-[#828282] text-xs mt-1">Tambahkan item roti atau pastry baru ke katalog toko</p>
                 </div>
-                <button onclick="closeProductModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors" title="Tutup">
+                <button type="button" onclick="closeProductModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors cursor-pointer" title="Tutup">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
             <!-- Form -->
-            <form id="productForm" action="produk.php" method="POST" class="space-y-4">
+            <form id="productForm" action="produk.php" method="POST" class="flex flex-col flex-1 overflow-hidden">
                 <input type="hidden" name="action" id="productModalFormAction" value="add_product">
                 <input type="hidden" name="product_id" id="editProductId" value="">
 
-                <!-- Nama Produk -->
-                <div>
-                    <label for="prod_nama" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
-                    <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Tawar Kupas Special" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
-                </div>
-
-                <!-- Row 1: Kategori & Harga Jual Satuan -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Scrollable Body -->
+                <div class="p-6 space-y-4 flex-1 overflow-y-auto">
+                    <!-- Nama Produk -->
                     <div>
-                        <label for="prod_kategori" class="block text-xs font-semibold text-[#333333] mb-1.5">Kategori <span class="text-[#EB5757]">*</span></label>
-                        <div class="relative">
-                            <select id="prod_kategori" name="kategori" required 
-                                class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                <option value="Roti">Roti</option>
-                                <option value="Donat">Donat</option>
-                                <option value="Kue & Pastry">Kue & Pastry</option>
-                                <option value="Snack Box">Snack Box</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <label for="prod_nama" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
+                        <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Tawar Kupas Special" 
+                            class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                    </div>
+
+                    <!-- Row 1: Kategori & Harga Jual Satuan -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="prod_kategori" class="block text-xs font-semibold text-[#333333] mb-1.5">Kategori <span class="text-[#EB5757]">*</span></label>
+                            <div class="relative">
+                                <select id="prod_kategori" name="kategori" required 
+                                    class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
+                                    <option value="" disabled selected>Pilih Kategori</option>
+                                    <option value="Roti">Roti</option>
+                                    <option value="Donat">Donat</option>
+                                    <option value="Kue & Pastry">Kue & Pastry</option>
+                                    <option value="Snack Box">Snack Box</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="prod_harga" class="block text-xs font-semibold text-[#333333] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
+                            <div class="relative flex rounded-lg shadow-2xs">
+                                <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-semibold">Rp</span>
+                                <input type="text" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" 
+                                    class="w-full bg-white border border-[#E0E0E0] rounded-r-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label for="prod_harga" class="block text-xs font-semibold text-[#333333] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
-                        <div class="relative flex rounded-lg shadow-2xs">
-                            <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-semibold">Rp</span>
-                            <input type="text" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-r-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                    <!-- Row 2: Tipe Kemasan & Jumlah Isi -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="prod_kemasan" class="block text-xs font-semibold text-[#333333] mb-1.5">Tipe Kemasan</label>
+                            <div class="relative">
+                                <select id="prod_kemasan" name="kemasan" onchange="handleKemasanChange()" 
+                                    class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
+                                    <option value="Mika" selected>Mika</option>
+                                    <option value="Kardus">Kardus</option>
+                                    <option value="Satuan">Satuan</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Row 2: Tipe Kemasan & Jumlah Isi -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="prod_kemasan" class="block text-xs font-semibold text-[#333333] mb-1.5">Tipe Kemasan</label>
-                        <div class="relative">
-                            <select id="prod_kemasan" name="kemasan" onchange="handleKemasanChange()" 
-                                class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
-                                <option value="Mika" selected>Mika</option>
-                                <option value="Kardus">Kardus</option>
-                                <option value="Satuan">Satuan</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="prod_isi" class="block text-xs font-semibold text-[#333333]">Jumlah Isi</label>
+                                <span class="text-[10px] font-medium text-[#D97706] bg-[#FEF6EE] px-1.5 py-0.5 rounded border border-[#FDE6D2]">[Khusus Mika/Kardus]</span>
+                            </div>
+                            <div class="relative flex rounded-lg shadow-2xs">
+                                <input type="number" id="prod_isi" name="isi" value="12" min="1" 
+                                    class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                                <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#828282] text-xs">pcs</span>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label for="prod_isi" class="block text-xs font-semibold text-[#333333]">Jumlah Isi</label>
-                            <span class="text-[10px] font-medium text-[#D97706] bg-[#FEF6EE] px-1.5 py-0.5 rounded border border-[#FDE6D2]">[Khusus Mika/Kardus]</span>
-                        </div>
-                        <div class="relative flex rounded-lg shadow-2xs">
-                            <input type="number" id="prod_isi" name="isi" value="12" min="1" 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
-                            <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#828282] text-xs">pcs</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Row 3: Minimal Order (MOQ) & Status Produk -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="prod_moq" class="block text-xs font-semibold text-[#333333] mb-1.5">Minimal Order (MOQ)</label>
-                        <div class="relative flex rounded-lg shadow-2xs">
-                            <input type="number" id="prod_moq" name="moq" value="1" min="1" 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
-                            <span id="moq_unit" class="inline-flex items-center px-3.5 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-medium">mika</span>
-                        </div>
-                        <p class="text-[11px] text-[#828282] mt-1">Batas terendah pesanan diproses</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-[#333333] mb-1.5">Status Produk</label>
-                        <div class="flex items-center justify-between p-2 border border-[#E0E0E0] rounded-lg bg-white h-[42px]">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-medium text-[#1C1C1C]" id="status_label">Aktif Siap Pesan</span>
-                                <span class="bg-[#27AE60]/15 text-[#27AE60] text-[10px] font-semibold px-2 py-0.5 rounded-full" id="status_badge">Aktif</span>
+                    <!-- Row 3: Minimal Order (MOQ) & Status Produk -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="prod_moq" class="block text-xs font-semibold text-[#333333] mb-1.5">Minimal Order (MOQ)</label>
+                            <div class="relative flex rounded-lg shadow-2xs">
+                                <input type="number" id="prod_moq" name="moq" value="1" min="1" 
+                                    class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                                <span id="moq_unit" class="inline-flex items-center px-3.5 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-medium">mika</span>
                             </div>
-                            <!-- Toggle Switch -->
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="prod_status" name="status" checked onchange="handleStatusToggle(this)" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
-                            </label>
+                            <p class="text-[11px] text-[#828282] mt-1">Batas terendah pesanan diproses</p>
                         </div>
-                        <p class="text-[11px] text-[#828282] mt-1">Item muncul di formulir kasir</p>
+
+                        <div>
+                            <label for="prod_status" class="block text-xs font-semibold text-[#333333] mb-1.5">Status Produk</label>
+                            <div class="flex items-center justify-between p-2 border border-[#E0E0E0] rounded-lg bg-white h-[42px]">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium text-[#1C1C1C]" id="status_label">Aktif Siap Pesan</span>
+                                    <span class="bg-[#27AE60]/15 text-[#27AE60] text-[10px] font-semibold px-2 py-0.5 rounded-full" id="status_badge">Aktif</span>
+                                </div>
+                                <!-- Toggle Switch -->
+                                <label for="prod_status" class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="prod_status" name="status" checked onchange="handleStatusToggle(this)" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
+                                </label>
+                            </div>
+                            <p class="text-[11px] text-[#828282] mt-1">Item muncul di formulir kasir</p>
+                        </div>
+                    </div>
+
+                    <!-- Deskripsi Produk -->
+                    <div>
+                        <label for="prod_deskripsi" class="block text-xs font-semibold text-[#333333] mb-1.5">Deskripsi Produk (Opsional)</label>
+                        <textarea id="prod_deskripsi" name="deskripsi" rows="3" placeholder="Tuliskan keterangan rasa, komposisi utama, atau instruksi simpan..." 
+                            class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors"></textarea>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3 flex items-start gap-2.5">
+                        <svg class="w-4 h-4 text-[#D97706] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-xs text-[#828282] leading-relaxed">Produk akan otomatis disinkronkan ke rekap kebutuhan bahan harian dapur.</p>
                     </div>
                 </div>
 
-                <!-- Deskripsi Produk -->
-                <div>
-                    <label for="prod_deskripsi" class="block text-xs font-semibold text-[#333333] mb-1.5">Deskripsi Produk (Opsional)</label>
-                    <textarea id="prod_deskripsi" name="deskripsi" rows="3" placeholder="Tuliskan keterangan rasa, komposisi utama, atau instruksi simpan..." 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors"></textarea>
-                </div>
-
-                <!-- Info Box -->
-                <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3 flex items-start gap-2.5">
-                    <svg class="w-4 h-4 text-[#D97706] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-xs text-[#828282] leading-relaxed">Produk akan otomatis disinkronkan ke rekap kebutuhan bahan harian dapur.</p>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#F0ECE9]">
+                <!-- Sticky Action Buttons Footer -->
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#F0ECE9] bg-white shrink-0">
                     <button type="button" onclick="closeProductModal()" 
-                        class="bg-white hover:bg-gray-100 text-[#544337] text-sm font-medium px-5 py-2.5 rounded-lg border border-[#E0E0E0] transition-colors">
+                        class="bg-white hover:bg-gray-100 text-[#544337] text-sm font-medium px-5 py-2.5 rounded-lg border border-[#E0E0E0] transition-colors cursor-pointer">
                         Batal
                     </button>
                     <button type="submit" 
-                        class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                        class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span id="submitProductBtnText">Simpan Produk</span>
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: ALUR PRODUKSI & ATURAN ARMADA (FIGMA SPEC)      -->
+    <!-- ============================================================== -->
+    <div id="workflowModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeWorkflowModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#FFF8F2] text-[#FF9B45] flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-[#1C1C1C]">Alur Produksi & Distribusi</h3>
+                        <p class="text-xs text-[#828282]">Sistem Informasi Berkat Dinasti Bakery</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeWorkflowModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-xs text-[#544337] leading-relaxed">
+                <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3.5">
+                    <h4 class="font-bold text-[#924C00] mb-2 flex items-center gap-1.5 text-sm">
+                        <span>4 Swimlanes Kanban Produksi</span>
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-1 text-[#3E2B21]">
+                        <li><strong class="text-[#FF9B45]">Menunggu Konfirmasi:</strong> Pesanan masuk diverifikasi admin & DP minimal 50% atau Pelunasan.</li>
+                        <li><strong class="text-[#2F80ED]">Proses Dapur:</strong> Resep, takaran, dan batas MOQ di-baking oleh tim dapur sesuai jadwal kirim.</li>
+                        <li><strong class="text-[#E2B93B]">Siap Kirim:</strong> Roti di-packing ke box/mika/kardus dan ditata ke rak pengiriman.</li>
+                        <li><strong class="text-[#27AE60]">Selesai:</strong> Pesanan diterima pelanggan dan invoice ditandai Lunas.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-blue-50/60 border border-blue-200/60 rounded-xl p-3.5">
+                    <h4 class="font-bold text-blue-900 mb-1.5 flex items-center gap-1.5 text-sm">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
+                        <span>Ketentuan Pengiriman & Obrok Motor</span>
+                    </h4>
+                    <ul class="list-disc list-inside space-y-1 text-blue-800">
+                        <li><strong>Bebas Ongkir:</strong> Pengiriman area Kota Malang & Kota Batu bersifat Bebas Ongkir (Rp 0).</li>
+                        <li><strong>Kapasitas Armada:</strong> Kurir motor obrok dibatasi maksimal <strong>150 pcs roti</strong> per trip/keberangkatan untuk menjaga bentuk fisik roti tetap prima.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button type="button" onclick="closeWorkflowModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
+                    Saya Mengerti
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1426,6 +1520,34 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
             filterProducts();
         }
 
+        // Popover Notifikasi & User Dropdown
+        function toggleNotifPopover() {
+            const pop = document.getElementById('notifPopover');
+            if (pop) pop.classList.toggle('hidden');
+        }
+
+        function toggleUserDropdown() {
+            const drop = document.getElementById('userDropdown');
+            if (drop) drop.classList.toggle('hidden');
+        }
+
+        // Modal Alur Produksi & Armada Obrok Motor
+        function openWorkflowModal() {
+            const modal = document.getElementById('workflowModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeWorkflowModal() {
+            const modal = document.getElementById('workflowModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
         // Logout Modal Open / Close
         function openLogoutModal() {
             const modal = document.getElementById('logoutModal');
@@ -1449,6 +1571,19 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
                 closeLogoutModal();
                 closeProductModal();
                 closeDeleteModal();
+                closeWorkflowModal();
+            }
+        });
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', function(e) {
+            const notifPop = document.getElementById('notifPopover');
+            const userDrop = document.getElementById('userDropdown');
+            if (notifPop && !e.target.closest('#notifPopover') && !e.target.closest('button[onclick="toggleNotifPopover()"]')) {
+                notifPop.classList.add('hidden');
+            }
+            if (userDrop && !e.target.closest('#userDropdown') && !e.target.closest('div[onclick="toggleUserDropdown()"]')) {
+                userDrop.classList.add('hidden');
             }
         });
 

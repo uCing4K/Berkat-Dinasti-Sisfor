@@ -17,7 +17,7 @@ $error_message = '';
 $success_message = '';
 $username_val = '';
 
-if (isset($_GET['status']) && $_GET['status'] === 'logged_out') {
+if (isset($_GET['status']) && $_GET['status'] === 'logged_out' && empty($error_message)) {
     $success_message = 'Anda telah berhasil keluar dari sistem.';
 }
 
@@ -109,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         $error_message = 'Username atau password yang Anda masukkan salah. Silakan periksa kembali.';
+        $success_message = ''; // Mencegah tumpang tindih banner logout saat login salah
     }
 } else {
     if (isset($_COOKIE['remember_user']) && empty($username_val)) {
@@ -122,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Berkat Dinasti</title>
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -300,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Copyright -->
             <div class="mt-10 pt-6 border-t border-[#E0E0E0]/60 text-center">
-                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2025 Berkat Dinasti. All rights reserved.</p>
+                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
             </div>
         </div>
     </div>

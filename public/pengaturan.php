@@ -174,6 +174,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <title>Pengaturan - Berkat Dinasti</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
     
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -188,16 +190,16 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         brand: {
                             brown: '#3E2B21',
                             brownDark: '#2C1E17',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FBF9F7',
-                            surface: '#FFFFFF',
-                            border: '#F0ECE9',
-                            muted: '#828282',
-                            dark: '#1C1C1C',
-                            darkText: '#1B1C1B',
-                            brownText: '#544337',
+                            bg: '#F5F1EB',
+                            surface: '#FDFBF7',
+                            border: '#E2D7C8',
+                            muted: '#8E7E73',
+                            dark: '#251A14',
+                            darkText: '#251A14',
+                            brownText: '#5E4D42',
                             brownDeep: '#924C00',
                             accentGreen: '#27AE60',
                             accentYellow: '#E2B93B',
@@ -209,8 +211,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         sans: ['Inter', 'sans-serif'],
                     },
                     boxShadow: {
-                        'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
-                        'button-orange': '0px 2px 4px rgba(255, 155, 69, 0.25)',
+                        'card': '0px 4px 16px rgba(62, 43, 33, 0.06)',
+                        'button-orange': '0px 2px 4px rgba(212, 110, 21, 0.25)',
                     }
                 }
             }
@@ -220,8 +222,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FBF9F7;
-            color: #1C1C1C;
+            background-color: #F5F1EB;
+            color: #251A14;
         }
 
         /* Thermal Struk Print Style */
@@ -245,30 +247,33 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] text-[#251A14] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
 
         <!-- MOBILE SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
                 <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
-                    <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                <div class="h-20 px-5 flex items-center gap-3 border-b border-white/10 shrink-0">
+                    <div class="w-9 h-9 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
+                    <div class="flex flex-col">
+                        <span class="text-white font-bold text-base tracking-tight leading-none">Berkat Dinasti</span>
+                        <span class="text-[#D8C7B8] text-[10px] tracking-wider uppercase font-semibold mt-1">Bakery & Pastry</span>
+                    </div>
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
 
@@ -276,37 +281,37 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_beranda.svg" alt="Beranda" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-home w-5 text-center text-base"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-bread-slice w-5 text-center text-base"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-clipboard-list w-5 text-center text-base"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pelanggan.svg" alt="Pelanggan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-users w-5 text-center text-base"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_laporan.svg" alt="Laporan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-chart-line w-5 text-center text-base"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan (Active) -->
-                    <a href="pengaturan.php" class="bg-[#FF9B45] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-all shadow-sm">
-                        <img src="assets/icons/nav_pengaturan.svg" alt="Pengaturan" class="w-5 h-5">
+                    <a href="pengaturan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
+                        <i class="fas fa-cog w-5 text-center text-base"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -314,18 +319,18 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/15 rounded-xl p-2.5 flex items-center justify-between">
+                <div class="bg-black/25 rounded-xl p-2.5 flex items-center justify-between border border-white/5">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
-                        <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
+                        <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
             </div>
@@ -335,42 +340,42 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
 
             <!-- TOP HEADER (Height 64px) -->
-            <header class="h-16 bg-white border-b border-[#F0ECE9] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+            <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg" aria-label="Buka Menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg" aria-label="Buka Menu">
+                        <i class="fas fa-bars text-lg"></i>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="pengaturan.php" class="text-[#544337] hover:underline" id="headerBreadcrumb">Pengaturan</a>
-                            <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium" id="headerSubtitle"><?= $active_tab === 'user' ? 'Manajemen User' : 'Profil Toko' ?></span>
+                            <a href="pengaturan.php" class="text-[#8E7E73] hover:text-[#3E2B21] transition-colors" id="headerBreadcrumb">Pengaturan</a>
+                            <span class="text-[#8E7E73]">/</span>
+                            <span class="text-[#D46E15] font-semibold" id="headerSubtitle"><?= $active_tab === 'user' ? 'Manajemen User' : 'Profil Toko' ?></span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">
                             <?= $active_tab === 'user' ? 'Manajemen Pengguna' : 'Pengaturan Toko' ?>
                         </h1>
                     </div>
                 </div>
 
                 <!-- Right: Date Indicator, Notification Bell, User Avatar -->
-                <div class="flex items-center gap-3 md:gap-5 relative">
+                <div class="flex items-center gap-3 md:gap-4 relative">
                     
                     <!-- Date Button (Dinamis) -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
-                        <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#DDD3C5]">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-sm"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
-                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
-                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
+                            <i class="far fa-bell text-[#3E2B21] text-lg"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-[#FDFBF7]"></span>
                         </button>
 
                         <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
@@ -387,8 +392,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                     <!-- User Circle Icon with Popover -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
-                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div onclick="toggleUserDropdown()" class="w-9 h-9 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:bg-[#B85207] transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
+                            <i class="fas fa-user text-white text-xs"></i>
                         </div>
 
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
@@ -397,14 +402,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?> Toko</p>
                             </div>
                             <div class="py-1">
-                                <a href="pengaturan.php" class="craft-dropdown-item">
-                                    <span>⚙️</span>
+                                <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
+                                    <i class="fas fa-cog text-[#8E7E73]"></i>
                                     <span>Pengaturan Toko</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
-                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <span>🚪</span>
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i>
                                     <span>Keluar dari Akun</span>
                                 </button>
                             </div>
@@ -421,28 +426,28 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <?php if ($toast_message): ?>
                     <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
                         <div class="flex items-center gap-2.5">
-                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <i class="fas fa-check-circle text-emerald-600"></i>
                             <span class="text-sm font-medium"><?= htmlspecialchars($toast_message) ?></span>
                         </div>
                         <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                 <?php endif; ?>
 
                 <!-- TAB SWITCHER BAR (PROFIL TOKO VS MANAJEMEN USER) -->
-                <div class="bg-white rounded-xl border border-[#F0ECE9] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
+                <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
                     <!-- Tab 1: Profil UMKM -->
                     <button onclick="switchSettingTab('profil')" id="tabBtnProfil" 
-                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'user' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
+                        <i class="fas fa-store text-xs"></i>
                         <span>Profil Toko & Printer</span>
                     </button>
 
                     <!-- Tab 2: Manajemen User -->
                     <button onclick="switchSettingTab('user')" id="tabBtnUser" 
-                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'user' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C]' ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
+                        <i class="fas fa-users-cog text-xs"></i>
                         <span>Manajemen Pengguna</span>
                     </button>
                 </div>
@@ -457,93 +462,93 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <div class="lg:col-span-2 space-y-6">
                             
                             <!-- CARD 1: INFORMASI BISNIS & TOKO -->
-                            <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card">
-                                <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+                            <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-card">
+                                <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] mb-5">
                                     <div>
-                                        <h3 class="text-base font-bold text-[#1C1C1C]">Informasi Bisnis & Toko</h3>
-                                        <p class="text-xs text-[#828282] mt-0.5">Kelola data identitas UMKM dan alamat resmi operasional bakery</p>
+                                        <h3 class="text-base font-bold text-[#251A14]">Informasi Bisnis & Toko</h3>
+                                        <p class="text-xs text-[#8E7E73] mt-0.5">Kelola data identitas UMKM dan alamat resmi operasional bakery</p>
                                     </div>
-                                    <span class="w-5 h-5 rounded-full bg-[#27AE60]/15 text-[#1B7A43] flex items-center justify-center text-xs font-bold">✓</span>
+                                    <span class="w-6 h-6 rounded-full bg-[#27AE60]/15 text-[#1B7A43] flex items-center justify-center text-xs font-bold"><i class="fas fa-check text-[10px]"></i></span>
                                 </div>
 
                                 <!-- Logo Berkat Dinasti Box with Real File Input Preview -->
-                                <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
-                                    <div class="w-16 h-16 rounded-xl bg-white p-1 border border-[#F0ECE9] flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                                <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
+                                    <div class="w-16 h-16 rounded-xl bg-white p-1 border border-[#DDD3C5] flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
                                         <img src="<?= htmlspecialchars($store['logo'] ?? 'assets/images/logo.png') ?>" id="storeLogoPreview" alt="Logo Berkat Dinasti" class="w-full h-full object-contain">
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
-                                            <h4 class="text-sm font-bold text-[#1C1C1C]">Logo Toko Bakery</h4>
-                                            <span class="w-4 h-4 rounded-full bg-[#27AE60] text-white text-[10px] flex items-center justify-center font-bold">✓</span>
+                                            <h4 class="text-sm font-bold text-[#251A14]">Logo Toko Bakery</h4>
+                                            <span class="w-4 h-4 rounded-full bg-[#27AE60] text-white text-[9px] flex items-center justify-center font-bold">✓</span>
                                         </div>
-                                        <p class="text-xs text-[#828282] mt-0.5">Format PNG/JPG transparan resolusi minimum 500 × 500 px (Maks. 2MB)</p>
+                                        <p class="text-xs text-[#8E7E73] mt-0.5">Format PNG/JPG transparan resolusi minimum 500 × 500 px (Maks. 2MB)</p>
                                         
                                         <!-- Hidden File Input for Logo -->
                                         <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="previewLogo(this)">
 
                                         <div class="flex items-center gap-2.5 mt-3">
                                             <button type="button" onclick="document.getElementById('logoFileInput').click()" 
-                                                class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors">
-                                                <span>⬆</span>
+                                                class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors">
+                                                <i class="fas fa-upload text-[10px]"></i>
                                                 <span>Ubah Logo</span>
                                             </button>
                                             <button type="button" onclick="resetLogo()" 
-                                                class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-medium px-3 py-1.5 rounded-lg border border-[#E0E0E0] transition-colors">
+                                                class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#DDD3C5] transition-colors">
                                                 Reset
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Form Fields (Equipped with Label & ID for Accessibility) -->
+                                <!-- Form Fields -->
                                 <form id="storeSettingsForm" method="POST" action="pengaturan.php" class="space-y-4">
                                     <input type="hidden" name="action" value="save_store_settings">
 
                                     <!-- Nama Toko -->
                                     <div>
                                         <div class="flex items-center justify-between mb-1.5">
-                                            <label for="storeNameInput" class="block text-xs font-semibold text-[#333333]">Nama Resmi UMKM / Toko <span class="text-[#EB5757]">*</span></label>
-                                            <span class="text-[11px] text-[#828282]">Ditampilkan di struk & faktur</span>
+                                            <label for="storeNameInput" class="block text-xs font-semibold text-[#251A14]">Nama Resmi UMKM / Toko <span class="text-[#EB5757]">*</span></label>
+                                            <span class="text-[11px] text-[#8E7E73]">Ditampilkan di struk & faktur</span>
                                         </div>
                                         <div class="relative">
-                                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                                <i class="fas fa-store text-xs"></i>
                                             </div>
                                             <input type="text" id="storeNameInput" name="store_name" value="<?= htmlspecialchars($store['name']) ?>" required
                                                 onkeyup="updateReceiptPreview()"
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-semibold focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#251A14] font-semibold focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
                                     </div>
 
                                     <!-- 2 Cols: Phone & WA -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label for="storePhoneInput" class="block text-xs font-semibold text-[#333333] mb-1.5">No. Telepon Toko</label>
+                                            <label for="storePhoneInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. Telepon Toko</label>
                                             <input type="text" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" 
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
-                                            <label for="storeWaInput" class="block text-xs font-semibold text-[#333333] mb-1.5">WhatsApp Bisnis</label>
+                                            <label for="storeWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">WhatsApp Bisnis</label>
                                             <input type="text" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" 
                                                 onkeyup="updateReceiptPreview()"
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
                                     </div>
 
                                     <!-- Alamat Lengkap Operasional Toko -->
                                     <div>
-                                        <label for="storeAddressInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Alamat Lengkap Operasional Toko</label>
+                                        <label for="storeAddressInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Alamat Lengkap Operasional Toko</label>
                                         <textarea id="storeAddressInput" name="store_address" rows="2" 
                                             onkeyup="updateReceiptPreview()"
-                                            class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"><?= htmlspecialchars($store['address']) ?></textarea>
+                                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"><?= htmlspecialchars($store['address']) ?></textarea>
                                     </div>
 
                                     <!-- 2 Cols: Provinsi & Kota -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label for="storeProvinceSelect" class="block text-xs font-semibold text-[#333333] mb-1.5">Provinsi</label>
-                                            <select id="storeProvinceSelect" name="store_province" class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                                            <label for="storeProvinceSelect" class="block text-xs font-semibold text-[#251A14] mb-1.5">Provinsi</label>
+                                            <select id="storeProvinceSelect" name="store_province" class="w-full appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none transition-colors cursor-pointer">
                                                 <option value="Jawa Timur" <?= ($store['province'] === 'Jawa Timur') ? 'selected' : '' ?>>Jawa Timur</option>
                                                 <option value="Jawa Barat" <?= ($store['province'] === 'Jawa Barat') ? 'selected' : '' ?>>Jawa Barat</option>
                                                 <option value="DKI Jakarta" <?= ($store['province'] === 'DKI Jakarta') ? 'selected' : '' ?>>DKI Jakarta</option>
@@ -551,8 +556,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         </div>
 
                                         <div>
-                                            <label for="storeCitySelect" class="block text-xs font-semibold text-[#333333] mb-1.5">Kota / Kabupaten</label>
-                                            <select id="storeCitySelect" name="store_city" class="w-full appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none transition-colors cursor-pointer">
+                                            <label for="storeCitySelect" class="block text-xs font-semibold text-[#251A14] mb-1.5">Kota / Kabupaten</label>
+                                            <select id="storeCitySelect" name="store_city" class="w-full appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none transition-colors cursor-pointer">
                                                 <option value="Kota Malang" <?= ($store['city'] === 'Kota Malang') ? 'selected' : '' ?>>Kota Malang</option>
                                                 <option value="Kota Batu" <?= ($store['city'] === 'Kota Batu') ? 'selected' : '' ?>>Kota Batu</option>
                                                 <option value="Kabupaten Malang" <?= ($store['city'] === 'Kabupaten Malang') ? 'selected' : '' ?>>Kabupaten Malang</option>
@@ -563,51 +568,51 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <!-- 2 Cols: Kode Pos & Email -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
-                                            <label for="storePostalInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Kode Pos</label>
+                                            <label for="storePostalInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Kode Pos</label>
                                             <input type="text" id="storePostalInput" name="store_postal" value="<?= htmlspecialchars($store['postal']) ?>" 
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
-                                            <label for="storeEmailInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Email Bisnis</label>
+                                            <label for="storeEmailInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Email Bisnis</label>
                                             <input type="email" id="storeEmailInput" name="store_email" value="<?= htmlspecialchars($store['email']) ?>" 
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none transition-colors">
                                         </div>
                                     </div>
 
                                     <!-- CARD 2: PENGATURAN STRUK PRINTER -->
-                                    <div class="pt-6 mt-6 border-t border-[#F0ECE9]">
+                                    <div class="pt-6 mt-6 border-t border-[#E2D7C8]">
                                         <div class="flex items-center justify-between pb-3 mb-4">
                                             <div class="flex items-center gap-2">
-                                                <span>🖨️</span>
-                                                <h4 class="text-sm font-bold text-[#1C1C1C]">Pengaturan Struk Kasir (Thermal POS)</h4>
+                                                <i class="fas fa-print text-[#D46E15]"></i>
+                                                <h4 class="text-sm font-bold text-[#251A14]">Pengaturan Struk Kasir (Thermal POS)</h4>
                                             </div>
-                                            <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                            <span class="bg-[#D46E15]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
                                                 Bluetooth & USB
                                             </span>
                                         </div>
 
                                         <!-- Pilihan Ukuran Kertas Thermal -->
                                         <div class="mb-4">
-                                            <label class="block text-xs font-semibold text-[#333333] mb-2">Pilihan Ukuran Kertas Thermal:</label>
+                                            <label class="block text-xs font-semibold text-[#251A14] mb-2">Pilihan Ukuran Kertas Thermal:</label>
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                                <label class="border border-[#E0E0E0] rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-[#FF9B45] transition-colors">
-                                                    <input type="radio" id="storePaperSize58" name="paper_size" value="58" <?= ($store['paper_size'] === '58') ? 'checked' : '' ?> class="text-[#FF9B45] focus:ring-[#FF9B45]">
+                                                <label class="border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-[#D46E15] transition-colors">
+                                                    <input type="radio" id="storePaperSize58" name="paper_size" value="58" <?= ($store['paper_size'] === '58') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
                                                     <div>
-                                                        <p class="text-xs font-bold text-[#1C1C1C]">58 mm (Mini Portable POS)</p>
-                                                        <p class="text-[11px] text-[#828282] mt-0.5">Lebar 32 karakter per baris</p>
+                                                        <p class="text-xs font-bold text-[#251A14]">58 mm (Mini Portable POS)</p>
+                                                        <p class="text-[11px] text-[#8E7E73] mt-0.5">Lebar 32 karakter per baris</p>
                                                     </div>
                                                 </label>
 
-                                                <label class="border-2 border-[#FF9B45] bg-[#FFF8F2] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+                                                <label class="border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
                                                     <div class="flex items-center gap-3">
-                                                        <input type="radio" id="storePaperSize80" name="paper_size" value="80" <?= ($store['paper_size'] === '80') ? 'checked' : '' ?> class="text-[#FF9B45] focus:ring-[#FF9B45]">
+                                                        <input type="radio" id="storePaperSize80" name="paper_size" value="80" <?= ($store['paper_size'] === '80') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
                                                         <div>
                                                             <p class="text-xs font-bold text-[#924C00]">80 mm (Standar Desktop Kasir)</p>
-                                                            <p class="text-[11px] text-[#544337] mt-0.5">Lebar 48 karakter • Terpilih</p>
+                                                            <p class="text-[11px] text-[#5E4D42] mt-0.5">Lebar 48 karakter • Terpilih</p>
                                                         </div>
                                                     </div>
-                                                    <span class="text-sm">🧾</span>
+                                                    <i class="fas fa-receipt text-[#D46E15] text-base"></i>
                                                 </label>
                                             </div>
                                         </div>
@@ -615,24 +620,24 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <!-- Pesan Penutup (Footer Nota Kasir) -->
                                         <div class="mb-5">
                                             <div class="flex items-center justify-between mb-1.5">
-                                                <label for="storeFooterInput" class="block text-xs font-semibold text-[#333333]">Pesan Penutup (Footer Nota Kasir):</label>
-                                                <span class="text-[11px] text-[#828282]">Maks. 140 karakter</span>
+                                                <label for="storeFooterInput" class="block text-xs font-semibold text-[#251A14]">Pesan Penutup (Footer Nota Kasir):</label>
+                                                <span class="text-[11px] text-[#8E7E73]">Maks. 140 karakter</span>
                                             </div>
                                             <textarea rows="2" id="storeFooterInput" name="store_footer" onkeyup="updateReceiptPreview()"
-                                                class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"><?= htmlspecialchars($store['footer']) ?></textarea>
+                                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none transition-colors"><?= htmlspecialchars($store['footer']) ?></textarea>
                                         </div>
 
                                         <!-- Test Print Actions -->
-                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#F0ECE9]">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#E2D7C8]">
                                             <button type="button" onclick="printThermalReceipt()" 
-                                                class="bg-[#F5F3F1] hover:bg-[#EBE8E5] text-[#1C1C1C] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0] flex items-center gap-2 transition-colors">
-                                                <span>🖨️</span>
+                                                class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center gap-2 transition-colors">
+                                                <i class="fas fa-print text-xs"></i>
                                                 <span>Test Print Nota Struk (80mm)</span>
                                             </button>
 
                                             <button type="submit" 
-                                                class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white font-bold text-xs md:text-sm px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                class="bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs md:text-sm px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all">
+                                                <i class="fas fa-check text-xs"></i>
                                                 <span>Simpan Pengaturan Toko</span>
                                             </button>
                                         </div>
@@ -646,29 +651,29 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <div class="space-y-6">
                             
                             <!-- CARD: SIMULASI CETAK NOTA 80MM -->
-                            <div class="bg-white rounded-2xl border border-[#F0ECE9] p-5 shadow-card" id="printableThermalReceipt">
-                                <div class="flex items-center justify-between pb-3 border-b border-[#F0ECE9] mb-4">
-                                    <div class="flex items-center gap-2 text-xs font-bold text-[#1C1C1C]">
-                                        <span>🧾</span>
+                            <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-5 shadow-card" id="printableThermalReceipt">
+                                <div class="flex items-center justify-between pb-3 border-b border-[#E2D7C8] mb-4">
+                                    <div class="flex items-center gap-2 text-xs font-bold text-[#251A14]">
+                                        <i class="fas fa-receipt text-[#D46E15]"></i>
                                         <span>Simulasi Cetak Nota 80mm</span>
                                     </div>
-                                    <span class="bg-[#F5F3F1] text-[#828282] text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-[#EBE8E5]">
+                                    <span class="bg-[#EFE8DE] text-[#8E7E73] text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-[#DDD3C5]">
                                         THERMAL VIEW
                                     </span>
                                 </div>
 
                                 <!-- Receipt Paper Preview -->
-                                <div class="thermal-paper bg-[#FCFCFA] border border-[#E0E0E0] rounded-lg p-4 text-[11px] leading-relaxed shadow-xs text-[#1C1C1C]">
+                                <div class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 text-[11px] leading-relaxed shadow-xs text-[#251A14]">
                                     
                                     <!-- Store Header -->
-                                    <div class="text-center pb-2 border-b border-dashed border-[#828282]">
+                                    <div class="text-center pb-2 border-b border-dashed border-[#8E7E73]">
                                         <p class="font-bold text-xs uppercase tracking-wider" id="previewReceiptName"><?= htmlspecialchars($store['name']) ?></p>
-                                        <p class="text-[10px] text-[#544337]" id="previewReceiptAddress"><?= htmlspecialchars($store['address']) ?></p>
-                                        <p class="text-[10px] text-[#544337]">Malang • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
+                                        <p class="text-[10px] text-[#5E4D42]" id="previewReceiptAddress"><?= htmlspecialchars($store['address']) ?></p>
+                                        <p class="text-[10px] text-[#5E4D42]">Malang • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
                                     </div>
 
                                     <!-- Meta Order -->
-                                    <div class="py-2 border-b border-dashed border-[#828282] text-[10px] space-y-0.5">
+                                    <div class="py-2 border-b border-dashed border-[#8E7E73] text-[10px] space-y-0.5">
                                         <div class="flex justify-between">
                                             <span>Nota: INV-<?= date('Ymd') ?>-0001</span>
                                             <span><?= date('d/m/y H:i') ?></span>
@@ -680,7 +685,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     </div>
 
                                     <!-- Items Ordered -->
-                                    <div class="py-2 border-b border-dashed border-[#828282] space-y-1.5 text-[10px]">
+                                    <div class="py-2 border-b border-dashed border-[#8E7E73] space-y-1.5 text-[10px]">
                                         <div class="flex justify-between">
                                             <span>10x Roti Hajatan (Kardus Putih)</span>
                                             <span class="font-bold">Rp 100.000</span>
@@ -692,12 +697,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     </div>
 
                                     <!-- Totals Calculation -->
-                                    <div class="py-2 border-b border-dashed border-[#828282] text-[10px] space-y-1">
-                                        <div class="flex justify-between text-[#828282]">
+                                    <div class="py-2 border-b border-dashed border-[#8E7E73] text-[10px] space-y-1">
+                                        <div class="flex justify-between text-[#8E7E73]">
                                             <span>Subtotal:</span>
                                             <span>Rp 144.000</span>
                                         </div>
-                                        <div class="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-[#828282]/50">
+                                        <div class="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-[#8E7E73]/50">
                                             <span>TOTAL AKHIR:</span>
                                             <span class="text-[#924C00]">Rp 144.000</span>
                                         </div>
@@ -709,20 +714,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                                     <!-- Footer Message & Barcode -->
                                     <div class="pt-3 text-center text-[10px]">
-                                        <p class="italic text-[#544337] mb-2 leading-tight" id="previewReceiptFooter">
+                                        <p class="italic text-[#5E4D42] mb-2 leading-tight" id="previewReceiptFooter">
                                             "<?= htmlspecialchars($store['footer']) ?>"
                                         </p>
-                                        <div class="font-mono text-center tracking-widest text-[#828282] text-[10px] my-1">
+                                        <div class="font-mono text-center tracking-widest text-[#8E7E73] text-[10px] my-1">
                                             ||||||||||||||||||||||||||||||||||||||||||||
                                         </div>
-                                        <p class="text-[9px] text-[#828282]">Berkat Dinasti — Kota Malang</p>
+                                        <p class="text-[9px] text-[#8E7E73]">Berkat Dinasti — Kota Malang</p>
                                     </div>
 
                                 </div>
 
-                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9] text-xs">
-                                    <span class="text-[#828282]">Ukuran kertas: <strong class="text-[#1C1C1C]">80 mm</strong></span>
-                                    <button type="button" onclick="printThermalReceipt()" class="text-[#FF9B45] hover:text-[#E88C3D] font-bold">
+                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#E2D7C8] text-xs">
+                                    <span class="text-[#8E7E73]">Ukuran kertas: <strong class="text-[#251A14]">80 mm</strong></span>
+                                    <button type="button" onclick="printThermalReceipt()" class="text-[#D46E15] hover:text-[#B85207] font-bold">
                                         Cetak Uji Coba &rarr;
                                     </button>
                                 </div>
@@ -737,21 +742,21 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <!-- TAB 2 CONTENT: MANAJEMEN USER                                  -->
                 <!-- ============================================================== -->
                 <div id="tabContentUser" class="<?= $active_tab !== 'user' ? 'hidden' : '' ?>">
-                    <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card mb-6">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#F0ECE9] mb-5">
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-card mb-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E2D7C8] mb-5">
                             <div>
                                 <div class="flex items-center gap-2.5">
-                                    <h3 class="text-base font-bold text-[#1C1C1C]">Daftar Pengguna Sistem</h3>
-                                    <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                    <h3 class="text-base font-bold text-[#251A14]">Daftar Pengguna Sistem</h3>
+                                    <span class="bg-[#D46E15]/15 text-[#924C00] text-xs font-semibold px-2.5 py-0.5 rounded-full">
                                         <?= count($users_list) ?> Pengguna
                                     </span>
                                 </div>
-                                <p class="text-xs text-[#828282] mt-0.5">Kelola akun kasir, staf bakery, serta hak akses pengelolaan pesanan pelanggan</p>
+                                <p class="text-xs text-[#8E7E73] mt-0.5">Kelola akun kasir, staf bakery, serta hak akses pengelolaan pesanan pelanggan</p>
                             </div>
 
                             <button onclick="openUserModal()" 
-                                class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
-                                <img src="assets/icons/user_plus.svg" alt="Tambah User" class="w-4 h-4">
+                                class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                                <i class="fas fa-user-plus text-xs"></i>
                                 <span>+ Tambah User Baru</span>
                             </button>
                         </div>
@@ -759,7 +764,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse" id="usersTable">
                                 <thead>
-                                    <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
+                                    <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
                                         <th class="py-3 px-4 min-w-[200px]">PENGGUNA</th>
                                         <th class="py-3 px-4 min-w-[140px]">USERNAME</th>
                                         <th class="py-3 px-4 min-w-[160px]">ROLE / HAK AKSES</th>
@@ -767,28 +772,28 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <th class="py-3 px-4 text-center min-w-[120px]">AKSI</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#F0ECE9] text-xs md:text-sm">
-                                    <?php foreach ($users_list as $u): ?>
-                                        <tr class="hover:bg-[#FAF8F5] transition-colors">
+                                <tbody class="divide-y divide-[#E2D7C8] text-xs md:text-sm">
+                                    <?php foreach ($users_list as $idx => $u): ?>
+                                        <tr class="transition-colors <?= $idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]' ?> hover:bg-[#F0E9DF]">
                                             <td class="py-4 px-4">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="w-9 h-9 rounded-full <?= $u['avatar_bg'] ?> text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                                                    <div class="w-9 h-9 rounded-full <?= $u['id'] === 1 ? 'bg-[#3E2B21]' : 'bg-[#D46E15]' ?> text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                                                         <?= htmlspecialchars($u['avatar']) ?>
                                                     </div>
                                                     <div>
-                                                        <h4 class="font-bold text-[#1C1C1C] leading-tight"><?= htmlspecialchars($u['nama']) ?></h4>
-                                                        <p class="text-xs text-[#828282] mt-0.5"><?= htmlspecialchars($u['subtext']) ?></p>
+                                                        <h4 class="font-bold text-[#251A14] leading-tight"><?= htmlspecialchars($u['nama']) ?></h4>
+                                                        <p class="text-xs text-[#8E7E73] mt-0.5"><?= htmlspecialchars($u['subtext']) ?></p>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td class="py-4 px-4 font-mono font-medium text-[#544337]">
+                                            <td class="py-4 px-4 font-mono font-medium text-[#5E4D42]">
                                                 @<?= htmlspecialchars($u['username']) ?>
                                             </td>
 
                                             <td class="py-4 px-4">
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold <?= $u['role_class'] ?>">
-                                                    <span class="w-1.5 h-1.5 rounded-full <?= $u['id'] === 1 ? 'bg-white' : 'bg-[#FF9B45]' ?>"></span>
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold <?= $u['id'] === 1 ? 'bg-[#3E2B21] text-white' : 'bg-[#D46E15]/15 text-[#924C00]' ?>">
+                                                    <span class="w-1.5 h-1.5 rounded-full <?= $u['id'] === 1 ? 'bg-white' : 'bg-[#D46E15]' ?>"></span>
                                                     <span><?= htmlspecialchars($u['role']) ?></span>
                                                 </span>
                                             </td>
@@ -802,14 +807,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                                             <td class="py-4 px-4 text-center">
                                                 <?php if ($u['is_locked'] ?? false): ?>
-                                                    <span class="text-xs text-[#828282] italic">Terkunci (Owner)</span>
+                                                    <span class="text-xs text-[#8E7E73] italic">Terkunci (Owner)</span>
                                                 <?php else: ?>
                                                     <div class="flex items-center justify-center gap-2">
-                                                        <button onclick="openUserModal(<?= $u['id'] ?>)" title="Edit Pengguna" class="p-1.5 text-[#828282] hover:text-[#2F80ED] rounded hover:bg-[#F5F3F1] transition-colors">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                        <button onclick="openUserModal(<?= $u['id'] ?>)" title="Edit Pengguna" class="p-1.5 text-[#8E7E73] hover:text-[#2F80ED] rounded hover:bg-[#EFE8DE] transition-colors">
+                                                            <i class="fas fa-edit text-xs"></i>
                                                         </button>
-                                                        <button onclick="handleDeleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['nama']) ?>')" title="Hapus Pengguna" class="p-1.5 text-[#828282] hover:text-[#EB5757] rounded hover:bg-[#FFF5F5] transition-colors">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                        <button onclick="handleDeleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['nama']) ?>')" title="Hapus Pengguna" class="p-1.5 text-[#8E7E73] hover:text-[#EB5757] rounded hover:bg-rose-50 transition-colors">
+                                                            <i class="fas fa-trash-alt text-xs"></i>
                                                         </button>
                                                     </div>
                                                 <?php endif; ?>
@@ -834,13 +839,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
     <!-- MODAL POPOUT: TAMBAH / EDIT USER -->
     <div id="userModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div onclick="closeUserModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <div onclick="closeUserModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
-            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
-                <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]" id="userModalTitle">Tambah User Baru</h3>
-                <button onclick="closeUserModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="craft-modal-dialog max-w-lg w-full p-6 sm:p-8 relative z-10 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] mb-5">
+                <h3 class="text-base sm:text-lg font-bold text-[#251A14]" id="userModalTitle">Tambah User Baru</h3>
+                <button onclick="closeUserModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
@@ -849,48 +854,48 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <input type="hidden" id="editUserId" name="user_id" value="">
 
                 <div>
-                    <label for="userNameInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Lengkap <span class="text-[#EB5757]">*</span></label>
+                    <label for="userNameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Nama Lengkap <span class="text-[#EB5757]">*</span></label>
                     <input type="text" id="userNameInput" name="nama" required placeholder="Contoh: Budi Prasetyo" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label for="userUsernameInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Username Login <span class="text-[#EB5757]">*</span></label>
+                        <label for="userUsernameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Username Login <span class="text-[#EB5757]">*</span></label>
                         <input type="text" id="userUsernameInput" name="username" required placeholder="Contoh: budi.p" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                     </div>
 
                     <div>
-                        <label for="userSubtextInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Keterangan / Posisi</label>
+                        <label for="userSubtextInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Keterangan / Posisi</label>
                         <input type="text" id="userSubtextInput" name="subtext" placeholder="Contoh: Kasir Shift Pagi" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label for="userRoleInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Role / Hak Akses</label>
-                        <select id="userRoleInput" name="role" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                        <label for="userRoleInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Role / Hak Akses</label>
+                        <select id="userRoleInput" name="role" class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                             <option value="Karyawan">Karyawan / Kasir</option>
                             <option value="Pemilik (Owner)">Pemilik (Owner)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label for="userStatusInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Status Akun</label>
-                        <select id="userStatusInput" name="status" class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                        <label for="userStatusInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Status Akun</label>
+                        <select id="userStatusInput" name="status" class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                             <option value="Aktif">Aktif</option>
                             <option value="Nonaktif">Nonaktif</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#F0ECE9] mt-6">
-                    <button type="button" onclick="closeUserModal()" class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0]">
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E2D7C8] mt-6">
+                    <button type="button" onclick="closeUserModal()" class="craft-btn-secondary text-xs font-semibold px-4 py-2.5 rounded-xl">
                         Batal
                     </button>
-                    <button type="submit" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-button-orange">
+                    <button type="submit" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-button-orange active:scale-95 transition-all">
                         Simpan Pengguna
                     </button>
                 </div>
@@ -907,7 +912,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <i class="fas fa-sign-out-alt text-xl"></i>
             </div>
 
             <!-- Title -->
@@ -919,9 +924,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             <!-- Action Buttons -->
             <div class="space-y-2">
                 <a href="logout.php" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
-                    </svg>
+                    <i class="fas fa-sign-out-alt"></i>
                     <span>Ya, Keluar</span>
                 </a>
                 <button type="button" onclick="closeLogoutModal()" class="w-full craft-btn-secondary text-xs sm:text-sm py-2 px-4 rounded-lg">
@@ -972,17 +975,19 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             if (tab === 'user') {
                 tabContentProfil.classList.add('hidden');
                 tabContentUser.classList.remove('hidden');
-                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
+                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
+                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
                 headerSubtitle.textContent = 'Manajemen User';
                 headerTitle.textContent = 'Manajemen Pengguna';
             } else {
                 tabContentUser.classList.add('hidden');
                 tabContentProfil.classList.remove('hidden');
-                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C]';
+                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
+                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
                 headerSubtitle.textContent = 'Profil Toko';
                 headerTitle.textContent = 'Pengaturan Toko';
+            }
+        }engaturan Toko';
             }
         }
 

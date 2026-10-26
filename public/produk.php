@@ -634,7 +634,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Modern Craft Design System -->
     <link rel="stylesheet" href="css/modern-craft.css">
 
@@ -646,13 +651,13 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                         brand: {
                             brown: '#3E2B21',
                             brownDark: '#2C1E17',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FBF9F7',
-                            surface: '#FFFFFF',
-                            border: '#F0ECE9',
-                            muted: '#828282',
+                            bg: '#F5F1EB',
+                            surface: '#FDFBF7',
+                            border: '#E2D7C8',
+                            muted: '#8E7E73',
                             dark: '#1C1C1C',
                             darkText: '#1B1C1B',
                             brownText: '#544337',
@@ -668,7 +673,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     },
                     boxShadow: {
                         'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
-                        'button-orange': '0px 2px 4px rgba(255, 155, 69, 0.25)',
+                        'button-orange': '0px 2px 4px rgba(212, 110, 21, 0.25)',
                     }
                 }
             }
@@ -678,12 +683,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FBF9F7;
-            color: #1C1C1C;
+            background-color: #F5F1EB;
+            color: #251A14;
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
@@ -692,7 +697,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -706,7 +711,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
 
@@ -714,37 +719,37 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_beranda.svg" alt="Beranda" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-th-large w-5 text-center text-sm opacity-90"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk (Active) -->
-                    <a href="produk.php" class="bg-[#FF9B45] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-all shadow-sm">
-                        <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5">
+                    <a href="produk.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
+                        <i class="fas fa-box-open w-5 text-center text-sm"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm opacity-90"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pelanggan.svg" alt="Pelanggan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-users w-5 text-center text-sm opacity-90"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_laporan.svg" alt="Laporan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pengaturan.svg" alt="Pengaturan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -752,18 +757,18 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/15 rounded-xl p-2.5 flex items-center justify-between">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
-                        <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
+                        <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
             </div>
@@ -773,23 +778,23 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
         <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
 
             <!-- TOP HEADER (Height 64px) -->
-            <header class="h-16 bg-white border-b border-[#F0ECE9] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+            <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg">
+                        <i class="fas fa-bars text-lg text-[#3E2B21]"></i>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="produk.php" class="text-[#544337] hover:underline">Produk</a>
-                            <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium">Daftar Produk</span>
+                            <a href="produk.php" class="text-[#8E7E73] hover:underline">Produk</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <span class="text-[#3E2B21] font-semibold">Daftar Produk</span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5">Daftar Produk</h1>
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5">Daftar Produk</h1>
                     </div>
                 </div>
 
@@ -797,15 +802,15 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <div class="flex items-center gap-3 md:gap-5">
                     
                     <!-- Date Button -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
-                        <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-[#DDD3C5]">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
-                        <button onclick="toggleNotifPopover()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors cursor-pointer" title="Notifikasi">
-                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                        <button onclick="toggleNotifPopover()" class="relative p-2 text-[#544337] hover:bg-[#EFE8DE] rounded-lg transition-colors cursor-pointer" title="Notifikasi">
+                            <i class="far fa-bell text-lg"></i>
                             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
                         <div id="notifPopover" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
@@ -828,8 +833,8 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
                     <!-- User Circle Icon with Dropdown -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
-                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
+                            <i class="fas fa-user text-xs"></i>
                         </div>
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
@@ -838,13 +843,13 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                             </div>
                             <div class="py-1">
                                 <a href="pengaturan.php" class="craft-dropdown-item">
-                                    <span>⚙️</span>
+                                    <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <span>🚪</span>
+                                    <i class="fas fa-sign-out-alt text-xs text-rose-600"></i>
                                     <span>Keluar / Logout</span>
                                 </button>
                             </div>
@@ -860,11 +865,11 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <?php if (!empty($toast_message)): ?>
                     <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
                         <div class="flex items-center gap-2.5">
-                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <i class="fas fa-check-circle text-emerald-600 text-base"></i>
                             <span class="text-sm font-medium"><?= $toast_message ?></span>
                         </div>
                         <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                 <?php endif; ?>
@@ -872,45 +877,45 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <!-- TOP SECTION: GREETING & 3 STAT CARDS -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
                     <div>
-                        <h2 class="text-[#1B1C1B] text-2xl font-bold tracking-tight">Daftar Produk Bakery</h2>
-                        <p class="text-[#828282] text-sm mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, roti manis, varian kemasan, dan batas minimal pemesanan produksi.</p>
+                        <h2 class="text-[#251A14] text-2xl font-bold tracking-tight">Daftar Produk Bakery</h2>
+                        <p class="text-[#8E7E73] text-sm mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, roti manis, varian kemasan, dan batas minimal pemesanan produksi.</p>
                     </div>
 
-                    <!-- 3 KPI Cards Cluster -->
+                    <!-- 3 KPI Cards Cluster (Dark Chocolate Espresso - Consistent with Beranda) -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 shrink-0">
                         <!-- Card 1: Total Produk -->
-                        <div class="bg-white rounded-xl p-3.5 shadow-card border border-[#F0ECE9] relative overflow-hidden flex items-center justify-between min-w-[150px]">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#FF9B45]"></div>
+                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#D46E15]"></div>
                             <div class="pl-2">
-                                <p class="text-[#828282] text-[11px] font-semibold uppercase tracking-wider">TOTAL PRODUK</p>
-                                <p class="text-[#1C1C1C] text-lg font-bold leading-tight mt-0.5"><?= $total_katalog ?> Katalog</p>
+                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">TOTAL PRODUK</p>
+                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $total_katalog ?> Katalog</p>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-[#FF9B45]/15 flex items-center justify-center text-[#FF9B45] shrink-0 ml-3">
-                                <img src="assets/icons/orders_clipboard.svg" alt="Total" class="w-4 h-4">
+                            <div class="w-9 h-9 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0 ml-3">
+                                <i class="fas fa-boxes text-sm"></i>
                             </div>
                         </div>
 
                         <!-- Card 2: Produk Aktif -->
-                        <div class="bg-white rounded-xl p-3.5 shadow-card border border-[#F0ECE9] relative overflow-hidden flex items-center justify-between min-w-[150px]">
+                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#27AE60]"></div>
                             <div class="pl-2">
-                                <p class="text-[#828282] text-[11px] font-semibold uppercase tracking-wider">PRODUK AKTIF</p>
-                                <p class="text-[#1C1C1C] text-lg font-bold leading-tight mt-0.5"><?= $produk_aktif ?> Siap Pesan</p>
+                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">PRODUK AKTIF</p>
+                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $produk_aktif ?> Siap Pesan</p>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-[#27AE60]/15 flex items-center justify-center text-[#27AE60] shrink-0 ml-3">
-                                <img src="assets/icons/check_circle.svg" alt="Aktif" class="w-4 h-4">
+                            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0 ml-3">
+                                <i class="fas fa-check-circle text-sm"></i>
                             </div>
                         </div>
 
                         <!-- Card 3: Varian Kemasan -->
-                        <div class="bg-white rounded-xl p-3.5 shadow-card border border-[#F0ECE9] relative overflow-hidden flex items-center justify-between min-w-[150px]">
+                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#E2B93B]"></div>
                             <div class="pl-2">
-                                <p class="text-[#828282] text-[11px] font-semibold uppercase tracking-wider">VARIAN KEMASAN</p>
-                                <p class="text-[#1C1C1C] text-lg font-bold leading-tight mt-0.5"><?= $varian_kemasan ?> Tipe Box/Pcs</p>
+                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">VARIAN KEMASAN</p>
+                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $varian_kemasan ?> Tipe Box/Pcs</p>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-[#E2B93B]/15 flex items-center justify-center text-[#E2B93B] shrink-0 ml-3">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            <div class="w-9 h-9 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0 ml-3">
+                                <i class="fas fa-box text-sm"></i>
                             </div>
                         </div>
                     </div>
@@ -922,37 +927,37 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Search Box -->
                         <div class="relative w-full sm:w-64 md:w-72">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                <img src="assets/icons/search.svg" alt="Cari" class="w-4 h-4 opacity-70">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                <i class="fas fa-search text-xs"></i>
                             </div>
                             <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Cari nama produk, SKU..." 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-10 pr-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:outline-none focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] transition-colors shadow-2xs">
+                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-colors shadow-2xs">
                         </div>
 
                         <!-- Dropdown Kategori -->
                         <div class="relative">
                             <select id="categoryFilter" onchange="filterProducts()" 
-                                class="appearance-none bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] font-medium focus:outline-none focus:border-[#FF9B45] cursor-pointer transition-colors shadow-2xs">
+                                class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer transition-colors shadow-2xs">
                                 <option value="">Semua Kategori</option>
                                 <option value="Roti Hajatan">Roti Hajatan</option>
                                 <option value="Bolu Premium">Bolu Premium</option>
                                 <option value="Roti Manis">Roti Manis</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                <i class="fas fa-chevron-down text-xs"></i>
                             </div>
                         </div>
 
                         <!-- Dropdown Status -->
                         <div class="relative">
                             <select id="statusFilter" onchange="filterProducts()" 
-                                class="appearance-none bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] font-medium focus:outline-none focus:border-[#FF9B45] cursor-pointer transition-colors shadow-2xs">
+                                class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer transition-colors shadow-2xs">
                                 <option value="">Semua Status</option>
                                 <option value="Aktif">Aktif</option>
                                 <option value="Nonaktif">Nonaktif</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                <i class="fas fa-chevron-down text-xs"></i>
                             </div>
                         </div>
                     </div>
@@ -961,25 +966,25 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <div class="flex items-center gap-3 shrink-0">
                         <!-- Ekspor Data (Live CSV Export) -->
                         <a href="produk.php?action=export_csv" title="Unduh katalog produk format CSV/Excel" 
-                            class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
-                            <img src="assets/icons/download.svg" alt="Ekspor" class="w-4 h-4">
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
+                            <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
                             <span>Ekspor Data</span>
                         </a>
 
                         <!-- Tambah Produk Button (Triggers Modal) -->
-                        <button onclick="openProductModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
-                            <img src="assets/icons/plus.svg" alt="Tambah" class="w-4 h-4">
+                        <button onclick="openProductModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                            <i class="fas fa-plus text-xs"></i>
                             <span>+ Tambah Produk</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- TABLE CARD (FULL WIDTH) -->
-                <div class="bg-white rounded-xl shadow-card border border-[#F0ECE9] overflow-hidden mb-6">
+                <div class="bg-[#FDFBF7] rounded-xl shadow-sm border border-[#E2D7C8] overflow-hidden mb-6">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse" id="productsTable">
                             <thead>
-                                <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
+                                <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
                                     <th class="px-3.5 py-3 w-12 text-center">NO</th>
                                     <th class="px-3.5 py-3">NAMA PRODUK</th>
                                     <th class="px-3.5 py-3">KATEGORI</th>
@@ -990,40 +995,36 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                     <th class="px-3.5 py-3 text-center">AKSI</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#F0ECE9] text-xs sm:text-sm" id="productsTableBody">
+                            <tbody class="divide-y divide-[#EAE1D5] text-xs sm:text-sm" id="productsTableBody">
                                 <?php foreach ($products as $idx => $prod): ?>
-                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#FFF8F2]' : 'bg-white' ?> hover:bg-[#FFF0E0] transition-colors product-row"
+                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#F8F5F0]' : 'bg-[#FDFBF7]' ?> hover:bg-[#F0E9DF] transition-colors product-row"
                                         data-name="<?= strtolower(htmlspecialchars($prod['name'])) ?>"
                                         data-sku="<?= strtolower(htmlspecialchars($prod['sku'])) ?>"
                                         data-category="<?= htmlspecialchars($prod['category']) ?>"
                                         data-status="<?= htmlspecialchars($prod['status']) ?>">
                                         
                                         <!-- No -->
-                                        <td class="px-3.5 py-3 text-center text-[#828282] font-medium row-number">
+                                        <td class="px-3.5 py-3 text-center text-[#8E7E73] font-medium row-number">
                                             <?= $idx + 1 ?>
                                         </td>
 
                                         <!-- Nama Produk -->
-                                        <td class="px-3.5 py-3 text-[#1B1C1B] font-semibold max-w-[200px]">
-                                            <div class="truncate font-semibold text-[#1C1C1C]" title="<?= htmlspecialchars($prod['name']) ?>"><?= htmlspecialchars($prod['name']) ?></div>
-                                            <span class="text-[11px] text-[#828282] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
+                                        <td class="px-3.5 py-3 text-[#251A14] font-semibold max-w-[200px]">
+                                            <div class="truncate font-semibold text-[#251A14]" title="<?= htmlspecialchars($prod['name']) ?>"><?= htmlspecialchars($prod['name']) ?></div>
+                                            <span class="text-[11px] text-[#8E7E73] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
                                         </td>
 
                                         <!-- Kategori -->
                                         <td class="px-3.5 py-3 text-[#544337] whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
                                                 <?php if ($prod['category'] === 'Roti Hajatan'): ?>
-                                                    <!-- Icon Roti Hajatan -->
-                                                    <svg class="w-4 h-4 text-[#B86B28] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7 19H17M7 22H17"></path></svg>
+                                                    <i class="fas fa-bread-slice text-[#D46E15] text-sm"></i>
                                                 <?php elseif ($prod['category'] === 'Bolu Premium'): ?>
-                                                    <!-- Icon Bolu Premium -->
-                                                    <svg class="w-4 h-4 text-[#C05621] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M12 7V4"></path></svg>
+                                                    <i class="fas fa-birthday-cake text-[#B85207] text-sm"></i>
                                                 <?php elseif ($prod['category'] === 'Roti Manis'): ?>
-                                                    <!-- Icon Roti Manis -->
-                                                    <svg class="w-4 h-4 text-[#D97706] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M8 12c1 2 3 2 4 0 1 2 3 2 4 0"></path></svg>
+                                                    <i class="fas fa-cookie text-amber-600 text-sm"></i>
                                                 <?php else: ?>
-                                                    <!-- Icon Box -->
-                                                    <svg class="w-4 h-4 text-[#828282] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
+                                                    <i class="fas fa-box text-[#8E7E73] text-sm"></i>
                                                 <?php endif; ?>
                                                 <span class="font-medium"><?= htmlspecialchars($prod['category']) ?></span>
                                             </div>
@@ -1033,33 +1034,33 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                         <td class="px-3.5 py-3 whitespace-nowrap">
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border <?= $prod['packaging_badge_class'] ?>">
                                                 <?php if ($prod['packaging_icon'] === 'mika'): ?>
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke-width="2"></rect><path d="M3 10h18" stroke-width="2"></path></svg>
+                                                    <i class="far fa-window-restore text-xs"></i>
                                                 <?php elseif ($prod['packaging_icon'] === 'kardus'): ?>
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                                    <i class="fas fa-box-open text-xs"></i>
                                                 <?php else: ?>
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke-width="2"></circle></svg>
+                                                    <i class="fas fa-circle text-[8px]"></i>
                                                 <?php endif; ?>
                                                 <?= htmlspecialchars($prod['packaging_label']) ?>
                                             </span>
                                         </td>
 
                                         <!-- Minimal Order -->
-                                        <td class="px-3.5 py-3 text-[#333333] font-medium whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-[#3E2B21] font-medium whitespace-nowrap">
                                             <?= htmlspecialchars($prod['min_order']) ?>
                                         </td>
 
                                         <!-- Harga Jual -->
                                         <td class="px-3.5 py-3 whitespace-nowrap">
-                                            <span class="text-[#1B1C1B] font-bold">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
-                                            <span class="text-[#828282] text-xs">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
+                                            <span class="text-[#251A14] font-bold">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
+                                            <span class="text-[#8E7E73] text-xs">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                         </td>
 
                                         <!-- Status dengan Quick Interactive Toggle -->
                                         <td class="px-3.5 py-3 text-center whitespace-nowrap">
                                             <button type="button" onclick="toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
                                                 title="Klik untuk ubah status ke <?= $prod['status'] === 'Aktif' ? 'Nonaktif' : 'Aktif' ?>"
-                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#828282]/15 text-[#828282] hover:bg-[#828282]/25' ?>">
-                                                <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#828282]' ?>"></span>
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#8E7E73]/15 text-[#8E7E73] hover:bg-[#8E7E73]/25' ?>">
+                                                <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
                                                 <span><?= htmlspecialchars($prod['status']) ?></span>
                                             </button>
                                         </td>
@@ -1068,12 +1069,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                         <td class="px-3.5 py-3 text-center whitespace-nowrap">
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- Edit Button -->
-                                                <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#FF9B45] hover:bg-[#FF9B45]/10 rounded-md transition-colors cursor-pointer" title="Edit Produk">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#D46E15] hover:bg-[#D46E15]/10 rounded-md transition-colors cursor-pointer" title="Edit Produk">
+                                                    <i class="fas fa-edit text-sm"></i>
                                                 </button>
                                                 <!-- Delete Button (Custom Modal Confirmation) -->
                                                 <button onclick="confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" class="p-1.5 text-[#EB5757] hover:bg-[#EB5757]/10 rounded-md transition-colors cursor-pointer" title="Hapus Produk">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    <i class="fas fa-trash-alt text-sm"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -1084,12 +1085,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                 <tr id="emptyStateRow" class="hidden">
                                     <td colspan="8" class="py-12 text-center">
                                         <div class="flex flex-col items-center justify-center max-w-sm mx-auto text-center">
-                                            <div class="w-12 h-12 rounded-full bg-[#FFF8F2] text-[#FF9B45] flex items-center justify-center mb-3">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                            <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#D46E15] flex items-center justify-center mb-3">
+                                                <i class="fas fa-search text-lg"></i>
                                             </div>
-                                            <h4 class="text-sm font-bold text-[#1C1C1C]">Tidak Ada Produk Ditemukan</h4>
-                                            <p class="text-xs text-[#828282] mt-1 mb-4">Coba sesuaikan kata kunci pencarian atau ganti pilihan filter kategori / status Anda.</p>
-                                            <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-[#FF9B45] hover:text-[#E88C3D] underline cursor-pointer">
+                                            <h4 class="text-sm font-bold text-[#251A14]">Tidak Ada Produk Ditemukan</h4>
+                                            <p class="text-xs text-[#8E7E73] mt-1 mb-4">Coba sesuaikan kata kunci pencarian atau ganti pilihan filter kategori / status Anda.</p>
+                                            <button type="button" onclick="resetFilters()" class="text-xs font-semibold text-[#D46E15] hover:text-[#B85207] underline cursor-pointer">
                                                 Reset Semua Filter
                                             </button>
                                         </div>
@@ -1100,67 +1101,60 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     </div>
 
                     <!-- Table Footer: Record count & Pagination -->
-                    <div class="px-6 py-4 border-t border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white">
-                        <p class="text-xs text-[#828282]" id="tableSummary">
-                            Menampilkan <span id="visibleCount" class="font-semibold text-[#1C1C1C]"><?= count($products) ?></span> dari <span class="font-semibold text-[#1C1C1C]"><?= count($products) ?></span> produk bakery
+                    <div class="px-6 py-4 border-t border-[#E2D7C8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#FDFBF7]">
+                        <p class="text-xs text-[#8E7E73]" id="tableSummary">
+                            Menampilkan <span id="visibleCount" class="font-semibold text-[#251A14]"><?= count($products) ?></span> dari <span class="font-semibold text-[#251A14]"><?= count($products) ?></span> produk bakery
                         </p>
 
                         <!-- Pagination Buttons -->
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] bg-gray-50 cursor-not-allowed opacity-60" title="Sebelumnya" disabled>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Sebelumnya" disabled>
+                                <i class="fas fa-chevron-left text-xs"></i>
                             </button>
-                            <button class="w-8 h-8 rounded-lg bg-[#FF9B45] text-white flex items-center justify-center shadow-xs">1</button>
+                            <button class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shadow-xs">1</button>
                             <?php if (count($products) > 10): ?>
-                            <button class="w-8 h-8 rounded-lg text-[#1C1C1C] hover:bg-[#F5F3F1] flex items-center justify-center transition-colors">2</button>
+                            <button class="w-8 h-8 rounded-lg text-[#251A14] hover:bg-[#EFE8DE] flex items-center justify-center transition-colors">2</button>
                             <?php endif; ?>
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#828282] bg-gray-50 cursor-not-allowed opacity-60" title="Berikutnya" disabled>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Berikutnya" disabled>
+                                <i class="fas fa-chevron-right text-xs"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- BOTTOM INFO CALLOUT BANNER -->
-                <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
+                <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-2xs">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45]/15 flex items-center justify-center text-[#FF9B45] shrink-0">
-                            <!-- Lamp icon -->
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15]/15 flex items-center justify-center text-[#D46E15] shrink-0">
+                            <i class="fas fa-info-circle text-base"></i>
                         </div>
                         <div>
-                            <h4 class="text-[#1C1C1C] text-sm font-semibold">Aturan Batas Minimal Order (MOQ) Produksi</h4>
-                            <p class="text-[#828282] text-xs mt-0.5">Pesanan dari pelanggan di kasir atau WhatsApp akan otomatis diverifikasi sesuai batas minimal per varian kemasan ini.</p>
+                            <h4 class="text-[#251A14] text-sm font-semibold">Aturan Batas Minimal Order (MOQ) Produksi</h4>
+                            <p class="text-[#8E7E73] text-xs mt-0.5">Pesanan dari pelanggan di kasir atau WhatsApp akan otomatis diverifikasi sesuai batas minimal per varian kemasan ini.</p>
                         </div>
                     </div>
-                    <a href="javascript:void(0)" onclick="openWorkflowModal()" class="text-[#924C00] hover:text-[#FF9B45] font-semibold text-xs flex items-center gap-1.5 transition-colors shrink-0">
+                    <a href="javascript:void(0)" onclick="openWorkflowModal()" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-xs flex items-center gap-1.5 transition-colors shrink-0">
                         <span>Pelajari Alur Produksi</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <i class="fas fa-arrow-right text-xs"></i>
                     </a>
-                </div>
-
-            </main>
-        </div>
-    </div>
-
     <!-- ============================================================== -->
-    <!-- MODAL POPOUT: TAMBAH PRODUK BARU (SESUAI FIGMA SCREENSHOT 2)  -->
+    <!-- MODAL POPOUT: TAMBAH PRODUK BARU (SESUAI FIGMA SPEC)          -->
     <!-- ============================================================== -->
     <div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <!-- Backdrop with blur -->
         <div onclick="closeProductModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
         <!-- Modal Card Container with sticky header & footer -->
-        <div class="bg-white rounded-2xl max-w-[560px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden">
+        <div class="bg-[#FDFBF7] rounded-2xl max-w-[560px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden border border-[#E2D7C8]">
             
             <!-- Sticky Header -->
-            <div class="flex items-start justify-between px-6 py-5 border-b border-[#F0ECE9] shrink-0 bg-white">
+            <div class="flex items-start justify-between px-6 py-5 border-b border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
                 <div>
-                    <h3 class="text-xl font-bold text-[#1C1C1C]" id="modalTitle">Tambah Produk Baru</h3>
-                    <p class="text-[#828282] text-xs mt-1">Tambahkan item roti atau pastry baru ke katalog toko</p>
+                    <h3 class="text-xl font-bold text-[#251A14]" id="modalTitle">Tambah Produk Baru</h3>
+                    <p class="text-[#8E7E73] text-xs mt-1">Tambahkan item roti atau pastry baru ke katalog toko</p>
                 </div>
-                <button type="button" onclick="closeProductModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors cursor-pointer" title="Tutup">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button type="button" onclick="closeProductModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors cursor-pointer" title="Tutup">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
@@ -1173,35 +1167,35 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <div class="p-6 space-y-4 flex-1 overflow-y-auto">
                     <!-- Nama Produk -->
                     <div>
-                        <label for="prod_nama" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
+                        <label for="prod_nama" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
                         <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Hajatan (9 Pilihan Topping) / Bolu Pisang" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 
                     <!-- Row 1: Kategori & Harga Jual Satuan -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="prod_kategori" class="block text-xs font-semibold text-[#333333] mb-1.5">Kategori <span class="text-[#EB5757]">*</span></label>
+                            <label for="prod_kategori" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Kategori <span class="text-[#EB5757]">*</span></label>
                             <div class="relative">
                                 <select id="prod_kategori" name="kategori" required 
-                                    class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
+                                    class="appearance-none w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none cursor-pointer transition-colors">
                                     <option value="" disabled selected>Pilih Kategori</option>
                                     <option value="Roti Hajatan">Roti Hajatan</option>
                                     <option value="Bolu Premium">Bolu Premium</option>
                                     <option value="Roti Manis">Roti Manis</option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label for="prod_harga" class="block text-xs font-semibold text-[#333333] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
+                            <label for="prod_harga" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
                             <div class="relative flex rounded-lg shadow-2xs">
-                                <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-semibold">Rp</span>
+                                <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold">Rp</span>
                                 <input type="text" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-r-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-r-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                             </div>
                         </div>
                     </div>
@@ -1209,31 +1203,31 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <!-- Row 2: Tipe Kemasan & Jumlah Isi -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="prod_kemasan" class="block text-xs font-semibold text-[#333333] mb-1.5">Tipe Kemasan</label>
+                            <label for="prod_kemasan" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Tipe Kemasan</label>
                             <div class="relative">
                                 <select id="prod_kemasan" name="kemasan" onchange="handleKemasanChange()" 
-                                    class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
+                                    class="appearance-none w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none cursor-pointer transition-colors">
                                     <option value="Kardus Putih">Kardus Putih</option>
                                     <option value="Kardus Coklat">Kardus Coklat</option>
                                     <option value="Kardus Batik">Kardus Batik</option>
                                     <option value="Mika" selected>Mika</option>
                                     <option value="Satuan">Satuan</option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
                         </div>
 
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
-                                <label for="prod_isi" class="block text-xs font-semibold text-[#333333]">Jumlah Isi</label>
-                                <span class="text-[10px] font-medium text-[#D97706] bg-[#FEF6EE] px-1.5 py-0.5 rounded border border-[#FDE6D2]">[Khusus Mika/Kardus]</span>
+                                <label for="prod_isi" class="block text-xs font-semibold text-[#3E2B21]">Jumlah Isi</label>
+                                <span class="text-[10px] font-medium text-[#D46E15] bg-[#EFE8DE] px-1.5 py-0.5 rounded border border-[#DDD3C5]">[Khusus Mika/Kardus]</span>
                             </div>
                             <div class="relative flex rounded-lg shadow-2xs">
                                 <input type="number" id="prod_isi" name="isi" value="12" min="1" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
-                                <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#828282] text-xs">pcs</span>
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-l-lg px-3.5 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
+                                <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#544337] text-xs">pcs</span>
                             </div>
                         </div>
                     </div>
@@ -1241,55 +1235,55 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <!-- Row 3: Minimal Order (MOQ) & Status Produk -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="prod_moq" class="block text-xs font-semibold text-[#333333] mb-1.5">Minimal Order (MOQ)</label>
+                            <label for="prod_moq" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Minimal Order (MOQ)</label>
                             <div class="relative flex rounded-lg shadow-2xs">
                                 <input type="number" id="prod_moq" name="moq" value="1" min="1" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-l-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
-                                <span id="moq_unit" class="inline-flex items-center px-3.5 rounded-r-lg border border-l-0 border-[#E0E0E0] bg-[#F5F3F1] text-[#544337] text-xs font-medium">mika</span>
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-l-lg px-3.5 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
+                                <span id="moq_unit" class="inline-flex items-center px-3.5 rounded-r-lg border border-l-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#3E2B21] text-xs font-medium">mika</span>
                             </div>
-                            <p class="text-[11px] text-[#828282] mt-1">Batas terendah pesanan diproses</p>
+                            <p class="text-[11px] text-[#8E7E73] mt-1">Batas terendah pesanan diproses</p>
                         </div>
 
                         <div>
-                            <label for="prod_status" class="block text-xs font-semibold text-[#333333] mb-1.5">Status Produk</label>
-                            <div class="flex items-center justify-between p-2 border border-[#E0E0E0] rounded-lg bg-white h-[42px]">
+                            <label for="prod_status" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Status Produk</label>
+                            <div class="flex items-center justify-between p-2 border border-[#DDD3C5] rounded-lg bg-[#EFE8DE] h-[42px]">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-medium text-[#1C1C1C]" id="status_label">Aktif Siap Pesan</span>
+                                    <span class="text-xs font-medium text-[#251A14]" id="status_label">Aktif Siap Pesan</span>
                                     <span class="bg-[#27AE60]/15 text-[#27AE60] text-[10px] font-semibold px-2 py-0.5 rounded-full" id="status_badge">Aktif</span>
                                 </div>
                                 <!-- Toggle Switch -->
                                 <label for="prod_status" class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="prod_status" name="status" checked onchange="handleStatusToggle(this)" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF9B45]"></div>
+                                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D46E15]"></div>
                                 </label>
                             </div>
-                            <p class="text-[11px] text-[#828282] mt-1">Item muncul di formulir kasir</p>
+                            <p class="text-[11px] text-[#8E7E73] mt-1">Item muncul di formulir kasir</p>
                         </div>
                     </div>
 
                     <!-- Deskripsi Produk -->
                     <div>
-                        <label for="prod_deskripsi" class="block text-xs font-semibold text-[#333333] mb-1.5">Deskripsi Produk (Opsional)</label>
+                        <label for="prod_deskripsi" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Deskripsi Produk (Opsional)</label>
                         <textarea id="prod_deskripsi" name="deskripsi" rows="3" placeholder="Tuliskan keterangan rasa, komposisi utama, atau instruksi simpan..." 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors"></textarea>
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                     </div>
 
                     <!-- Info Box -->
-                    <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3 flex items-start gap-2.5">
-                        <svg class="w-4 h-4 text-[#D97706] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <p class="text-xs text-[#828282] leading-relaxed">Produk akan otomatis disinkronkan ke rekap kebutuhan bahan harian dapur.</p>
+                    <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 flex items-start gap-2.5">
+                        <i class="fas fa-info-circle text-[#D46E15] mt-0.5 shrink-0 text-sm"></i>
+                        <p class="text-xs text-[#544337] leading-relaxed">Produk akan otomatis disinkronkan ke rekap kebutuhan bahan harian dapur.</p>
                     </div>
                 </div>
 
                 <!-- Sticky Action Buttons Footer -->
-                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#F0ECE9] bg-white shrink-0">
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E2D7C8] bg-[#FDFBF7] shrink-0">
                     <button type="button" onclick="closeProductModal()" 
-                        class="bg-white hover:bg-gray-100 text-[#544337] text-sm font-medium px-5 py-2.5 rounded-lg border border-[#E0E0E0] transition-colors cursor-pointer">
+                        class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-sm font-medium px-5 py-2.5 rounded-lg border border-[#DDD3C5] transition-colors cursor-pointer">
                         Batal
                     </button>
                     <button type="submit" 
-                        class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 cursor-pointer">
+                        <i class="fas fa-check text-xs"></i>
                         <span id="submitProductBtnText">Simpan Produk</span>
                     </button>
                 </div>
@@ -1302,38 +1296,38 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
     <!-- ============================================================== -->
     <div id="workflowModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div onclick="closeWorkflowModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
-            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+        <div class="bg-[#FDFBF7] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 border border-[#E2D7C8]">
+            <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] mb-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#FFF8F2] text-[#FF9B45] flex items-center justify-center">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <div class="w-10 h-10 rounded-xl bg-[#EFE8DE] text-[#D46E15] flex items-center justify-center">
+                        <i class="fas fa-dolly-flatbed text-base"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-[#1C1C1C]">Alur Produksi & Distribusi</h3>
-                        <p class="text-xs text-[#828282]">Sistem Informasi Berkat Dinasti Bakery</p>
+                        <h3 class="text-lg font-bold text-[#251A14]">Alur Produksi & Distribusi</h3>
+                        <p class="text-xs text-[#8E7E73]">Sistem Informasi Berkat Dinasti Bakery</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeWorkflowModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button type="button" onclick="closeWorkflowModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] cursor-pointer">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
             
             <div class="space-y-4 text-xs text-[#544337] leading-relaxed">
-                <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3.5">
-                    <h4 class="font-bold text-[#924C00] mb-2 flex items-center gap-1.5 text-sm">
+                <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3.5">
+                    <h4 class="font-bold text-[#3E2B21] mb-2 flex items-center gap-1.5 text-sm">
                         <span>4 Swimlanes Kanban Produksi</span>
                     </h4>
                     <ol class="list-decimal list-inside space-y-1 text-[#3E2B21]">
-                        <li><strong class="text-[#FF9B45]">Menunggu Konfirmasi:</strong> Pesanan masuk diverifikasi admin & DP minimal 50% atau Pelunasan.</li>
+                        <li><strong class="text-[#D46E15]">Menunggu Konfirmasi:</strong> Pesanan masuk diverifikasi admin & DP minimal 50% atau Pelunasan.</li>
                         <li><strong class="text-[#2F80ED]">Proses Dapur:</strong> Resep, takaran, dan batas MOQ di-baking oleh tim dapur sesuai jadwal kirim.</li>
                         <li><strong class="text-[#E2B93B]">Siap Kirim:</strong> Roti di-packing ke box/mika/kardus dan ditata ke rak pengiriman.</li>
                         <li><strong class="text-[#27AE60]">Selesai:</strong> Pesanan diterima pelanggan dan invoice ditandai Lunas.</li>
                     </ol>
                 </div>
 
-                <div class="bg-blue-50/60 border border-blue-200/60 rounded-xl p-3.5">
+                <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3.5">
                     <h4 class="font-bold text-blue-900 mb-1.5 flex items-center gap-1.5 text-sm">
-                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
+                        <i class="fas fa-motorcycle text-blue-600 mr-1"></i>
                         <span>Ketentuan Pengiriman & Obrok Motor</span>
                     </h4>
                     <ul class="list-disc list-inside space-y-1 text-blue-800">
@@ -1344,7 +1338,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button type="button" onclick="closeWorkflowModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
+                <button type="button" onclick="closeWorkflowModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer">
                     Saya Mengerti
                 </button>
             </div>
@@ -1362,9 +1356,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
+                <i class="fas fa-sign-out-alt text-xl"></i>
             </div>
 
             <!-- Title -->
@@ -1377,9 +1369,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
             <div class="space-y-2">
                 <a href="logout.php" 
                     class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
+                    <i class="fas fa-sign-out-alt text-sm"></i>
                     <span>Ya, Keluar</span>
                 </a>
 
@@ -1391,9 +1381,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
             <!-- Encrypted Session Note -->
             <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A89C92]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
+                <i class="fas fa-shield-alt text-xs"></i>
                 <span>Sesi aman terenkripsi Berkat Dinasti</span>
             </div>
         </div>
@@ -1410,9 +1398,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Trash Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
+                <i class="fas fa-trash-alt text-xl"></i>
             </div>
 
             <!-- Title -->

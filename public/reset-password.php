@@ -15,7 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - Berkat Dinasti</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
+    
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/modern-craft.css">
     
     <script>
@@ -24,11 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 extend: {
                     colors: {
                         brand: {
-                            brown: '#2C1D16',
+                            brown: '#3E2B21',
                             orange: '#D46E15',
-                            orangeHover: '#BC5F10',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FAF8F5'
+                            bg: '#F5F1EB'
                         }
                     },
                     fontFamily: {
@@ -41,125 +47,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <style>
         body {
-            background-color: var(--brand-canvas, #FAF8F5);
+            background-color: #F5F1EB;
+            font-family: 'Inter', sans-serif;
         }
         .logo-box {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="h-screen w-full m-0 flex overflow-hidden">
+<body class="h-screen w-full m-0 flex overflow-hidden bg-[#F5F1EB]">
     
     <!-- LEFT PANEL: Branding -->
-    <div class="hidden md:flex w-[45%] max-w-[512px] bg-brand-brown relative flex-col justify-between items-center p-8 lg:p-16 overflow-hidden">
+    <div class="hidden md:flex w-[45%] max-w-[512px] bg-[#3E2B21] border-r border-[#2C1E17] relative flex-col justify-between items-center p-8 lg:p-16 overflow-hidden">
         
         <!-- Abstract Circles Background Gradient dari Figma -->
-        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 120.83% 60.42% at 50.00% 45.00%, rgba(255, 155, 69, 0.18) 0%, rgba(255, 155, 69, 0) 70%)"></div>
+        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 120.83% 60.42% at 50.00% 45.00%, rgba(212, 110, 21, 0.22) 0%, rgba(212, 110, 21, 0) 70%)"></div>
         
         <!-- Decorative Subtle Background Circles (Bottom Right) -->
         <div class="absolute w-[384px] h-[384px] -right-[120px] -bottom-[120px] rounded-full border border-white/5 pointer-events-none"></div>
-        <div class="absolute w-[288px] h-[288px] -right-[72px] -bottom-[72px] rounded-full border border-[#FF9B45]/10 pointer-events-none"></div>
+        <div class="absolute w-[288px] h-[288px] -right-[72px] -bottom-[72px] rounded-full border border-[#D46E15]/15 pointer-events-none"></div>
         
         <!-- Decorative Subtle Background Circle (Top Left) -->
         <div class="absolute w-[320px] h-[320px] -left-[80px] -top-[80px] rounded-full border border-white/5 pointer-events-none"></div>
 
         <div class="flex-1 flex flex-col justify-center items-center w-full z-10">
             <!-- Kotak Logo (Artisan Craft Style) -->
-            <div class="relative w-28 h-28 mb-8">
-                <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center p-3 logo-box">
+            <div class="relative w-28 h-28 mb-6">
+                <div class="relative w-full h-full bg-[#FAF8F5] rounded-2xl flex items-center justify-center p-2.5 logo-box border border-white/20">
                     <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                 </div>
             </div>
 
-            <h1 class="text-white text-[36px] leading-[40px] font-bold text-center mb-3">Berkat Dinasti</h1>
-            <p class="text-brand-lightText text-[16px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
+            <h1 class="text-[#FAF8F5] text-[32px] leading-[38px] font-bold text-center mb-2 tracking-tight">Berkat Dinasti</h1>
+            <p class="text-[#D8C7B8] text-[15px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
             
-            <div class="bg-brand-orange/15 border border-brand-orange/20 rounded-full px-4 py-1.5 mb-8">
-                <span class="text-brand-orange text-xs font-semibold tracking-[0.6px] uppercase">Sistem Manajemen Pesanan</span>
+            <div class="bg-[#D46E15]/20 border border-[#D46E15]/30 rounded-full px-4 py-1.5 mb-8">
+                <span class="text-[#F5A25D] text-xs font-semibold tracking-[0.6px] uppercase">Sistem Manajemen Pesanan</span>
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="w-8 h-px bg-brand-orange/30"></div>
-                <div class="flex items-center gap-1.5 text-brand-orange/70 text-xs font-medium tracking-[0.6px] uppercase">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7.7 15C7 16.5 5 17 3.5 17M16.3 15C17 16.5 19 17 20.5 17M7 19H17M7 22H17"></path></svg>
+                <div class="w-8 h-px bg-[#D46E15]/40"></div>
+                <div class="flex items-center gap-1.5 text-[#F5A25D]/90 text-xs font-medium tracking-[0.6px] uppercase">
+                    <i class="fas fa-bread-slice text-xs"></i>
                     BAKERY & PASTRY UMKM
                 </div>
-                <div class="w-11 h-px bg-brand-orange/30"></div>
+                <div class="w-8 h-px bg-[#D46E15]/40"></div>
             </div>
         </div>
 
         <!-- Footer Kiri -->
         <div class="w-full pt-6 border-t border-white/10 flex justify-between items-center z-10">
-            <div class="flex items-center gap-1.5 text-[#E8D7CD]/70 text-xs">
-                <svg class="w-4 h-4 text-[#27AE60]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex items-center gap-2 text-[#D8C7B8]/80 text-xs">
+                <i class="fas fa-shield-alt text-emerald-400"></i>
                 Sistem Khusus Internal Admin
             </div>
-            <span class="text-[#828282] text-xs">v1.0.0</span>
+            <span class="text-[#8E7E73] text-xs font-mono">v1.0.0</span>
         </div>
     </div>
 
     <!-- RIGHT PANEL: Reset Password Form -->
-    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-brand-bg relative">
-
-        <div class="w-full max-w-[440px] bg-white craft-card p-8 lg:p-10 shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)]">
+    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#F5F1EB] overflow-y-auto">
+        <div class="w-full max-w-[440px] bg-[#FDFBF7] border border-[#E2D7C8] shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)] rounded-2xl p-8 lg:p-10 my-auto">
             
             <div class="mb-8">
-                <div class="w-10 h-10 bg-brand-orange/10 rounded-xl flex items-center justify-center mb-4">
+                <div class="w-10 h-10 bg-[#3E2B21] border border-white/10 rounded-xl flex items-center justify-center mb-4 text-[#D46E15]">
                     <!-- Key Icon -->
-                    <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    <i class="fas fa-key text-base"></i>
                 </div>
-                <h2 class="text-[30px] leading-[38px] font-bold text-[#1D1D1D] tracking-tight mb-2">Reset Password</h2>
-                <p class="text-[#828282] text-sm leading-[20px]">Masukkan username Anda dan kami akan mengirim tautan reset ke admin.</p>
+                <h2 class="text-[28px] leading-[34px] font-bold text-[#251A14] tracking-tight mb-2">Reset Password</h2>
+                <p class="text-[#8E7E73] text-sm leading-[20px]">Masukkan username Anda dan kami akan mengirim tautan reset ke admin.</p>
             </div>
 
             <?php if (!empty($success_msg)): ?>
                 <!-- Alert Sukses Permintaan Reset -->
-                <div class="mb-6 p-4 rounded-xl bg-[#27AE60]/10 border border-[#27AE60]/30 flex items-start gap-3 text-sm text-[#1B7A43]">
-                    <svg class="w-5 h-5 text-[#27AE60] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 text-sm text-emerald-800 shadow-xs">
+                    <i class="fas fa-check-circle text-emerald-600 mt-0.5 shrink-0 text-base"></i>
                     <div>
                         <p class="font-bold">Permintaan Terkirim!</p>
-                        <p class="text-xs mt-0.5 text-[#1B7A43]/90"><?= htmlspecialchars($success_msg) ?></p>
+                        <p class="text-xs mt-0.5 text-emerald-700 leading-relaxed"><?= htmlspecialchars($success_msg) ?></p>
                     </div>
                 </div>
             <?php endif; ?>
 
             <!-- Form -->
-            <form action="" method="POST" class="space-y-6">
+            <form action="" method="POST" class="space-y-5">
                 <!-- Username -->
                 <div class="space-y-1.5">
-                    <label for="username" class="block text-[14px] font-semibold text-[#333333]">Username</label>
+                    <label for="username" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Username</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-[#828282]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                            <i class="fas fa-user text-xs"></i>
                         </div>
                         <input type="text" id="username" name="username" placeholder="Masukkan username" required
-                            class="craft-input w-full pl-11 pr-4 py-3 text-[15px]">
+                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
                     </div>
                 </div>
 
                 <!-- Info Message -->
-                <div class="bg-[#F6F4F0] border border-[#ECE5DD] rounded-xl p-3 flex items-start gap-3">
-                    <svg class="w-5 h-5 text-[#828282] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-[#786E65] text-[12px] leading-[18px]">Tautan reset akan diproses oleh Super Admin dalam 1x24 jam.</p>
+                <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 flex items-start gap-3">
+                    <i class="fas fa-info-circle text-[#8E7E73] mt-0.5 shrink-0 text-sm"></i>
+                    <p class="text-[#5E4D42] text-xs leading-[18px]">Tautan reset akan diproses oleh Super Admin dalam 1x24 jam.</p>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="craft-btn-primary w-full h-12 text-[15px] font-semibold flex justify-center items-center">
-                    Kirim Permintaan Reset
+                <button type="submit" class="w-full h-11 text-sm font-semibold rounded-xl bg-[#D46E15] hover:bg-[#B85207] text-white shadow-button-orange flex justify-center items-center gap-2 transition-all duration-200">
+                    <span>Kirim Permintaan Reset</span>
+                    <i class="fas fa-paper-plane text-xs"></i>
                 </button>
 
                 <div class="text-center pt-2">
-                    <a href="login.php" class="text-[14px] font-medium text-brand-orange hover:text-brand-orangeHover inline-flex items-center gap-1.5 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <a href="login.php" class="text-xs font-medium text-[#D46E15] hover:text-[#B85207] inline-flex items-center gap-1.5 transition-colors">
+                        <i class="fas fa-arrow-left text-xs"></i>
                         Kembali ke Halaman Login
                     </a>
                 </div>
             </form>
 
             <!-- Copyright -->
-            <div class="mt-10 pt-6 border-t border-[#E0E0E0]/60 text-center">
-                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
+            <div class="mt-8 pt-6 border-t border-[#E2D7C8] text-center">
+                <p class="text-[12px] text-[#8E7E73] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
             </div>
         </div>
     </div>

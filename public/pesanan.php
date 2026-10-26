@@ -269,7 +269,12 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Modern Craft Design System -->
     <link rel="stylesheet" href="css/modern-craft.css">
 
@@ -281,13 +286,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         brand: {
                             brown: '#3E2B21',
                             brownDark: '#2C1E17',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FBF9F7',
-                            surface: '#FFFFFF',
-                            border: '#F0ECE9',
-                            muted: '#828282',
+                            bg: '#F5F1EB',
+                            surface: '#FDFBF7',
+                            border: '#E2D7C8',
+                            muted: '#8E7E73',
                             dark: '#1C1C1C',
                             darkText: '#1B1C1B',
                             brownText: '#544337',
@@ -303,7 +308,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     },
                     boxShadow: {
                         'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
-                        'button-orange': '0px 2px 4px rgba(255, 155, 69, 0.25)',
+                        'button-orange': '0px 2px 4px rgba(212, 110, 21, 0.25)',
                     }
                 }
             }
@@ -313,17 +318,17 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FBF9F7;
-            color: #1C1C1C;
+            background-color: #F5F1EB;
+            color: #251A14;
         }
 
         .kanban-column.drag-over {
-            background-color: #FFF3E8 !important;
+            background-color: #EFE8DE !important;
             border: 2px dashed #D46E15 !important;
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
@@ -332,7 +337,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -346,7 +351,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
 
@@ -354,37 +359,37 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_beranda.svg" alt="Beranda" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-th-large w-5 text-center text-sm opacity-90"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-box-open w-5 text-center text-sm opacity-90"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan (Active) -->
-                    <a href="pesanan.php" class="bg-[#FF9B45] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-all shadow-sm">
-                        <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5">
+                    <a href="pesanan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pelanggan.svg" alt="Pelanggan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-users w-5 text-center text-sm opacity-90"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_laporan.svg" alt="Laporan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pengaturan.svg" alt="Pengaturan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -392,18 +397,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/15 rounded-xl p-2.5 flex items-center justify-between">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
-                        <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
+                        <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
             </div>
@@ -413,23 +418,23 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
 
             <!-- TOP HEADER (Height 64px) -->
-            <header class="h-16 bg-white border-b border-[#F0ECE9] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+            <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg" aria-label="Buka Menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg" aria-label="Buka Menu">
+                        <i class="fas fa-bars text-lg text-[#3E2B21]"></i>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="pesanan.php" class="text-[#544337] hover:underline">Pesanan</a>
-                            <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium" id="headerBreadcrumb">Manajemen</span>
+                            <a href="pesanan.php" class="text-[#8E7E73] hover:underline">Pesanan</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb">Manajemen</span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">Manage Pesanan</h1>
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">Manage Pesanan</h1>
                     </div>
                 </div>
 
@@ -437,15 +442,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div class="flex items-center gap-3 md:gap-5 relative">
                     
                     <!-- Date Button (Dinamis) -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
-                        <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-[#DDD3C5]">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Orange Dot -->
                     <div class="relative">
-                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
-                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#EFE8DE] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
+                            <i class="far fa-bell text-lg"></i>
                             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
 
@@ -489,8 +494,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                     <!-- User Circle Icon with Dropdown -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
-                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
+                            <i class="fas fa-user text-xs"></i>
                         </div>
 
                         <!-- User Dropdown Popover -->
@@ -501,17 +506,17 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
                             <div class="py-1">
                                 <a href="pengaturan.php" class="craft-dropdown-item">
-                                    <span>⚙️</span>
+                                    <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Toko</span>
                                 </a>
                                 <a href="pengaturan.php?tab=user" class="craft-dropdown-item">
-                                    <span>👥</span>
+                                    <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
                                     <span>Manajemen User</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <span>🚪</span>
+                                    <i class="fas fa-sign-out-alt text-xs text-rose-600"></i>
                                     <span>Keluar dari Akun</span>
                                 </button>
                             </div>
@@ -527,77 +532,85 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <?php if ($toast_message): ?>
                     <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
                         <div class="flex items-center gap-2.5">
-                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <i class="fas fa-check-circle text-emerald-600 text-base"></i>
                             <span class="text-sm font-medium"><?= htmlspecialchars($toast_message) ?></span>
                         </div>
                         <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                 <?php endif; ?>
 
                 <!-- Dynamic In-Page Toast for Drag & Drop / Actions -->
-                <div id="dynamicToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#1C1C1C] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-in slide-in-from-bottom-3 duration-200">
-                    <span id="dynamicToastIcon">✨</span>
+                <div id="dynamicToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#3E2B21] text-[#FAF8F5] border border-white/10 px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-in slide-in-from-bottom-3 duration-200">
+                    <span id="dynamicToastIcon"><i class="fas fa-check-circle text-[#D46E15]"></i></span>
                     <span id="dynamicToastText">Aksi berhasil dijalankan</span>
                 </div>
                 
-                <!-- TOP BANNER: TITLE, STATS, & OMSET -->
+                <!-- TOP BANNER: TITLE, STATS, & OMSET (Dark Chocolate Espresso Cards) -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div>
                         <div class="flex items-center gap-2.5">
-                            <h2 class="text-[#1B1C1B] text-2xl font-bold tracking-tight">Manajemen Pesanan</h2>
-                            <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2.5 py-1 rounded-full border border-[#FF9B45]/20" id="totalOrdersBadge">
+                            <h2 class="text-[#251A14] text-2xl font-bold tracking-tight">Manajemen Pesanan</h2>
+                            <span class="bg-[#EFE8DE] text-[#D46E15] text-xs font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C5]" id="totalOrdersBadge">
                                 <?= $totalOrdersCount ?> Total Pesanan
                             </span>
                         </div>
-                        <p class="text-[#828282] text-sm mt-1" id="pageSubtitle">
+                        <p class="text-[#8E7E73] text-sm mt-1" id="pageSubtitle">
                             Kelola status dan alur pengiriman pesanan roti secara real-time
                         </p>
                     </div>
 
-                    <!-- Right Stats Indicator Pills -->
-                    <div class="flex flex-wrap items-center gap-3">
+                    <!-- Right Stats Indicator Pills (Dark Chocolate Espresso Cluster) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                         <!-- Menunggu & Proses: count -->
-                        <div class="bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2 flex items-center gap-2 text-xs font-medium shadow-2xs">
-                            <span class="w-2 h-2 rounded-full bg-[#E2B93B]"></span>
-                            <span class="text-[#828282]">Aktif Dapur:</span>
-                            <span class="font-bold text-[#1C1C1C]" id="statMenunggu"><?= $totalMenungguCount ?></span>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">AKTIF DAPUR</span>
+                                <span class="font-bold text-base text-[#FAF8F5]" id="statMenunggu"><?= $totalMenungguCount ?> Pesanan</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                                <i class="fas fa-fire text-xs"></i>
+                            </div>
                         </div>
 
                         <!-- Selesai: count -->
-                        <div class="bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2 flex items-center gap-2 text-xs font-medium shadow-2xs">
-                            <span class="w-2 h-2 rounded-full bg-[#27AE60]"></span>
-                            <span class="text-[#828282]">Selesai:</span>
-                            <span class="font-bold text-[#1C1C1C]" id="statSelesai"><?= $totalSelesaiCount ?></span>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">SELESAI</span>
+                                <span class="font-bold text-base text-[#FAF8F5]" id="statSelesai"><?= $totalSelesaiCount ?> Pesanan</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+                                <i class="fas fa-check-double text-xs"></i>
+                            </div>
                         </div>
 
                         <!-- Omset Card -->
-                        <div class="bg-[#6B3E1F] text-white rounded-xl px-4 py-2 flex items-center gap-2.5 text-xs shadow-xs">
-                            <div class="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center shrink-0">
-                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[170px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">TOTAL OMSET</span>
+                                <span class="font-bold text-base text-[#FAF8F5]">Rp <?= number_format($totalOmset, 0, ',', '.') ?></span>
                             </div>
-                            <div>
-                                <span class="text-white/80 text-[10px] block leading-none">Total Omset</span>
-                                <span class="font-bold text-sm tracking-tight leading-tight">Rp <?= number_format($totalOmset, 0, ',', '.') ?></span>
+                            <div class="w-8 h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
+                                <i class="fas fa-wallet text-xs"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB SWITCHER BAR (KANBAN BOARD VS KALENDER PENGIRIMAN) -->
-                <div class="bg-white rounded-xl border border-[#F0ECE9] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
+                <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
                     <!-- Tab 1: Kanban Board -->
                     <button onclick="switchTab('kanban')" id="tabBtnKanban" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'kalender' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1]' ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        <i class="fas fa-columns text-xs"></i>
                         <span>Kanban Board</span>
                     </button>
 
                     <!-- Tab 2: Kalender Pengiriman -->
                     <button onclick="switchTab('kalender')" id="tabBtnKalender" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#FF9B45] text-white shadow-xs' : 'text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1]' ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        <i class="far fa-calendar-alt text-xs"></i>
                         <span>Kalender Pengiriman</span>
                     </button>
                 </div>
@@ -609,21 +622,21 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     
                     <!-- Action Bar: Unduh Rekap & Tambah Pesanan -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                        <div class="flex items-center gap-2 text-xs text-[#828282]">
+                        <div class="flex items-center gap-2 text-xs text-[#8E7E73]">
                             <span class="inline-block w-2 h-2 rounded-full bg-[#27AE60]"></span>
                             <span>Tarik kartu untuk memindahkan status alur kerja produksi & pengiriman secara langsung.</span>
                         </div>
 
                         <div class="flex items-center gap-3 self-end sm:self-auto">
                             <!-- Tombol Unduh Rekap (Ekspor CSV Riil) -->
-                            <button onclick="handleDownloadRecap()" class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
-                                <img src="assets/icons/download.svg" alt="Unduh" class="w-4 h-4">
+                            <button onclick="handleDownloadRecap()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
+                                <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
                                 <span>Unduh Rekap</span>
                             </button>
 
                             <!-- Tombol Tambah Pesanan -->
-                            <button onclick="openOrderModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
-                                <img src="assets/icons/plus.svg" alt="Tambah" class="w-4 h-4">
+                            <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                                <i class="fas fa-plus text-xs"></i>
                                 <span>+ Tambah Pesanan</span>
                             </button>
                         </div>
@@ -633,7 +646,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
                         
                         <!-- SWIMLANE 1: MENUNGGU KONFIRMASI -->
-                        <div class="kanban-column bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
+                        <div class="kanban-column bg-[#EFE8DE]/60 border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
                              id="col-menunggu" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'menunggu')">
                             <div>
                                 <div class="flex items-center justify-between mb-1">
@@ -642,35 +655,34 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         <span class="w-5 h-5 rounded-full bg-[#E2B93B] text-white text-[11px] font-bold flex items-center justify-center count-badge" id="count-menunggu"><?= count($orders_by_status['menunggu']) ?></span>
                                     </div>
                                 </div>
-                                <p class="text-[#828282] text-xs mb-4">Pesanan baru masuk kasir</p>
+                                <p class="text-[#8E7E73] text-xs mb-4">Pesanan baru masuk kasir</p>
 
                                 <!-- Kartu Pesanan Container -->
                                 <div class="space-y-3.5 order-cards-container" id="container-menunggu">
                                     <?php foreach ($orders_by_status['menunggu'] as $ord): ?>
-                                        <?php include __DIR__ . '/../views/partials/kanban_card.php'; if (!file_exists(__DIR__ . '/../views/partials/kanban_card.php')): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
-                                             class="bg-white rounded-xl p-4 border border-[#F0ECE9] border-l-4 border-l-[#E2B93B] shadow-card hover:shadow-md transition-shadow relative cursor-grab active:cursor-grabbing"
+                                             class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#E2B93B] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
                                              onclick="openOrderDetail(<?= htmlspecialchars(json_encode($ord)) ?>)">
                                             <div class="flex items-start justify-between">
                                                 <div>
-                                                    <h4 class="text-[#1C1C1C] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
-                                                    <span class="text-[#828282] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
+                                                    <h4 class="text-[#251A14] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
+                                                    <span class="text-[#8E7E73] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
                                                 </div>
-                                                <span class="text-[#BDBDBD] hover:text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                <span class="text-[#A89C92] hover:text-[#251A14]">
+                                                    <i class="fas fa-ellipsis-v text-xs"></i>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-1.5 text-xs text-[#544337] font-medium mt-2.5">
-                                                <span>🛍️</span>
+                                                <i class="fas fa-bread-slice text-[#D46E15] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['items']) ?></span>
                                             </div>
-                                            <div class="flex items-center gap-1.5 text-xs text-[#828282] mt-1">
-                                                <span>🛵</span>
+                                            <div class="flex items-center gap-1.5 text-xs text-[#8E7E73] mt-1">
+                                                <i class="fas fa-map-marker-alt text-[#8E7E73] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['destination']) ?></span>
                                             </div>
-                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9]">
-                                                <div class="flex items-center gap-1 text-xs <?= $ord['is_urgent'] ? 'text-[#EB5757] font-semibold' : 'text-[#828282]' ?>">
-                                                    <img src="assets/icons/clock.svg" alt="Waktu" class="w-3.5 h-3.5">
+                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EAE1D5]">
+                                                <div class="flex items-center gap-1 text-xs <?= $ord['is_urgent'] ? 'text-[#EB5757] font-semibold' : 'text-[#8E7E73]' ?>">
+                                                    <i class="far fa-clock text-xs"></i>
                                                     <span><?= htmlspecialchars($ord['time']) ?></span>
                                                 </div>
                                                 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full <?= $ord['bayar_class'] ?>">
@@ -678,54 +690,53 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                                 </span>
                                             </div>
                                         </div>
-                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </div>
                             </div>
 
-                            <button onclick="openOrderModal()" class="w-full py-2.5 mt-4 border border-dashed border-[#D8D2CB] hover:border-[#FF9B45] text-[#828282] hover:text-[#FF9B45] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <button onclick="openOrderModal()" class="w-full py-2.5 mt-4 border border-dashed border-[#DDD3C5] hover:border-[#D46E15] text-[#8E7E73] hover:text-[#D46E15] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                                <i class="fas fa-plus text-xs"></i>
                                 <span>+ Tambah Kartu</span>
                             </button>
                         </div>
 
                         <!-- SWIMLANE 2: PROSES DAPUR (OVEN & BAKING) -->
-                        <div class="kanban-column bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
+                        <div class="kanban-column bg-[#EFE8DE]/60 border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
                              id="col-proses" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'proses')">
                             <div>
                                 <div class="flex items-center justify-between mb-1">
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-[#FF9B45]/20 text-[#924C00] text-xs font-bold px-2.5 py-0.5 rounded-full">Proses Dapur</span>
-                                        <span class="w-5 h-5 rounded-full bg-[#FF9B45] text-white text-[11px] font-bold flex items-center justify-center count-badge" id="count-proses"><?= count($orders_by_status['proses']) ?></span>
+                                        <span class="bg-[#D46E15]/20 text-[#B85207] text-xs font-bold px-2.5 py-0.5 rounded-full">Proses Dapur</span>
+                                        <span class="w-5 h-5 rounded-full bg-[#D46E15] text-white text-[11px] font-bold flex items-center justify-center count-badge" id="count-proses"><?= count($orders_by_status['proses']) ?></span>
                                     </div>
                                 </div>
-                                <p class="text-[#828282] text-xs mb-4">Adonan, oven & pendinginan</p>
+                                <p class="text-[#8E7E73] text-xs mb-4">Adonan, oven & pendinginan</p>
 
                                 <div class="space-y-3.5 order-cards-container" id="container-proses">
                                     <?php foreach ($orders_by_status['proses'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
-                                             class="bg-white rounded-xl p-4 border border-[#F0ECE9] border-l-4 border-l-[#FF9B45] shadow-card hover:shadow-md transition-shadow relative cursor-grab active:cursor-grabbing"
+                                             class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#D46E15] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
                                              onclick="openOrderDetail(<?= htmlspecialchars(json_encode($ord)) ?>)">
                                             <div class="flex items-start justify-between">
                                                 <div>
-                                                    <h4 class="text-[#1C1C1C] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
-                                                    <span class="text-[#828282] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
+                                                    <h4 class="text-[#251A14] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
+                                                    <span class="text-[#8E7E73] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
                                                 </div>
-                                                <span class="text-[#BDBDBD] hover:text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                <span class="text-[#A89C92] hover:text-[#251A14]">
+                                                    <i class="fas fa-ellipsis-v text-xs"></i>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-1.5 text-xs text-[#544337] font-medium mt-2.5">
-                                                <span>🛍️</span>
+                                                <i class="fas fa-bread-slice text-[#D46E15] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['items']) ?></span>
                                             </div>
-                                            <div class="flex items-center gap-1.5 text-xs text-[#828282] mt-1">
-                                                <span>🛵</span>
+                                            <div class="flex items-center gap-1.5 text-xs text-[#8E7E73] mt-1">
+                                                <i class="fas fa-map-marker-alt text-[#8E7E73] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['destination']) ?></span>
                                             </div>
-                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9]">
-                                                <div class="flex items-center gap-1 text-xs text-[#828282]">
-                                                    <img src="assets/icons/clock.svg" alt="Waktu" class="w-3.5 h-3.5">
+                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EAE1D5]">
+                                                <div class="flex items-center gap-1 text-xs text-[#8E7E73]">
+                                                    <i class="far fa-clock text-xs"></i>
                                                     <span><?= htmlspecialchars($ord['time']) ?></span>
                                                 </div>
                                                 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full <?= $ord['bayar_class'] ?>">
@@ -739,7 +750,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- SWIMLANE 3: SIAP KIRIM (PACKING SELESAI / DRIVER TRIP) -->
-                        <div class="kanban-column bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
+                        <div class="kanban-column bg-[#EFE8DE]/60 border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
                              id="col-kirim" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'kirim')">
                             <div>
                                 <div class="flex items-center justify-between mb-1">
@@ -748,33 +759,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         <span class="w-5 h-5 rounded-full bg-[#2F80ED] text-white text-[11px] font-bold flex items-center justify-center count-badge" id="count-kirim"><?= count($orders_by_status['kirim']) ?></span>
                                     </div>
                                 </div>
-                                <p class="text-[#828282] text-xs mb-4">Sudah dipacking mika / kardus</p>
+                                <p class="text-[#8E7E73] text-xs mb-4">Sudah dipacking mika / kardus</p>
 
                                 <div class="space-y-3.5 order-cards-container" id="container-kirim">
                                     <?php foreach ($orders_by_status['kirim'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
-                                             class="bg-white rounded-xl p-4 border border-[#F0ECE9] border-l-4 border-l-[#2F80ED] shadow-card hover:shadow-md transition-shadow relative cursor-grab active:cursor-grabbing"
+                                             class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#2F80ED] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
                                              onclick="openOrderDetail(<?= htmlspecialchars(json_encode($ord)) ?>)">
                                             <div class="flex items-start justify-between">
                                                 <div>
-                                                    <h4 class="text-[#1C1C1C] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
-                                                    <span class="text-[#828282] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
+                                                    <h4 class="text-[#251A14] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
+                                                    <span class="text-[#8E7E73] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
                                                 </div>
-                                                <span class="text-[#BDBDBD] hover:text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                <span class="text-[#A89C92] hover:text-[#251A14]">
+                                                    <i class="fas fa-ellipsis-v text-xs"></i>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-1.5 text-xs text-[#544337] font-medium mt-2.5">
-                                                <span>🛍️</span>
+                                                <i class="fas fa-bread-slice text-[#D46E15] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['items']) ?></span>
                                             </div>
-                                            <div class="inline-flex items-center gap-1.5 text-xs font-medium text-[#544337] bg-[#F5F3F1] px-2.5 py-1 rounded-md mt-2 border border-[#EBE8E5]">
-                                                <span>🛵</span>
+                                            <div class="inline-flex items-center gap-1.5 text-xs font-medium text-[#544337] bg-[#EFE8DE] px-2.5 py-1 rounded-md mt-2 border border-[#DDD3C5]">
+                                                <i class="fas fa-motorcycle text-xs text-[#D46E15]"></i>
                                                 <span><?= htmlspecialchars($ord['courier_info'] ?? 'Kurir Toko') ?></span>
                                             </div>
-                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9]">
-                                                <div class="flex items-center gap-1 text-xs text-[#828282]">
-                                                    <img src="assets/icons/clock.svg" alt="Waktu" class="w-3.5 h-3.5">
+                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EAE1D5]">
+                                                <div class="flex items-center gap-1 text-xs text-[#8E7E73]">
+                                                    <i class="far fa-clock text-xs"></i>
                                                     <span><?= htmlspecialchars($ord['time']) ?></span>
                                                 </div>
                                                 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full <?= $ord['bayar_class'] ?>">
@@ -788,7 +799,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- SWIMLANE 4: SELESAI -->
-                        <div class="kanban-column bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
+                        <div class="kanban-column bg-[#EFE8DE]/60 border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between min-h-[520px] transition-colors"
                              id="col-selesai" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="drop(event, 'selesai')">
                             <div>
                                 <div class="flex items-center justify-between mb-1">
@@ -797,33 +808,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         <span class="w-5 h-5 rounded-full bg-[#27AE60] text-white text-[11px] font-bold flex items-center justify-center count-badge" id="count-selesai"><?= count($orders_by_status['selesai']) ?></span>
                                     </div>
                                 </div>
-                                <p class="text-[#828282] text-xs mb-4">Diterima pelanggan / lunas</p>
+                                <p class="text-[#8E7E73] text-xs mb-4">Diterima pelanggan / lunas</p>
 
                                 <div class="space-y-3.5 order-cards-container" id="container-selesai">
                                     <?php foreach ($orders_by_status['selesai'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
-                                             class="bg-white rounded-xl p-4 border border-[#F0ECE9] border-l-4 border-l-[#27AE60] shadow-card hover:shadow-md transition-shadow relative cursor-grab active:cursor-grabbing"
+                                             class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#27AE60] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
                                              onclick="openOrderDetail(<?= htmlspecialchars(json_encode($ord)) ?>)">
                                             <div class="flex items-start justify-between">
                                                 <div>
-                                                    <h4 class="text-[#1C1C1C] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
-                                                    <span class="text-[#828282] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
+                                                    <h4 class="text-[#251A14] font-bold text-sm leading-tight"><?= htmlspecialchars($ord['customer']) ?></h4>
+                                                    <span class="text-[#8E7E73] text-xs font-mono"><?= htmlspecialchars($ord['id']) ?></span>
                                                 </div>
-                                                <span class="text-[#BDBDBD] hover:text-[#828282]">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4zm-6 6a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                                <span class="text-[#A89C92] hover:text-[#251A14]">
+                                                    <i class="fas fa-ellipsis-v text-xs"></i>
                                                 </span>
                                             </div>
                                             <div class="flex items-center gap-1.5 text-xs text-[#544337] font-medium mt-2.5">
-                                                <span>🛍️</span>
+                                                <i class="fas fa-bread-slice text-[#D46E15] text-xs"></i>
                                                 <span class="truncate"><?= htmlspecialchars($ord['items']) ?></span>
                                             </div>
-                                            <div class="inline-flex items-center gap-1.5 text-xs font-medium text-[#544337] bg-[#F5F3F1] px-2.5 py-1 rounded-md mt-2 border border-[#EBE8E5]">
-                                                <span>✓</span>
+                                            <div class="inline-flex items-center gap-1.5 text-xs font-medium text-[#1B7A43] bg-emerald-50 px-2.5 py-1 rounded-md mt-2 border border-emerald-200">
+                                                <i class="fas fa-check text-xs"></i>
                                                 <span><?= htmlspecialchars($ord['courier_info'] ?? 'Pesanan Diterima') ?></span>
                                             </div>
-                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#F0ECE9]">
-                                                <div class="flex items-center gap-1 text-xs text-[#828282]">
-                                                    <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-3.5 h-3.5">
+                                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EAE1D5]">
+                                                <div class="flex items-center gap-1 text-xs text-[#8E7E73]">
+                                                    <i class="far fa-calendar-alt text-xs"></i>
                                                     <span><?= htmlspecialchars($ord['time']) ?></span>
                                                 </div>
                                                 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full <?= $ord['bayar_class'] ?>">
@@ -839,28 +850,30 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
 
                     <!-- BOTTOM SECTION: CATATAN DAPUR / MEMO KOKI -->
-                    <div class="bg-white border border-[#F0ECE9] rounded-2xl p-6 shadow-card">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-[#F0ECE9] mb-5">
+                    <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-[#E2D7C8] mb-5">
                             <div class="flex items-center gap-2.5">
-                                <span class="text-xl">📝</span>
+                                <div class="w-9 h-9 rounded-xl bg-[#EFE8DE] text-[#D46E15] flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list text-sm"></i>
+                                </div>
                                 <div>
-                                    <h3 class="text-[#1C1C1C] font-bold text-base">Catatan Produksi & Memo Dapur</h3>
-                                    <p class="text-xs text-[#828282]">Instruksi khusus bahan, request irisan roti, dan memo kurir trip obrok</p>
+                                    <h3 class="text-[#251A14] font-bold text-base">Catatan Produksi & Memo Dapur</h3>
+                                    <p class="text-xs text-[#8E7E73]">Instruksi khusus bahan, request irisan roti, dan memo kurir trip obrok</p>
                                 </div>
                             </div>
                             <button onclick="openNoteModal()" 
-                                class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs transition-colors self-start sm:self-auto">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-button-orange transition-colors self-start sm:self-auto">
+                                <i class="fas fa-plus text-xs"></i>
                                 <span>+ Tambah Catatan</span>
                             </button>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="kitchenNotesList">
                             <?php foreach ($kitchen_notes as $note): ?>
-                                <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9]">
+                                <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5]">
                                     <div class="flex items-center justify-between text-xs font-bold mb-1.5">
                                         <span class="<?= $note['tag_class'] ?>"><?= htmlspecialchars($note['tag']) ?></span>
-                                        <span class="text-[#828282] font-normal"><?= htmlspecialchars($note['time']) ?></span>
+                                        <span class="text-[#8E7E73] font-normal"><?= htmlspecialchars($note['time']) ?></span>
                                     </div>
                                     <p class="text-xs text-[#544337] leading-relaxed">
                                         <?= htmlspecialchars($note['text']) ?>
@@ -882,54 +895,54 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="flex flex-wrap items-center gap-3">
                             <!-- Dropdown Bulan Dinamis -->
                             <div class="relative">
-                                <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="appearance-none bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#1C1C1C] font-semibold focus:outline-none focus:border-[#FF9B45] cursor-pointer shadow-2xs">
+                                <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#251A14] font-semibold focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
                                     <option value="<?= date('Y-m') ?>"><?= $currentMonthIndo ?></option>
                                     <option value="<?= date('Y-m', strtotime('-1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?></option>
                                     <option value="<?= date('Y-m', strtotime('+1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('+1 month'))] ?? '') . ' ' . date('Y', strtotime('+1 month')) ?></option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
 
                             <!-- Dropdown Tipe Pengiriman -->
                             <div class="relative">
-                                <select id="shippingTypeSelect" onchange="filterShippingType(this.value)" class="appearance-none bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#1C1C1C] font-medium focus:outline-none focus:border-[#FF9B45] cursor-pointer shadow-2xs">
+                                <select id="shippingTypeSelect" onchange="filterShippingType(this.value)" class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
                                     <option value="all">Semua Pengiriman</option>
                                     <option value="kurir">Kurir Toko (Obrok)</option>
                                     <option value="toko">Ambil di Toko</option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
 
                             <!-- Badge 3 Hari Pengiriman Aktif -->
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FEF6EE] text-[#D97706] border border-[#FDE6D2]">
-                                <span class="w-2 h-2 rounded-full bg-[#FF9B45]"></span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
+                                <i class="fas fa-motorcycle text-xs"></i>
                                 <span>Kapasitas Trip: Maks. 150 pcs/Motor</span>
                             </span>
                         </div>
 
                         <!-- Button Tambah Pesanan -->
-                        <button onclick="openOrderModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
-                            <img src="assets/icons/plus.svg" alt="Tambah" class="w-4 h-4">
+                        <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                            <i class="fas fa-plus text-xs"></i>
                             <span>+ Tambah Pesanan</span>
                         </button>
                     </div>
 
                     <!-- Main Big Calendar Card -->
-                    <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card mb-6">
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-sm mb-6">
                         <!-- Calendar Header: Month Title & Legend -->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#F0ECE9] mb-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E2D7C8] mb-4">
                             <div class="flex items-center gap-3">
-                                <h3 class="text-[#1C1C1C] font-bold text-lg" id="calendarGridTitle"><?= $currentMonthIndo ?></h3>
+                                <h3 class="text-[#251A14] font-bold text-lg" id="calendarGridTitle"><?= $currentMonthIndo ?></h3>
                                 <div class="flex items-center gap-1">
-                                    <button onclick="prevCalendarMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Sebelumnya">
-                                        <img src="assets/icons/chevron_left.svg" alt="Prev" class="w-4 h-4">
+                                    <button onclick="prevCalendarMonth()" class="p-1.5 hover:bg-[#EFE8DE] rounded-lg text-[#8E7E73] hover:text-[#251A14] transition-colors" title="Bulan Sebelumnya">
+                                        <i class="fas fa-chevron-left text-xs"></i>
                                     </button>
-                                    <button onclick="nextCalendarMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Berikutnya">
-                                        <img src="assets/icons/chevron_right_calendar.svg" alt="Next" class="w-4 h-4">
+                                    <button onclick="nextCalendarMonth()" class="p-1.5 hover:bg-[#EFE8DE] rounded-lg text-[#8E7E73] hover:text-[#251A14] transition-colors" title="Bulan Berikutnya">
+                                        <i class="fas fa-chevron-right text-xs"></i>
                                     </button>
                                 </div>
                             </div>
@@ -937,11 +950,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <!-- Legend Pills -->
                             <div class="flex items-center gap-4 text-xs">
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#FF9B45]"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#D46E15]"></span>
                                     <span class="text-[#544337] font-medium">Aktif</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full border-2 border-[#FF9B45] bg-white"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full border-2 border-[#D46E15] bg-[#FDFBF7]"></span>
                                     <span class="text-[#544337] font-medium">Hari Ini</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
@@ -952,7 +965,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- Day Names Header (SEN - MIN) -->
-                        <div class="grid grid-cols-7 text-center text-xs font-bold text-[#828282] uppercase tracking-wider py-2 border-b border-[#F0ECE9]">
+                        <div class="grid grid-cols-7 text-center text-xs font-bold text-[#8E7E73] uppercase tracking-wider py-2 border-b border-[#E2D7C8]">
                             <div>SEN</div>
                             <div>SEL</div>
                             <div>RAB</div>
@@ -968,91 +981,91 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- Calendar Footer Note -->
-                        <div class="pt-4 mt-4 border-t border-[#F0ECE9] flex items-center gap-2 text-xs text-[#828282]">
-                            <svg class="w-4 h-4 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div class="pt-4 mt-4 border-t border-[#E2D7C8] flex items-center gap-2 text-xs text-[#8E7E73]">
+                            <i class="fas fa-info-circle text-[#D46E15] text-xs"></i>
                             <span>Klik tanggal mana saja pada kalender untuk melihat daftar pengiriman roti dan status kurir.</span>
                         </div>
                     </div>
 
                     <!-- Bottom Delivery Schedule (Interactive Filtered View) -->
-                    <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card" id="deliveryScheduleSection">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-[#F0ECE9] mb-5">
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-sm" id="deliveryScheduleSection">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-[#E2D7C8] mb-5">
                             <div class="flex items-center gap-2.5">
-                                <h3 class="text-[#1C1C1C] font-bold text-base" id="deliveryScheduleTitle">Jadwal Pengiriman: <?= $todayFormatted ?></h3>
+                                <h3 class="text-[#251A14] font-bold text-base" id="deliveryScheduleTitle">Jadwal Pengiriman: <?= $todayFormatted ?></h3>
                                 <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full" id="deliveryBatchBadge">
                                     2 Batch Siap
                                 </span>
                             </div>
-                            <span class="text-xs text-[#828282]" id="deliveryCountLabel">2 Pengiriman Terjadwal</span>
+                            <span class="text-xs text-[#8E7E73]" id="deliveryCountLabel">2 Pengiriman Terjadwal</span>
                         </div>
 
                         <!-- 3 Cards Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="deliveryCardsGrid">
                             
                             <!-- Card 1: Ibu Sari -->
-                            <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex flex-col justify-between delivery-card" data-type="kurir">
+                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="kurir">
                                 <div>
                                     <div class="flex items-center justify-between text-xs mb-2">
-                                        <span class="font-mono text-[#D97706] font-semibold">#ORD-089</span>
+                                        <span class="font-mono text-[#D46E15] font-semibold">#ORD-089</span>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-[#828282]">🕒 14:00 WIB</span>
-                                            <span class="bg-[#828282]/15 text-[#544337] px-2 py-0.5 rounded-full text-[10px] font-semibold">Belum Bayar</span>
+                                            <span class="text-[#8E7E73]"><i class="far fa-clock text-[10px]"></i> 14:00 WIB</span>
+                                            <span class="bg-[#8E7E73]/15 text-[#544337] px-2 py-0.5 rounded-full text-[10px] font-semibold">Belum Bayar</span>
                                         </div>
                                     </div>
-                                    <h4 class="text-[#1C1C1C] font-bold text-sm">Ibu Sari</h4>
+                                    <h4 class="text-[#251A14] font-bold text-sm">Ibu Sari</h4>
                                     <p class="text-xs text-[#544337] mt-1">Roti Hajatan Putih 10 box, Bolu Pisang 2 mika</p>
                                 </div>
-                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EBE8E5] text-xs">
-                                    <span class="bg-[#FF9B45]/15 text-[#924C00] font-semibold px-2.5 py-1 rounded-md text-[11px]">🛵 Kurir Toko (Siap Antar)</span>
-                                    <button type="button" onclick="openOrderDetailById('ORD-089')" class="text-[#924C00] hover:text-[#FF9B45] font-semibold flex items-center gap-1">
+                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#DDD3C5] text-xs">
+                                    <span class="bg-[#D46E15]/15 text-[#B85207] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-motorcycle text-xs mr-1"></i> Kurir Toko (Siap Antar)</span>
+                                    <button type="button" onclick="openOrderDetailById('ORD-089')" class="text-[#D46E15] hover:text-[#B85207] font-semibold flex items-center gap-1">
                                         <span>Detail</span>
-                                        <span>&rarr;</span>
+                                        <i class="fas fa-arrow-right text-xs"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Card 2: Bu Rina -->
-                            <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex flex-col justify-between delivery-card" data-type="toko">
+                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="toko">
                                 <div>
                                     <div class="flex items-center justify-between text-xs mb-2">
                                         <span class="font-mono text-[#27AE60] font-semibold">#ORD-084</span>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-[#828282]">🕒 16:30 WIB</span>
+                                            <span class="text-[#8E7E73]"><i class="far fa-clock text-[10px]"></i> 16:30 WIB</span>
                                             <span class="bg-[#27AE60]/15 text-[#1B7A43] px-2 py-0.5 rounded-full text-[10px] font-semibold">Lunas</span>
                                         </div>
                                     </div>
-                                    <h4 class="text-[#1C1C1C] font-bold text-sm">Bu Rina</h4>
+                                    <h4 class="text-[#251A14] font-bold text-sm">Bu Rina</h4>
                                     <p class="text-xs text-[#544337] mt-1">Bolu Pisang Mika 2 mika, Roti Bijian Besar 20 pcs</p>
                                 </div>
-                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EBE8E5] text-xs">
-                                    <span class="bg-gray-100 text-[#544337] font-semibold px-2.5 py-1 rounded-md text-[11px]">🏪 Ambil di Toko</span>
-                                    <button type="button" onclick="openOrderDetailById('ORD-084')" class="text-[#924C00] hover:text-[#FF9B45] font-semibold flex items-center gap-1">
+                                <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#DDD3C5] text-xs">
+                                    <span class="bg-[#E5DDD0] text-[#544337] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-store text-xs mr-1"></i> Ambil di Toko</span>
+                                    <button type="button" onclick="openOrderDetailById('ORD-084')" class="text-[#D46E15] hover:text-[#B85207] font-semibold flex items-center gap-1">
                                         <span>Detail</span>
-                                        <span>&rarr;</span>
+                                        <i class="fas fa-arrow-right text-xs"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Card 3: Action Panel -->
-                            <div class="bg-[#FBF9F7] rounded-xl p-4 border border-[#F0ECE9] flex flex-col justify-between">
+                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between">
                                 <div>
-                                    <h4 class="text-[#1C1C1C] font-bold text-sm mb-1">Aksi Cepat Pengiriman</h4>
-                                    <p class="text-xs text-[#828282] leading-relaxed">Perbarui status semua pesanan hari ini atau cetak dokumen surat jalan untuk kurir.</p>
+                                    <h4 class="text-[#251A14] font-bold text-sm mb-1">Aksi Cepat Pengiriman</h4>
+                                    <p class="text-xs text-[#8E7E73] leading-relaxed">Perbarui status semua pesanan hari ini atau cetak dokumen surat jalan untuk kurir.</p>
                                 </div>
                                 <div class="space-y-2 mt-4">
                                     <!-- Konfirmasi Semua Siap Kirim Riil -->
                                     <form method="POST" action="pesanan.php">
                                         <input type="hidden" name="action" value="batch_siap_kirim">
-                                        <button type="submit" class="w-full bg-[#FF9B45] hover:bg-[#E88C3D] text-white font-semibold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        <button type="submit" class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-semibold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-button-orange transition-colors">
+                                            <i class="fas fa-check-double text-xs"></i>
                                             <span>Konfirmasi Semua Siap Kirim</span>
                                         </button>
                                     </form>
                                     
                                     <!-- Cetak Rekap Surat Jalan (Hari Ini) -->
                                     <button type="button" onclick="printDeliverySlip()" 
-                                        class="w-full bg-white hover:bg-gray-100 text-[#544337] font-medium text-xs py-2.5 rounded-lg border border-[#E0E0E0] flex items-center justify-center gap-1.5 transition-colors">
-                                        <span>🖨️</span>
+                                        class="w-full bg-[#FDFBF7] hover:bg-[#E5DDD0] text-[#3E2B21] font-medium text-xs py-2.5 rounded-lg border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
+                                        <i class="fas fa-print text-xs text-[#D46E15]"></i>
                                         <span>Cetak Rekap Surat Jalan (Hari Ini)</span>
                                     </button>
                                 </div>
@@ -1075,16 +1088,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         <div onclick="closeOrderModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
         <!-- Modal Card Container (Structured Header, Scroll Body, Sticky Footer) -->
-        <div class="bg-white rounded-2xl max-w-[720px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden">
+        <div class="bg-[#FDFBF7] rounded-2xl max-w-[720px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden border border-[#E2D7C8]">
             
             <!-- Sticky Header -->
-            <div class="px-6 py-4 border-b border-[#F0ECE9] flex items-center justify-between shrink-0 bg-white">
+            <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between shrink-0 bg-[#FDFBF7]">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1C1C1C]">Tambah Pesanan Baru</h3>
-                    <p class="text-[#828282] text-xs mt-0.5">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
+                    <h3 class="text-lg font-bold text-[#251A14]">Tambah Pesanan Baru</h3>
+                    <p class="text-[#8E7E73] text-xs mt-0.5">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
-                <button onclick="closeOrderModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors" title="Tutup" aria-label="Tutup Modal">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup" aria-label="Tutup Modal">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
@@ -1097,30 +1110,30 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                 <!-- SECTION 1: DATA PELANGGAN -->
                 <div>
-                    <label for="custSearchInput" class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider block mb-2">Data Pelanggan</label>
+                    <label for="custSearchInput" class="text-xs font-bold text-[#251A14] uppercase tracking-wider block mb-2">Data Pelanggan</label>
                     
                     <!-- Search Input Pelanggan -->
                     <div class="relative mb-2">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                            <i class="fas fa-search text-xs"></i>
                         </div>
                         <input type="text" id="custSearchInput" name="customer_name" value="Ibu Sari" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-10 pr-4 py-2 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-4 py-2 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 
                     <!-- Detail Pelanggan Box (3 Columns) -->
-                    <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                            <p class="font-bold text-[#1C1C1C] mt-0.5" id="previewCustName">Ibu Sari</p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
+                            <p class="font-bold text-[#251A14] mt-0.5" id="previewCustName">Ibu Sari</p>
                         </div>
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                            <p class="font-bold text-[#1C1C1C] mt-0.5">0812-3456-7890</p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
+                            <p class="font-bold text-[#251A14] mt-0.5">0812-3456-7890</p>
                         </div>
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                            <p class="font-medium text-[#1C1C1C] mt-0.5">Komplek Melati No. 4, Blok B</p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
+                            <p class="font-medium text-[#251A14] mt-0.5">Komplek Melati No. 4, Blok B</p>
                         </div>
                     </div>
                 </div>
@@ -1128,14 +1141,14 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- SECTION 2: DETAIL PESANAN -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider">Detail Produk & Minimal Order</h4>
-                        <span class="text-xs text-[#828282]" id="itemCountLabel">2 Item Dipilih</span>
+                        <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Detail Produk & Minimal Order</h4>
+                        <span class="text-xs text-[#8E7E73]" id="itemCountLabel">2 Item Dipilih</span>
                     </div>
 
                     <!-- Items Table -->
-                    <div class="border border-[#F0ECE9] rounded-xl overflow-hidden mb-3">
+                    <div class="border border-[#E2D7C8] rounded-xl overflow-hidden mb-3">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FBF9F7] text-[#828282] font-semibold uppercase border-b border-[#F0ECE9]">
+                            <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase">
                                 <tr>
                                     <th class="px-3.5 py-2.5">Produk</th>
                                     <th class="px-3.5 py-2.5">Kemasan</th>
@@ -1144,44 +1157,44 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <th class="px-3.5 py-2.5">Subtotal</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#F0ECE9] bg-white">
+                            <tbody class="divide-y divide-[#EAE1D5] bg-[#FDFBF7]">
                                 <!-- Row 1: Roti Hajatan (Pricelist 10k) -->
-                                <tr id="orderRow1">
+                                <tr id="orderRow1" class="hover:bg-[#F0E9DF] transition-colors">
                                     <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#1C1C1C]">Roti Hajatan (9 Pilihan Topping)</p>
+                                        <p class="font-bold text-[#251A14]">Roti Hajatan (9 Pilihan Topping)</p>
                                         <p class="text-[10px] text-[#27AE60] font-semibold">Min. 1 box</p>
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">Kardus Putih (10k)</td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" id="qtyItem1" name="qty_item_1" value="10" min="0" onchange="calculateOrderTotal()" 
-                                            class="w-16 px-2 py-1 border border-[#27AE60] text-[#1C1C1C] font-bold rounded text-center focus:outline-none transition-colors">
+                                            class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#27AE60] text-[#251A14] font-bold rounded text-center focus:outline-none transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">Rp 10.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal1">Rp 100.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal1">Rp 100.000</td>
                                 </tr>
 
                                 <!-- Row 2: Bolu Pisang Premium (Pricelist 22k) -->
-                                <tr id="orderRow2">
+                                <tr id="orderRow2" class="hover:bg-[#F0E9DF] transition-colors">
                                     <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#1C1C1C]">Bolu Pisang Premium</p>
-                                        <p class="text-[10px] text-[#828282]">Ready Fresh</p>
+                                        <p class="font-bold text-[#251A14]">Bolu Pisang Premium</p>
+                                        <p class="text-[10px] text-[#8E7E73]">Ready Fresh</p>
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">Mika (22k)</td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="0" onchange="calculateOrderTotal()" 
-                                            class="w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
+                                            class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#251A14] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">Rp 22.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal2">Rp 44.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal2">Rp 44.000</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <!-- Validation Callout Alert (MOQ Warning) -->
-                    <div id="moqAlertBox" class="bg-[#FFF5F5] border border-[#EB5757]/30 rounded-xl p-3 flex items-start gap-2.5 hidden">
-                        <span class="text-base text-[#EB5757] shrink-0">🔒</span>
-                        <p class="text-xs text-[#EB5757] leading-relaxed">
+                    <div id="moqAlertBox" class="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3 flex items-start gap-2.5 hidden">
+                        <i class="fas fa-lock text-rose-600 mt-0.5 shrink-0"></i>
+                        <p class="text-xs text-rose-800 leading-relaxed">
                             <strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.
                         </p>
                     </div>
@@ -1189,50 +1202,50 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                 <!-- SECTION 3: PENGIRIMAN & PEMBAYARAN -->
                 <div>
-                    <h4 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider mb-3">Pengiriman & Pembayaran</h4>
+                    <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider mb-3">Pengiriman & Pembayaran</h4>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         
                         <!-- Left: Tanggal & Waktu & Catatan -->
                         <div class="space-y-3.5">
                             <div>
-                                <label for="deliveryDateInput" class="block text-xs font-semibold text-[#333333] mb-1">Tanggal Pengiriman</label>
+                                <label for="deliveryDateInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Tanggal Pengiriman</label>
                                 <input type="date" id="deliveryDateInput" name="delivery_date" value="<?= date('Y-m-d') ?>" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                             </div>
 
                             <div>
-                                <label for="deliveryDestinationInput" class="block text-xs font-semibold text-[#333333] mb-1">Alamat Tujuan Pengiriman</label>
+                                <label for="deliveryDestinationInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Alamat Tujuan Pengiriman</label>
                                 <input type="text" id="deliveryDestinationInput" name="destination" value="Dikirim ke Komplek Melati No. 4" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                             </div>
 
                             <div>
-                                <label for="orderNotesTextarea" class="block text-xs font-semibold text-[#333333] mb-1">Catatan Dapur / Driver</label>
+                                <label for="orderNotesTextarea" class="block text-xs font-semibold text-[#3E2B21] mb-1">Catatan Dapur / Driver</label>
                                 <textarea id="orderNotesTextarea" name="notes" rows="2" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">Roti hajatan kardus putih diikat rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg p-3 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">Roti hajatan kardus putih diikat rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
                             </div>
                         </div>
 
                         <!-- Right: Total Tagihan & Status Bayar -->
-                        <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between">
+                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between">
                             <div>
-                                <p class="text-[11px] font-bold text-[#828282] uppercase tracking-wider">TOTAL TAGIHAN</p>
-                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
+                                <p class="text-[11px] font-bold text-[#8E7E73] uppercase tracking-wider">TOTAL TAGIHAN</p>
+                                <h3 class="text-2xl font-bold text-[#D46E15] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
                                 
                                 <div class="mt-4">
-                                    <label class="block text-xs font-semibold text-[#333333] mb-2">Status Pembayaran</label>
+                                    <label class="block text-xs font-semibold text-[#3E2B21] mb-2">Status Pembayaran</label>
                                     <div class="grid grid-cols-3 gap-2">
                                         <button type="button" onclick="selectPaymentStatus('Belum Bayar', this)" id="payBtn1" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#544337] text-white shadow-2xs transition-colors">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#3E2B21] text-[#FAF8F5] shadow-2xs transition-colors">
                                             Belum Bayar
                                         </button>
                                         <button type="button" onclick="selectPaymentStatus('Hutang', this)" id="payBtn2" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#E0E0E0] text-[#544337] hover:bg-gray-50 transition-colors">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
                                             Hutang
                                         </button>
                                         <button type="button" onclick="selectPaymentStatus('Lunas', this)" id="payBtn3" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#E0E0E0] text-[#544337] hover:bg-gray-50 transition-colors">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
                                             Lunas
                                         </button>
                                     </div>
@@ -1240,9 +1253,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
 
                             <div class="mt-4">
-                                <label for="paymentNoteInput" class="block text-xs font-semibold text-[#333333] mb-1">Metode Pembayaran</label>
+                                <label for="paymentNoteInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Metode Pembayaran</label>
                                 <input type="text" id="paymentNoteInput" name="payment_note" value="Transfer BCA / QRIS" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                    class="w-full bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                             </div>
                         </div>
 
@@ -1250,21 +1263,21 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
 
                 <!-- Sticky Footer Embedded in Form -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#F0ECE9]">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#E2D7C8]">
                     <div id="footerMoqWarning" class="flex items-center gap-1.5 text-xs text-[#27AE60] font-medium">
-                        <span>✓</span>
+                        <i class="fas fa-check-circle text-xs"></i>
                         <span>Minimum order terpenuhi</span>
                     </div>
 
                     <div class="flex items-center gap-3 ml-auto">
                         <button type="button" onclick="closeOrderModal()" 
-                            class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-semibold px-4 py-2.5 rounded-lg border border-[#E0E0E0] transition-colors">
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-4 py-2.5 rounded-lg border border-[#DDD3C5] transition-colors">
                             Batal
                         </button>
 
                         <button type="submit" id="submitOrderBtn" 
-                            class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
-                            <span id="submitLockIcon">✓</span>
+                            class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
+                            <i class="fas fa-check text-xs"></i>
                             <span>Simpan Pesanan</span>
                         </button>
                     </div>
@@ -1280,48 +1293,48 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <div id="orderDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div onclick="closeOrderDetailModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
-            <div class="flex items-start justify-between pb-3 border-b border-[#F0ECE9] mb-4">
+        <div class="bg-[#FDFBF7] rounded-2xl max-w-lg w-full p-6 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 border border-[#E2D7C8]">
+            <div class="flex items-start justify-between pb-3 border-b border-[#E2D7C8] mb-4">
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-mono text-[#FF9B45] font-bold text-base" id="modalDetailOrderId">#ORD-000</span>
+                        <span class="font-mono text-[#D46E15] font-bold text-base" id="modalDetailOrderId">#ORD-000</span>
                         <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold" id="modalDetailStatusBadge">Menunggu</span>
                     </div>
-                    <h3 class="text-lg font-bold text-[#1C1C1C] mt-1" id="modalDetailCustomer">Nama Pelanggan</h3>
+                    <h3 class="text-lg font-bold text-[#251A14] mt-1" id="modalDetailCustomer">Nama Pelanggan</h3>
                 </div>
-                <button onclick="closeOrderDetailModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onclick="closeOrderDetailModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE]">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
             <div class="space-y-3.5 text-xs">
-                <div class="bg-[#FBF9F7] p-3 rounded-xl border border-[#F0ECE9] space-y-2">
+                <div class="bg-[#EFE8DE] p-3.5 rounded-xl border border-[#DDD3C5] space-y-2">
                     <div class="flex justify-between">
-                        <span class="text-[#828282]">Rincian Item:</span>
-                        <span class="font-semibold text-[#1C1C1C]" id="modalDetailItems">-</span>
+                        <span class="text-[#8E7E73]">Rincian Item:</span>
+                        <span class="font-semibold text-[#251A14]" id="modalDetailItems">-</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-[#828282]">Tujuan Pengiriman:</span>
-                        <span class="font-semibold text-[#1C1C1C]" id="modalDetailDestination">-</span>
+                        <span class="text-[#8E7E73]">Tujuan Pengiriman:</span>
+                        <span class="font-semibold text-[#251A14]" id="modalDetailDestination">-</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-[#828282]">Waktu Pengiriman:</span>
-                        <span class="font-semibold text-[#1C1C1C]" id="modalDetailTime">-</span>
+                        <span class="text-[#8E7E73]">Waktu Pengiriman:</span>
+                        <span class="font-semibold text-[#251A14]" id="modalDetailTime">-</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-[#828282]">Status Bayar:</span>
-                        <span class="font-bold text-[#1C1C1C]" id="modalDetailPayStatus">-</span>
+                        <span class="text-[#8E7E73]">Status Bayar:</span>
+                        <span class="font-bold text-[#251A14]" id="modalDetailPayStatus">-</span>
                     </div>
                 </div>
 
                 <!-- Update Status Alur Kerja -->
                 <div>
-                    <label class="block font-semibold text-[#333333] mb-2">Ubah Status Alur Kerja:</label>
+                    <label class="block font-semibold text-[#3E2B21] mb-2">Ubah Status Alur Kerja:</label>
                     <div class="grid grid-cols-4 gap-2">
                         <button type="button" onclick="changeModalOrderStatus('menunggu')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#E2B93B] text-[#886C12] bg-[#E2B93B]/10 hover:bg-[#E2B93B]/20 text-[11px]">
                             Menunggu
                         </button>
-                        <button type="button" onclick="changeModalOrderStatus('proses')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#FF9B45] text-[#924C00] bg-[#FF9B45]/10 hover:bg-[#FF9B45]/20 text-[11px]">
+                        <button type="button" onclick="changeModalOrderStatus('proses')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#D46E15] text-[#B85207] bg-[#D46E15]/10 hover:bg-[#D46E15]/20 text-[11px]">
                             Oven/Dapur
                         </button>
                         <button type="button" onclick="changeModalOrderStatus('kirim')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#2F80ED] text-[#1B57A6] bg-[#2F80ED]/10 hover:bg-[#2F80ED]/20 text-[11px]">
@@ -1334,8 +1347,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
             </div>
 
-            <div class="pt-4 mt-5 border-t border-[#F0ECE9] flex justify-end">
-                <button type="button" onclick="closeOrderDetailModal()" class="bg-[#F5F3F1] hover:bg-[#EBE8E5] text-[#544337] px-4 py-2 rounded-lg text-xs font-semibold">
+            <div class="pt-4 mt-5 border-t border-[#E2D7C8] flex justify-end">
+                <button type="button" onclick="closeOrderDetailModal()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] px-4 py-2 rounded-lg text-xs font-semibold">
                     Tutup
                 </button>
             </div>
@@ -1348,33 +1361,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <div id="kitchenNoteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div onclick="closeNoteModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
-            <div class="flex items-center justify-between pb-3 border-b border-[#F0ECE9] mb-4">
-                <h3 class="text-base font-bold text-[#1C1C1C]">Tambah Catatan / Memo Dapur</h3>
-                <button onclick="closeNoteModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="bg-[#FDFBF7] rounded-2xl max-w-md w-full p-6 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 border border-[#E2D7C8]">
+            <div class="flex items-center justify-between pb-3 border-b border-[#E2D7C8] mb-4">
+                <h3 class="text-base font-bold text-[#251A14]">Tambah Catatan / Memo Dapur</h3>
+                <button onclick="closeNoteModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
             <form method="POST" action="pesanan.php" class="space-y-4">
                 <input type="hidden" name="action" value="add_kitchen_note">
                 <div>
-                    <label for="noteTagInput" class="block text-xs font-semibold text-[#333333] mb-1">Judul / Tag Catatan</label>
+                    <label for="noteTagInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Judul / Tag Catatan</label>
                     <input type="text" id="noteTagInput" name="note_tag" placeholder="Contoh: ! Prioritas #ORD-089 atau Stok Coklat" required
-                        class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                 </div>
 
                 <div>
-                    <label for="noteTextInput" class="block text-xs font-semibold text-[#333333] mb-1">Isi Memo Dapur</label>
+                    <label for="noteTextInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Isi Memo Dapur</label>
                     <textarea id="noteTextInput" name="note_text" rows="3" placeholder="Tulis instruksi khusus untuk tim produksi dan kurir..." required
-                        class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none"></textarea>
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg p-3 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#F0ECE9]">
-                    <button type="button" onclick="closeNoteModal()" class="px-4 py-2 text-xs font-semibold text-[#544337] bg-[#F5F3F1] hover:bg-[#EBE8E5] rounded-lg">
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E2D7C8]">
+                    <button type="button" onclick="closeNoteModal()" class="px-4 py-2 text-xs font-semibold text-[#3E2B21] bg-[#EFE8DE] hover:bg-[#E5DDD0] rounded-lg border border-[#DDD3C5]">
                         Batal
                     </button>
-                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-[#FF9B45] hover:bg-[#E88C3D] rounded-lg shadow-button-orange">
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-[#D46E15] hover:bg-[#B85207] rounded-lg shadow-button-orange">
                         Simpan Catatan
                     </button>
                 </div>
@@ -1393,9 +1406,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
+                <i class="fas fa-sign-out-alt text-xl"></i>
             </div>
 
             <!-- Title -->
@@ -1408,9 +1419,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             <div class="space-y-2">
                 <a href="logout.php" 
                     class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
+                    <i class="fas fa-sign-out-alt text-sm"></i>
                     <span>Ya, Keluar</span>
                 </a>
 

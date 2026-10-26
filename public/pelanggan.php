@@ -239,6 +239,12 @@ $dayNum = date('d');
 $monthNum = date('m');
 $yearNum = date('Y');
 $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? date('M')) . " " . $yearNum;
+
+// Summary KPI counts for Pelanggan
+$totalCust = count($pelanggan_list);
+$totalReseller = count(array_filter($pelanggan_list, fn($c) => ($c['tipe'] ?? '') === 'Mitra Reseller'));
+$totalOrders = array_sum(array_column($pelanggan_list, 'pesanan_count'));
+$totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagihan'] ?? '', ['Hutang', 'Belum Bayar'])));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -248,6 +254,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <title>Pelanggan - Berkat Dinasti</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
     
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -262,16 +270,16 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         brand: {
                             brown: '#3E2B21',
                             brownDark: '#2C1E17',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FBF9F7',
-                            surface: '#FFFFFF',
-                            border: '#F0ECE9',
-                            muted: '#828282',
-                            dark: '#1C1C1C',
-                            darkText: '#1B1C1B',
-                            brownText: '#544337',
+                            bg: '#F5F1EB',
+                            surface: '#FDFBF7',
+                            border: '#E2D7C8',
+                            muted: '#8E7E73',
+                            dark: '#251A14',
+                            darkText: '#251A14',
+                            brownText: '#5E4D42',
                             brownDeep: '#924C00',
                             accentGreen: '#27AE60',
                             accentYellow: '#E2B93B',
@@ -283,8 +291,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         sans: ['Inter', 'sans-serif'],
                     },
                     boxShadow: {
-                        'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
-                        'button-orange': '0px 2px 4px rgba(255, 155, 69, 0.25)',
+                        'card': '0px 4px 16px rgba(62, 43, 33, 0.06)',
+                        'button-orange': '0px 2px 4px rgba(212, 110, 21, 0.25)',
                     }
                 }
             }
@@ -294,35 +302,38 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FBF9F7;
-            color: #1C1C1C;
+            background-color: #F5F1EB;
+            color: #251A14;
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] text-[#251A14] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
 
         <!-- MOBILE SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
                 <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
-                    <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                <div class="h-20 px-5 flex items-center gap-3 border-b border-white/10 shrink-0">
+                    <div class="w-9 h-9 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
+                    <div class="flex flex-col">
+                        <span class="text-white font-bold text-base tracking-tight leading-none">Berkat Dinasti</span>
+                        <span class="text-[#D8C7B8] text-[10px] tracking-wider uppercase font-semibold mt-1">Bakery & Pastry</span>
+                    </div>
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
 
@@ -330,37 +341,37 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_beranda.svg" alt="Beranda" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-home w-5 text-center text-base"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-bread-slice w-5 text-center text-base"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-clipboard-list w-5 text-center text-base"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan (Active) -->
-                    <a href="pelanggan.php" class="bg-[#FF9B45] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-all shadow-sm">
-                        <img src="assets/icons/nav_pelanggan.svg" alt="Pelanggan" class="w-5 h-5">
+                    <a href="pelanggan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
+                        <i class="fas fa-users w-5 text-center text-base"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_laporan.svg" alt="Laporan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-chart-line w-5 text-center text-base"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pengaturan.svg" alt="Pengaturan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-cog w-5 text-center text-base"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -368,18 +379,18 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/15 rounded-xl p-2.5 flex items-center justify-between">
+                <div class="bg-black/25 rounded-xl p-2.5 flex items-center justify-between border border-white/5">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
-                        <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
+                        <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
             </div>
@@ -389,40 +400,40 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
 
             <!-- TOP HEADER (Height 64px) -->
-            <header class="h-16 bg-white border-b border-[#F0ECE9] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+            <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg" aria-label="Buka Menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg" aria-label="Buka Menu">
+                        <i class="fas fa-bars text-lg"></i>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="beranda.php" class="text-[#544337] hover:underline">Beranda</a>
-                            <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium">Pelanggan</span>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#3E2B21] transition-colors">Beranda</a>
+                            <span class="text-[#8E7E73]">/</span>
+                            <span class="text-[#D46E15] font-semibold">Pelanggan</span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5">Data Pelanggan</h1>
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5">Data Pelanggan & Mitra</h1>
                     </div>
                 </div>
 
                 <!-- Right: Date Indicator, Notification Bell, User Avatar -->
-                <div class="flex items-center gap-3 md:gap-5 relative">
+                <div class="flex items-center gap-3 md:gap-4 relative">
                     
                     <!-- Date Button (Dinamis) -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
-                        <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#DDD3C5]">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-sm"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
-                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
-                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
+                            <i class="far fa-bell text-[#3E2B21] text-lg"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-[#FDFBF7]"></span>
                         </button>
 
                         <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 sm:w-96 craft-dropdown py-2 z-50">
@@ -453,8 +464,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                     <!-- User Circle Icon with Popover -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
-                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div onclick="toggleUserDropdown()" class="w-9 h-9 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:bg-[#B85207] transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
+                            <i class="fas fa-user text-white text-xs"></i>
                         </div>
 
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
@@ -463,14 +474,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> Toko</p>
                             </div>
                             <div class="py-1">
-                                <a href="pengaturan.php" class="craft-dropdown-item">
-                                    <span>⚙️</span>
+                                <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
+                                    <i class="fas fa-cog text-[#8E7E73]"></i>
                                     <span>Pengaturan Toko</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
-                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <span>🚪</span>
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
+                                    <i class="fas fa-sign-out-alt"></i>
                                     <span>Keluar dari Akun</span>
                                 </button>
                             </div>
@@ -487,14 +498,65 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <?php if ($toast_message): ?>
                     <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
                         <div class="flex items-center gap-2.5">
-                            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <i class="fas fa-check-circle text-emerald-600"></i>
                             <span class="text-sm font-medium"><?= htmlspecialchars($toast_message) ?></span>
                         </div>
                         <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                 <?php endif; ?>
+
+                <!-- TOP 4 KPI STATS (Dark Chocolate Espresso Cards) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Stat 1: Total Pelanggan -->
+                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Total Pelanggan</span>
+                            <div class="w-10 h-10 rounded-lg bg-[#D46E15]/20 text-[#D46E15] flex items-center justify-center ring-1 ring-[#D46E15]/30">
+                                <i class="fas fa-users text-base"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalCust ?> <span class="text-xs font-normal text-[#D8C7B8]">Kontak</span></p>
+                        <p class="text-xs text-[#D8C7B8] mt-1">Pelanggan terdaftar aktif</p>
+                    </div>
+
+                    <!-- Stat 2: Mitra Reseller -->
+                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Mitra Reseller</span>
+                            <div class="w-10 h-10 rounded-lg bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center ring-1 ring-[#27AE60]/30">
+                                <i class="fas fa-store text-base"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalReseller ?> <span class="text-xs font-normal text-[#D8C7B8]">Mitra</span></p>
+                        <p class="text-xs text-[#D8C7B8] mt-1">Distributor & toko reseller</p>
+                    </div>
+
+                    <!-- Stat 3: Total Transaksi / Repeat Orders -->
+                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Total Pesanan</span>
+                            <div class="w-10 h-10 rounded-lg bg-[#2F80ED]/20 text-[#2F80ED] flex items-center justify-center ring-1 ring-[#2F80ED]/30">
+                                <i class="fas fa-shopping-bag text-base"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalOrders ?> <span class="text-xs font-normal text-[#D8C7B8]">Pesanan</span></p>
+                        <p class="text-xs text-[#D8C7B8] mt-1">Akumulasi transaksi bakery</p>
+                    </div>
+
+                    <!-- Stat 4: Tagihan Piutang -->
+                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Status Piutang</span>
+                            <div class="w-10 h-10 rounded-lg bg-[#EB5757]/20 text-[#EB5757] flex items-center justify-center ring-1 ring-[#EB5757]/30">
+                                <i class="fas fa-file-invoice-dollar text-base"></i>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalHutang ?> <span class="text-xs font-normal text-[#D8C7B8]">Tertagih</span></p>
+                        <p class="text-xs text-[#D8C7B8] mt-1">Perlu pelunasan saat kirim</p>
+                    </div>
+                </div>
 
                 <!-- TOP FILTER & ACTION BAR -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -503,30 +565,30 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <div class="flex flex-wrap items-center gap-3 flex-1 max-w-2xl">
                         <!-- Search Box -->
                         <div class="relative flex-1 min-w-[240px]">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#828282]">
-                                <img src="assets/icons/search.svg" alt="Cari" class="w-4 h-4 opacity-70">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                <i class="fas fa-search text-xs"></i>
                             </div>
                             <input type="text" id="customerSearchInput" onkeyup="filterCustomers()" placeholder="Cari nama pelanggan, no. telp..." 
-                                class="w-full bg-white border border-[#E0E0E0] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:outline-none shadow-2xs transition-colors">
+                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none shadow-2xs transition-colors">
                         </div>
 
                         <!-- Dropdown Filter Tagihan -->
                         <div class="relative">
                             <select id="statusFilter" onchange="filterCustomers()" 
-                                class="appearance-none bg-white border border-[#E0E0E0] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:outline-none cursor-pointer shadow-2xs">
+                                class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
                                 <option value="all">Status: Semua Tagihan</option>
                                 <option value="Lunas">Status: Lunas</option>
                                 <option value="Hutang">Status: Hutang</option>
                                 <option value="Belum Bayar">Status: Belum Bayar</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                <i class="fas fa-chevron-down text-[10px]"></i>
                             </div>
                         </div>
 
                         <!-- Badge Pelanggan Count -->
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FEF6EE] text-[#D97706] border border-[#FDE6D2] shrink-0">
-                            <span class="w-2 h-2 rounded-full bg-[#FF9B45]"></span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EFE8DE] text-[#924C00] border border-[#DDD3C5] shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-[#D46E15]"></span>
                             <span id="customerCountBadge"><?= count($pelanggan_list) ?> Pelanggan</span>
                         </span>
                     </div>
@@ -534,39 +596,39 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <!-- Right: Button Ekspor & Tambah Pelanggan -->
                     <div class="flex items-center gap-2.5 self-end sm:self-auto">
                         <button onclick="exportCustomersCSV()" 
-                            class="bg-white hover:bg-[#F5F3F1] border border-[#E0E0E0] text-[#1B1C1B] text-xs md:text-sm font-medium px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
-                            <img src="assets/icons/download.svg" alt="Ekspor" class="w-4 h-4">
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                            <i class="fas fa-file-export text-xs"></i>
                             <span>Ekspor Data</span>
                         </button>
 
                         <button onclick="openCustomerModal()" 
-                            class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
-                            <img src="assets/icons/user_plus.svg" alt="Tambah Pelanggan" class="w-4 h-4">
+                            class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                            <i class="fas fa-user-plus text-xs"></i>
                             <span>+ Tambah Pelanggan</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- SECTION 1: DAFTAR KONTAK TABLE CARD -->
-                <div class="bg-white rounded-2xl border border-[#F0ECE9] shadow-card overflow-hidden mb-6">
+                <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-card overflow-hidden mb-6">
                     
                     <!-- Card Top Header -->
-                    <div class="px-5 py-4 border-b border-[#F0ECE9] flex items-center justify-between">
+                    <div class="px-5 py-4 border-b border-[#E2D7C8] flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-6 h-6 rounded-md bg-[#FF9B45]/15 flex items-center justify-center">
-                                <img src="assets/icons/users.svg" alt="Kontak" class="w-3.5 h-3.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center">
+                                <i class="fas fa-address-book text-xs"></i>
                             </div>
-                            <h3 class="text-[#1C1C1C] font-bold text-sm md:text-base">Daftar Kontak</h3>
+                            <h3 class="text-[#251A14] font-bold text-sm md:text-base">Daftar Kontak & Pelanggan</h3>
                         </div>
-                        <span class="text-xs text-[#828282]">Total Kontak: <?= count($pelanggan_list) ?> terdaftar</span>
+                        <span class="text-xs text-[#8E7E73]">Total Kontak: <?= count($pelanggan_list) ?> terdaftar</span>
                     </div>
 
                     <!-- Responsive Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse" id="customersTable">
-                            <!-- Table Header with Solid Orange Background -->
+                            <!-- Table Header with Dark Chocolate Theme -->
                             <thead>
-                                <tr class="bg-[#FF9B45] text-white text-xs font-bold uppercase tracking-wider">
+                                <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
                                     <th class="py-3 px-4 text-center w-12">No</th>
                                     <th class="py-3 px-4 min-w-[200px]">Nama Pelanggan</th>
                                     <th class="py-3 px-4 min-w-[220px]">Alamat Pengiriman</th>
@@ -576,14 +638,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <th class="py-3 px-4 text-center min-w-[110px]">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#F0ECE9] text-xs md:text-sm">
+                            <tbody class="divide-y divide-[#E2D7C8] text-xs md:text-sm">
                                 <?php foreach ($pelanggan_list as $idx => $cust): ?>
                                     <tr id="custRow-<?= $cust['id'] ?>" onclick="selectCustomer(<?= $cust['id'] ?>)" 
-                                        class="cursor-pointer transition-colors <?= $idx === 0 ? 'bg-[#FFF8F2] border-l-4 border-l-[#FF9B45]' : 'hover:bg-[#FAF8F5]' ?>">
+                                        class="cursor-pointer transition-colors <?= $idx === 0 ? 'bg-[#EFE8DE] border-l-4 border-l-[#D46E15]' : ($idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]') ?> hover:bg-[#F0E9DF]">
                                         
                                         <!-- No Column -->
                                         <td class="py-3.5 px-4 text-center">
-                                            <span class="w-6 h-6 rounded-full <?= $idx === 0 ? 'bg-[#924C00] text-white' : 'bg-[#F0ECE9] text-[#544337]' ?> font-bold text-xs inline-flex items-center justify-center">
+                                            <span class="w-6 h-6 rounded-full <?= $idx === 0 ? 'bg-[#D46E15] text-white' : 'bg-[#E2D7C8] text-[#5E4D42]' ?> font-bold text-xs inline-flex items-center justify-center">
                                                 <?= $idx + 1 ?>
                                             </span>
                                         </td>
@@ -591,13 +653,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <!-- Nama & Phone -->
                                         <td class="py-3.5 px-4">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-9 h-9 rounded-full bg-[#FF9B45]/20 text-[#924C00] font-bold text-xs flex items-center justify-center shrink-0">
+                                                <div class="w-9 h-9 rounded-full bg-[#D46E15]/20 text-[#924C00] font-bold text-xs flex items-center justify-center shrink-0">
                                                     <?= htmlspecialchars($cust['avatar']) ?>
                                                 </div>
                                                 <div class="truncate">
-                                                    <p class="font-bold text-[#1C1C1C] leading-tight customer-name truncate"><?= htmlspecialchars($cust['nama']) ?></p>
-                                                    <div class="flex items-center gap-1 text-[#828282] text-[11px] mt-0.5">
-                                                        <span>📞</span>
+                                                    <p class="font-bold text-[#251A14] leading-tight customer-name truncate"><?= htmlspecialchars($cust['nama']) ?></p>
+                                                    <div class="flex items-center gap-1.5 text-[#8E7E73] text-[11px] mt-0.5">
+                                                        <i class="fas fa-phone-alt text-[10px]"></i>
                                                         <span class="customer-phone"><?= htmlspecialchars($cust['no_wa']) ?></span>
                                                     </div>
                                                 </div>
@@ -605,13 +667,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         </td>
 
                                         <!-- Alamat -->
-                                        <td class="py-3.5 px-4 text-[#544337] truncate max-w-xs">
+                                        <td class="py-3.5 px-4 text-[#5E4D42] truncate max-w-xs">
                                             <?= htmlspecialchars($cust['alamat_short']) ?>
                                         </td>
 
                                         <!-- Pesanan Count Badge -->
                                         <td class="py-3.5 px-4 text-center">
-                                            <span class="bg-[#F0ECE9] text-[#544337] font-medium text-xs px-2.5 py-1 rounded-full inline-block">
+                                            <span class="bg-[#EFE8DE] text-[#3E2B21] font-semibold text-xs px-2.5 py-1 rounded-full inline-block border border-[#DDD3C5]">
                                                 <?= $cust['pesanan_count'] ?> pesanan
                                             </span>
                                         </td>
@@ -624,7 +686,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         </td>
 
                                         <!-- Total Transaksi -->
-                                        <td class="py-3.5 px-4 text-right font-bold text-[#1C1C1C]">
+                                        <td class="py-3.5 px-4 text-right font-bold text-[#251A14]">
                                             <?= htmlspecialchars($cust['total_transaksi']) ?>
                                         </td>
 
@@ -633,18 +695,18 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- View -->
                                                 <button onclick="selectCustomer(<?= $cust['id'] ?>)" title="Lihat Profil" 
-                                                    class="p-1.5 text-[#828282] hover:text-[#FF9B45] hover:bg-[#F5F3F1] rounded-lg transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                    class="p-1.5 text-[#8E7E73] hover:text-[#D46E15] hover:bg-[#EFE8DE] rounded-lg transition-colors">
+                                                    <i class="fas fa-eye text-xs"></i>
                                                 </button>
                                                 <!-- Edit -->
                                                 <button onclick="openCustomerModal(<?= $cust['id'] ?>)" title="Edit Pelanggan" 
-                                                    class="p-1.5 text-[#828282] hover:text-[#2F80ED] hover:bg-[#F5F3F1] rounded-lg transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                    class="p-1.5 text-[#8E7E73] hover:text-[#2F80ED] hover:bg-[#EFE8DE] rounded-lg transition-colors">
+                                                    <i class="fas fa-edit text-xs"></i>
                                                 </button>
                                                 <!-- Delete -->
                                                 <button onclick="handleDeleteCustomer(<?= $cust['id'] ?>, '<?= htmlspecialchars($cust['nama']) ?>')" title="Hapus Pelanggan" 
-                                                    class="p-1.5 text-[#828282] hover:text-[#EB5757] hover:bg-[#FFF5F5] rounded-lg transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    class="p-1.5 text-[#8E7E73] hover:text-[#EB5757] hover:bg-rose-50 rounded-lg transition-colors">
+                                                    <i class="fas fa-trash-alt text-xs"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -655,13 +717,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     </div>
 
                     <!-- Pagination Footer (Akurat & Dinamis) -->
-                    <div class="px-5 py-4 border-t border-[#F0ECE9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#828282]">
+                    <div class="px-5 py-4 border-t border-[#E2D7C8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#8E7E73] bg-[#FDFBF7]">
                         <span>Menampilkan 1-<?= count($pelanggan_list) ?> dari <?= count($pelanggan_list) ?> pelanggan</span>
                         
                         <div class="flex items-center gap-1.5">
-                            <button class="px-2.5 py-1 text-[#828282] rounded-md font-medium cursor-default opacity-50">Prev</button>
-                            <button class="w-7 h-7 rounded-md bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shadow-xs">1</button>
-                            <button class="px-2.5 py-1 text-[#828282] rounded-md font-medium cursor-default opacity-50">Next</button>
+                            <button class="px-2.5 py-1 text-[#8E7E73] rounded-md font-medium cursor-default opacity-50">Prev</button>
+                            <button class="w-7 h-7 rounded-md bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shadow-xs">1</button>
+                            <button class="px-2.5 py-1 text-[#8E7E73] rounded-md font-medium cursor-default opacity-50">Next</button>
                         </div>
                     </div>
 
@@ -671,20 +733,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
                     <!-- LEFT CARD: DETAIL PELANGGAN TERPILIH -->
-                    <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-card flex flex-col justify-between">
                         <div>
                             <!-- Header with Avatar & Status -->
-                            <div class="flex items-start justify-between pb-4 border-b border-[#F0ECE9] mb-4">
+                            <div class="flex items-start justify-between pb-4 border-b border-[#E2D7C8] mb-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-full bg-[#FF9B45] text-white font-bold text-base flex items-center justify-center shadow-sm" id="detailAvatar">
+                                    <div class="w-12 h-12 rounded-full bg-[#D46E15] text-white font-bold text-base flex items-center justify-center shadow-sm" id="detailAvatar">
                                         <?= htmlspecialchars($pelanggan_list[0]['avatar'] ?? 'SD') ?>
                                     </div>
                                     <div>
-                                        <h3 class="text-[#1C1C1C] font-bold text-base" id="detailNama"><?= htmlspecialchars($pelanggan_list[0]['nama'] ?? 'Ibu Sari Dewi') ?></h3>
-                                        <p class="text-xs text-[#828282]" id="detailTipe"><?= htmlspecialchars($pelanggan_list[0]['tipe'] ?? 'Pelanggan Reguler') ?></p>
+                                        <h3 class="text-[#251A14] font-bold text-base" id="detailNama"><?= htmlspecialchars($pelanggan_list[0]['nama'] ?? 'Ibu Sari Dewi') ?></h3>
+                                        <p class="text-xs text-[#8E7E73]" id="detailTipe"><?= htmlspecialchars($pelanggan_list[0]['tipe'] ?? 'Pelanggan Reguler') ?></p>
                                     </div>
                                 </div>
-                                <span class="bg-[#F5F3F1] text-[#544337] border border-[#EBE8E5] text-[11px] font-medium px-2.5 py-1 rounded-full" id="detailMemberSince">
+                                <span class="bg-[#EFE8DE] text-[#3E2B21] border border-[#DDD3C5] text-[11px] font-semibold px-2.5 py-1 rounded-full" id="detailMemberSince">
                                     <?= htmlspecialchars($pelanggan_list[0]['member_since'] ?? 'Sejak Jan 2025') ?>
                                 </span>
                             </div>
@@ -692,11 +754,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <!-- Detail Information List -->
                             <div class="space-y-3 text-xs">
                                 <div>
-                                    <span class="text-[#828282] block text-[11px] font-semibold uppercase">Nomor WhatsApp:</span>
+                                    <span class="text-[#8E7E73] block text-[11px] font-semibold uppercase tracking-wider">Nomor WhatsApp:</span>
                                     <div class="flex items-center gap-2 mt-0.5">
-                                        <span class="font-bold text-[#1C1C1C]" id="detailNoWa"><?= htmlspecialchars($pelanggan_list[0]['no_wa'] ?? '0812-3456-7890') ?></span>
+                                        <span class="font-bold text-[#251A14]" id="detailNoWa"><?= htmlspecialchars($pelanggan_list[0]['no_wa'] ?? '0812-3456-7890') ?></span>
                                         <a href="https://wa.me/<?= htmlspecialchars($pelanggan_list[0]['wa_clean'] ?? '6281234567890') ?>" id="detailWaLink" target="_blank" 
-                                            class="text-[#27AE60] hover:underline font-semibold flex items-center gap-1 text-[11px]">
+                                            class="text-[#27AE60] hover:underline font-semibold flex items-center gap-1.5 text-[11px]">
+                                            <i class="fab fa-whatsapp text-sm"></i>
                                             <span>Chat WA</span>
                                             <span>&rarr;</span>
                                         </a>
@@ -704,14 +767,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 </div>
 
                                 <div>
-                                    <span class="text-[#828282] block text-[11px] font-semibold uppercase">Alamat Lengkap:</span>
-                                    <p class="text-[#544337] mt-0.5 leading-relaxed font-medium" id="detailAlamat">
+                                    <span class="text-[#8E7E73] block text-[11px] font-semibold uppercase tracking-wider">Alamat Lengkap:</span>
+                                    <p class="text-[#5E4D42] mt-0.5 leading-relaxed font-medium" id="detailAlamat">
                                         <?= htmlspecialchars($pelanggan_list[0]['alamat'] ?? 'Jl. Mawar No. 5, RT 02/04') ?>
                                     </p>
                                 </div>
 
-                                <div class="bg-[#FBF9F7] p-3 rounded-xl border border-[#F0ECE9]">
-                                    <p class="text-xs text-[#544337] leading-relaxed italic" id="detailCatatan">
+                                <div class="bg-[#EFE8DE] p-3 rounded-xl border border-[#DDD3C5]">
+                                    <p class="text-xs text-[#5E4D42] leading-relaxed italic" id="detailCatatan">
                                         Catatan: <?= htmlspecialchars($pelanggan_list[0]['catatan'] ?? '-') ?>
                                     </p>
                                 </div>
@@ -719,35 +782,35 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         </div>
 
                         <!-- 3 Stats Cluster in Customer Card -->
-                        <div class="grid grid-cols-3 gap-3 pt-5 mt-5 border-t border-[#F0ECE9] text-center">
-                            <div class="bg-[#F9F7F5] p-2.5 rounded-xl border border-[#F0ECE9]">
-                                <span class="text-[10px] text-[#828282] uppercase font-semibold block">Total Order</span>
-                                <span class="text-sm font-bold text-[#1C1C1C]" id="detailTotalOrder"><?= $pelanggan_list[0]['pesanan_count'] ?? 0 ?></span>
+                        <div class="grid grid-cols-3 gap-3 pt-5 mt-5 border-t border-[#E2D7C8] text-center">
+                            <div class="bg-[#EFE8DE] p-2.5 rounded-xl border border-[#DDD3C5]">
+                                <span class="text-[10px] text-[#8E7E73] uppercase font-semibold block">Total Order</span>
+                                <span class="text-sm font-bold text-[#251A14]" id="detailTotalOrder"><?= $pelanggan_list[0]['pesanan_count'] ?? 0 ?></span>
                             </div>
-                            <div class="bg-[#F9F7F5] p-2.5 rounded-xl border border-[#F0ECE9]">
-                                <span class="text-[10px] text-[#828282] uppercase font-semibold block">Akumulasi</span>
+                            <div class="bg-[#EFE8DE] p-2.5 rounded-xl border border-[#DDD3C5]">
+                                <span class="text-[10px] text-[#8E7E73] uppercase font-semibold block">Akumulasi</span>
                                 <span class="text-sm font-bold text-[#27AE60]" id="detailAkumulasi">Rp <?= number_format(($pelanggan_list[0]['total_raw'] ?? 0) / 1000, 0) ?>k</span>
                             </div>
-                            <div class="bg-[#F9F7F5] p-2.5 rounded-xl border border-[#F0ECE9]">
-                                <span class="text-[10px] text-[#828282] uppercase font-semibold block">Antrean</span>
-                                <span class="text-sm font-bold text-[#FF9B45]" id="detailAntrean"><?= $pelanggan_list[0]['antrean'] ?? 0 ?></span>
+                            <div class="bg-[#EFE8DE] p-2.5 rounded-xl border border-[#DDD3C5]">
+                                <span class="text-[10px] text-[#8E7E73] uppercase font-semibold block">Antrean</span>
+                                <span class="text-sm font-bold text-[#D46E15]" id="detailAntrean"><?= $pelanggan_list[0]['antrean'] ?? 0 ?></span>
                             </div>
                         </div>
 
                     </div>
 
                     <!-- RIGHT CARD: RIWAYAT PESANAN PELANGGAN TERPILIH -->
-                    <div class="bg-white rounded-2xl border border-[#F0ECE9] p-6 shadow-card flex flex-col justify-between">
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-card flex flex-col justify-between">
                         <div>
                             <!-- Header -->
-                            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-4">
+                            <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] mb-4">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-[#1C1C1C] font-bold text-base">Riwayat Pesanan</h3>
-                                    <span class="bg-[#FF9B45]/15 text-[#924C00] text-xs font-semibold px-2 py-0.5 rounded-full" id="historyCountBadge">
+                                    <h3 class="text-[#251A14] font-bold text-base">Riwayat Pesanan</h3>
+                                    <span class="bg-[#D46E15]/15 text-[#924C00] text-xs font-semibold px-2 py-0.5 rounded-full" id="historyCountBadge">
                                         <?= $pelanggan_list[0]['pesanan_count'] ?? 0 ?>
                                     </span>
                                 </div>
-                                <a href="pesanan.php" class="text-xs text-[#924C00] hover:text-[#FF9B45] font-semibold flex items-center gap-1" id="viewAllOrdersLink">
+                                <a href="pesanan.php" class="text-xs text-[#924C00] hover:text-[#D46E15] font-semibold flex items-center gap-1" id="viewAllOrdersLink">
                                     <span>Lihat di Pesanan</span>
                                     <span>&rarr;</span>
                                 </a>
@@ -757,23 +820,23 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <div class="space-y-3" id="orderHistoryContainer">
                                 <?php if (!empty($pelanggan_list[0]['history'])): ?>
                                     <?php foreach ($pelanggan_list[0]['history'] as $ord): ?>
-                                        <div class="bg-[#FBF9F7] rounded-xl p-3.5 border border-[#F0ECE9]">
+                                        <div class="bg-[#EFE8DE] rounded-xl p-3.5 border border-[#DDD3C5]">
                                             <div class="flex items-center justify-between text-xs mb-1">
                                                 <div class="flex items-center gap-2">
-                                                    <span class="font-mono font-bold text-[#1C1C1C]"><?= htmlspecialchars($ord['order_no']) ?></span>
+                                                    <span class="font-mono font-bold text-[#251A14]"><?= htmlspecialchars($ord['order_no']) ?></span>
                                                     <span class="<?= $ord['status_bayar_class'] ?> text-[10px] font-semibold px-2 py-0.5 rounded-full"><?= htmlspecialchars($ord['status_bayar']) ?></span>
                                                 </div>
                                                 <div class="text-right">
-                                                    <span class="font-bold text-[#1C1C1C] block"><?= htmlspecialchars($ord['amount']) ?></span>
+                                                    <span class="font-bold text-[#251A14] block"><?= htmlspecialchars($ord['amount']) ?></span>
                                                     <span class="<?= $ord['delivery_status_class'] ?> text-[11px]"><?= htmlspecialchars($ord['delivery_status']) ?></span>
                                                 </div>
                                             </div>
-                                            <p class="text-[11px] text-[#828282]"><?= htmlspecialchars($ord['date_time']) ?></p>
-                                            <p class="text-xs text-[#544337] mt-1 font-medium"><?= htmlspecialchars($ord['items']) ?></p>
+                                            <p class="text-[11px] text-[#8E7E73]"><?= htmlspecialchars($ord['date_time']) ?></p>
+                                            <p class="text-xs text-[#5E4D42] mt-1 font-medium"><?= htmlspecialchars($ord['items']) ?></p>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <div class="p-6 text-center text-[#828282] text-xs">
+                                    <div class="p-6 text-center text-[#8E7E73] text-xs">
                                         Belum ada riwayat transaksi tercatat untuk pelanggan ini.
                                     </div>
                                 <?php endif; ?>
@@ -781,9 +844,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         </div>
 
                         <!-- Card Action: Buat Pesanan untuk Pelanggan Ini -->
-                        <div class="pt-4 mt-4 border-t border-[#F0ECE9]">
-                            <a href="pesanan.php" class="w-full bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-2xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <div class="pt-4 mt-4 border-t border-[#E2D7C8]">
+                            <a href="pesanan.php" class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-2xs">
+                                <i class="fas fa-plus text-xs"></i>
                                 <span>Buat Pesanan Baru untuk Pelanggan Ini</span>
                             </a>
                         </div>
@@ -800,18 +863,18 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <!-- ============================================================== -->
     <div id="customerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <!-- Backdrop with blur -->
-        <div onclick="closeCustomerModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <div onclick="closeCustomerModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
         <!-- Modal Card Container -->
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150">
+        <div class="craft-modal-dialog max-w-lg w-full p-6 sm:p-8 relative z-10 animate-in fade-in zoom-in-95 duration-150">
             <!-- Header -->
-            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9] mb-5">
+            <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] mb-5">
                 <div>
-                    <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]" id="modalTitle">Tambah Pelanggan Baru</h3>
-                    <p class="text-xs text-[#828282] mt-0.5">Lengkapi data kontak untuk pengiriman pesanan bakery</p>
+                    <h3 class="text-base sm:text-lg font-bold text-[#251A14]" id="modalTitle">Tambah Pelanggan Baru</h3>
+                    <p class="text-xs text-[#8E7E73] mt-0.5">Lengkapi data kontak untuk pengiriman pesanan bakery</p>
                 </div>
-                <button onclick="closeCustomerModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors" title="Tutup" aria-label="Tutup Modal">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onclick="closeCustomerModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup" aria-label="Tutup Modal">
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
@@ -822,23 +885,23 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                 <!-- Nama Pelanggan -->
                 <div>
-                    <label for="custNameInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Lengkap Pelanggan <span class="text-[#EB5757]">*</span></label>
+                    <label for="custNameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Nama Lengkap Pelanggan <span class="text-[#EB5757]">*</span></label>
                     <input type="text" id="custNameInput" name="nama" required placeholder="Contoh: Ibu Sari Dewi" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                 </div>
 
                 <!-- No. WhatsApp & Tipe Pelanggan (2 Columns) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                        <label for="custWaInput" class="block text-xs font-semibold text-[#333333] mb-1.5">No. WhatsApp <span class="text-[#EB5757]">*</span></label>
+                        <label for="custWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. WhatsApp <span class="text-[#EB5757]">*</span></label>
                         <input type="text" id="custWaInput" name="no_wa" required placeholder="Contoh: 0812-3456-7890" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 
                     <div>
-                        <label for="custTypeInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Tipe Pelanggan</label>
+                        <label for="custTypeInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Tipe Pelanggan</label>
                         <select id="custTypeInput" name="tipe" 
-                            class="w-full bg-white border border-[#E0E0E0] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors">
+                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none transition-colors">
                             <option value="Pelanggan Reguler">Pelanggan Reguler</option>
                             <option value="Mitra Reseller">Mitra Reseller</option>
                             <option value="Instansi / Kantor">Instansi / Kantor</option>
@@ -848,27 +911,27 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                 <!-- Alamat Pengiriman -->
                 <div>
-                    <label for="custAddressInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Alamat Pengiriman Lengkap <span class="text-[#EB5757]">*</span></label>
+                    <label for="custAddressInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Alamat Pengiriman Lengkap <span class="text-[#EB5757]">*</span></label>
                     <textarea id="custAddressInput" name="alamat" rows="2" required placeholder="Contoh: Jl. Mawar No. 5, RT 02/04, Sukajadi, Malang" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"></textarea>
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                 </div>
 
                 <!-- Catatan Khusus Pengiriman / Preferensi -->
                 <div>
-                    <label for="custNotesInput" class="block text-xs font-semibold text-[#333333] mb-1.5">Catatan Khusus Pengiriman / Preferensi</label>
+                    <label for="custNotesInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Catatan Khusus Pengiriman / Preferensi</label>
                     <textarea id="custNotesInput" name="catatan" rows="2" placeholder="Contoh: Pengiriman pagi sebelum jam 10:00 WIB, roti minta diiris tipis..." 
-                        class="w-full bg-white border border-[#E0E0E0] rounded-xl p-3 text-xs md:text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none transition-colors"></textarea>
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                 </div>
 
                 <!-- Footer Buttons -->
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#F0ECE9] mt-6">
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E2D7C8] mt-6">
                     <button type="button" onclick="closeCustomerModal()" 
-                        class="bg-white hover:bg-gray-100 text-[#544337] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#E0E0E0] transition-colors">
+                        class="craft-btn-secondary text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors">
                         Batal
                     </button>
                     <button type="submit" 
-                        class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                        <i class="fas fa-check text-xs"></i>
                         <span id="saveBtnText">Simpan Pelanggan</span>
                     </button>
                 </div>
@@ -893,9 +956,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
+                <i class="fas fa-sign-out-alt text-xl"></i>
             </div>
 
             <!-- Title -->
@@ -908,9 +969,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             <div class="space-y-2">
                 <a href="logout.php" 
                     class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
+                    <i class="fas fa-sign-out-alt"></i>
                     <span>Ya, Keluar</span>
                 </a>
 
@@ -993,20 +1052,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             if (!customer) return;
 
             // Highlight table row
-            document.querySelectorAll('#customersTable tbody tr').forEach(r => {
-                r.className = 'cursor-pointer transition-colors hover:bg-[#FAF8F5]';
+            document.querySelectorAll('#customersTable tbody tr').forEach((r, idx) => {
+                r.className = 'cursor-pointer transition-colors ' + (idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]') + ' hover:bg-[#F0E9DF]';
                 const noBadge = r.querySelector('td:first-child span');
                 if (noBadge) {
-                    noBadge.className = 'w-6 h-6 rounded-full bg-[#F0ECE9] text-[#544337] font-bold text-xs inline-flex items-center justify-center';
+                    noBadge.className = 'w-6 h-6 rounded-full bg-[#E2D7C8] text-[#5E4D42] font-bold text-xs inline-flex items-center justify-center';
                 }
             });
 
             const activeRow = document.getElementById('custRow-' + id);
             if (activeRow) {
-                activeRow.className = 'cursor-pointer transition-colors bg-[#FFF8F2] border-l-4 border-l-[#FF9B45]';
+                activeRow.className = 'cursor-pointer transition-colors bg-[#EFE8DE] border-l-4 border-l-[#D46E15]';
                 const noBadge = activeRow.querySelector('td:first-child span');
                 if (noBadge) {
-                    noBadge.className = 'w-6 h-6 rounded-full bg-[#924C00] text-white font-bold text-xs inline-flex items-center justify-center';
+                    noBadge.className = 'w-6 h-6 rounded-full bg-[#D46E15] text-white font-bold text-xs inline-flex items-center justify-center';
                 }
             }
 
@@ -1034,26 +1093,26 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             if (customer.history && customer.history.length > 0) {
                 customer.history.forEach(ord => {
                     const itemHtml = `
-                        <div class="bg-[#FBF9F7] rounded-xl p-3.5 border border-[#F0ECE9]">
+                        <div class="bg-[#EFE8DE] rounded-xl p-3.5 border border-[#DDD3C5]">
                             <div class="flex items-center justify-between text-xs mb-1">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono font-bold text-[#1C1C1C]">${ord.order_no}</span>
+                                    <span class="font-mono font-bold text-[#251A14]">${ord.order_no}</span>
                                     <span class="${ord.status_bayar_class} text-[10px] font-semibold px-2 py-0.5 rounded-full">${ord.status_bayar}</span>
                                 </div>
                                 <div class="text-right">
-                                    <span class="font-bold text-[#1C1C1C] block">${ord.amount}</span>
+                                    <span class="font-bold text-[#251A14] block">${ord.amount}</span>
                                     <span class="${ord.delivery_status_class} text-[11px]">${ord.delivery_status}</span>
                                 </div>
                             </div>
-                            <p class="text-[11px] text-[#828282]">${ord.date_time}</p>
-                            <p class="text-xs text-[#544337] mt-1 font-medium">${ord.items}</p>
+                            <p class="text-[11px] text-[#8E7E73]">${ord.date_time}</p>
+                            <p class="text-xs text-[#5E4D42] mt-1 font-medium">${ord.items}</p>
                         </div>
                     `;
                     historyContainer.insertAdjacentHTML('beforeend', itemHtml);
                 });
             } else {
                 historyContainer.innerHTML = `
-                    <div class="p-6 text-center text-[#828282] text-xs">
+                    <div class="p-6 text-center text-[#8E7E73] text-xs">
                         Belum ada riwayat pesanan tercatat untuk pelanggan ini.
                     </div>
                 `;

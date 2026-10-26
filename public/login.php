@@ -124,6 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Berkat Dinasti</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
+    
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -139,9 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         brand: {
                             brown: '#3E2B21',
                             orange: '#D46E15',
-                            orangeHover: '#BF5E0C',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FAF8F5'
+                            bg: '#F5F1EB'
                         }
                     },
                     fontFamily: {
@@ -154,25 +157,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <style>
         body {
-            background-color: #FAF8F5;
+            background-color: #F5F1EB;
             font-family: 'Inter', sans-serif;
         }
         .logo-box {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="h-screen w-full m-0 flex overflow-hidden">
+<body class="h-screen w-full m-0 flex overflow-hidden bg-[#F5F1EB]">
     
     <!-- LEFT PANEL: Branding (Disembunyikan saat di HP, muncul di layar besar) -->
-    <div class="hidden md:flex w-[45%] max-w-[512px] bg-brand-brown relative flex-col justify-between items-center p-8 lg:p-16 overflow-hidden">
+    <div class="hidden md:flex w-[45%] max-w-[512px] bg-[#3E2B21] border-r border-[#2C1E17] relative flex-col justify-between items-center p-8 lg:p-16 overflow-hidden">
         
         <!-- Abstract Circles Background Gradient dari Figma -->
-        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 120.83% 60.42% at 50.00% 45.00%, rgba(255, 155, 69, 0.18) 0%, rgba(255, 155, 69, 0) 70%)"></div>
+        <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 120.83% 60.42% at 50.00% 45.00%, rgba(212, 110, 21, 0.22) 0%, rgba(212, 110, 21, 0) 70%)"></div>
         
         <!-- Decorative Subtle Background Circles (Bottom Right) -->
         <div class="absolute w-[384px] h-[384px] -right-[120px] -bottom-[120px] rounded-full border border-white/5 pointer-events-none"></div>
-        <div class="absolute w-[288px] h-[288px] -right-[72px] -bottom-[72px] rounded-full border border-[#FF9B45]/10 pointer-events-none"></div>
+        <div class="absolute w-[288px] h-[288px] -right-[72px] -bottom-[72px] rounded-full border border-[#D46E15]/15 pointer-events-none"></div>
         
         <!-- Decorative Subtle Background Circle (Top Left) -->
         <div class="absolute w-[320px] h-[320px] -left-[80px] -top-[80px] rounded-full border border-white/5 pointer-events-none"></div>
@@ -180,46 +183,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="flex-1 flex flex-col justify-center items-center w-full z-10">
             <!-- Kotak Logo -->
             <div class="relative w-28 h-28 mb-6">
-                <div class="relative w-full h-full bg-white rounded-2xl flex items-center justify-center p-2.5 logo-box border border-white/20">
+                <div class="relative w-full h-full bg-[#FAF8F5] rounded-2xl flex items-center justify-center p-2.5 logo-box border border-white/20">
                     <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                 </div>
             </div>
 
-            <h1 class="text-white text-[32px] leading-[38px] font-bold text-center mb-2 tracking-tight">Berkat Dinasti</h1>
-            <p class="text-brand-lightText text-[15px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
+            <h1 class="text-[#FAF8F5] text-[32px] leading-[38px] font-bold text-center mb-2 tracking-tight">Berkat Dinasti</h1>
+            <p class="text-[#D8C7B8] text-[15px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
             
-            <div class="bg-brand-orange/15 border border-brand-orange/20 rounded-full px-4 py-1.5 mb-8">
-                <span class="text-brand-orange text-xs font-semibold tracking-[0.6px] uppercase">Sistem Manajemen Pesanan</span>
+            <div class="bg-[#D46E15]/20 border border-[#D46E15]/30 rounded-full px-4 py-1.5 mb-8">
+                <span class="text-[#F5A25D] text-xs font-semibold tracking-[0.6px] uppercase">Sistem Manajemen Pesanan</span>
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="w-8 h-px bg-brand-orange/30"></div>
-                <div class="flex items-center gap-1.5 text-brand-orange/70 text-xs font-medium tracking-[0.6px] uppercase">
-                    <!-- Icon Topi Koki -->
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7.7 15C7 16.5 5 17 3.5 17M16.3 15C17 16.5 19 17 20.5 17M7 19H17M7 22H17"></path></svg>
+                <div class="w-8 h-px bg-[#D46E15]/40"></div>
+                <div class="flex items-center gap-1.5 text-[#F5A25D]/90 text-xs font-medium tracking-[0.6px] uppercase">
+                    <!-- Icon Roti FontAwesome 5 -->
+                    <i class="fas fa-bread-slice text-xs"></i>
                     BAKERY & PASTRY UMKM
                 </div>
-                <div class="w-11 h-px bg-brand-orange/30"></div>
+                <div class="w-8 h-px bg-[#D46E15]/40"></div>
             </div>
         </div>
 
         <!-- Footer Kiri -->
         <div class="w-full pt-6 border-t border-white/10 flex justify-between items-center z-10">
-            <div class="flex items-center gap-1.5 text-[#E8D7CD]/70 text-xs">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="flex items-center gap-2 text-[#D8C7B8]/80 text-xs">
+                <i class="fas fa-shield-alt text-emerald-400"></i>
                 Sistem Khusus Internal Admin
             </div>
-            <span class="text-[#8E7E73] text-xs">v1.0.0</span>
+            <span class="text-[#8E7E73] text-xs font-mono">v1.0.0</span>
         </div>
     </div>
 
     <!-- RIGHT PANEL: Login Form -->
-    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#FAF8F5] overflow-y-auto">
-        <div class="w-full max-w-[420px] bg-white border border-[#ECE5DD] shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)] rounded-2xl p-8 lg:p-10 my-auto">
+    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#F5F1EB] overflow-y-auto">
+        <div class="w-full max-w-[420px] bg-[#FDFBF7] border border-[#E2D7C8] shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)] rounded-2xl p-8 lg:p-10 my-auto">
             
             <div class="mb-6">
-                <div class="w-10 h-10 bg-[#FFF6EC] border border-[#F7D4B2] rounded-xl flex items-center justify-center mb-4">
-                    <svg class="w-5 h-5 text-[#D46E15]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <div class="w-10 h-10 bg-[#3E2B21] border border-white/10 rounded-xl flex items-center justify-center mb-4 text-[#D46E15]">
+                    <i class="fas fa-lock text-base"></i>
                 </div>
                 <h2 class="text-[28px] leading-[34px] font-bold text-[#251A14] tracking-tight mb-1.5">Selamat Datang</h2>
                 <p class="text-[#8E7E73] text-sm leading-[20px]">Masuk ke akun Anda untuk mengelola pesanan bakery</p>
@@ -228,9 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Pesan Sukses Logout -->
             <?php if (!empty($success_message)): ?>
                 <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
-                    <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                    <i class="fas fa-check-circle text-emerald-600 shrink-0 mt-0.5"></i>
                     <div class="text-sm font-medium leading-relaxed">
                         <?= htmlspecialchars($success_message) ?>
                     </div>
@@ -240,9 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Pesan Error Login -->
             <?php if (!empty($error_message)): ?>
                 <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
-                    <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
+                    <i class="fas fa-exclamation-triangle text-rose-500 shrink-0 mt-0.5"></i>
                     <div class="text-sm font-medium leading-relaxed">
                         <?= htmlspecialchars($error_message) ?>
                     </div>
@@ -255,11 +254,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="space-y-1.5">
                     <label for="username" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Username</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-[#8E7E73]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                            <i class="fas fa-user text-xs"></i>
                         </div>
                         <input type="text" id="username" name="username" value="<?= htmlspecialchars($username_val) ?>" placeholder="Masukkan username" required autocomplete="username"
-                            class="craft-input w-full pl-10 pr-4 py-2.5 text-sm">
+                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
                     </div>
                 </div>
 
@@ -267,16 +266,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="space-y-1.5">
                     <label for="password" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Password</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-[#8E7E73]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                            <i class="fas fa-key text-xs"></i>
                         </div>
                         <input type="password" id="password" name="password" placeholder="Masukkan password" required autocomplete="current-password"
-                            class="craft-input w-full pl-10 pr-10 py-2.5 text-sm">
+                            class="w-full pl-10 pr-10 py-2.5 text-sm bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
                         <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8E7E73] hover:text-[#251A14] transition-colors focus:outline-none" title="Lihat/Sembunyikan password">
-                            <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
+                            <i id="eye-icon" class="fas fa-eye text-xs"></i>
                         </button>
                     </div>
                 </div>
@@ -284,22 +280,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Remember Me & Lupa Password -->
                 <div class="flex items-center justify-between pt-1 pb-2">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#DFD7CE] text-[#D46E15] focus:ring-[#D46E15]/20 cursor-pointer">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#DDD3C5] text-[#D46E15] focus:ring-[#D46E15]/30 cursor-pointer bg-[#EFE8DE]">
                         <span class="text-xs text-[#5E4D42]">Ingat saya</span>
                     </label>
-                    <a href="reset-password.php" class="text-xs font-medium text-[#D46E15] hover:text-[#BF5E0C] transition-colors">Lupa Password?</a>
+                    <a href="reset-password.php" class="text-xs font-medium text-[#D46E15] hover:text-[#B85207] transition-colors">Lupa Password?</a>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="craft-btn-primary w-full h-11 text-sm font-medium rounded-lg flex justify-center items-center gap-2">
+                <button type="submit" class="w-full h-11 text-sm font-semibold rounded-xl bg-[#D46E15] hover:bg-[#B85207] text-white shadow-button-orange flex justify-center items-center gap-2 transition-all duration-200">
                     <span>Masuk</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    <i class="fas fa-arrow-right text-xs"></i>
                 </button>
             </form>
 
             <!-- Copyright -->
-            <div class="mt-10 pt-6 border-t border-[#E0E0E0]/60 text-center">
-                <p class="text-[12px] text-[#BDBDBD] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
+            <div class="mt-8 pt-6 border-t border-[#E2D7C8] text-center">
+                <p class="text-[12px] text-[#8E7E73] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
             </div>
         </div>
     </div>
@@ -311,10 +307,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const eyeIcon = document.getElementById('eye-icon');
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+                eyeIcon.className = 'fas fa-eye-slash text-xs';
             } else {
                 passwordInput.type = 'password';
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                eyeIcon.className = 'fas fa-eye text-xs';
             }
         }
     </script>

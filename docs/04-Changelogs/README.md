@@ -4,6 +4,35 @@ Seluruh perubahan rancangan, pembaruan fitur, serta revisi dokumentasi proyek **
 
 ---
 
+## [v1.1.0] - 2026-10-26
+
+### 🍞 Sinkronisasi Katalog Master Produk & Pricelist Resmi Berkat Dinasti
+- **Penyelarasan Data Master Produk & Varian Kemasan 1:1:**
+  - **Roti Hajatan (9 Pilihan Topping):**
+    - Topping: Coco Chip + Keju, Coco Chip + Wijen, Meses + Keju, Meses + Wijen, Wijen + Keju, Meses + Sprinkle, Coco Chip + Sprinkle, Wijen, Wijen + Sprinkle.
+    - Kemasan: Kardus Putih (Rp 10.000), Kardus Coklat (Rp 10.000), Kardus Batik (Rp 11.000), Mika (Rp 11.000).
+  - **Bolu Premium:**
+    - Bolu Pisang: Kemasan Kardus Coklat (Rp 21.000), Kemasan Mika (Rp 22.000).
+    - Bolu Tanpa Pisang: Kemasan Kardus Putih (Rp 19.000), Kemasan Mika (Rp 20.000).
+  - **Roti Manis:**
+    - Roti Kopi: Satuan Rp 4.000 (Min. Order 50 pcs).
+    - Roti Bijian Besar: Satuan Rp 4.000 (Min. Order 20 pcs).
+    - Roti Bijian Kecil: Satuan Rp 3.000 (Min. Order 50 pcs).
+- **Pembaruan Database:**
+  - Pembaruan skema baseline di `database/berkat_dinasti_final.sql` dan `database/rodd1157_berkat_dinasti_db.sql`.
+  - Pembuatan skrip migrasi idempotensial di `database/migration_update.sql`.
+- **Penyelarasan Frontend & Controller:**
+  - `public/produk.php`: Sinkronisasi katalog, helper kemasan `getBerkatPackagingMeta()`, filter kategori dinamis, dan auto-sync database.
+  - `public/beranda.php`: Modal pesanan, kalkulator real-time, audit log, dan ekspor CSV disinkronkan ke produk resmi.
+  - `public/pesanan.php`: Modal form pesanan baru, validasi MOQ, papan Kanban, dan kartu rincian kirim.
+  - `public/pelanggan.php`: Riwayat pesanan dan preferensi kemasan pelanggan.
+  - `public/laporan.php`: Rekap riwayat transaksi dan omset.
+  - `public/pengaturan.php`: Preview struk kasir termal.
+- **Arsip Bukti Dokumen Pricelist:**
+  - Dokumentasi foto fisik disimpan di `docs/DATA/pricelist/`.
+
+---
+
 ## [v1.0.0-final] - 2026-10-01
 
 ### 🚀 Perilisan Rancangan Final (Disetujui Mitra & Tim)

@@ -412,7 +412,8 @@ CREATE TABLE `kategori` (
 
 INSERT INTO `kategori` (`id_kategori`, `nama_kategori`, `deskripsi`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
 (1, 'Roti Hajatan', 'Roti untuk acara hajatan, syukuran, dan acara spesial', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 'Roti Manis', 'Berbagai macam roti manis untuk konsumsi sehari-hari', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(2, 'Bolu Premium', 'Bolu premium lembut aneka rasa khas Berkat Dinasti', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
+(3, 'Roti Manis', 'Berbagai macam roti manis untuk konsumsi sehari-hari', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
 
 -- --------------------------------------------------------
 
@@ -902,10 +903,12 @@ CREATE TABLE `produk` (
 --
 
 INSERT INTO `produk` (`id_produk`, `id_kategori`, `nama_produk`, `deskripsi`, `shelf_life`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Roti Hajatan Isi 6 Rasa', 'Paket roti hajatan berisi 6 varian rasa dalam satu kemasan', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 2, 'Roti Kopi', 'Roti dengan topping kopi yang lezat', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 2, 'Roti Bijian Besar', 'Roti bijian ukuran besar, cocok untuk sarapan', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 2, 'Roti Bijian Kecil', 'Roti bijian ukuran kecil, praktis dibawa', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 1, 'Roti Hajatan (9 Pilihan Topping)', 'Roti hajatan bulat 7 kelopak lembut dengan 9 aneka topping (Coco Chip, Keju, Meses, Wijen, Sprinkle)', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(2, 2, 'Bolu Pisang Premium', 'Bolu pisang premium bertekstur moist dengan aroma pisang harum khas Berkat Dinasti', 7, 'tersedia', 1, 1, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(3, 2, 'Bolu Tanpa Pisang Premium', 'Bolu panggang klasik premium tanpa pisang, harum mentega lembut dan gurih manis pas', 7, 'tersedia', 1, 1, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(4, 3, 'Roti Kopi', 'Roti manis dengan crust aroma kopi harum semerbak ala coffee bun', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
+(5, 3, 'Roti Bijian Besar', 'Roti manis bijian ukuran besar, cocok untuk sarapan', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
+(6, 3, 'Roti Bijian Kecil', 'Roti manis bijian ukuran kecil praktis untuk snack harian', 7, 'tersedia', 1, 1, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
 
 -- --------------------------------------------------------
 
@@ -1008,11 +1011,17 @@ CREATE TABLE `varian_produk` (
 --
 
 INSERT INTO `varian_produk` (`id_varian`, `id_produk`, `nama_varian`, `harga`, `min_order`, `stok`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Kardus Biasa', 9000.00, 1, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(2, 1, 'Mika', 10000.00, 1, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(3, 2, 'Satuan', 4000.00, 50, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(4, 3, 'Satuan', 4000.00, 20, 0, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
-(5, 4, 'Satuan', 3000.00, 50, 0, '2026-04-24 23:10:43', '2026-04-25 03:54:13');
+(1, 1, 'Kardus Putih', 10000.00, 1, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(2, 1, 'Kardus Coklat', 10000.00, 1, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(3, 1, 'Kardus Batik', 11000.00, 1, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(4, 1, 'Mika', 11000.00, 1, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(5, 6, 'Satuan', 3000.00, 50, 200, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(6, 2, 'Kardus Coklat', 21000.00, 1, 50, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(7, 2, 'Mika', 22000.00, 1, 50, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(8, 3, 'Kardus Putih', 19000.00, 1, 50, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(9, 3, 'Mika', 20000.00, 1, 50, '2026-10-26 21:00:00', '2026-10-26 21:00:00'),
+(10, 4, 'Satuan', 4000.00, 50, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00'),
+(11, 5, 'Satuan', 4000.00, 20, 100, '2026-04-24 23:10:43', '2026-10-26 21:00:00');
 
 -- --------------------------------------------------------
 

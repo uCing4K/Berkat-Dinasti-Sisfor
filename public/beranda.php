@@ -84,9 +84,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_rekap') {
     
     if (!$exported) {
         // Fallback default sample data
-        fputcsv($output, ['#ORD-20250926-01', $today, 'Ibu Ratna Sari', '0812-3456-7890', 'Hari Ini, 14:00', 'Rp 110.000', 'BELUM BAYAR', 'PROSES', 'Roti Sisir Butter (50 pcs)']);
-        fputcsv($output, ['#ORD-20250926-02', $today, 'Pak Hendra Wijaya', '0813-8899-7711', 'Hari Ini, 16:30', 'Rp 270.000', 'HUTANG', 'PROSES', 'Roti Sobek Cokelat Keju (30 box)']);
-        fputcsv($output, ['#ORD-20250926-03', $today, 'Toko Berkah Jaya', '0821-4455-6677', 'Besok, 09:00', 'Rp 650.000', 'LUNAS', 'PROSES', 'Donat Kentang Tabur Salju (100 pcs)']);
+        fputcsv($output, ['#ORD-20250926-01', $today, 'Ibu Ratna Sari', '0812-3456-7890', 'Hari Ini, 14:00', 'Rp 100.000', 'BELUM BAYAR', 'PROSES', 'Roti Hajatan Putih (10 box)']);
+        fputcsv($output, ['#ORD-20250926-02', $today, 'Pak Hendra Wijaya', '0813-8899-7711', 'Hari Ini, 16:30', 'Rp 220.000', 'HUTANG', 'PROSES', 'Roti Hajatan Batik (20 box)']);
+        fputcsv($output, ['#ORD-20250926-03', $today, 'Toko Berkah Jaya', '0821-4455-6677', 'Besok, 09:00', 'Rp 440.000', 'LUNAS', 'PROSES', 'Bolu Pisang Mika (20 mika)']);
     }
     
     fclose($output);
@@ -116,9 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         foreach ($raw_items as $it) {
             $p_name = trim($it['nama'] ?? 'Roti Bakery');
             $p_var_id = intval($it['id_varian'] ?? 1);
-            $p_kemasan = trim($it['kemasan'] ?? 'Satuan');
+            $p_kemasan = trim($it['kemasan'] ?? 'Kardus Putih');
             $p_qty = max(1, intval($it['qty'] ?? 1));
-            $p_harga = max(0, floatval($it['harga'] ?? 15000));
+            $p_harga = max(0, floatval($it['harga'] ?? 10000));
             $sub = $p_qty * $p_harga;
             $grand_total += $sub;
             $processed_items[] = [
@@ -134,14 +134,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     if (empty($processed_items)) {
         $processed_items[] = [
-            'nama' => 'Roti Tawar Kupas Special',
+            'nama' => 'Roti Hajatan (9 Pilihan Topping)',
             'id_varian' => 1,
-            'kemasan' => 'Mika (10 pcs)',
-            'qty' => 5,
-            'harga' => 15000,
-            'subtotal' => 75000
+            'kemasan' => 'Kardus Putih',
+            'qty' => 10,
+            'harga' => 10000,
+            'subtotal' => 100000
         ];
-        $grand_total = 75000;
+        $grand_total = 100000;
     }
     
     $dateCode = date('Ymd');
@@ -325,12 +325,17 @@ if ($db_connected && $pdo) {
 }
 
 $products_for_select = [
-    ['id' => 1, 'id_varian' => 1, 'nama' => 'Roti Tawar Kupas Special', 'kemasan' => 'Mika (10 pcs)', 'harga' => 15000, 'min_order' => 5],
-    ['id' => 2, 'id_varian' => 2, 'nama' => 'Donat Kentang Coklat Meises', 'kemasan' => 'Mika (6 pcs)', 'harga' => 25000, 'min_order' => 1],
-    ['id' => 3, 'id_varian' => 3, 'nama' => 'Roti Sisir Butter Mentega', 'kemasan' => 'Kardus (20 pcs)', 'harga' => 80000, 'min_order' => 1],
-    ['id' => 4, 'id_varian' => 4, 'nama' => 'Roti Sobek Cokelat Keju', 'kemasan' => 'Box (1 loyang)', 'harga' => 35000, 'min_order' => 2],
-    ['id' => 5, 'id_varian' => 5, 'nama' => 'Donat Kentang Tabur Salju', 'kemasan' => 'Mika (6 pcs)', 'harga' => 25000, 'min_order' => 1],
-    ['id' => 6, 'id_varian' => 6, 'nama' => 'Baguette & Croissant Mini', 'kemasan' => 'Pack (5 pcs)', 'harga' => 30000, 'min_order' => 1]
+    ['id' => 1, 'id_varian' => 1, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Putih', 'harga' => 10000, 'min_order' => 1],
+    ['id' => 1, 'id_varian' => 2, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Coklat', 'harga' => 10000, 'min_order' => 1],
+    ['id' => 1, 'id_varian' => 3, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Batik', 'harga' => 11000, 'min_order' => 1],
+    ['id' => 1, 'id_varian' => 4, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Mika', 'harga' => 11000, 'min_order' => 1],
+    ['id' => 2, 'id_varian' => 6, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Kardus Coklat', 'harga' => 21000, 'min_order' => 1],
+    ['id' => 2, 'id_varian' => 7, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Mika', 'harga' => 22000, 'min_order' => 1],
+    ['id' => 3, 'id_varian' => 8, 'nama' => 'Bolu Tanpa Pisang Premium', 'kemasan' => 'Kardus Putih', 'harga' => 19000, 'min_order' => 1],
+    ['id' => 3, 'id_varian' => 9, 'nama' => 'Bolu Tanpa Pisang Premium', 'kemasan' => 'Mika', 'harga' => 20000, 'min_order' => 1],
+    ['id' => 4, 'id_varian' => 10, 'nama' => 'Roti Kopi', 'kemasan' => 'Satuan', 'harga' => 4000, 'min_order' => 50],
+    ['id' => 5, 'id_varian' => 11, 'nama' => 'Roti Bijian Besar', 'kemasan' => 'Satuan', 'harga' => 4000, 'min_order' => 20],
+    ['id' => 6, 'id_varian' => 5, 'nama' => 'Roti Bijian Kecil', 'kemasan' => 'Satuan', 'harga' => 3000, 'min_order' => 50]
 ];
 
 if ($db_connected && $pdo) {
@@ -411,65 +416,65 @@ $pending_orders = [
     [
         'id' => 'ORD-20250926-01',
         'customer' => 'Ibu Ratna Sari',
-        'product' => 'Roti Sisir Butter (50 pcs)',
+        'product' => 'Roti Hajatan Kardus Batik (50 box)',
         'deadline' => 'Hari Ini, 14:00',
         'is_urgent' => true,
         'status' => 'proses',
         'payment_status' => 'Belum Bayar',
         'payment_class' => 'bg-[#828282]/15 text-[#544337]',
-        'total' => 'Rp 110.000',
+        'total' => 'Rp 550.000',
         'no_wa' => '0812-3456-7890',
         'alamat' => 'Komplek Melati No. 4, Blok B'
     ],
     [
         'id' => 'ORD-20250926-02',
         'customer' => 'Pak Hendra Wijaya',
-        'product' => 'Roti Sobek Cokelat Keju (30 box)',
+        'product' => 'Bolu Pisang Premium Mika (10 mika)',
         'deadline' => 'Hari Ini, 16:30',
         'is_urgent' => true,
         'status' => 'proses',
         'payment_status' => 'Hutang',
         'payment_class' => 'bg-[#E2B93B]/20 text-[#886C12]',
-        'total' => 'Rp 270.000',
+        'total' => 'Rp 220.000',
         'no_wa' => '0813-8899-7711',
-        'alamat' => 'Jl. Anggrek No. 12, Bandung'
+        'alamat' => 'Jl. Anggrek No. 12, Malang'
     ],
     [
         'id' => 'ORD-20250926-03',
         'customer' => 'Toko Berkah Jaya',
-        'product' => 'Donat Kentang Tabur Salju (100 pcs)',
+        'product' => 'Roti Hajatan Kardus Putih (100 box)',
         'deadline' => 'Besok, 09:00',
         'is_urgent' => false,
         'status' => 'pending',
         'payment_status' => 'Lunas',
         'payment_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
-        'total' => 'Rp 650.000',
+        'total' => 'Rp 1.000.000',
         'no_wa' => '0821-4455-6677',
         'alamat' => 'Ruko Harmoni Blok C-02'
     ],
     [
         'id' => 'ORD-20250926-04',
         'customer' => 'Kafe Kopi Seduh',
-        'product' => 'Baguette & Croissant Mini (40 pcs)',
+        'product' => 'Roti Kopi Satuan (50 pcs)',
         'deadline' => '28 Sep 2025',
         'is_urgent' => false,
         'status' => 'kirim',
         'payment_status' => 'Belum Bayar',
         'payment_class' => 'bg-[#828282]/15 text-[#544337]',
-        'total' => 'Rp 240.000',
+        'total' => 'Rp 200.000',
         'no_wa' => '0812-9876-5432',
-        'alamat' => 'Jl. Progo No. 8, Riau'
+        'alamat' => 'Jl. Ijen No. 8, Malang'
     ],
     [
         'id' => 'ORD-20250926-05',
         'customer' => 'Bu Siti Rahayu',
-        'product' => 'Roti Tawar Gandum Spesial (25 pack)',
+        'product' => 'Bolu Tanpa Pisang Kardus Putih (10 box)',
         'deadline' => '29 Sep 2025',
         'is_urgent' => false,
         'status' => 'selesai',
         'payment_status' => 'Lunas',
         'payment_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
-        'total' => 'Rp 180.000',
+        'total' => 'Rp 190.000',
         'no_wa' => '0856-1122-3344',
         'alamat' => 'Komplek Griya Asri No. 9'
     ]
@@ -542,14 +547,14 @@ $deliveries = [
     [
         'time' => '14:00',
         'customer' => 'Ibu Ratna Sari',
-        'items' => '50 pcs Roti Sisir Butter',
+        'items' => '10 box Roti Hajatan Putih',
         'status' => 'Siap Kirim',
         'status_class' => 'bg-[#27AE60]/15 text-[#1B7A43]'
     ],
     [
         'time' => '16:30',
         'customer' => 'Pak Hendra Wijaya',
-        'items' => '30 box Roti Sobek Cokelat',
+        'items' => '20 box Roti Hajatan Batik',
         'status' => 'Sedang Dikemas',
         'status_class' => 'bg-[#E2B93B]/20 text-[#886C12]'
     ]
@@ -599,7 +604,7 @@ if ($db_connected && $pdo) {
 $activities = [
     [
         'dot_color' => 'bg-[#FF9B45]',
-        'text' => '<span class="text-[#FF9B45] font-medium">Pesanan baru <a href="javascript:void(0)" onclick="viewOrderDetail(\'ORD-20250926-01\', \'Ibu Ratna Sari\', \'Roti Sisir Butter (50 pcs)\', \'Hari Ini, 14:00\', \'Belum Bayar\', \'proses\', \'Rp 110.000\', \'0812-3456-7890\', \'Komplek Melati No. 4, Blok B\')" class="font-semibold hover:underline">#ORD-20250926-01</a> dibuat oleh Ibu Ratna Sari (50 pcs Roti Sisir Butter)</span>',
+        'text' => '<span class="text-[#FF9B45] font-medium">Pesanan baru <a href="javascript:void(0)" onclick="viewOrderDetail(\'ORD-20250926-01\', \'Ibu Ratna Sari\', \'Roti Hajatan Putih (10 box)\', \'Hari Ini, 14:00\', \'Belum Bayar\', \'proses\', \'Rp 100.000\', \'0812-3456-7890\', \'Komplek Melati No. 4, Blok B\')" class="font-semibold hover:underline">#ORD-20250926-01</a> dibuat oleh Ibu Ratna Sari (10 box Roti Hajatan Putih)</span>',
         'time' => '15 menit yang lalu'
     ],
     [
@@ -866,7 +871,7 @@ if ($db_connected && $pdo) {
                                 </div>
                                 <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
                                     <p class="font-medium text-[#251A14]">2 Batch Siap Diantar Driver</p>
-                                    <p class="text-[11px] text-[#8E7E73] mt-0.5">Roti Sisir Butter & Sobek siap kirim</p>
+                                    <p class="text-[11px] text-[#8E7E73] mt-0.5">Roti Hajatan & Bolu siap kirim</p>
                                 </div>
                                 <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
                                     <p class="font-medium text-[#251A14]">Stok Kardus Roti Hampir Habis</p>
@@ -1591,27 +1596,27 @@ if ($db_connected && $pdo) {
                                 </tr>
                             </thead>
                             <tbody id="orderItemsTableBody" class="divide-y divide-[#F0ECE9] bg-white">
-                                <!-- Default Row 1: Roti Tawar Kupas Special (Initial qty 4 triggers MOQ alert!) -->
-                                <tr class="order-product-row" data-min-order="5" data-price="15000">
+                                <!-- Default Row 1: Roti Hajatan Kardus Putih -->
+                                <tr class="order-product-row" data-min-order="1" data-price="10000">
                                     <td class="px-3.5 py-3">
-                                        <input type="hidden" name="items[0][nama]" value="Roti Tawar Kupas Special" class="item-name-input">
+                                        <input type="hidden" name="items[0][nama]" value="Roti Hajatan (9 Pilihan Topping)" class="item-name-input">
                                         <input type="hidden" name="items[0][id_varian]" value="1" class="item-varian-input">
-                                        <p class="font-bold text-[#1C1C1C] item-title">Roti Tawar Kupas Special</p>
-                                        <p class="text-[10px] text-[#EB5757] font-semibold item-moq-label">Min. 5 pcs</p>
+                                        <p class="font-bold text-[#1C1C1C] item-title">Roti Hajatan (9 Pilihan Topping)</p>
+                                        <p class="text-[10px] text-[#27AE60] font-semibold item-moq-label">Ready Stock (Min. 1 box)</p>
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
-                                        <span class="item-kemasan-text">Mika (10 pcs)</span>
-                                        <input type="hidden" name="items[0][kemasan]" value="Mika (10 pcs)" class="item-kemasan-input">
+                                        <span class="item-kemasan-text">Kardus Putih</span>
+                                        <input type="hidden" name="items[0][kemasan]" value="Kardus Putih" class="item-kemasan-input">
                                     </td>
                                     <td class="px-3.5 py-3">
-                                        <input type="number" name="items[0][qty]" value="4" min="1" oninput="calculateOrderTotal()" 
-                                            class="item-qty-input w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors">
+                                        <input type="number" name="items[0][qty]" value="10" min="1" oninput="calculateOrderTotal()" 
+                                            class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
-                                        <span class="item-price-text">Rp 15.000</span>
-                                        <input type="hidden" name="items[0][harga]" value="15000" class="item-price-input">
+                                        <span class="item-price-text">Rp 10.000</span>
+                                        <input type="hidden" name="items[0][harga]" value="10000" class="item-price-input">
                                     </td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 60.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 100.000</td>
                                     <td class="px-3 py-3 text-center">
                                         <button type="button" onclick="removeOrderProductRow(this)" class="text-[#828282] hover:text-[#EB5757]" title="Hapus Item">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -1619,27 +1624,27 @@ if ($db_connected && $pdo) {
                                     </td>
                                 </tr>
 
-                                <!-- Default Row 2: Donat Kentang Coklat -->
-                                <tr class="order-product-row" data-min-order="1" data-price="25000">
+                                <!-- Default Row 2: Bolu Pisang Premium Mika -->
+                                <tr class="order-product-row" data-min-order="1" data-price="22000">
                                     <td class="px-3.5 py-3">
-                                        <input type="hidden" name="items[1][nama]" value="Donat Kentang Coklat Meises" class="item-name-input">
-                                        <input type="hidden" name="items[1][id_varian]" value="2" class="item-varian-input">
-                                        <p class="font-bold text-[#1C1C1C] item-title">Donat Kentang Coklat Meises</p>
-                                        <p class="text-[10px] text-[#828282] item-moq-label">Ready Batch Pagi</p>
+                                        <input type="hidden" name="items[1][nama]" value="Bolu Pisang Premium" class="item-name-input">
+                                        <input type="hidden" name="items[1][id_varian]" value="7" class="item-varian-input">
+                                        <p class="font-bold text-[#1C1C1C] item-title">Bolu Pisang Premium</p>
+                                        <p class="text-[10px] text-[#27AE60] font-semibold item-moq-label">Ready Batch Pagi</p>
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
-                                        <span class="item-kemasan-text">Mika (6 pcs)</span>
-                                        <input type="hidden" name="items[1][kemasan]" value="Mika (6 pcs)" class="item-kemasan-input">
+                                        <span class="item-kemasan-text">Mika</span>
+                                        <input type="hidden" name="items[1][kemasan]" value="Mika" class="item-kemasan-input">
                                     </td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" name="items[1][qty]" value="2" min="1" oninput="calculateOrderTotal()" 
                                             class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
-                                        <span class="item-price-text">Rp 25.000</span>
-                                        <input type="hidden" name="items[1][harga]" value="25000" class="item-price-input">
+                                        <span class="item-price-text">Rp 22.000</span>
+                                        <input type="hidden" name="items[1][harga]" value="22000" class="item-price-input">
                                     </td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 50.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 44.000</td>
                                     <td class="px-3 py-3 text-center">
                                         <button type="button" onclick="removeOrderProductRow(this)" class="text-[#828282] hover:text-[#EB5757]" title="Hapus Item">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -1657,10 +1662,10 @@ if ($db_connected && $pdo) {
                     </button>
 
                     <!-- Validation Callout Alert (MOQ Warning) -->
-                    <div id="moqAlertBox" class="bg-[#FFF5F5] border border-[#EB5757]/30 rounded-xl p-3 flex items-start gap-2.5">
+                    <div id="moqAlertBox" class="bg-[#FFF5F5] border border-[#EB5757]/30 rounded-xl p-3 flex items-start gap-2.5 hidden">
                         <span class="text-base text-[#EB5757] shrink-0">🔒</span>
                         <p class="text-xs text-[#EB5757] leading-relaxed" id="moqAlertMessage">
-                            <strong>Roti Tawar Kupas Special</strong> — Jumlah pesanan <span id="currentMoqQty">4</span> pcs (Minimum order 5 pcs). Pesanan dikunci dan tidak dapat disimpan sebelum memenuhi jumlah minimum.
+                            <strong>Roti Kopi</strong> — Jumlah pesanan kurang dari minimum order. Pesanan dikunci dan tidak dapat disimpan sebelum memenuhi jumlah minimum.
                         </p>
                     </div>
                 </div>
@@ -1697,7 +1702,7 @@ if ($db_connected && $pdo) {
 
                             <div>
                                 <label class="block text-xs font-semibold text-[#333333] mb-1">Catatan Dapur / Driver</label>
-                                <textarea name="catatan" rows="2" placeholder="Catatan khusus: roti tawar diiris tipis, antar sebelum jam 3 sore..." 
+                                <textarea name="catatan" rows="2" placeholder="Catatan khusus: roti hajatan kardus putih diikat rapi, antar sebelum jam 3 sore..." 
                                     class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none"></textarea>
                             </div>
                         </div>
@@ -1706,7 +1711,7 @@ if ($db_connected && $pdo) {
                         <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between">
                             <div>
                                 <p class="text-[11px] font-bold text-[#828282] uppercase tracking-wider">TOTAL TAGIHAN</p>
-                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 110.000</h3>
+                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
                                 
                                 <div class="mt-4">
                                     <label class="block text-xs font-semibold text-[#333333] mb-2">Status Pembayaran</label>
@@ -2020,13 +2025,13 @@ if ($db_connected && $pdo) {
             
             // Default product: 3rd in catalog or 1st
             const defaultProd = PRODUCTS_DATA[2] || PRODUCTS_DATA[0] || {
-                id_varian: 1, nama: 'Roti Manis', kemasan: 'Pcs', harga: 15000, min_order: 1
+                id_varian: 1, nama: 'Roti Hajatan (9 Pilihan Topping)', kemasan: 'Kardus Putih', harga: 10000, min_order: 1
             };
 
             const tr = document.createElement('tr');
             tr.className = 'order-product-row';
             tr.setAttribute('data-min-order', defaultProd.min_order || 1);
-            tr.setAttribute('data-price', defaultProd.harga || 15000);
+            tr.setAttribute('data-price', defaultProd.harga || 10000);
 
             let optionsHtml = '';
             PRODUCTS_DATA.forEach(p => {

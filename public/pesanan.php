@@ -27,7 +27,7 @@ if (!isset($_SESSION['kitchen_notes'])) {
             'tag' => '! Prioritas #ORD-089',
             'tag_class' => 'text-[#EB5757]',
             'time' => '10:15',
-            'text' => 'Roti tawar butuh dikirim jam 15:00. Dahulukan baking & packing mika terlebih dahulu.'
+            'text' => 'Roti hajatan 10 box butuh dikirim jam 15:00. Dahulukan baking & packing kardus putih terlebih dahulu.'
         ],
         [
             'id' => 2,
@@ -35,7 +35,7 @@ if (!isset($_SESSION['kitchen_notes'])) {
             'tag' => '🕒 Catatan #ORD-088',
             'tag_class' => 'text-[#D97706]',
             'time' => '09:30',
-            'text' => 'Pak Budi minta kardus roti sisir diikat tali rafia rapat saat diambil sore.'
+            'text' => 'Pak Budi minta kardus roti hajatan batik diikat tali rafia rapat saat diambil sore.'
         ],
         [
             'id' => 3,
@@ -43,7 +43,7 @@ if (!isset($_SESSION['kitchen_notes'])) {
             'tag' => '📋 Catatan Stok Bahan',
             'tag_class' => 'text-[#544337]',
             'time' => '08:00',
-            'text' => 'Coklat mika sisa 4 bungkus untuk persiapan pesanan besok pagi.'
+            'text' => 'Bolu pisang mika sisa 4 box untuk persiapan pesanan besok pagi.'
         ]
     ];
 }
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'add_order') {
         $custName = trim($_POST['customer_name'] ?? 'Pelanggan');
-        $itemsDesc = trim($_POST['items_desc'] ?? 'Roti Aneka');
+        $itemsDesc = trim($_POST['items_desc'] ?? 'Roti Hajatan (10 box), Bolu Pisang (2 mika)');
         $newId = 'ORD-' . date('ymd') . '-' . rand(10, 99);
         $newOrder = [
             'id' => $newId,
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status_bayar' => $_POST['payment_status'] ?? 'Belum Bayar',
             'bayar_class' => 'bg-[#828282]/15 text-[#544337]',
             'courier_info' => 'Kurir Toko',
-            'total' => intval($_POST['grand_total'] ?? 110000)
+            'total' => intval($_POST['grand_total'] ?? 144000)
         ];
         if (!isset($_SESSION['custom_orders'])) {
             $_SESSION['custom_orders'] = [];
@@ -121,7 +121,7 @@ $master_orders = [
         'id' => 'ORD-089',
         'customer' => 'Ibu Sari',
         'phone' => '0812-3456-7890',
-        'items' => 'Roti Tawar 20pcs, Donat 1 mika',
+        'items' => 'Roti Hajatan Putih (10 box), Bolu Pisang Mika (2 mika)',
         'destination' => 'Dikirim ke Komplek Melati No. 4',
         'time' => 'Hari Ini, 15:00',
         'date' => date('Y-m-d'),
@@ -130,13 +130,13 @@ $master_orders = [
         'status_bayar' => 'Belum Bayar',
         'bayar_class' => 'bg-[#828282]/15 text-[#544337]',
         'courier_info' => 'Kurir Toko (Siap Antar 14:00)',
-        'total' => 110000
+        'total' => 144000
     ],
     [
         'id' => 'ORD-088',
         'customer' => 'Pak Budi',
         'phone' => '0823-4567-8901',
-        'items' => 'Roti Sisir 2 kardus (24 pcs)',
+        'items' => 'Roti Hajatan Kardus Batik (10 box)',
         'destination' => 'Ambil Langsung Sore Hari',
         'time' => 'Hari Ini, 16:30',
         'date' => date('Y-m-d'),
@@ -145,13 +145,13 @@ $master_orders = [
         'status_bayar' => 'Hutang',
         'bayar_class' => 'bg-[#E2B93B]/20 text-[#886C12]',
         'courier_info' => 'Ambil Sendiri di Toko',
-        'total' => 95000
+        'total' => 110000
     ],
     [
         'id' => 'ORD-087',
         'customer' => 'Toko Maju',
         'phone' => '0834-5678-9012',
-        'items' => 'Kue Bolu 15pcs, Roti Sobek 5 box',
+        'items' => 'Bolu Tanpa Pisang Putih (15 box), Roti Kopi (50 pcs)',
         'destination' => 'Kirim via Driver Roda Tiga',
         'time' => 'Hari Ini, 10:00',
         'date' => date('Y-m-d'),
@@ -160,13 +160,13 @@ $master_orders = [
         'status_bayar' => 'Lunas',
         'bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
         'courier_info' => 'Driver Roda Tiga',
-        'total' => 450000
+        'total' => 485000
     ],
     [
         'id' => 'ORD-084',
         'customer' => 'Bu Rina',
         'phone' => '0815-6789-0123',
-        'items' => 'Donat Coklat 2 mika (12 pcs)',
+        'items' => 'Bolu Pisang Mika (2 mika), Roti Bijian Besar (20 pcs)',
         'destination' => 'Ambil di Toko',
         'courier_info' => 'Ambil di Toko (14:00)',
         'time' => 'Kemarin, 14:00',
@@ -175,13 +175,13 @@ $master_orders = [
         'is_urgent' => false,
         'status_bayar' => 'Lunas',
         'bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
-        'total' => 50000
+        'total' => 124000
     ],
     [
         'id' => 'ORD-081',
         'customer' => 'Warung Pak Haji',
         'phone' => '0819-0123-4567',
-        'items' => 'Roti Tawar 50pcs (Kemasan Mika)',
+        'items' => 'Roti Bijian Kecil Satuan (100 pcs)',
         'destination' => 'Jl. Pasar Baru No. 12',
         'courier_info' => 'Kurir Obrok Motor',
         'time' => 'Kemarin, 11:00',
@@ -190,13 +190,13 @@ $master_orders = [
         'is_urgent' => false,
         'status_bayar' => 'Lunas',
         'bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
-        'total' => 325000
+        'total' => 300000
     ],
     [
         'id' => 'ORD-080',
         'customer' => 'Ibu Maya',
         'phone' => '0821-9988-7766',
-        'items' => 'Roll Cokelat Mini (10x), Chiffon Pandan',
+        'items' => 'Roti Hajatan Mika (10 mika), Bolu Pisang Kardus Coklat (2 box)',
         'destination' => 'Kirim ke Jl. Ijen No. 15',
         'courier_info' => 'Kurir Toko',
         'time' => 'Hari Ini, 17:00',
@@ -205,7 +205,7 @@ $master_orders = [
         'is_urgent' => false,
         'status_bayar' => 'Belum Bayar',
         'bayar_class' => 'bg-[#828282]/15 text-[#544337]',
-        'total' => 145000
+        'total' => 152000
     ]
 ];
 
@@ -468,7 +468,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
                                     <div>
                                         <p class="text-xs font-medium text-[#251A14]">Pesanan #ORD-084 Selesai</p>
-                                        <p class="text-[11px] text-[#5E4D42] mt-0.5">Bu Rina telah mengambil donat di toko.</p>
+                                        <p class="text-[11px] text-[#5E4D42] mt-0.5">Bu Rina telah mengambil pesanan bolu pisang di toko.</p>
                                         <span class="text-[10px] text-[#8E7E73] tabular-nums">45 menit lalu</span>
                                     </div>
                                 </div>
@@ -1000,7 +1000,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         </div>
                                     </div>
                                     <h4 class="text-[#1C1C1C] font-bold text-sm">Ibu Sari</h4>
-                                    <p class="text-xs text-[#544337] mt-1">Roti Tawar 20 pcs, Donat 1 mika</p>
+                                    <p class="text-xs text-[#544337] mt-1">Roti Hajatan Putih 10 box, Bolu Pisang 2 mika</p>
                                 </div>
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EBE8E5] text-xs">
                                     <span class="bg-[#FF9B45]/15 text-[#924C00] font-semibold px-2.5 py-1 rounded-md text-[11px]">🛵 Kurir Toko (Siap Antar)</span>
@@ -1022,7 +1022,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         </div>
                                     </div>
                                     <h4 class="text-[#1C1C1C] font-bold text-sm">Bu Rina</h4>
-                                    <p class="text-xs text-[#544337] mt-1">Donat Coklat 2 mika (12 pcs)</p>
+                                    <p class="text-xs text-[#544337] mt-1">Bolu Pisang Mika 2 mika, Roti Bijian Besar 20 pcs</p>
                                 </div>
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#EBE8E5] text-xs">
                                     <span class="bg-gray-100 text-[#544337] font-semibold px-2.5 py-1 rounded-md text-[11px]">🏪 Ambil di Toko</span>
@@ -1091,8 +1091,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             <!-- Scrollable Body -->
             <form id="orderForm" method="POST" action="pesanan.php" onsubmit="handleSaveOrder(event)" class="flex-1 overflow-y-auto p-6 space-y-6">
                 <input type="hidden" name="action" value="add_order">
-                <input type="hidden" name="grand_total" id="hiddenGrandTotal" value="110000">
-                <input type="hidden" name="items_desc" id="hiddenItemsDesc" value="Roti Tawar Kupas (4 pcs), Donat Coklat (2 mika)">
+                <input type="hidden" name="grand_total" id="hiddenGrandTotal" value="144000">
+                <input type="hidden" name="items_desc" id="hiddenItemsDesc" value="Roti Hajatan Putih (10 box), Bolu Pisang Mika (2 mika)">
                 <input type="hidden" name="payment_status" id="selectedPaymentStatus" value="Belum Bayar">
 
                 <!-- SECTION 1: DATA PELANGGAN -->
@@ -1145,34 +1145,34 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#F0ECE9] bg-white">
-                                <!-- Row 1: Roti Tawar (Initial qty 5 meets MOQ) -->
+                                <!-- Row 1: Roti Hajatan (Pricelist 10k) -->
                                 <tr id="orderRow1">
                                     <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#1C1C1C]">Roti Tawar Kupas Special</p>
-                                        <p class="text-[10px] text-[#27AE60] font-semibold">Min. 5 pcs</p>
+                                        <p class="font-bold text-[#1C1C1C]">Roti Hajatan (9 Pilihan Topping)</p>
+                                        <p class="text-[10px] text-[#27AE60] font-semibold">Min. 1 box</p>
                                     </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Mika (10 pcs)</td>
+                                    <td class="px-3.5 py-3 text-[#544337]">Kardus Putih (10k)</td>
                                     <td class="px-3.5 py-3">
-                                        <input type="number" id="qtyItem1" name="qty_item_1" value="5" min="1" onchange="calculateOrderTotal()" 
+                                        <input type="number" id="qtyItem1" name="qty_item_1" value="10" min="0" onchange="calculateOrderTotal()" 
                                             class="w-16 px-2 py-1 border border-[#27AE60] text-[#1C1C1C] font-bold rounded text-center focus:outline-none transition-colors">
                                     </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Rp 15.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal1">Rp 75.000</td>
+                                    <td class="px-3.5 py-3 text-[#544337]">Rp 10.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal1">Rp 100.000</td>
                                 </tr>
 
-                                <!-- Row 2: Donat Kentang Coklat -->
+                                <!-- Row 2: Bolu Pisang Premium (Pricelist 22k) -->
                                 <tr id="orderRow2">
                                     <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#1C1C1C]">Donat Kentang Coklat Meises</p>
-                                        <p class="text-[10px] text-[#828282]">Ready Batch Pagi</p>
+                                        <p class="font-bold text-[#1C1C1C]">Bolu Pisang Premium</p>
+                                        <p class="text-[10px] text-[#828282]">Ready Fresh</p>
                                     </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Mika (6 pcs)</td>
+                                    <td class="px-3.5 py-3 text-[#544337]">Mika (22k)</td>
                                     <td class="px-3.5 py-3">
-                                        <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="1" onchange="calculateOrderTotal()" 
+                                        <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="0" onchange="calculateOrderTotal()" 
                                             class="w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
                                     </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Rp 25.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal2">Rp 50.000</td>
+                                    <td class="px-3.5 py-3 text-[#544337]">Rp 22.000</td>
+                                    <td class="px-3.5 py-3 font-bold text-[#1C1C1C]" id="subtotal2">Rp 44.000</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1182,7 +1182,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <div id="moqAlertBox" class="bg-[#FFF5F5] border border-[#EB5757]/30 rounded-xl p-3 flex items-start gap-2.5 hidden">
                         <span class="text-base text-[#EB5757] shrink-0">🔒</span>
                         <p class="text-xs text-[#EB5757] leading-relaxed">
-                            <strong>Roti Tawar Kupas Special</strong> — Jumlah pesanan <span id="currentMoqQty">4</span> pcs (Minimum order 5 pcs). Pesanan dikunci dan tidak dapat disimpan sebelum memenuhi jumlah minimum.
+                            <strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.
                         </p>
                     </div>
                 </div>
@@ -1210,7 +1210,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <div>
                                 <label for="orderNotesTextarea" class="block text-xs font-semibold text-[#333333] mb-1">Catatan Dapur / Driver</label>
                                 <textarea id="orderNotesTextarea" name="notes" rows="2" 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">Roti tawar diiris rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
+                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">Roti hajatan kardus putih diikat rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
                             </div>
                         </div>
 
@@ -1218,7 +1218,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between">
                             <div>
                                 <p class="text-[11px] font-bold text-[#828282] uppercase tracking-wider">TOTAL TAGIHAN</p>
-                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 125.000</h3>
+                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
                                 
                                 <div class="mt-4">
                                     <label class="block text-xs font-semibold text-[#333333] mb-2">Status Pembayaran</label>
@@ -1772,14 +1772,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const q1 = parseInt(document.getElementById('qtyItem1').value) || 0;
             const q2 = parseInt(document.getElementById('qtyItem2').value) || 0;
 
-            const sub1 = q1 * 15000;
-            const sub2 = q2 * 25000;
+            const sub1 = q1 * 10000;
+            const sub2 = q2 * 22000;
             const total = sub1 + sub2;
 
             document.getElementById('subtotal1').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(sub1);
             document.getElementById('subtotal2').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(sub2);
             document.getElementById('orderGrandTotal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
             document.getElementById('hiddenGrandTotal').value = total;
+            document.getElementById('hiddenItemsDesc').value = `Roti Hajatan Putih (${q1} box), Bolu Pisang Mika (${q2} mika)`;
 
             const qtyInput1 = document.getElementById('qtyItem1');
             const alertBox = document.getElementById('moqAlertBox');
@@ -1788,15 +1789,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const footerWarning = document.getElementById('footerMoqWarning');
             const currentMoqQty = document.getElementById('currentMoqQty');
 
-            currentMoqQty.textContent = q1;
+            if (currentMoqQty) currentMoqQty.textContent = q1;
 
-            if (q1 < 5) {
+            if (q1 < 1 && q2 < 1) {
                 qtyInput1.className = 'w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors';
                 alertBox.classList.remove('hidden');
                 submitBtn.disabled = true;
                 submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
                 lockIcon.textContent = '🔒';
-                footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Penuhi minimal order roti tawar (5 pcs)</span>';
+                footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Minimal pesan 1 box roti / bolu</span>';
             } else {
                 qtyInput1.className = 'w-16 px-2 py-1 border border-[#27AE60] text-[#1C1C1C] font-bold rounded text-center focus:outline-none transition-colors';
                 alertBox.classList.add('hidden');

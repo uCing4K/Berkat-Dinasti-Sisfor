@@ -27,132 +27,256 @@ if (file_exists($configFile)) {
     }
 }
 
-// Daftar Produk Default Sesuai Desain Figma (Katalog Bakery Berkat Dinasti)
+// Helper Metadata Kemasan
+function getBerkatPackagingMeta($nv, $isi = 1) {
+    $nvLower = strtolower($nv);
+    if (strpos($nvLower, 'mika') !== false) {
+        return [
+            'type' => 'Mika',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Mika ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
+            'icon' => 'mika',
+            'unit' => 'mika'
+        ];
+    } elseif (strpos($nvLower, 'batik') !== false) {
+        return [
+            'type' => 'Kardus Batik',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Batik ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#FFF0E6] text-[#924C00] border-[#FFD8BF]',
+            'icon' => 'kardus',
+            'unit' => 'box'
+        ];
+    } elseif (strpos($nvLower, 'coklat') !== false) {
+        return [
+            'type' => 'Kardus Coklat',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Coklat ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
+            'icon' => 'kardus',
+            'unit' => 'box'
+        ];
+    } elseif (strpos($nvLower, 'putih') !== false) {
+        return [
+            'type' => 'Kardus Putih',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Putih ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
+            'icon' => 'kardus',
+            'unit' => 'box'
+        ];
+    } elseif (strpos($nvLower, 'kardus') !== false) {
+        return [
+            'type' => 'Kardus',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
+            'icon' => 'kardus',
+            'unit' => 'box'
+        ];
+    } else {
+        return [
+            'type' => 'Satuan',
+            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Satuan ({$isi} pcs)" : $nv,
+            'badge' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
+            'icon' => 'satuan',
+            'unit' => 'pcs'
+        ];
+    }
+}
+
+// Daftar Produk Resmi Sesuai Pricelist Aktual Berkat Dinasti (Dynasty Food & Beverage)
 $initial_products = [
     [
         'id' => 1,
-        'sku' => 'BD-RT-01',
-        'name' => 'Roti Tawar Kupas Special',
-        'category' => 'Roti',
-        'packaging_type' => 'Satuan',
-        'packaging_label' => 'Satuan',
+        'sku' => 'BD-RH-01',
+        'name' => 'Roti Hajatan (9 Pilihan Topping)',
+        'category' => 'Roti Hajatan',
+        'packaging_type' => 'Kardus Putih',
+        'packaging_label' => 'Kardus Putih',
         'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
-        'packaging_icon' => 'satuan',
-        'min_order' => '5 pcs',
-        'moq_num' => 5,
+        'packaging_icon' => 'kardus',
+        'min_order' => '1 box',
+        'moq_num' => 1,
         'isi' => 1,
-        'price' => 5000,
-        'price_unit' => 'pcs',
+        'price' => 10000,
+        'price_unit' => 'box',
         'status' => 'Aktif',
-        'description' => 'Roti tawar kupas lembut dengan aroma butter harum.'
+        'description' => 'Roti hajatan bulat 7 kelopak lembut dengan 9 topping pilihan (Coco Chip, Keju, Meses, Wijen, Sprinkle) dalam kemasan Kardus Putih bersih.'
     ],
     [
         'id' => 2,
-        'sku' => 'BD-DN-01',
-        'name' => 'Donat Coklat Meises',
-        'category' => 'Donat',
-        'packaging_type' => 'Mika',
-        'packaging_label' => 'Mika (12 pcs)',
-        'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
-        'packaging_icon' => 'mika',
-        'min_order' => '1 mika (12 pcs)',
+        'sku' => 'BD-RH-02',
+        'name' => 'Roti Hajatan (9 Pilihan Topping)',
+        'category' => 'Roti Hajatan',
+        'packaging_type' => 'Kardus Coklat',
+        'packaging_label' => 'Kardus Coklat',
+        'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
+        'packaging_icon' => 'kardus',
+        'min_order' => '1 box',
         'moq_num' => 1,
-        'isi' => 12,
-        'price' => 45000,
-        'price_unit' => 'mika',
+        'isi' => 1,
+        'price' => 10000,
+        'price_unit' => 'box',
         'status' => 'Aktif',
-        'description' => 'Donat empuk bertabur meises coklat premium.'
+        'description' => 'Roti hajatan bulat 7 kelopak lembut kemasan Kardus Coklat kraft elegan dengan 9 topping pilihan.'
     ],
     [
         'id' => 3,
-        'sku' => 'BD-RT-02',
-        'name' => 'Roti Sisir Mentega Special',
-        'category' => 'Roti',
-        'packaging_type' => 'Kardus',
-        'packaging_label' => 'Kardus (20 pcs)',
-        'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
+        'sku' => 'BD-RH-03',
+        'name' => 'Roti Hajatan (9 Pilihan Topping)',
+        'category' => 'Roti Hajatan',
+        'packaging_type' => 'Kardus Batik',
+        'packaging_label' => 'Kardus Batik',
+        'packaging_badge_class' => 'bg-[#FFF0E6] text-[#924C00] border-[#FFD8BF]',
         'packaging_icon' => 'kardus',
-        'min_order' => '1 kardus',
+        'min_order' => '1 box',
         'moq_num' => 1,
-        'isi' => 20,
-        'price' => 80000,
-        'price_unit' => 'kardus',
+        'isi' => 1,
+        'price' => 11000,
+        'price_unit' => 'box',
         'status' => 'Aktif',
-        'description' => 'Roti sisir legendaris dengan olesan mentega manis gurih.'
+        'description' => 'Roti hajatan bulat 7 kelopak kemasan Kardus Batik premium cantik cocok untuk hantaran & syukuran.'
     ],
     [
         'id' => 4,
-        'sku' => 'BD-KP-01',
-        'name' => 'Kue Bolu Gulung Pandan',
-        'category' => 'Kue & Pastry',
-        'packaging_type' => 'Satuan',
-        'packaging_label' => 'Satuan',
-        'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
-        'packaging_icon' => 'satuan',
-        'min_order' => '10 pcs',
-        'moq_num' => 10,
+        'sku' => 'BD-RH-04',
+        'name' => 'Roti Hajatan (9 Pilihan Topping)',
+        'category' => 'Roti Hajatan',
+        'packaging_type' => 'Mika',
+        'packaging_label' => 'Mika',
+        'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
+        'packaging_icon' => 'mika',
+        'min_order' => '1 mika',
+        'moq_num' => 1,
         'isi' => 1,
-        'price' => 8500,
-        'price_unit' => 'pcs',
-        'status' => 'Nonaktif',
-        'description' => 'Bolu gulung aroma pandan asli dengan selai srikaya.'
+        'price' => 11000,
+        'price_unit' => 'mika',
+        'status' => 'Aktif',
+        'description' => 'Roti hajatan bulat 7 kelopak dalam wadah Mika bening transparan higienis.'
     ],
     [
         'id' => 5,
-        'sku' => 'BD-KP-02',
-        'name' => 'Chiffon Cake Keju (16cm)',
-        'category' => 'Kue & Pastry',
-        'packaging_type' => 'Mika',
-        'packaging_label' => 'Mika (1 pcs)',
-        'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
-        'packaging_icon' => 'mika',
-        'min_order' => '2 box',
-        'moq_num' => 2,
+        'sku' => 'BD-BP-01',
+        'name' => 'Bolu Pisang Premium',
+        'category' => 'Bolu Premium',
+        'packaging_type' => 'Kardus Coklat',
+        'packaging_label' => 'Kardus Coklat',
+        'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
+        'packaging_icon' => 'kardus',
+        'min_order' => '1 box',
+        'moq_num' => 1,
         'isi' => 1,
-        'price' => 45000,
+        'price' => 21000,
         'price_unit' => 'box',
         'status' => 'Aktif',
-        'description' => 'Chiffon cake ekstra lembut dengan taburan parutan keju cheddar.'
+        'description' => 'Bolu pisang premium moist beraroma harum pisang asli Dynasty Food & Beverage dalam kemasan Kardus Coklat.'
     ],
     [
         'id' => 6,
-        'sku' => 'BD-RT-03',
-        'name' => 'Roti Sobek Manis 3 Rasa',
-        'category' => 'Roti',
-        'packaging_type' => 'Kardus',
-        'packaging_label' => 'Kardus (10 pcs)',
-        'packaging_badge_class' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
-        'packaging_icon' => 'kardus',
-        'min_order' => '2 kardus',
-        'moq_num' => 2,
-        'isi' => 10,
-        'price' => 65000,
-        'price_unit' => 'kardus',
+        'sku' => 'BD-BP-02',
+        'name' => 'Bolu Pisang Premium',
+        'category' => 'Bolu Premium',
+        'packaging_type' => 'Mika',
+        'packaging_label' => 'Mika',
+        'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
+        'packaging_icon' => 'mika',
+        'min_order' => '1 mika',
+        'moq_num' => 1,
+        'isi' => 1,
+        'price' => 22000,
+        'price_unit' => 'mika',
         'status' => 'Aktif',
-        'description' => 'Roti sobek isi cokelat, keju, dan selai nanas segar.'
+        'description' => 'Bolu pisang premium moist dalam kemasan Mika bulat transparan eksklusif.'
     ],
     [
         'id' => 7,
-        'sku' => 'BD-SB-01',
-        'name' => 'Croissant Butter Flaky',
-        'category' => 'Snack Box',
+        'sku' => 'BD-BT-01',
+        'name' => 'Bolu Tanpa Pisang Premium',
+        'category' => 'Bolu Premium',
+        'packaging_type' => 'Kardus Putih',
+        'packaging_label' => 'Kardus Putih',
+        'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
+        'packaging_icon' => 'kardus',
+        'min_order' => '1 box',
+        'moq_num' => 1,
+        'isi' => 1,
+        'price' => 19000,
+        'price_unit' => 'box',
+        'status' => 'Aktif',
+        'description' => 'Bolu panggang klasik premium tanpa pisang, harum mentega dan lembut dalam kemasan Kardus Putih.'
+    ],
+    [
+        'id' => 8,
+        'sku' => 'BD-BT-02',
+        'name' => 'Bolu Tanpa Pisang Premium',
+        'category' => 'Bolu Premium',
+        'packaging_type' => 'Mika',
+        'packaging_label' => 'Mika',
+        'packaging_badge_class' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
+        'packaging_icon' => 'mika',
+        'min_order' => '1 mika',
+        'moq_num' => 1,
+        'isi' => 1,
+        'price' => 20000,
+        'price_unit' => 'mika',
+        'status' => 'Aktif',
+        'description' => 'Bolu panggang klasik premium tanpa pisang dalam wadah Mika bulat transparan.'
+    ],
+    [
+        'id' => 9,
+        'sku' => 'BD-RM-01',
+        'name' => 'Roti Kopi',
+        'category' => 'Roti Manis',
         'packaging_type' => 'Satuan',
-        'packaging_label' => 'Satuan',
+        'packaging_label' => 'Satuan (Pcs)',
         'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
         'packaging_icon' => 'satuan',
-        'min_order' => '15 pcs',
-        'moq_num' => 15,
+        'min_order' => '50 pcs',
+        'moq_num' => 50,
         'isi' => 1,
-        'price' => 12000,
+        'price' => 4000,
         'price_unit' => 'pcs',
         'status' => 'Aktif',
-        'description' => 'Pastry croissant renyah berlapis dengan butter New Zealand.'
+        'description' => 'Roti manis dengan crust aroma kopi harum semerbak ala coffee bun.'
+    ],
+    [
+        'id' => 10,
+        'sku' => 'BD-RM-02',
+        'name' => 'Roti Bijian Besar',
+        'category' => 'Roti Manis',
+        'packaging_type' => 'Satuan',
+        'packaging_label' => 'Satuan (Pcs)',
+        'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
+        'packaging_icon' => 'satuan',
+        'min_order' => '20 pcs',
+        'moq_num' => 20,
+        'isi' => 1,
+        'price' => 4000,
+        'price_unit' => 'pcs',
+        'status' => 'Aktif',
+        'description' => 'Roti manis bijian ukuran besar, empuk dan mengenyangkan.'
+    ],
+    [
+        'id' => 11,
+        'sku' => 'BD-RM-03',
+        'name' => 'Roti Bijian Kecil',
+        'category' => 'Roti Manis',
+        'packaging_type' => 'Satuan',
+        'packaging_label' => 'Satuan (Pcs)',
+        'packaging_badge_class' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
+        'packaging_icon' => 'satuan',
+        'min_order' => '50 pcs',
+        'moq_num' => 50,
+        'isi' => 1,
+        'price' => 3000,
+        'price_unit' => 'pcs',
+        'status' => 'Aktif',
+        'description' => 'Roti manis bijian ukuran kecil praktis untuk snack dan konsumsi harian.'
     ]
 ];
 
-// Inisialisasi ke session jika belum ada
-if (!isset($_SESSION['product_list'])) {
+// Inisialisasi ke session dengan versioning agar selalu sinkron
+$catalog_version = '2026-10-26_berkat_dinasti_pricelist_v3';
+if (!isset($_SESSION['product_list']) || !isset($_SESSION['catalog_ver']) || $_SESSION['catalog_ver'] !== $catalog_version) {
     $_SESSION['product_list'] = $initial_products;
+    $_SESSION['catalog_ver'] = $catalog_version;
 }
 
 // -------------------------------------------------------------
@@ -202,22 +326,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = isset($_POST['status']) && $_POST['status'] === 'on' ? 'Aktif' : 'Nonaktif';
     $deskripsi = trim($_POST['deskripsi'] ?? '');
 
-    $packaging_label = $kemasan;
-    $packaging_badge_class = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
-    $packaging_icon = 'satuan';
-    $unit = 'pcs';
-
-    if ($kemasan === 'Mika') {
-        $packaging_label = "Mika ({$isi} pcs)";
-        $packaging_badge_class = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
-        $packaging_icon = 'mika';
-        $unit = 'mika';
-    } elseif ($kemasan === 'Kardus') {
-        $packaging_label = "Kardus ({$isi} pcs)";
-        $packaging_badge_class = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
-        $packaging_icon = 'kardus';
-        $unit = 'kardus';
-    }
+    $packMeta = getBerkatPackagingMeta($kemasan, $isi);
+    $packaging_label = $packMeta['label'];
+    $packaging_badge_class = $packMeta['badge'];
+    $packaging_icon = $packMeta['icon'];
+    $unit = $packMeta['unit'];
 
     $skuPrefix = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $kategori), 0, 2));
     if (empty($skuPrefix)) $skuPrefix = 'BD';
@@ -287,22 +400,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = isset($_POST['status']) && $_POST['status'] === 'on' ? 'Aktif' : 'Nonaktif';
     $deskripsi = trim($_POST['deskripsi'] ?? '');
 
-    $packaging_label = $kemasan;
-    $packaging_badge_class = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
-    $packaging_icon = 'satuan';
-    $unit = 'pcs';
-
-    if ($kemasan === 'Mika') {
-        $packaging_label = "Mika ({$isi} pcs)";
-        $packaging_badge_class = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
-        $packaging_icon = 'mika';
-        $unit = 'mika';
-    } elseif ($kemasan === 'Kardus') {
-        $packaging_label = "Kardus ({$isi} pcs)";
-        $packaging_badge_class = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
-        $packaging_icon = 'kardus';
-        $unit = 'kardus';
-    }
+    $packMeta = getBerkatPackagingMeta($kemasan, $isi);
+    $packaging_label = $packMeta['label'];
+    $packaging_badge_class = $packMeta['badge'];
+    $packaging_icon = $packMeta['icon'];
+    $unit = $packMeta['unit'];
 
     // Sync ke DB
     if ($db_connected && $pdo && $prod_id > 0) {
@@ -406,6 +508,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $products = $_SESSION['product_list'];
 if ($db_connected && $pdo) {
     try {
+        // Auto-Sync: Pastikan produk resmi Berkat Dinasti tersimpan di MySQL
+        $chkSync = $pdo->query("SELECT COUNT(*) FROM produk WHERE nama_produk LIKE '%Bolu%'")->fetchColumn();
+        if ($chkSync == 0) {
+            // 1. Kategori
+            $cats = [
+                1 => ['Roti Hajatan', 'Roti untuk acara hajatan, syukuran, khitanan, dan acara spesial'],
+                2 => ['Bolu Premium', 'Bolu premium lembut aneka rasa khas Berkat Dinasti'],
+                3 => ['Roti Manis', 'Berbagai macam roti manis bijian untuk konsumsi harian']
+            ];
+            foreach ($cats as $cId => $cData) {
+                $st = $pdo->prepare("INSERT INTO kategori (id_kategori, nama_kategori, deskripsi) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nama_kategori = VALUES(nama_kategori), deskripsi = VALUES(deskripsi)");
+                $st->execute([$cId, $cData[0], $cData[1]]);
+            }
+
+            // 2. Master Produk
+            $prods = [
+                1 => [1, 'Roti Hajatan (9 Pilihan Topping)', 'Roti hajatan bulat 7 kelopak lembut dengan 9 aneka topping (Coco Chip, Keju, Meses, Wijen, Sprinkle)', 7],
+                2 => [2, 'Bolu Pisang Premium', 'Bolu pisang premium bertekstur moist dengan aroma pisang harum khas Berkat Dinasti', 7],
+                3 => [2, 'Bolu Tanpa Pisang Premium', 'Bolu panggang klasik premium tanpa pisang, harum mentega lembut dan gurih manis pas', 7],
+                4 => [3, 'Roti Kopi', 'Roti manis dengan crust aroma kopi harum semerbak ala coffee bun', 7],
+                5 => [3, 'Roti Bijian Besar', 'Roti manis bijian ukuran besar, empuk dan mengenyangkan', 7],
+                6 => [3, 'Roti Bijian Kecil', 'Roti manis bijian ukuran kecil praktis untuk snack harian', 7]
+            ];
+            foreach ($prods as $pId => $pData) {
+                $st = $pdo->prepare("INSERT INTO produk (id_produk, id_kategori, nama_produk, deskripsi, shelf_life, status) VALUES (?, ?, ?, ?, ?, 'tersedia') ON DUPLICATE KEY UPDATE id_kategori = VALUES(id_kategori), nama_produk = VALUES(nama_produk), deskripsi = VALUES(deskripsi), status = 'tersedia'");
+                $st->execute([$pId, $pData[0], $pData[1], $pData[2], $pData[3]]);
+            }
+
+            // 3. Varian Kemasan & Harga
+            $vars = [
+                1  => [1, 'Kardus Putih', 10000.00, 1],
+                2  => [1, 'Kardus Coklat', 10000.00, 1],
+                3  => [1, 'Kardus Batik', 11000.00, 1],
+                4  => [1, 'Mika', 11000.00, 1],
+                5  => [6, 'Satuan', 3000.00, 50],
+                6  => [2, 'Kardus Coklat', 21000.00, 1],
+                7  => [2, 'Mika', 22000.00, 1],
+                8  => [3, 'Kardus Putih', 19000.00, 1],
+                9  => [3, 'Mika', 20000.00, 1],
+                10 => [4, 'Satuan', 4000.00, 50],
+                11 => [5, 'Satuan', 4000.00, 20]
+            ];
+            foreach ($vars as $vId => $vData) {
+                $st = $pdo->prepare("INSERT INTO varian_produk (id_varian, id_produk, nama_varian, harga, min_order, stok) VALUES (?, ?, ?, ?, ?, 100) ON DUPLICATE KEY UPDATE id_produk = VALUES(id_produk), nama_varian = VALUES(nama_varian), harga = VALUES(harga), min_order = VALUES(min_order)");
+                $st->execute([$vId, $vData[0], $vData[1], $vData[2], $vData[3]]);
+            }
+        }
+
         $stmtLoad = $pdo->query("
             SELECT p.id_produk as id, p.nama_produk as name, p.deskripsi as description,
                    p.status as p_status, k.nama_kategori as category,
@@ -413,54 +563,39 @@ if ($db_connected && $pdo) {
             FROM produk p
             LEFT JOIN kategori k ON p.id_kategori = k.id_kategori
             LEFT JOIN varian_produk vp ON p.id_produk = vp.id_produk
-            ORDER BY p.id_produk DESC
+            ORDER BY k.id_kategori ASC, p.id_produk ASC, vp.harga ASC
         ");
         $dbRows = $stmtLoad->fetchAll();
         if (!empty($dbRows)) {
             $loadedProducts = [];
             foreach ($dbRows as $dp) {
-                $cat = !empty($dp['category']) ? $dp['category'] : 'Roti';
+                $cat = !empty($dp['category']) ? $dp['category'] : 'Roti Hajatan';
                 $st = ($dp['p_status'] === 'tersedia') ? 'Aktif' : 'Nonaktif';
                 $nv = !empty($dp['nama_varian']) ? $dp['nama_varian'] : 'Satuan';
                 
-                $pack_type = 'Satuan';
-                $pack_badge = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
-                $pack_icon = 'satuan';
-                $unit = 'pcs';
                 $isi = 1;
-
-                if (stripos($nv, 'mika') !== false) {
-                    $pack_type = 'Mika';
-                    $pack_badge = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
-                    $pack_icon = 'mika';
-                    $unit = 'mika';
-                    if (preg_match('/\((\d+)\s*pcs\)/i', $nv, $m)) $isi = (int)$m[1];
-                } elseif (stripos($nv, 'kardus') !== false) {
-                    $pack_type = 'Kardus';
-                    $pack_badge = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
-                    $pack_icon = 'kardus';
-                    $unit = 'kardus';
-                    if (preg_match('/\((\d+)\s*pcs\)/i', $nv, $m)) $isi = (int)$m[1];
-                }
+                if (preg_match('/\((\d+)\s*pcs\)/i', $nv, $m)) $isi = (int)$m[1];
+                $packMeta = getBerkatPackagingMeta($nv, $isi);
 
                 $skuPrefix = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $cat), 0, 2));
                 if (empty($skuPrefix)) $skuPrefix = 'BD';
-                $sku = 'BD-' . $skuPrefix . '-' . sprintf('%02d', $dp['id']);
+                $rowId = $dp['id_varian'] ?: $dp['id'];
+                $sku = 'BD-' . $skuPrefix . '-' . sprintf('%02d', $rowId);
 
                 $loadedProducts[] = [
-                    'id' => $dp['id'],
+                    'id' => $rowId,
                     'sku' => $sku,
                     'name' => $dp['name'],
                     'category' => $cat,
-                    'packaging_type' => $pack_type,
-                    'packaging_label' => $nv,
-                    'packaging_badge_class' => $pack_badge,
-                    'packaging_icon' => $pack_icon,
-                    'min_order' => ($dp['min_order'] ?? 1) . ' ' . $unit,
+                    'packaging_type' => $packMeta['type'],
+                    'packaging_label' => $packMeta['label'],
+                    'packaging_badge_class' => $packMeta['badge'],
+                    'packaging_icon' => $packMeta['icon'],
+                    'min_order' => ($dp['min_order'] ?? 1) . ' ' . $packMeta['unit'],
                     'moq_num' => (int)($dp['min_order'] ?? 1),
                     'isi' => $isi,
                     'price' => (float)$dp['price'],
-                    'price_unit' => $unit,
+                    'price_unit' => $packMeta['unit'],
                     'status' => $st,
                     'description' => $dp['description'] ?? ''
                 ];
@@ -738,7 +873,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
                     <div>
                         <h2 class="text-[#1B1C1B] text-2xl font-bold tracking-tight">Daftar Produk Bakery</h2>
-                        <p class="text-[#828282] text-sm mt-1 max-w-xl">Kelola katalog roti, donat, kue, varian kemasan, dan batas minimal pemesanan produksi.</p>
+                        <p class="text-[#828282] text-sm mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, roti manis, varian kemasan, dan batas minimal pemesanan produksi.</p>
                     </div>
 
                     <!-- 3 KPI Cards Cluster -->
@@ -799,10 +934,9 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                             <select id="categoryFilter" onchange="filterProducts()" 
                                 class="appearance-none bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] font-medium focus:outline-none focus:border-[#FF9B45] cursor-pointer transition-colors shadow-2xs">
                                 <option value="">Semua Kategori</option>
-                                <option value="Roti">Roti</option>
-                                <option value="Donat">Donat</option>
-                                <option value="Kue & Pastry">Kue & Pastry</option>
-                                <option value="Snack Box">Snack Box</option>
+                                <option value="Roti Hajatan">Roti Hajatan</option>
+                                <option value="Bolu Premium">Bolu Premium</option>
+                                <option value="Roti Manis">Roti Manis</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -878,15 +1012,15 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                         <!-- Kategori -->
                                         <td class="px-3.5 py-3 text-[#544337] whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
-                                                <?php if ($prod['category'] === 'Roti'): ?>
-                                                    <!-- Icon Bakery / Roti -->
+                                                <?php if ($prod['category'] === 'Roti Hajatan'): ?>
+                                                    <!-- Icon Roti Hajatan -->
                                                     <svg class="w-4 h-4 text-[#B86B28] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C9.5 2 7.7 4 7 6.3C5 6.7 3.5 8.5 3.5 10.8C3.5 13.1 5.4 15 7.7 15H16.3C18.6 15 20.5 13.1 20.5 10.8C20.5 8.5 19 6.7 17 6.3C16.3 4 14.5 2 12 2Z"></path><path d="M7 19H17M7 22H17"></path></svg>
-                                                <?php elseif ($prod['category'] === 'Donat'): ?>
-                                                    <!-- Icon Donat -->
-                                                    <svg class="w-4 h-4 text-[#D97706] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-                                                <?php elseif ($prod['category'] === 'Kue & Pastry'): ?>
-                                                    <!-- Icon Cake -->
+                                                <?php elseif ($prod['category'] === 'Bolu Premium'): ?>
+                                                    <!-- Icon Bolu Premium -->
                                                     <svg class="w-4 h-4 text-[#C05621] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8"></path><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path><path d="M12 7V4"></path></svg>
+                                                <?php elseif ($prod['category'] === 'Roti Manis'): ?>
+                                                    <!-- Icon Roti Manis -->
+                                                    <svg class="w-4 h-4 text-[#D97706] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M8 12c1 2 3 2 4 0 1 2 3 2 4 0"></path></svg>
                                                 <?php else: ?>
                                                     <!-- Icon Box -->
                                                     <svg class="w-4 h-4 text-[#828282] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg>
@@ -1040,7 +1174,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <!-- Nama Produk -->
                     <div>
                         <label for="prod_nama" class="block text-xs font-semibold text-[#333333] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
-                        <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Tawar Kupas Special" 
+                        <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Hajatan (9 Pilihan Topping) / Bolu Pisang" 
                             class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-sm text-[#1C1C1C] placeholder-[#828282] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
                     </div>
 
@@ -1052,10 +1186,9 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                 <select id="prod_kategori" name="kategori" required 
                                     class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
                                     <option value="" disabled selected>Pilih Kategori</option>
-                                    <option value="Roti">Roti</option>
-                                    <option value="Donat">Donat</option>
-                                    <option value="Kue & Pastry">Kue & Pastry</option>
-                                    <option value="Snack Box">Snack Box</option>
+                                    <option value="Roti Hajatan">Roti Hajatan</option>
+                                    <option value="Bolu Premium">Bolu Premium</option>
+                                    <option value="Roti Manis">Roti Manis</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -1080,8 +1213,10 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                             <div class="relative">
                                 <select id="prod_kemasan" name="kemasan" onchange="handleKemasanChange()" 
                                     class="appearance-none w-full bg-white border border-[#E0E0E0] rounded-lg pl-3.5 pr-9 py-2.5 text-sm text-[#1C1C1C] focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none cursor-pointer transition-colors">
+                                    <option value="Kardus Putih">Kardus Putih</option>
+                                    <option value="Kardus Coklat">Kardus Coklat</option>
+                                    <option value="Kardus Batik">Kardus Batik</option>
                                     <option value="Mika" selected>Mika</option>
-                                    <option value="Kardus">Kardus</option>
                                     <option value="Satuan">Satuan</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#828282]">
@@ -1367,11 +1502,11 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
             if (kemasan === 'Mika') {
                 moqUnit.textContent = 'mika';
                 isiInput.disabled = false;
-                if (!isiInput.value || isiInput.value < 1) isiInput.value = 12;
-            } else if (kemasan === 'Kardus') {
-                moqUnit.textContent = 'kardus';
+                if (!isiInput.value || isiInput.value < 1) isiInput.value = 1;
+            } else if (kemasan.toLowerCase().includes('kardus')) {
+                moqUnit.textContent = 'box';
                 isiInput.disabled = false;
-                if (!isiInput.value || isiInput.value < 1) isiInput.value = 20;
+                if (!isiInput.value || isiInput.value < 1) isiInput.value = 1;
             } else {
                 moqUnit.textContent = 'pcs';
                 isiInput.disabled = true;

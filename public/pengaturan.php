@@ -682,12 +682,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <!-- Items Ordered -->
                                     <div class="py-2 border-b border-dashed border-[#828282] space-y-1.5 text-[10px]">
                                         <div class="flex justify-between">
-                                            <span>1x Roti Sisir Mentega Spesial</span>
-                                            <span class="font-bold">Rp 35.000</span>
+                                            <span>10x Roti Hajatan (Kardus Putih)</span>
+                                            <span class="font-bold">Rp 100.000</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span>2x Chiffon Pandan Keju</span>
-                                            <span class="font-bold">Rp 80.000</span>
+                                            <span>2x Bolu Pisang (Mika)</span>
+                                            <span class="font-bold">Rp 44.000</span>
                                         </div>
                                     </div>
 
@@ -695,11 +695,11 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <div class="py-2 border-b border-dashed border-[#828282] text-[10px] space-y-1">
                                         <div class="flex justify-between text-[#828282]">
                                             <span>Subtotal:</span>
-                                            <span>Rp 115.000</span>
+                                            <span>Rp 144.000</span>
                                         </div>
                                         <div class="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-[#828282]/50">
                                             <span>TOTAL AKHIR:</span>
-                                            <span class="text-[#924C00]">Rp 115.000</span>
+                                            <span class="text-[#924C00]">Rp 144.000</span>
                                         </div>
                                         <div class="flex justify-between font-bold text-[#27AE60]">
                                             <span>Status:</span>

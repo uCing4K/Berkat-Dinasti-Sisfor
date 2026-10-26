@@ -38,21 +38,21 @@ if (!isset($_SESSION['pelanggan_list'])) {
                     'order_no' => '#ORD-20250926-01',
                     'status_bayar' => 'Belum Bayar',
                     'status_bayar_class' => 'bg-[#E2B93B]/20 text-[#886C12]',
-                    'amount' => 'Rp 110.000',
+                    'amount' => 'Rp 144.000',
                     'delivery_status' => 'Siap Kirim >',
                     'delivery_status_class' => 'text-[#924C00] font-semibold',
                     'date_time' => '🕒 Hari Ini, 14:00',
-                    'items' => '20 pcs Roti Tawar Kupas Special, 1 mika Donat Coklat'
+                    'items' => '10 box Roti Hajatan Putih, 2 mika Bolu Pisang'
                 ],
                 [
                     'order_no' => '#ORD-20250918-03',
                     'status_bayar' => 'Lunas',
                     'status_bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]',
-                    'amount' => 'Rp 175.000',
+                    'amount' => 'Rp 150.000',
                     'delivery_status' => '✓ Selesai Diterima >',
                     'delivery_status_class' => 'text-[#27AE60] font-semibold',
                     'date_time' => '📅 18 Sep 2025',
-                    'items' => '10 pcs Roti Sisir Butter, 2 box Kue Bolu'
+                    'items' => '10 box Roti Hajatan Batik, 2 box Bolu Tanpa Pisang'
                 ]
             ]
         ],
@@ -71,18 +71,18 @@ if (!isset($_SESSION['pelanggan_list'])) {
             'total_raw' => 320000,
             'tipe' => 'Pelanggan Reguler',
             'member_since' => 'Sejak Mar 2025',
-            'catatan' => 'Minta kardus roti sisir diikat tali rafia rapat saat diambil sore.',
+            'catatan' => 'Minta kardus roti hajatan batik diikat tali rafia rapat saat diambil sore.',
             'antrean' => 1,
             'history' => [
                 [
                     'order_no' => '#ORD-20250926-02',
                     'status_bayar' => 'Hutang',
                     'status_bayar_class' => 'bg-[#EB5757]/15 text-[#EB5757]',
-                    'amount' => 'Rp 95.000',
+                    'amount' => 'Rp 110.000',
                     'delivery_status' => 'Antrean Oven >',
                     'delivery_status_class' => 'text-[#D97706] font-semibold',
                     'date_time' => '🕒 Hari Ini, 16:30',
-                    'items' => 'Roti Sisir 2 kardus (24 pcs)'
+                    'items' => 'Roti Hajatan Kardus Batik (10 box)'
                 ]
             ]
         ],

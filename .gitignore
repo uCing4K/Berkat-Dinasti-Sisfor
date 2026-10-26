@@ -7,5 +7,5 @@ node_modules/
 *.json
 !composer.json
 !package.json
-data/
+/data/
 scripts/__pycache__/

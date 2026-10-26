@@ -25,6 +25,8 @@ Selamat datang di pusat dokumentasi **Sistem Informasi Berkat Dinasti**. File in
 - **`Rancangan Final/`**
   - [[Rancangan Final/Kelompok 5_Laporan DFD_Final|Laporan DFD Final (Full Text)]]
   - [[Rancangan Final/Kelompok 5_Laporan UI_UX_Final|Laporan UI/UX Final (Full Text)]]
+- **`Dokumen RPL & Sintesis Proyek`**
+  - [[Rangkuman_Materi_RPL_dan_Analisis_Project_Berkat_Dinasti.pdf|Rangkuman Materi RPL & Analisis Penerapan Berkat Dinasti (PDF)]]
 - **`DATA/`**
   - Berisi draf / informasi mentah sebelum tahap finalisasi.
 - **`../database/`**

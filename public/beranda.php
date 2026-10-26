@@ -675,6 +675,8 @@ if ($db_connected && $pdo) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 5 Free CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Modern Craft Design System -->
     <link rel="stylesheet" href="css/modern-craft.css">
 
@@ -686,13 +688,13 @@ if ($db_connected && $pdo) {
                         brand: {
                             brown: '#3E2B21',
                             brownDark: '#2C1E17',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#B85207',
                             lightText: '#E8D7CD',
-                            bg: '#FBF9F7',
-                            surface: '#FFFFFF',
-                            border: '#F0ECE9',
-                            muted: '#828282',
+                            bg: '#F5F1EB',
+                            surface: '#FDFBF7',
+                            border: '#E2D7C8',
+                            muted: '#8E7E73',
                             dark: '#1C1C1C',
                             darkText: '#1B1C1B',
                             brownText: '#544337',
@@ -708,7 +710,7 @@ if ($db_connected && $pdo) {
                     },
                     boxShadow: {
                         'card': '0px 4px 12px rgba(0, 0, 0, 0.06)',
-                        'button-orange': '0px 2px 4px rgba(255, 155, 69, 0.25)',
+                        'button-orange': '0px 2px 4px rgba(212, 110, 21, 0.25)',
                     }
                 }
             }
@@ -734,7 +736,7 @@ if ($db_connected && $pdo) {
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
@@ -743,7 +745,7 @@ if ($db_connected && $pdo) {
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -757,45 +759,45 @@ if ($db_connected && $pdo) {
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
 
                 <!-- Navigation List -->
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda (Active) -->
-                    <a href="beranda.php" class="bg-[#FF9B45] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-all shadow-sm">
-                        <img src="assets/icons/nav_beranda.svg" alt="Beranda" class="w-5 h-5">
+                    <a href="beranda.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
+                        <i class="fas fa-th-large w-5 text-center text-sm"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_produk.svg" alt="Produk" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-box-open w-5 text-center text-sm opacity-90"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pesanan.svg" alt="Pesanan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm opacity-90"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pelanggan.svg" alt="Pelanggan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-users w-5 text-center text-sm opacity-90"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_laporan.svg" alt="Laporan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <img src="assets/icons/nav_pengaturan.svg" alt="Pengaturan" class="w-5 h-5 opacity-90">
+                        <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -803,18 +805,18 @@ if ($db_connected && $pdo) {
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/15 rounded-xl p-2.5 flex items-center justify-between">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-9 h-9 rounded-full bg-[#FF9B45] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                        <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#828282] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
-                        <img src="assets/icons/logout.svg" alt="Logout" class="w-5 h-5">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
+                        <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
             </div>
@@ -829,7 +831,7 @@ if ($db_connected && $pdo) {
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
                     <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <i class="fas fa-bars text-lg text-[#3E2B21]"></i>
                     </button>
 
                     <div>
@@ -849,14 +851,14 @@ if ($db_connected && $pdo) {
                     
                     <!-- Date Button -->
                     <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-[#DDD3C5]">
-                        <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
                         <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
-                            <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
+                            <i class="far fa-bell text-[#3E2B21] text-base"></i>
                             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
                         <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
@@ -886,8 +888,8 @@ if ($db_connected && $pdo) {
 
                     <!-- User Circle Icon with Dropdown -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
-                            <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#3E2B21] border border-white/20 flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
+                            <i class="fas fa-user text-xs text-[#FAF8F5]"></i>
                         </div>
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
@@ -896,17 +898,17 @@ if ($db_connected && $pdo) {
                             </div>
                             <div class="py-1">
                                 <a href="pengaturan.php" class="craft-dropdown-item">
-                                    <span class="opacity-75">⚙️</span>
+                                    <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun & Toko</span>
                                 </a>
                                 <a href="reset-password.php" class="craft-dropdown-item">
-                                    <span class="opacity-75">🔑</span>
+                                    <i class="fas fa-key text-xs text-[#8E7E73]"></i>
                                     <span>Ganti Password</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <span>🚪</span>
+                                    <i class="fas fa-sign-out-alt text-xs text-[#991B1B]"></i>
                                     <span>Keluar (Logout)</span>
                                 </button>
                             </div>
@@ -923,12 +925,12 @@ if ($db_connected && $pdo) {
                     <div id="flashAlert" class="bg-[#27AE60]/10 border border-[#27AE60]/30 rounded-2xl p-4 mb-6 flex items-center justify-between text-sm text-[#1B7A43] shadow-xs animate-in fade-in slide-in-from-top-2">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-[#27AE60]/20 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-[#27AE60]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <i class="fas fa-check-circle text-[#27AE60] text-base"></i>
                             </div>
                             <span class="font-medium"><?= htmlspecialchars($_SESSION['flash_msg']) ?></span>
                         </div>
                         <button onclick="document.getElementById('flashAlert').remove()" class="text-[#1B7A43]/70 hover:text-[#1B7A43] p-1.5 rounded-lg hover:bg-[#27AE60]/10 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                     <?php unset($_SESSION['flash_msg']); ?>
@@ -947,7 +949,7 @@ if ($db_connected && $pdo) {
                         <a href="beranda.php?action=export_rekap" 
                             title="Unduh rekap penjualan harian format CSV/Excel" 
                             class="bg-[#EFE8DE] hover:bg-[#E4DCCE] text-[#251A14] text-xs md:text-sm font-semibold px-3.5 py-2.5 rounded-lg border border-[#DDD3C5] flex items-center gap-2 transition-colors shadow-2xs">
-                            <img src="assets/icons/download.svg" alt="Unduh" class="w-4 h-4">
+                            <i class="fas fa-file-download text-xs text-[#544337]"></i>
                             <span>Unduh Rekap Harian</span>
                         </a>
 
@@ -955,56 +957,56 @@ if ($db_connected && $pdo) {
                         <a href="pesanan.php?tab=kanban" 
                             title="Buka alur produksi dan antrean oven" 
                             class="hidden md:flex bg-[#FFF6ED] hover:bg-[#FFEEDD] text-[#924C00] text-xs md:text-sm font-bold px-3.5 py-2.5 rounded-lg border border-[#F7D4B2] items-center gap-2 transition-colors shadow-2xs">
-                            <svg class="w-4 h-4 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
+                            <i class="fas fa-fire text-xs text-[#D46E15]"></i>
                             <span>Antrean Oven</span>
                         </a>
 
                         <!-- Tambah Pesanan Baru Button -->
-                        <button onclick="openOrderModal()" class="bg-[#FF9B45] hover:bg-[#E88C3D] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
-                            <img src="assets/icons/plus.svg" alt="Tambah" class="w-4 h-4">
+                        <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                            <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan Baru</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- ROW 1: 4 KPI STAT CARDS -->
+                <!-- ROW 1: 4 KPI STAT CARDS (ALL UNIFIED DARK CHOCOLATE / ESPRESSO CARDS) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     
                     <!-- Card 1: Total Pesanan Hari Ini -->
-                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#FF9B45]"></div>
-                        <div class="flex items-start justify-between">
+                    <div class="craft-card-espresso rounded-xl p-5 relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                        <div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
+                        <div class="flex items-start justify-between relative z-10">
                             <div>
-                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Total Pesanan</p>
+                                <p class="text-[#D8C7B8] text-xs font-bold uppercase tracking-wider">Total Pesanan</p>
                                 <p class="text-xs text-[#B5A89E] mt-0.5">Hari Ini</p>
-                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_orders']) ?></p>
+                                <p class="text-[#FAF8F5] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_orders']) ?></p>
                             </div>
-                            <div class="w-11 h-11 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
-                                <img src="assets/icons/orders_clipboard.svg" alt="Pesanan Hari Ini" class="w-5 h-5">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas fa-clipboard-check text-amber-300 text-lg"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
-                            <img src="assets/icons/trend_up.svg" alt="Trend" class="w-3.5 h-3.5">
-                            <span class="text-[#166534] text-xs font-semibold"><?= htmlspecialchars($kpi_data['orders_diff']) ?></span>
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-white/10 relative z-10">
+                            <i class="fas fa-arrow-up text-[#4ADE80] text-xs"></i>
+                            <span class="text-[#86EFAC] text-xs font-medium"><?= htmlspecialchars($kpi_data['orders_diff']) ?></span>
                         </div>
                     </div>
 
-                    <!-- Card 2: Pesanan Pending -->
-                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#E2B93B]"></div>
-                        <div class="flex items-start justify-between">
+                    <!-- Card 2: Pesanan Antrean / Pending -->
+                    <div class="craft-card-espresso rounded-xl p-5 relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                        <div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
+                        <div class="flex items-start justify-between relative z-10">
                             <div>
-                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Pesanan Antrean</p>
+                                <p class="text-[#D8C7B8] text-xs font-bold uppercase tracking-wider">Pesanan Antrean</p>
                                 <p class="text-xs text-[#B5A89E] mt-0.5">Perlu Konfirmasi</p>
-                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['pending_orders']) ?></p>
+                                <p class="text-[#FAF8F5] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['pending_orders']) ?></p>
                             </div>
-                            <div class="w-11 h-11 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center justify-center shrink-0">
-                                <img src="assets/icons/hourglass.svg" alt="Pesanan Pending" class="w-5 h-5">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas fa-hourglass-half text-amber-300 text-lg"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
-                            <img src="assets/icons/warning_exclamation.svg" alt="Perlu Konfirmasi" class="w-3.5 h-3.5">
-                            <span class="text-[#92400E] text-xs font-semibold"><?= htmlspecialchars($kpi_data['pending_note']) ?></span>
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-white/10 relative z-10">
+                            <i class="fas fa-exclamation-circle text-amber-400 text-xs"></i>
+                            <span class="text-amber-200 text-xs font-medium"><?= htmlspecialchars($kpi_data['pending_note']) ?></span>
                         </div>
                     </div>
 
@@ -1017,8 +1019,8 @@ if ($db_connected && $pdo) {
                                 <p class="text-xs text-[#B5A89E] mt-0.5">Bulan Ini (Akumulasi)</p>
                                 <p class="text-[#FAF8F5] text-2xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_revenue']) ?></p>
                             </div>
-                            <div class="w-11 h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
-                                <img src="assets/icons/wallet.svg" alt="Total Pemasukan" class="w-5 h-5 brightness-200">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas fa-wallet text-emerald-300 text-lg"></i>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-white/10 relative z-10">
@@ -1028,21 +1030,21 @@ if ($db_connected && $pdo) {
                     </div>
 
                     <!-- Card 4: Pelanggan Baru -->
-                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#2F80ED]"></div>
-                        <div class="flex items-start justify-between">
+                    <div class="craft-card-espresso rounded-xl p-5 relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                        <div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
+                        <div class="flex items-start justify-between relative z-10">
                             <div>
-                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Pelanggan Baru</p>
+                                <p class="text-[#D8C7B8] text-xs font-bold uppercase tracking-wider">Pelanggan Baru</p>
                                 <p class="text-xs text-[#B5A89E] mt-0.5">Bulan Ini</p>
-                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['new_customers']) ?></p>
+                                <p class="text-[#FAF8F5] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['new_customers']) ?></p>
                             </div>
-                            <div class="w-11 h-11 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] flex items-center justify-center shrink-0">
-                                <img src="assets/icons/users.svg" alt="Pelanggan Baru" class="w-5 h-5">
+                            <div class="w-11 h-11 rounded-xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas fa-user-plus text-sky-300 text-lg"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
-                            <img src="assets/icons/user_plus.svg" alt="User Baru" class="w-3.5 h-3.5">
-                            <span class="text-[#075985] text-xs font-semibold"><?= htmlspecialchars($kpi_data['customers_note']) ?></span>
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-white/10 relative z-10">
+                            <i class="far fa-calendar-check text-sky-400 text-xs"></i>
+                            <span class="text-sky-200 text-xs font-medium"><?= htmlspecialchars($kpi_data['customers_note']) ?></span>
                         </div>
                     </div>
                 </div>
@@ -1083,11 +1085,11 @@ if ($db_connected && $pdo) {
 
                             <!-- Live Search Input -->
                             <div class="relative w-full sm:w-52">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <img src="assets/icons/search.svg" alt="Cari" class="w-4 h-4 opacity-70">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-search text-xs"></i>
                                 </div>
                                 <input type="text" id="orderSearchInput" onkeyup="filterOrdersTable()" placeholder="Cari pesanan..."
-                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#251A14] placeholder-[#8E7E73] focus:border-[#FF9B45] focus:bg-white focus:outline-none transition-all">
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:bg-white focus:outline-none transition-all">
                             </div>
                         </div>
                     </div>
@@ -1125,7 +1127,7 @@ if ($db_connected && $pdo) {
                                         <td class="px-5 py-4 whitespace-nowrap">
                                             <?php if ($order['is_urgent']): ?>
                                                 <div class="flex items-center gap-1.5 text-[#991B1B] font-semibold">
-                                                    <img src="assets/icons/clock.svg" alt="Deadline" class="w-3.5 h-3.5">
+                                                    <i class="far fa-clock text-xs"></i>
                                                     <span><?= htmlspecialchars($order['deadline']) ?></span>
                                                 </div>
                                             <?php else: ?>
@@ -1137,13 +1139,13 @@ if ($db_connected && $pdo) {
                                         <td class="px-5 py-4 whitespace-nowrap">
                                             <?php
                                              $ordStatus = $order['status'] ?? 'pending';
-                                            $statusPill = match($ordStatus) {
-                                                'proses' => ['Sedang Diproses', 'bg-[#FFF8F2] text-[#D97706] border border-[#FF9B45]/30'],
-                                                'kirim' => ['Siap Kirim', 'bg-[#F0F7FF] text-[#2F80ED] border border-[#2F80ED]/30'],
-                                                'selesai' => ['Selesai', 'bg-[#F2FBF6] text-[#1B7A43] border border-[#27AE60]/30'],
-                                                default => ['Pending', 'bg-[#EFE8DE] text-[#5E4D42] border border-[#DDD3C5]']
-                                            };
-                                            ?>
+                                             $statusPill = match($ordStatus) {
+                                                 'proses' => ['Sedang Diproses', 'bg-[#FFF8F2] text-[#D97706] border border-[#FF9B45]/30'],
+                                                 'kirim' => ['Siap Kirim', 'bg-[#F0F7FF] text-[#2F80ED] border border-[#2F80ED]/30'],
+                                                 'selesai' => ['Selesai', 'bg-[#F2FBF6] text-[#1B7A43] border border-[#27AE60]/30'],
+                                                 default => ['Pending', 'bg-[#EFE8DE] text-[#5E4D42] border border-[#DDD3C5]']
+                                             };
+                                             ?>
                                             <span class="<?= $statusPill[1] ?> px-2.5 py-1 rounded-full text-xs font-semibold">
                                                 <?= $statusPill[0] ?>
                                             </span>
@@ -1159,9 +1161,9 @@ if ($db_connected && $pdo) {
                                         <!-- Aksi -->
                                         <td class="px-5 py-4 text-center whitespace-nowrap">
                                             <button onclick="viewOrderDetail('<?= htmlspecialchars($order['id']) ?>', '<?= htmlspecialchars(addslashes($order['customer'])) ?>', '<?= htmlspecialchars(addslashes($order['product'])) ?>', '<?= htmlspecialchars($order['deadline']) ?>', '<?= htmlspecialchars($order['payment_status']) ?>', '<?= htmlspecialchars($order['status'] ?? 'pending') ?>', '<?= htmlspecialchars($order['total'] ?? 'Rp 0') ?>', '<?= htmlspecialchars(addslashes($order['no_wa'] ?? '-')) ?>', '<?= htmlspecialchars(addslashes($order['alamat'] ?? '-')) ?>')"
-                                                class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs inline-flex items-center gap-1 transition-colors group">
+                                                class="text-[#D46E15] hover:text-[#B85207] font-bold text-xs inline-flex items-center gap-1 transition-colors group">
                                                 <span>Lihat Detail</span>
-                                                <img src="assets/icons/chevron_right.svg" alt="Detail" class="w-2 h-3.5 group-hover:translate-x-0.5 transition-transform">
+                                                <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -1175,9 +1177,9 @@ if ($db_connected && $pdo) {
                         <span id="table-footer-text" class="text-[#5E4D42] text-xs md:text-sm font-medium">
                             Menampilkan 1-<?= count($pending_orders) ?> dari <?= count($pending_orders) ?> pesanan pending
                         </span>
-                        <a href="pesanan.php" class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
+                        <a href="pesanan.php" class="text-[#D46E15] hover:text-[#B85207] font-bold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
                             <span>Lihat Semua Pesanan</span>
-                            <img src="assets/icons/arrow_right.svg" alt="Semua Pesanan" class="w-4 h-4">
+                            <i class="fas fa-arrow-right text-xs"></i>
                         </a>
                     </div>
                 </div>
@@ -1192,7 +1194,7 @@ if ($db_connected && $pdo) {
                             <div class="flex items-center justify-between pb-3 border-b border-[#EFE8DE] mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
-                                        <img src="assets/icons/truck.svg" alt="Pengiriman" class="w-5 h-5">
+                                        <i class="fas fa-truck text-[#D46E15] text-base"></i>
                                     </div>
                                     <div>
                                         <h3 class="text-[#251A14] text-base font-bold leading-tight">Pengiriman Hari Ini</h3>
@@ -1232,9 +1234,9 @@ if ($db_connected && $pdo) {
                         <!-- Footer -->
                         <div class="flex items-center justify-between pt-4 mt-4 border-t border-[#EFE8DE]">
                             <span class="text-[#5E4D42] text-xs font-medium">Total 30 box disiapkan hari ini</span>
-                            <a href="pesanan.php?tab=kalender" class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs flex items-center gap-1 transition-colors">
+                            <a href="pesanan.php?tab=kalender" class="text-[#D46E15] hover:text-[#B85207] font-bold text-xs flex items-center gap-1 transition-colors">
                                 <span>Kelola Pengiriman</span>
-                                <img src="assets/icons/chevron_right_orange.svg" alt="Kelola" class="w-2.5 h-3">
+                                <i class="fas fa-chevron-right text-[10px]"></i>
                             </a>
                         </div>
                     </div>
@@ -1246,7 +1248,7 @@ if ($db_connected && $pdo) {
                             <div class="flex items-center justify-between pb-3 border-b border-[#EFE8DE] mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
-                                        <img src="assets/icons/calendar.svg" alt="Kalender" class="w-5 h-5">
+                                        <i class="far fa-calendar-alt text-[#D46E15] text-base"></i>
                                     </div>
                                     <h3 class="text-[#251A14] text-base font-bold">Jadwal Pengiriman</h3>
                                 </div>
@@ -1254,10 +1256,10 @@ if ($db_connected && $pdo) {
                                     <span id="miniCalTitle" class="text-[#251A14] text-sm font-bold"><?= $currentMonthIndo ?></span>
                                     <div class="flex items-center gap-0.5">
                                         <button type="button" onclick="prevMiniMonth()" class="p-1 hover:bg-[#EFE8DE] rounded text-[#5E4D42] transition-colors" title="Bulan Sebelumnya">
-                                            <img src="assets/icons/chevron_left.svg" alt="Prev" class="w-3 h-3">
+                                            <i class="fas fa-chevron-left text-xs text-[#5E4D42]"></i>
                                         </button>
                                         <button type="button" onclick="nextMiniMonth()" class="p-1 hover:bg-[#EFE8DE] rounded text-[#5E4D42] transition-colors" title="Bulan Berikutnya">
-                                            <img src="assets/icons/chevron_right_calendar.svg" alt="Next" class="w-3 h-3">
+                                            <i class="fas fa-chevron-right text-xs text-[#5E4D42]"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -1372,7 +1374,7 @@ if ($db_connected && $pdo) {
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center">
-                                <img src="assets/icons/history.svg" alt="Aktivitas" class="w-4 h-4">
+                                <i class="fas fa-history text-xs text-[#D46E15]"></i>
                             </div>
                             <h3 class="text-[#251A14] text-base font-bold">Aktivitas Operasional Terbaru</h3>
                         </div>
@@ -1424,7 +1426,7 @@ if ($db_connected && $pdo) {
                         Proses
                     </span>
                     <button onclick="closeModal('orderDetailModal')" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#F5F2ED] transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
             </div>
@@ -1439,7 +1441,7 @@ if ($db_connected && $pdo) {
                             <p id="modalCustomer" class="text-sm font-bold text-[#251A14]">-</p>
                         </div>
                         <a id="modalWaLink" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                            <i class="fab fa-whatsapp text-sm text-emerald-600"></i>
                             <span id="modalWa" class="tabular-nums">-</span>
                         </a>
                     </div>
@@ -1459,13 +1461,13 @@ if ($db_connected && $pdo) {
 
                 <!-- Timing & Financials Grid -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-[#FFF8F2] border border-[#FF9B45]/20 rounded-xl p-3">
+                    <div class="bg-[#FFF8F2] border border-[#D46E15]/20 rounded-xl p-3">
                         <p class="text-[10px] text-[#828282] uppercase font-semibold">Batas Waktu (Deadline)</p>
                         <p id="modalDeadline" class="text-xs font-bold text-[#EB5757] mt-1">-</p>
                     </div>
                     <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-xl p-3">
                         <p class="text-[10px] text-[#828282] uppercase font-semibold">Total Tagihan</p>
-                        <p id="modalTotal" class="text-sm font-bold text-[#FF9B45] mt-1">-</p>
+                        <p id="modalTotal" class="text-sm font-bold text-[#D46E15] mt-1">-</p>
                     </div>
                 </div>
 
@@ -1486,18 +1488,18 @@ if ($db_connected && $pdo) {
                 <p class="text-[11px] font-semibold text-[#828282] uppercase tracking-wider">Perbarui Status Operasional:</p>
                 <div class="grid grid-cols-3 gap-2">
                     <button type="button" onclick="submitStatusChange('proses')" 
-                        class="px-2.5 py-2 bg-[#FFF8F2] hover:bg-[#FFEEDD] border border-[#FF9B45]/40 text-[#D97706] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                        <span>🔥</span>
+                        class="px-2.5 py-2 bg-[#FFF8F2] hover:bg-[#FFEEDD] border border-[#D46E15]/40 text-[#D97706] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                        <i class="fas fa-fire mr-1 text-xs"></i>
                         <span>Oven/Proses</span>
                     </button>
                     <button type="button" onclick="submitStatusChange('kirim')" 
                         class="px-2.5 py-2 bg-[#F0F7FF] hover:bg-[#E0EFFF] border border-[#2F80ED]/40 text-[#2F80ED] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                        <span>🚚</span>
+                        <i class="fas fa-truck mr-1 text-xs"></i>
                         <span>Siap Kirim</span>
                     </button>
                     <button type="button" onclick="submitStatusChange('selesai')" 
                         class="px-2.5 py-2 bg-[#F2FBF6] hover:bg-[#E2F7EB] border border-[#27AE60]/40 text-[#1B7A43] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                        <span>✓</span>
+                        <i class="fas fa-check mr-1 text-xs"></i>
                         <span>Selesai</span>
                     </button>
                 </div>
@@ -1528,7 +1530,7 @@ if ($db_connected && $pdo) {
                     <p class="text-[#8E7E73] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
                 <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <i class="fas fa-times text-base"></i>
                 </button>
             </div>
 
@@ -1616,7 +1618,7 @@ if ($db_connected && $pdo) {
                                     </td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" name="items[0][qty]" value="10" min="1" oninput="calculateOrderTotal()" 
-                                            class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
+                                            class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
                                         <span class="item-price-text">Rp 10.000</span>
@@ -1624,8 +1626,8 @@ if ($db_connected && $pdo) {
                                     </td>
                                     <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 100.000</td>
                                     <td class="px-3 py-3 text-center">
-                                        <button type="button" onclick="removeOrderProductRow(this)" class="text-[#828282] hover:text-[#EB5757]" title="Hapus Item">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                                            <i class="far fa-trash-alt text-xs"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -1644,7 +1646,7 @@ if ($db_connected && $pdo) {
                                     </td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" name="items[1][qty]" value="2" min="1" oninput="calculateOrderTotal()" 
-                                            class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
+                                            class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                                     </td>
                                     <td class="px-3.5 py-3 text-[#544337]">
                                         <span class="item-price-text">Rp 22.000</span>
@@ -1652,8 +1654,8 @@ if ($db_connected && $pdo) {
                                     </td>
                                     <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 44.000</td>
                                     <td class="px-3 py-3 text-center">
-                                        <button type="button" onclick="removeOrderProductRow(this)" class="text-[#828282] hover:text-[#EB5757]" title="Hapus Item">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                                            <i class="far fa-trash-alt text-xs"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -1663,8 +1665,9 @@ if ($db_connected && $pdo) {
 
                     <!-- Tambah Produk Button -->
                     <button type="button" onclick="addOrderProductRow()" 
-                        class="w-full py-2.5 border border-dashed border-[#FF9B45] text-[#FF9B45] hover:bg-[#FF9B45]/10 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors mb-3">
-                        <span>+ Tambah Produk</span>
+                        class="w-full py-2.5 border border-dashed border-[#D46E15] text-[#D46E15] hover:bg-[#D46E15]/10 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors mb-3">
+                        <i class="fas fa-plus text-xs"></i>
+                        <span>Tambah Produk</span>
                     </button>
 
                     <!-- Validation Callout Alert (MOQ Warning) -->
@@ -1687,29 +1690,29 @@ if ($db_connected && $pdo) {
                             <div>
                                 <label class="block text-xs font-semibold text-[#333333] mb-1">Tanggal Pengiriman</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#828282]">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                        <i class="far fa-calendar-alt text-xs"></i>
                                     </div>
                                     <input type="date" name="tgl_kirim" value="<?= date('Y-m-d') ?>" 
-                                        class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-9 pr-3.5 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                        class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-9 pr-3.5 py-2 text-xs text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-semibold text-[#333333] mb-1">Waktu / Jam Pengiriman</label>
                                 <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#828282]">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8E7E73]">
+                                        <i class="far fa-clock text-xs"></i>
                                     </div>
                                     <input type="time" name="waktu_kirim" value="14:00" 
-                                        class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-9 pr-3.5 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                        class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-9 pr-3.5 py-2 text-xs text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-semibold text-[#333333] mb-1">Catatan Dapur / Driver</label>
                                 <textarea name="catatan" rows="2" placeholder="Catatan khusus: roti hajatan kardus putih diikat rapi, antar sebelum jam 3 sore..." 
-                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none"></textarea>
+                                    class="w-full bg-white border border-[#E0E0E0] rounded-lg p-3 text-xs text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none"></textarea>
                             </div>
                         </div>
 
@@ -1717,7 +1720,7 @@ if ($db_connected && $pdo) {
                         <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between">
                             <div>
                                 <p class="text-[11px] font-bold text-[#828282] uppercase tracking-wider">TOTAL TAGIHAN</p>
-                                <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
+                                <h3 class="text-2xl font-bold text-[#D46E15] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
                                 
                                 <div class="mt-4">
                                     <label class="block text-xs font-semibold text-[#333333] mb-2">Status Pembayaran</label>
@@ -1741,7 +1744,7 @@ if ($db_connected && $pdo) {
 
                             <div class="mt-4">
                                 <label class="block text-xs font-semibold text-[#333333] mb-1">Metode Pembayaran</label>
-                                <select name="metode_bayar" class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none">
+                                <select name="metode_bayar" class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
                                     <option value="cash">Tunai / Cash saat Kurir Tiba</option>
                                     <option value="transfer">Transfer Bank (BCA / Mandiri)</option>
                                 </select>
@@ -1790,9 +1793,7 @@ if ($db_connected && $pdo) {
         <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
             <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
-                </svg>
+                <i class="fas fa-sign-out-alt text-2xl text-rose-600"></i>
             </div>
 
             <!-- Title -->
@@ -1807,9 +1808,7 @@ if ($db_connected && $pdo) {
             <div class="space-y-2">
                 <a href="logout.php" 
                     class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
-                    </svg>
+                    <i class="fas fa-sign-out-alt text-sm"></i>
                     <span>Ya, Keluar</span>
                 </a>
 
@@ -1821,9 +1820,7 @@ if ($db_connected && $pdo) {
 
             <!-- Encrypted Session Note -->
             <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A89C92]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
+                <i class="fas fa-lock text-xs text-[#A89C92]"></i>
                 <span>Sesi aman terenkripsi Berkat Dinasti</span>
             </div>
         </div>
@@ -1861,7 +1858,7 @@ if ($db_connected && $pdo) {
             buttons.forEach(b => {
                 b.className = 'px-3 py-1.5 rounded-md text-[#544337] hover:text-[#1C1C1C] transition-all status-filter-btn';
             });
-            btn.className = 'px-3 py-1.5 rounded-md bg-[#FF9B45] text-white font-semibold shadow-2xs transition-all status-filter-btn';
+            btn.className = 'px-3 py-1.5 rounded-md bg-[#3E2B21] text-[#FAF8F5] font-semibold shadow-xs transition-all status-filter-btn';
 
             applyOrdersFilter();
         }
@@ -2050,7 +2047,7 @@ if ($db_connected && $pdo) {
                     <input type="hidden" name="items[${rowIndex}][nama]" value="${defaultProd.nama}" class="item-name-input">
                     <input type="hidden" name="items[${rowIndex}][id_varian]" value="${defaultProd.id_varian}" class="item-varian-input">
                     <select onchange="onProductSelectRowChange(this, ${rowIndex})" 
-                        class="w-full bg-white border border-[#E0E0E0] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#FF9B45] focus:outline-none mb-1">
+                        class="w-full bg-white border border-[#E0E0E0] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none mb-1">
                         ${optionsHtml}
                     </select>
                     <p class="text-[10px] text-[#828282] item-moq-label">${defaultProd.min_order > 1 ? 'Min. ' + defaultProd.min_order + ' pcs' : 'Ready Stock'}</p>
@@ -2061,7 +2058,7 @@ if ($db_connected && $pdo) {
                 </td>
                 <td class="px-3.5 py-3">
                     <input type="number" name="items[${rowIndex}][qty]" value="1" min="1" oninput="calculateOrderTotal()" 
-                        class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors">
+                        class="item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                 </td>
                 <td class="px-3.5 py-3 text-[#544337]">
                     <span class="item-price-text">Rp ${new Intl.NumberFormat('id-ID').format(defaultProd.harga)}</span>
@@ -2069,8 +2066,8 @@ if ($db_connected && $pdo) {
                 </td>
                 <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp ${new Intl.NumberFormat('id-ID').format(defaultProd.harga)}</td>
                 <td class="px-3 py-3 text-center">
-                    <button type="button" onclick="removeOrderProductRow(this)" class="text-[#828282] hover:text-[#EB5757]" title="Hapus Item">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                        <i class="far fa-trash-alt text-xs"></i>
                     </button>
                 </td>
             `;
@@ -2153,7 +2150,7 @@ if ($db_connected && $pdo) {
                     });
                     qtyInput.className = 'item-qty-input w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors';
                 } else {
-                    qtyInput.className = 'item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#FF9B45] transition-colors';
+                    qtyInput.className = 'item-qty-input w-16 px-2 py-1 border border-[#E0E0E0] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors';
                 }
             });
 
@@ -2178,13 +2175,13 @@ if ($db_connected && $pdo) {
                 
                 submitBtn.disabled = true;
                 submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
-                lockIcon.textContent = '🔒';
+                lockIcon.innerHTML = '<i class="fas fa-lock text-xs mr-1"></i>';
                 footerWarning.classList.remove('hidden');
             } else {
                 alertBox.classList.add('hidden');
                 submitBtn.disabled = false;
-                submitBtn.className = 'bg-[#FF9B45] hover:bg-[#E88C3D] text-white cursor-pointer text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95';
-                lockIcon.textContent = '✓';
+                submitBtn.className = 'bg-[#D46E15] hover:bg-[#B85207] text-white cursor-pointer text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95';
+                lockIcon.innerHTML = '<i class="fas fa-check text-xs mr-1"></i>';
                 footerWarning.classList.add('hidden');
             }
         }
@@ -2194,9 +2191,9 @@ if ($db_connected && $pdo) {
             document.getElementById('selectedPaymentStatus').value = status;
             const buttons = document.querySelectorAll('.pay-status-btn');
             buttons.forEach(b => {
-                b.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#E0E0E0] text-[#544337] hover:bg-gray-50 transition-colors pay-status-btn';
+                b.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#DDD3C5] text-[#3E2B21] hover:bg-[#F5F1EB] transition-colors pay-status-btn';
             });
-            btn.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#544337] text-white shadow-2xs transition-colors pay-status-btn';
+            btn.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#3E2B21] text-white shadow-2xs transition-colors pay-status-btn';
         }
 
         // Logout Modal Open / Close
@@ -2289,13 +2286,13 @@ if ($db_connected && $pdo) {
 
                 if (isToday) {
                     html += `<div class="flex flex-col items-center justify-center">
-                        <span class="w-6 h-6 rounded-full bg-[#FF9B45] text-white font-bold flex items-center justify-center">${day}</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#924C00] mt-0.5"></span>
+                        <span class="w-6 h-6 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">${day}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                     </div>`;
                 } else if (hasDelivery) {
                     html += `<div class="flex flex-col items-center justify-center">
-                        <span class="text-[#1B1C1B] font-medium">${day}</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                        <span class="text-[#251A14] font-medium">${day}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                     </div>`;
                 } else {
                     html += `<div class="text-[#1B1C1B] font-medium py-1">${day}</div>`;

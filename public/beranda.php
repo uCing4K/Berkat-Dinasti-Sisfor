@@ -718,8 +718,8 @@ if ($db_connected && $pdo) {
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FBF9F7;
-            color: #1C1C1C;
+            background-color: #F5F1EB;
+            color: #251A14;
         }
 
         /* Continuous Vertical Timeline line */
@@ -730,11 +730,11 @@ if ($db_connected && $pdo) {
             top: 14px;
             bottom: 14px;
             width: 2px;
-            background-color: #E4E2E0;
+            background-color: #DDD3C5;
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#FBF9F7] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
+<body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#FF9B45] selection:text-white">
 
     <!-- OVERALL WRAPPER -->
     <div class="flex flex-1 w-full relative">
@@ -824,23 +824,23 @@ if ($db_connected && $pdo) {
         <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
 
             <!-- TOP HEADER (Height 64px) -->
-            <header class="h-16 bg-white border-b border-[#F0ECE9] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
+            <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
                 
                 <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
-                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#544337] hover:bg-[#F5F3F1] rounded-lg">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <span class="text-[#544337]">Beranda</span>
-                            <span class="text-[#DBC2B2]">/</span>
-                            <span class="text-[#924C00] font-medium">Ringkasan</span>
+                            <span class="text-[#8E7E73]">Beranda</span>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <span class="text-[#3E2B21] font-semibold">Ringkasan</span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#1B1C1B] font-bold text-base md:text-lg leading-tight mt-0.5">Operasional</h1>
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5">Operasional Toko</h1>
                     </div>
                 </div>
 
@@ -848,7 +848,7 @@ if ($db_connected && $pdo) {
                 <div class="flex items-center gap-3 md:gap-5">
                     
                     <!-- Date Button -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#F5F3F1] text-[#544337] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#EBE8E5]">
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-[#DDD3C5]">
                         <img src="assets/icons/header_calendar.svg" alt="Kalender" class="w-4 h-4">
                         <span><?= $todayFormatted ?></span>
                     </div>
@@ -937,8 +937,8 @@ if ($db_connected && $pdo) {
                 <!-- TOP BANNER: Greeting & Operational Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div>
-                        <p class="text-[#924C00] text-xs font-semibold tracking-wider uppercase mb-1">RINGKASAN OPERASIONAL TOKO</p>
-                        <h2 class="text-[#1B1C1B] text-2xl font-bold tracking-tight">Beranda Manajemen Pesanan</h2>
+                        <p class="text-[#924C00] text-xs font-bold tracking-wider uppercase mb-1">RINGKASAN OPERASIONAL TOKO</p>
+                        <h2 class="text-[#251A14] text-2xl font-bold tracking-tight">Beranda Manajemen Pesanan</h2>
                     </div>
 
                     <!-- Action Buttons -->
@@ -946,7 +946,7 @@ if ($db_connected && $pdo) {
                         <!-- Unduh Rekap Harian Button (Live CSV Export) -->
                         <a href="beranda.php?action=export_rekap" 
                             title="Unduh rekap penjualan harian format CSV/Excel" 
-                            class="bg-[#F5F3F1] hover:bg-[#ECE9E6] text-[#1B1C1B] text-xs md:text-sm font-medium px-3.5 py-2.5 rounded-lg border border-[#E0E0E0]/70 flex items-center gap-2 transition-colors shadow-2xs">
+                            class="bg-[#EFE8DE] hover:bg-[#E4DCCE] text-[#251A14] text-xs md:text-sm font-semibold px-3.5 py-2.5 rounded-lg border border-[#DDD3C5] flex items-center gap-2 transition-colors shadow-2xs">
                             <img src="assets/icons/download.svg" alt="Unduh" class="w-4 h-4">
                             <span>Unduh Rekap Harian</span>
                         </a>
@@ -954,7 +954,7 @@ if ($db_connected && $pdo) {
                         <!-- Antrean Oven Link to Kanban -->
                         <a href="pesanan.php?tab=kanban" 
                             title="Buka alur produksi dan antrean oven" 
-                            class="hidden md:flex bg-[#FFF8F2] hover:bg-[#FFEEDD] text-[#D97706] text-xs md:text-sm font-semibold px-3.5 py-2.5 rounded-lg border border-[#FF9B45]/30 items-center gap-2 transition-colors shadow-2xs">
+                            class="hidden md:flex bg-[#FFF6ED] hover:bg-[#FFEEDD] text-[#924C00] text-xs md:text-sm font-bold px-3.5 py-2.5 rounded-lg border border-[#F7D4B2] items-center gap-2 transition-colors shadow-2xs">
                             <svg class="w-4 h-4 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
                             <span>Antrean Oven</span>
                         </a>
@@ -968,89 +968,93 @@ if ($db_connected && $pdo) {
                 </div>
 
                 <!-- ROW 1: 4 KPI STAT CARDS -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     
                     <!-- Card 1: Total Pesanan Hari Ini -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#FF9B45]"></div>
                         <div class="flex items-start justify-between">
                             <div>
-                                <p class="text-[#828282] text-sm leading-snug">Total Pesanan<br>Hari Ini</p>
-                                <p class="text-[#1C1C1C] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_orders']) ?></p>
+                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Total Pesanan</p>
+                                <p class="text-xs text-[#B5A89E] mt-0.5">Hari Ini</p>
+                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_orders']) ?></p>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center shrink-0">
-                                <img src="assets/icons/orders_clipboard.svg" alt="Pesanan Hari Ini" class="w-6 h-6">
+                            <div class="w-11 h-11 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
+                                <img src="assets/icons/orders_clipboard.svg" alt="Pesanan Hari Ini" class="w-5 h-5">
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-1">
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
                             <img src="assets/icons/trend_up.svg" alt="Trend" class="w-3.5 h-3.5">
-                            <span class="text-[#27AE60] text-xs font-medium"><?= htmlspecialchars($kpi_data['orders_diff']) ?></span>
+                            <span class="text-[#166534] text-xs font-semibold"><?= htmlspecialchars($kpi_data['orders_diff']) ?></span>
                         </div>
                     </div>
 
                     <!-- Card 2: Pesanan Pending -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#E2B93B]"></div>
                         <div class="flex items-start justify-between">
                             <div>
-                                <p class="text-[#828282] text-sm leading-snug">Pesanan<br>Pending</p>
-                                <p class="text-[#1C1C1C] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['pending_orders']) ?></p>
+                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Pesanan Antrean</p>
+                                <p class="text-xs text-[#B5A89E] mt-0.5">Perlu Konfirmasi</p>
+                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['pending_orders']) ?></p>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#E2B93B]/15 flex items-center justify-center shrink-0">
-                                <img src="assets/icons/hourglass.svg" alt="Pesanan Pending" class="w-6 h-6">
+                            <div class="w-11 h-11 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center justify-center shrink-0">
+                                <img src="assets/icons/hourglass.svg" alt="Pesanan Pending" class="w-5 h-5">
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-1">
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
                             <img src="assets/icons/warning_exclamation.svg" alt="Perlu Konfirmasi" class="w-3.5 h-3.5">
-                            <span class="text-[#E2B93B] text-xs font-medium"><?= htmlspecialchars($kpi_data['pending_note']) ?></span>
+                            <span class="text-[#92400E] text-xs font-semibold"><?= htmlspecialchars($kpi_data['pending_note']) ?></span>
                         </div>
                     </div>
 
-                    <!-- Card 3: Total Pemasukan Bulan Ini -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#27AE60]"></div>
-                        <div class="flex items-start justify-between">
+                    <!-- Card 3: Total Pemasukan Bulan Ini (HERO DARK CHOCOLATE / ESPRESSO CARD) -->
+                    <div class="craft-card-espresso rounded-xl p-5 relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                        <div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 pointer-events-none"></div>
+                        <div class="flex items-start justify-between relative z-10">
                             <div>
-                                <p class="text-[#828282] text-sm leading-snug">Total Pemasukan<br>Bulan Ini</p>
-                                <p class="text-[#1C1C1C] text-2xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_revenue']) ?></p>
+                                <p class="text-[#D8C7B8] text-xs font-bold uppercase tracking-wider">Total Pemasukan</p>
+                                <p class="text-xs text-[#B5A89E] mt-0.5">Bulan Ini (Akumulasi)</p>
+                                <p class="text-[#FAF8F5] text-2xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['total_revenue']) ?></p>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#27AE60]/15 flex items-center justify-center shrink-0">
-                                <img src="assets/icons/wallet.svg" alt="Total Pemasukan" class="w-6 h-6">
+                            <div class="w-11 h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+                                <img src="assets/icons/wallet.svg" alt="Total Pemasukan" class="w-5 h-5 brightness-200">
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-1">
-                            <img src="assets/icons/check_circle.svg" alt="Target" class="w-3.5 h-3.5">
-                            <span class="text-[#27AE60] text-xs font-medium"><?= htmlspecialchars($kpi_data['revenue_target']) ?></span>
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-white/10 relative z-10">
+                            <span class="w-2 h-2 rounded-full bg-[#4ADE80]"></span>
+                            <span class="text-[#86EFAC] text-xs font-medium"><?= htmlspecialchars($kpi_data['revenue_target']) ?></span>
                         </div>
                     </div>
 
                     <!-- Card 4: Pelanggan Baru -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
+                    <div class="bg-[#FDFBF7] rounded-xl p-5 shadow-xs border border-[#E2D7C8] relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#2F80ED]"></div>
                         <div class="flex items-start justify-between">
                             <div>
-                                <p class="text-[#828282] text-sm leading-snug">Pelanggan Baru</p>
-                                <p class="text-[#1C1C1C] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['new_customers']) ?></p>
+                                <p class="text-[#8E7E73] text-xs font-semibold uppercase tracking-wider">Pelanggan Baru</p>
+                                <p class="text-xs text-[#B5A89E] mt-0.5">Bulan Ini</p>
+                                <p class="text-[#251A14] text-3xl font-bold mt-2 tracking-tight"><?= htmlspecialchars($kpi_data['new_customers']) ?></p>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#2F80ED]/15 flex items-center justify-center shrink-0">
-                                <img src="assets/icons/users.svg" alt="Pelanggan Baru" class="w-6 h-6">
+                            <div class="w-11 h-11 rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] flex items-center justify-center shrink-0">
+                                <img src="assets/icons/users.svg" alt="Pelanggan Baru" class="w-5 h-5">
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-3 pt-1">
+                        <div class="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#EFE8DE]">
                             <img src="assets/icons/user_plus.svg" alt="User Baru" class="w-3.5 h-3.5">
-                            <span class="text-[#2F80ED] text-xs font-medium"><?= htmlspecialchars($kpi_data['customers_note']) ?></span>
+                            <span class="text-[#075985] text-xs font-semibold"><?= htmlspecialchars($kpi_data['customers_note']) ?></span>
                         </div>
                     </div>
                 </div>
 
                 <!-- ROW 2: FULL-WIDTH PESANAN PERLU TINDAKAN CARD -->
-                <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] mb-6">
+                <div class="bg-[#FDFBF7] rounded-xl p-6 shadow-xs border border-[#E2D7C8] mb-6">
                     
                     <!-- Table Header Controls -->
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                         <div class="flex items-center gap-3">
-                            <h3 class="text-[#1C1C1C] text-base md:text-lg font-bold">Pesanan Perlu Tindakan</h3>
-                            <span id="pending-count-badge" class="bg-[#E2B93B]/15 text-[#886C12] text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                            <h3 class="text-[#251A14] text-base md:text-lg font-bold">Pesanan Perlu Tindakan</h3>
+                            <span id="pending-count-badge" class="bg-[#EFE8DE] text-[#92400E] border border-[#FDE68A] text-xs font-bold px-2.5 py-0.5 rounded-full">
                                 <?= count($pending_orders) ?> Pesanan
                             </span>
                         </div>
@@ -1058,21 +1062,21 @@ if ($db_connected && $pdo) {
                         <!-- Right Controls: Status Filter Pills + Live Search -->
                         <div class="flex flex-wrap items-center gap-2.5">
                             <!-- Filter Pills -->
-                            <div class="flex items-center bg-[#F5F3F1] p-1 rounded-lg text-xs font-medium">
+                            <div class="flex items-center bg-[#EFE8DE] p-1 rounded-lg text-xs font-medium border border-[#E2D7C8]">
                                 <button type="button" onclick="filterOrdersByStatus('all', this)" id="tabFilterAll" 
-                                    class="px-3 py-1.5 rounded-md bg-[#FF9B45] text-white font-semibold shadow-2xs transition-all status-filter-btn">
+                                    class="px-3 py-1.5 rounded-md bg-[#3E2B21] text-[#FAF8F5] font-semibold shadow-xs transition-all status-filter-btn">
                                     Semua
                                 </button>
                                 <button type="button" onclick="filterOrdersByStatus('proses', this)" 
-                                    class="px-3 py-1.5 rounded-md text-[#544337] hover:text-[#1C1C1C] transition-all status-filter-btn">
+                                    class="px-3 py-1.5 rounded-md text-[#5E4D42] hover:text-[#251A14] transition-all status-filter-btn font-medium">
                                     Perlu Diproses
                                 </button>
                                 <button type="button" onclick="filterOrdersByStatus('kirim', this)" 
-                                    class="px-3 py-1.5 rounded-md text-[#544337] hover:text-[#1C1C1C] transition-all status-filter-btn">
+                                    class="px-3 py-1.5 rounded-md text-[#5E4D42] hover:text-[#251A14] transition-all status-filter-btn font-medium">
                                     Siap Kirim
                                 </button>
                                 <button type="button" onclick="filterOrdersByStatus('selesai', this)" 
-                                    class="px-3 py-1.5 rounded-md text-[#544337] hover:text-[#1C1C1C] transition-all status-filter-btn">
+                                    class="px-3 py-1.5 rounded-md text-[#5E4D42] hover:text-[#251A14] transition-all status-filter-btn font-medium">
                                     Selesai
                                 </button>
                             </div>
@@ -1083,16 +1087,16 @@ if ($db_connected && $pdo) {
                                     <img src="assets/icons/search.svg" alt="Cari" class="w-4 h-4 opacity-70">
                                 </div>
                                 <input type="text" id="orderSearchInput" onkeyup="filterOrdersTable()" placeholder="Cari pesanan..."
-                                    class="w-full bg-[#F5F3F1] border border-transparent rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#1C1C1C] placeholder-[#9CA3AF] focus:border-[#FF9B45] focus:bg-white focus:outline-none transition-all">
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-3 py-1.5 text-xs text-[#251A14] placeholder-[#8E7E73] focus:border-[#FF9B45] focus:bg-white focus:outline-none transition-all">
                             </div>
                         </div>
                     </div>
 
                     <!-- Table Container -->
-                    <div class="overflow-x-auto rounded-lg border border-[#F0ECE9] shadow-sm">
+                    <div class="overflow-x-auto rounded-xl border border-[#E2D7C8] shadow-xs">
                         <table class="w-full text-left border-collapse" id="ordersTable">
                             <thead>
-                                <tr class="bg-[#FF9B45] text-white text-sm font-bold">
+                                <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
                                     <th class="px-5 py-3.5">Nama Pelanggan</th>
                                     <th class="px-5 py-3.5">Produk</th>
                                     <th class="px-5 py-3.5">Deadline</th>
@@ -1101,43 +1105,43 @@ if ($db_connected && $pdo) {
                                     <th class="px-5 py-3.5 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#F0ECE9] text-sm">
+                            <tbody class="divide-y divide-[#EAE1D5] text-sm">
                                 <?php foreach ($pending_orders as $idx => $order): ?>
-                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#FFF8F2]' : 'bg-white' ?> hover:bg-[#FFF3E8] transition-colors order-row" 
+                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#F8F5F0]' : 'bg-[#FDFBF7]' ?> hover:bg-[#F0E9DF] transition-colors order-row" 
                                         data-search="<?= strtolower($order['customer'] . ' ' . $order['product'] . ' ' . $order['payment_status'] . ' ' . $order['id']) ?>"
                                         data-status="<?= htmlspecialchars($order['status'] ?? 'pending') ?>">
                                         <!-- Nama Pelanggan -->
-                                        <td class="px-5 py-4 text-[#1B1C1B] font-medium whitespace-nowrap">
-                                            <div class="font-semibold text-[#1C1C1C]"><?= htmlspecialchars($order['customer']) ?></div>
-                                            <div class="text-[11px] text-[#828282] mt-0.5"><?= htmlspecialchars($order['id']) ?></div>
+                                        <td class="px-5 py-4 text-[#251A14] font-medium whitespace-nowrap">
+                                            <div class="font-bold text-[#251A14]"><?= htmlspecialchars($order['customer']) ?></div>
+                                            <div class="text-[11px] text-[#8E7E73] font-mono mt-0.5"><?= htmlspecialchars($order['id']) ?></div>
                                         </td>
                                         
                                         <!-- Produk -->
-                                        <td class="px-5 py-4 text-[#544337] max-w-xs">
-                                            <p class="truncate" title="<?= htmlspecialchars($order['product']) ?>"><?= htmlspecialchars($order['product']) ?></p>
+                                        <td class="px-5 py-4 text-[#5E4D42] max-w-xs">
+                                            <p class="truncate font-medium" title="<?= htmlspecialchars($order['product']) ?>"><?= htmlspecialchars($order['product']) ?></p>
                                         </td>
 
                                         <!-- Deadline -->
                                         <td class="px-5 py-4 whitespace-nowrap">
                                             <?php if ($order['is_urgent']): ?>
-                                                <div class="flex items-center gap-1.5 text-[#EB5757] font-medium">
+                                                <div class="flex items-center gap-1.5 text-[#991B1B] font-semibold">
                                                     <img src="assets/icons/clock.svg" alt="Deadline" class="w-3.5 h-3.5">
                                                     <span><?= htmlspecialchars($order['deadline']) ?></span>
                                                 </div>
                                             <?php else: ?>
-                                                <span class="text-[#333333]"><?= htmlspecialchars($order['deadline']) ?></span>
+                                                <span class="text-[#5E4D42] font-medium"><?= htmlspecialchars($order['deadline']) ?></span>
                                             <?php endif; ?>
                                         </td>
 
                                         <!-- Status Pesanan Badge -->
                                         <td class="px-5 py-4 whitespace-nowrap">
                                             <?php
-                                            $ordStatus = $order['status'] ?? 'pending';
+                                             $ordStatus = $order['status'] ?? 'pending';
                                             $statusPill = match($ordStatus) {
                                                 'proses' => ['Sedang Diproses', 'bg-[#FFF8F2] text-[#D97706] border border-[#FF9B45]/30'],
                                                 'kirim' => ['Siap Kirim', 'bg-[#F0F7FF] text-[#2F80ED] border border-[#2F80ED]/30'],
                                                 'selesai' => ['Selesai', 'bg-[#F2FBF6] text-[#1B7A43] border border-[#27AE60]/30'],
-                                                default => ['Pending', 'bg-[#F5F3F1] text-[#544337] border border-[#E0E0E0]']
+                                                default => ['Pending', 'bg-[#EFE8DE] text-[#5E4D42] border border-[#DDD3C5]']
                                             };
                                             ?>
                                             <span class="<?= $statusPill[1] ?> px-2.5 py-1 rounded-full text-xs font-semibold">
@@ -1155,7 +1159,7 @@ if ($db_connected && $pdo) {
                                         <!-- Aksi -->
                                         <td class="px-5 py-4 text-center whitespace-nowrap">
                                             <button onclick="viewOrderDetail('<?= htmlspecialchars($order['id']) ?>', '<?= htmlspecialchars(addslashes($order['customer'])) ?>', '<?= htmlspecialchars(addslashes($order['product'])) ?>', '<?= htmlspecialchars($order['deadline']) ?>', '<?= htmlspecialchars($order['payment_status']) ?>', '<?= htmlspecialchars($order['status'] ?? 'pending') ?>', '<?= htmlspecialchars($order['total'] ?? 'Rp 0') ?>', '<?= htmlspecialchars(addslashes($order['no_wa'] ?? '-')) ?>', '<?= htmlspecialchars(addslashes($order['alamat'] ?? '-')) ?>')"
-                                                class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-sm inline-flex items-center gap-1 transition-colors group">
+                                                class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs inline-flex items-center gap-1 transition-colors group">
                                                 <span>Lihat Detail</span>
                                                 <img src="assets/icons/chevron_right.svg" alt="Detail" class="w-2 h-3.5 group-hover:translate-x-0.5 transition-transform">
                                             </button>
@@ -1167,11 +1171,11 @@ if ($db_connected && $pdo) {
                     </div>
 
                     <!-- Table Footer Summary -->
-                    <div class="mt-4 bg-[#F5F3F1] rounded-lg px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <span id="table-footer-text" class="text-[#828282] text-xs md:text-sm">
+                    <div class="mt-4 bg-[#EFE8DE] rounded-xl px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border border-[#E2D7C8]">
+                        <span id="table-footer-text" class="text-[#5E4D42] text-xs md:text-sm font-medium">
                             Menampilkan 1-<?= count($pending_orders) ?> dari <?= count($pending_orders) ?> pesanan pending
                         </span>
-                        <a href="pesanan.php" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
+                        <a href="pesanan.php" class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs md:text-sm flex items-center gap-1.5 transition-colors self-end sm:self-auto">
                             <span>Lihat Semua Pesanan</span>
                             <img src="assets/icons/arrow_right.svg" alt="Semua Pesanan" class="w-4 h-4">
                         </a>
@@ -1182,20 +1186,20 @@ if ($db_connected && $pdo) {
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     
                     <!-- Left Widget: Pengiriman Hari Ini -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] flex flex-col justify-between">
+                    <div class="bg-[#FDFBF7] rounded-xl p-6 shadow-xs border border-[#E2D7C8] flex flex-col justify-between">
                         <div>
                             <!-- Header -->
-                            <div class="flex items-center justify-between pb-3 border-b border-[#F0ECE9] mb-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-[#EFE8DE] mb-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center shrink-0">
+                                    <div class="w-10 h-10 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
                                         <img src="assets/icons/truck.svg" alt="Pengiriman" class="w-5 h-5">
                                     </div>
                                     <div>
-                                        <h3 class="text-[#1C1C1C] text-base font-bold leading-tight">Pengiriman Hari Ini</h3>
-                                        <p class="text-[#828282] text-xs mt-0.5"><?= $todayFormatted ?></p>
+                                        <h3 class="text-[#251A14] text-base font-bold leading-tight">Pengiriman Hari Ini</h3>
+                                        <p class="text-[#8E7E73] text-xs mt-0.5"><?= $todayFormatted ?></p>
                                     </div>
                                 </div>
-                                <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-1 rounded-full">
+                                <span class="bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0] text-xs font-semibold px-2.5 py-1 rounded-full">
                                     2 Batch Siap
                                 </span>
                             </div>
@@ -1203,17 +1207,17 @@ if ($db_connected && $pdo) {
                             <!-- Batches List -->
                             <div class="space-y-3">
                                 <?php foreach ($deliveries as $deliv): ?>
-                                    <div class="bg-[#F5F3F1] rounded-lg p-3.5 flex items-center justify-between border border-[#EBE8E5] hover:border-[#FF9B45]/40 transition-colors">
+                                    <div class="bg-[#F5EFE6] rounded-xl p-3.5 flex items-center justify-between border border-[#E5DDD2] hover:border-[#D46E15]/50 transition-colors">
                                         <div class="flex items-center gap-3">
                                             <!-- Time Badge -->
-                                            <div class="bg-white border border-[#E5E0DC] rounded-lg px-2.5 py-1 text-center min-w-[56px] shadow-2xs">
-                                                <p class="text-[#EB5757] font-bold text-xs leading-tight"><?= htmlspecialchars($deliv['time']) ?></p>
-                                                <p class="text-[#828282] text-[10px] font-medium leading-none mt-0.5">WIB</p>
+                                            <div class="bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-center min-w-[56px] shadow-2xs">
+                                                <p class="text-[#D46E15] font-bold text-xs leading-tight"><?= htmlspecialchars($deliv['time']) ?></p>
+                                                <p class="text-[#8E7E73] text-[10px] font-semibold leading-none mt-0.5">WIB</p>
                                             </div>
                                             <!-- Info -->
                                             <div>
-                                                <h4 class="text-[#1C1C1C] font-semibold text-sm leading-tight"><?= htmlspecialchars($deliv['customer']) ?></h4>
-                                                <p class="text-[#828282] text-xs mt-0.5"><?= htmlspecialchars($deliv['items']) ?></p>
+                                                <h4 class="text-[#251A14] font-bold text-sm leading-tight"><?= htmlspecialchars($deliv['customer']) ?></h4>
+                                                <p class="text-[#5E4D42] text-xs mt-0.5"><?= htmlspecialchars($deliv['items']) ?></p>
                                             </div>
                                         </div>
                                         <!-- Status Badge -->
@@ -1226,9 +1230,9 @@ if ($db_connected && $pdo) {
                         </div>
 
                         <!-- Footer -->
-                        <div class="flex items-center justify-between pt-4 mt-4 border-t border-[#F0ECE9]">
-                            <span class="text-[#828282] text-xs">Total 80 item disiapkan hari ini</span>
-                            <a href="pesanan.php?tab=kalender" class="text-[#FF9B45] hover:text-[#E88C3D] font-semibold text-xs flex items-center gap-1 transition-colors">
+                        <div class="flex items-center justify-between pt-4 mt-4 border-t border-[#EFE8DE]">
+                            <span class="text-[#5E4D42] text-xs font-medium">Total 30 box disiapkan hari ini</span>
+                            <a href="pesanan.php?tab=kalender" class="text-[#D46E15] hover:text-[#BF5E0C] font-bold text-xs flex items-center gap-1 transition-colors">
                                 <span>Kelola Pengiriman</span>
                                 <img src="assets/icons/chevron_right_orange.svg" alt="Kelola" class="w-2.5 h-3">
                             </a>
@@ -1236,23 +1240,23 @@ if ($db_connected && $pdo) {
                     </div>
 
                     <!-- Right Widget: Jadwal Pengiriman (Mini Calendar) -->
-                    <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9] flex flex-col justify-between">
+                    <div class="bg-[#FDFBF7] rounded-xl p-6 shadow-xs border border-[#E2D7C8] flex flex-col justify-between">
                         <div>
                             <!-- Header -->
-                            <div class="flex items-center justify-between pb-3 border-b border-[#F0ECE9] mb-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-[#EFE8DE] mb-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-[#FF9B45]/15 flex items-center justify-center shrink-0">
+                                    <div class="w-10 h-10 rounded-xl bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
                                         <img src="assets/icons/calendar.svg" alt="Kalender" class="w-5 h-5">
                                     </div>
-                                    <h3 class="text-[#1C1C1C] text-base font-bold">Jadwal Pengiriman</h3>
+                                    <h3 class="text-[#251A14] text-base font-bold">Jadwal Pengiriman</h3>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span id="miniCalTitle" class="text-[#1C1C1C] text-sm font-semibold"><?= $currentMonthIndo ?></span>
+                                    <span id="miniCalTitle" class="text-[#251A14] text-sm font-bold"><?= $currentMonthIndo ?></span>
                                     <div class="flex items-center gap-0.5">
-                                        <button type="button" onclick="prevMiniMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Sebelumnya">
+                                        <button type="button" onclick="prevMiniMonth()" class="p-1 hover:bg-[#EFE8DE] rounded text-[#5E4D42] transition-colors" title="Bulan Sebelumnya">
                                             <img src="assets/icons/chevron_left.svg" alt="Prev" class="w-3 h-3">
                                         </button>
-                                        <button type="button" onclick="nextMiniMonth()" class="p-1 hover:bg-[#F5F3F1] rounded text-[#828282] transition-colors" title="Bulan Berikutnya">
+                                        <button type="button" onclick="nextMiniMonth()" class="p-1 hover:bg-[#EFE8DE] rounded text-[#5E4D42] transition-colors" title="Bulan Berikutnya">
                                             <img src="assets/icons/chevron_right_calendar.svg" alt="Next" class="w-3 h-3">
                                         </button>
                                     </div>
@@ -1260,7 +1264,7 @@ if ($db_connected && $pdo) {
                             </div>
 
                             <!-- Calendar Day Names -->
-                            <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#828282] mb-2.5">
+                            <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#7A695D] mb-2.5">
                                 <div>Min</div>
                                 <div>Sen</div>
                                 <div>Sel</div>
@@ -1274,103 +1278,105 @@ if ($db_connected && $pdo) {
                             <div id="miniCalGrid" class="grid grid-cols-7 gap-y-2 text-center text-xs">
                                 
                                 <!-- Week 1 -->
-                                <div class="text-[#828282]/40 py-1">31</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">1</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">2</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">3</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">4</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">5</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">6</div>
+                                <div class="text-[#B5A89E] py-1">31</div>
+                                <div class="text-[#251A14] font-medium py-1">1</div>
+                                <div class="text-[#251A14] font-medium py-1">2</div>
+                                <div class="text-[#251A14] font-medium py-1">3</div>
+                                <div class="text-[#251A14] font-medium py-1">4</div>
+                                <div class="text-[#251A14] font-medium py-1">5</div>
+                                <div class="text-[#251A14] font-medium py-1">6</div>
 
                                 <!-- Week 2 -->
-                                <div class="text-[#1B1C1B] font-medium py-1">7</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">8</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">9</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">10</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">11</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">12</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">13</div>
+                                <div class="text-[#251A14] font-medium py-1">7</div>
+                                <div class="text-[#251A14] font-medium py-1">8</div>
+                                <div class="text-[#251A14] font-medium py-1">9</div>
+                                <div class="text-[#251A14] font-medium py-1">10</div>
+                                <div class="text-[#251A14] font-medium py-1">11</div>
+                                <div class="text-[#251A14] font-medium py-1">12</div>
+                                <div class="text-[#251A14] font-medium py-1">13</div>
 
                                 <!-- Week 3 -->
-                                <div class="text-[#1B1C1B] font-medium py-1">14</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">15</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">16</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">17</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">18</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">19</div>
+                                <div class="text-[#251A14] font-medium py-1">14</div>
+                                <div class="text-[#251A14] font-medium py-1">15</div>
+                                <div class="text-[#251A14] font-medium py-1">16</div>
+                                <div class="text-[#251A14] font-medium py-1">17</div>
+                                <div class="text-[#251A14] font-medium py-1">18</div>
+                                <div class="text-[#251A14] font-medium py-1">19</div>
                                 <!-- 20 has delivery dot -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-[#1B1C1B] font-medium">20</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="text-[#251A14] font-medium">20</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
 
                                 <!-- Week 4 -->
-                                <div class="text-[#1B1C1B] font-medium py-1">21</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">22</div>
-                                <div class="text-[#1B1C1B] font-medium py-1">23</div>
+                                <div class="text-[#251A14] font-medium py-1">21</div>
+                                <div class="text-[#251A14] font-medium py-1">22</div>
+                                <div class="text-[#251A14] font-medium py-1">23</div>
                                 <!-- 24 has delivery dot -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-[#1B1C1B] font-medium">24</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="text-[#251A14] font-medium">24</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
                                 <!-- 25 past highlight -->
                                 <div class="flex items-center justify-center">
-                                    <span class="w-7 h-7 rounded-full bg-[#F5F3F1] text-[#828282] flex items-center justify-center">25</span>
+                                    <span class="w-7 h-7 rounded-full bg-[#EFE8DE] text-[#5E4D42] font-medium flex items-center justify-center">25</span>
                                 </div>
-                                <!-- 26 TODAY ACTIVE HIGHLIGHT (Orange Circle + Dot) -->
+                                <!-- 26 TODAY ACTIVE HIGHLIGHT (Signature Espresso Circle) -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="w-7 h-7 rounded-full bg-[#FF9B45] text-white font-bold flex items-center justify-center shadow-sm">26</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="w-7 h-7 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">26</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
                                 <!-- 27 has delivery dot -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-[#1B1C1B] font-medium">27</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="text-[#251A14] font-medium">27</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
 
                                 <!-- Week 5 -->
                                 <!-- 28 has delivery dot -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-[#1B1C1B] font-medium">28</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="text-[#251A14] font-medium">28</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
-                                <div class="text-[#1B1C1B] font-medium py-1">29</div>
+                                <div class="text-[#251A14] font-medium py-1">29</div>
                                 <!-- 30 has delivery dot -->
                                 <div class="flex flex-col items-center justify-center">
-                                    <span class="text-[#1B1C1B] font-medium">30</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#FF9B45] mt-0.5"></span>
+                                    <span class="text-[#251A14] font-medium">30</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
-                                <div class="text-[#828282]/40 py-1">1</div>
-                                <div class="text-[#828282]/40 py-1">2</div>
-                                <div class="text-[#828282]/40 py-1">3</div>
-                                <div class="text-[#828282]/40 py-1">4</div>
+                                <div class="text-[#B5A89E] py-1">1</div>
+                                <div class="text-[#B5A89E] py-1">2</div>
+                                <div class="text-[#B5A89E] py-1">3</div>
+                                <div class="text-[#B5A89E] py-1">4</div>
                             </div>
                         </div>
 
                         <!-- Footer Legend -->
-                        <div class="flex items-center justify-between pt-3 mt-4 border-t border-[#F0ECE9] text-xs">
+                        <div class="flex items-center justify-between pt-3 mt-4 border-t border-[#EFE8DE] text-xs">
                             <div class="flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-[#FF9B45]"></span>
-                                <span class="text-[#828282]">Ada jadwal kirim</span>
+                                <span class="w-2 h-2 rounded-full bg-[#D46E15]"></span>
+                                <span class="text-[#5E4D42]">Ada jadwal kirim</span>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-[#FF9B45]"></span>
-                                <span class="text-[#1C1C1C] font-medium">Hari ini</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#3E2B21]"></span>
+                                <span class="text-[#251A14] font-semibold">Hari ini</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- ROW 4: AKTIVITAS TERBARU (FULL WIDTH CARD) -->
-                <div class="bg-white rounded-lg p-6 shadow-card border border-[#F0ECE9]">
+                <div class="bg-[#FDFBF7] rounded-xl p-6 shadow-xs border border-[#E2D7C8]">
                     
                     <!-- Header -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-2.5">
-                            <img src="assets/icons/history.svg" alt="Aktivitas" class="w-5 h-5">
-                            <h3 class="text-[#1C1C1C] text-base font-bold">Aktivitas Terbaru</h3>
+                            <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center">
+                                <img src="assets/icons/history.svg" alt="Aktivitas" class="w-4 h-4">
+                            </div>
+                            <h3 class="text-[#251A14] text-base font-bold">Aktivitas Operasional Terbaru</h3>
                         </div>
-                        <span class="bg-[#EAE8E6] text-[#828282] text-xs font-medium px-3 py-1 rounded-full">
+                        <span class="bg-[#EFE8DE] text-[#5E4D42] text-xs font-semibold px-3 py-1 rounded-full border border-[#DDD3C5]">
                             Hari Ini
                         </span>
                     </div>
@@ -1379,16 +1385,16 @@ if ($db_connected && $pdo) {
                     <div class="relative timeline-container pl-6 space-y-6">
                         <?php foreach ($activities as $act): ?>
                             <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 group">
-                                <!-- Dot with white ring -->
-                                <div class="absolute -left-6 top-1 sm:top-1.5 w-3.5 h-3.5 rounded-full <?= $act['dot_color'] ?> ring-4 ring-white shadow-xs"></div>
+                                <!-- Dot with canvas matching ring -->
+                                <div class="absolute -left-6 top-1 sm:top-1.5 w-3.5 h-3.5 rounded-full <?= $act['dot_color'] ?> ring-4 ring-[#FDFBF7] shadow-xs"></div>
                                 
                                 <!-- Activity Content -->
-                                <div class="text-sm pr-4">
+                                <div class="text-sm pr-4 text-[#251A14]">
                                     <?= $act['text'] ?>
                                 </div>
 
                                 <!-- Timestamp -->
-                                <span class="text-[#828282] text-xs whitespace-nowrap shrink-0">
+                                <span class="text-[#8E7E73] text-xs whitespace-nowrap shrink-0 font-medium">
                                     <?= htmlspecialchars($act['time']) ?>
                                 </span>
                             </div>
@@ -1513,15 +1519,15 @@ if ($db_connected && $pdo) {
         <div onclick="closeOrderModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
         <!-- Modal Card Container -->
-        <div class="craft-modal-dialog max-w-[740px] w-full relative z-10 max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="craft-modal-dialog max-w-[740px] w-full relative z-10 max-h-[90vh] flex flex-col overflow-hidden bg-[#FDFBF7] border border-[#E2D7C8]">
             
             <!-- Header (Sticky Top) -->
-            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#ECE5DD] shrink-0">
+            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
                 <div>
                     <h3 class="text-xl font-bold text-[#251A14] tracking-tight">Tambah Pesanan Baru</h3>
                     <p class="text-[#8E7E73] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
-                <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#F5F2ED] transition-colors" title="Tutup">
+                <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -1538,7 +1544,7 @@ if ($db_connected && $pdo) {
                     <!-- Customer Selector Dropdown -->
                     <div class="relative mb-2">
                         <select id="custSelect" name="id_pelanggan" onchange="onSelectCustomerChange(this)"
-                            class="w-full bg-white border border-[#DFD7CE] rounded-lg px-3.5 py-2.5 text-xs text-[#251A14] font-medium craft-select focus:border-[#D46E15] focus:ring-2 focus:ring-[#D46E15]/15 focus:outline-none transition-colors">
+                            class="w-full bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-xs text-[#251A14] font-medium craft-select focus:border-[#D46E15] focus:ring-2 focus:ring-[#D46E15]/15 focus:outline-none transition-colors">
                             <?php foreach ($customers_for_select as $cust): ?>
                                 <option value="<?= $cust['id'] ?>">
                                     <?= htmlspecialchars($cust['nama']) ?> (<?= htmlspecialchars($cust['no_wa']) ?>)
@@ -1559,18 +1565,18 @@ if ($db_connected && $pdo) {
                     </div>
 
                     <!-- Detail Pelanggan Box (3 Columns Preview) -->
-                    <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                            <p id="previewCustName" class="font-bold text-[#1C1C1C] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
+                            <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
                         </div>
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                            <p id="previewCustWa" class="font-bold text-[#1C1C1C] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
+                            <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
                         </div>
                         <div>
-                            <p class="text-[#828282] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                            <p id="previewCustAddress" class="font-medium text-[#1C1C1C] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
+                            <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
                         </div>
                     </div>
                 </div>
@@ -1578,14 +1584,14 @@ if ($db_connected && $pdo) {
                 <!-- SECTION 2: DETAIL PESANAN -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider">Detail Pesanan</h4>
-                        <span class="text-xs text-[#828282]" id="itemCountLabel">2 Item Dipilih</span>
+                        <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Detail Pesanan</h4>
+                        <span class="text-xs text-[#8E7E73] font-medium" id="itemCountLabel">2 Item Dipilih</span>
                     </div>
 
                     <!-- Items Table -->
-                    <div class="border border-[#F0ECE9] rounded-xl overflow-x-auto mb-3">
+                    <div class="border border-[#E2D7C8] rounded-xl overflow-x-auto mb-3 shadow-2xs">
                         <table class="w-full text-left text-xs min-w-[560px]">
-                            <thead class="bg-[#FBF9F7] text-[#828282] font-semibold uppercase border-b border-[#F0ECE9]">
+                            <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase text-xs">
                                 <tr>
                                     <th class="px-3.5 py-2.5">Produk</th>
                                     <th class="px-3.5 py-2.5">Kemasan</th>
@@ -1708,7 +1714,7 @@ if ($db_connected && $pdo) {
                         </div>
 
                         <!-- Right: Total Tagihan & Status Bayar -->
-                        <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-2xl p-4 flex flex-col justify-between">
+                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between">
                             <div>
                                 <p class="text-[11px] font-bold text-[#828282] uppercase tracking-wider">TOTAL TAGIHAN</p>
                                 <h3 class="text-2xl font-bold text-[#FF9B45] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
@@ -1717,15 +1723,15 @@ if ($db_connected && $pdo) {
                                     <label class="block text-xs font-semibold text-[#333333] mb-2">Status Pembayaran</label>
                                     <div class="grid grid-cols-3 gap-2">
                                         <button type="button" onclick="selectPaymentStatus('belum_bayar', this)" id="payBtn1" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#544337] text-white shadow-2xs transition-colors pay-status-btn">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#3E2B21] text-white shadow-2xs transition-colors pay-status-btn">
                                             Belum Bayar
                                         </button>
                                         <button type="button" onclick="selectPaymentStatus('hutang', this)" id="payBtn2" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#E0E0E0] text-[#544337] hover:bg-gray-50 transition-colors pay-status-btn">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#DDD3C5] text-[#3E2B21] hover:bg-[#F5F1EB] transition-colors pay-status-btn">
                                             Hutang
                                         </button>
                                         <button type="button" onclick="selectPaymentStatus('lunas', this)" id="payBtn3" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#E0E0E0] text-[#544337] hover:bg-gray-50 transition-colors pay-status-btn">
+                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white border border-[#DDD3C5] text-[#3E2B21] hover:bg-[#F5F1EB] transition-colors pay-status-btn">
                                             Lunas
                                         </button>
                                     </div>
@@ -1749,7 +1755,7 @@ if ($db_connected && $pdo) {
                 <!-- /Scrollable Body Content -->
 
                 <!-- STICKY MODAL FOOTER -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 sm:px-8 border-t border-[#F0ECE9] bg-[#FAF8F5] shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 sm:px-8 border-t border-[#E2D7C8] bg-[#F5F1EB] shrink-0">
                     <div id="footerMoqWarning" class="flex items-center gap-1.5 text-xs text-[#EB5757] font-medium">
                         <span>ⓘ</span>
                         <span>Penuhi minimum order untuk menyimpan</span>

@@ -9,13 +9,19 @@
    1. GLOBAL RESET & BASE TOKENS
    ========================================================================== */
 :root {
-    /* Refined Artisan Bakery Palette */
-    --brand-canvas: #FAF8F5;
-    --brand-surface: #FFFFFF;
-    --brand-surface-subtle: #F6F3EE;
-    --brand-border: #ECE5DD;
+    /* Refined Artisan Bakery Palette (Anti-Glare Warmth) */
+    --brand-canvas: #F5F1EB;
+    --brand-surface: #FDFBF7;
+    --brand-surface-subtle: #EFE8DE;
+    --brand-border: #E2D7C8;
     --brand-border-focus: #D46E15;
     
+    /* Signature Dark Chocolate (Sidebar Matched) */
+    --brand-chocolate: #3E2B21;
+    --brand-chocolate-light: #543D30;
+    --brand-chocolate-tint: #F3EBE1;
+    --brand-chocolate-border: #D8C7B8;
+
     /* Typography Inks */
     --ink-primary: #251A14;
     --ink-secondary: #5E4D42;
@@ -197,8 +203,8 @@ html {
 
 /* Subtle Card Polish */
 .craft-card {
-    background-color: #FFFFFF;
-    border: 1px solid #ECE5DD;
+    background-color: var(--brand-surface);
+    border: 1px solid var(--brand-border);
     border-radius: 0.875rem; /* 14px */
     box-shadow: 0 1px 3px rgba(37, 26, 20, 0.03), 
                 0 1px 2px rgba(37, 26, 20, 0.02);
@@ -208,6 +214,27 @@ html {
 .craft-card-hover:hover {
     border-color: #DDD4CA;
     box-shadow: 0 4px 12px rgba(37, 26, 20, 0.05);
+}
+
+/* Signature Dark Chocolate Highlight Card */
+.craft-card-espresso {
+    background-color: #3E2B21 !important;
+    color: #FAF8F5 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 24px -4px rgba(62, 43, 33, 0.28),
+                0 2px 6px -1px rgba(62, 43, 33, 0.18) !important;
+}
+
+/* Artisan Table Header Bar */
+.craft-table-header-dark {
+    background-color: #3E2B21 !important;
+    color: #FAF8F5 !important;
+}
+
+.craft-table-header-warm {
+    background-color: #EDE5D8 !important;
+    color: #3E2B21 !important;
+    border-bottom: 2px solid #D8C7B8 !important;
 }
 
 /* ==========================================================================

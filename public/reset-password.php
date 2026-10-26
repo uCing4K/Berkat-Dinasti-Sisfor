@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Reset Password - Berkat Dinasti</title>
     <link rel="icon" type="image/png" href="assets/images/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/modern-craft.css">
     
     <script>
         tailwind.config = {
@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 extend: {
                     colors: {
                         brand: {
-                            brown: '#3E2B21',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            brown: '#2C1D16',
+                            orange: '#D46E15',
+                            orangeHover: '#BC5F10',
                             lightText: '#E8D7CD',
-                            bg: '#F9F7F5'
+                            bg: '#FAF8F5'
                         }
                     },
                     fontFamily: {
@@ -41,15 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <style>
         body {
-            background-color: #F9F7F5;
+            background-color: var(--brand-canvas, #FAF8F5);
         }
-        .focus-brand-orange:focus { 
-            outline: none; 
-            border-color: #FF9B45; 
-            box-shadow: 0 0 0 1px #FF9B45; 
-        }
-        .logo-glow {
-            box-shadow: 0px 8px 10px -6px rgba(0, 0, 0, 0.10), 0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0 0 35px rgba(255, 155, 69, 0.35);
+        .logo-box {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
@@ -69,10 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="absolute w-[320px] h-[320px] -left-[80px] -top-[80px] rounded-full border border-white/5 pointer-events-none"></div>
 
         <div class="flex-1 flex flex-col justify-center items-center w-full z-10">
-            <!-- Kotak Logo -->
-            <div class="relative w-32 h-32 mb-8">
-                <div class="absolute -inset-2 bg-brand-orange/20 blur-md rounded-2xl"></div>
-                <div class="relative w-full h-full bg-white rounded-2xl flex items-center justify-center p-2 logo-glow">
+            <!-- Kotak Logo (Artisan Craft Style) -->
+            <div class="relative w-28 h-28 mb-8">
+                <div class="w-full h-full bg-white rounded-2xl flex items-center justify-center p-3 logo-box">
                     <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                 </div>
             </div>
@@ -107,14 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- RIGHT PANEL: Reset Password Form -->
     <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-brand-bg relative">
 
-        <div class="w-full max-w-[440px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] rounded-2xl p-8 lg:p-12">
+        <div class="w-full max-w-[440px] bg-white craft-card p-8 lg:p-10 shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)]">
             
             <div class="mb-8">
                 <div class="w-10 h-10 bg-brand-orange/10 rounded-xl flex items-center justify-center mb-4">
                     <!-- Key Icon -->
                     <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                 </div>
-                <h2 class="text-[32px] leading-[40px] font-bold text-[#1D1D1D] mb-2">Reset Password</h2>
+                <h2 class="text-[30px] leading-[38px] font-bold text-[#1D1D1D] tracking-tight mb-2">Reset Password</h2>
                 <p class="text-[#828282] text-sm leading-[20px]">Masukkan username Anda dan kami akan mengirim tautan reset ke admin.</p>
             </div>
 
@@ -139,18 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <svg class="w-5 h-5 text-[#828282]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </div>
                         <input type="text" id="username" name="username" placeholder="Masukkan username" required
-                            class="w-full pl-11 pr-4 py-3 bg-white border border-[#E0E0E0] rounded-lg text-[16px] text-[#1D1D1D] placeholder-[#828282] focus-brand-orange transition-colors">
+                            class="craft-input w-full pl-11 pr-4 py-3 text-[15px]">
                     </div>
                 </div>
 
                 <!-- Info Message -->
-                <div class="bg-[#F2F2F2] rounded-lg p-3 flex items-start gap-3">
+                <div class="bg-[#F6F4F0] border border-[#ECE5DD] rounded-xl p-3 flex items-start gap-3">
                     <svg class="w-5 h-5 text-[#828282] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="text-[#828282] text-[12px] leading-[18px]">Tautan reset akan diproses oleh Super Admin dalam 1x24 jam.</p>
+                    <p class="text-[#786E65] text-[12px] leading-[18px]">Tautan reset akan diproses oleh Super Admin dalam 1x24 jam.</p>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full h-12 bg-brand-orange hover:bg-brand-orangeHover text-white font-semibold rounded-lg flex justify-center items-center transition-colors text-[16px]">
+                <button type="submit" class="craft-btn-primary w-full h-12 text-[15px] font-semibold flex justify-center items-center">
                     Kirim Permintaan Reset
                 </button>
 

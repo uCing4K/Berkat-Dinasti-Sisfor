@@ -1,0 +1,335 @@
+/**
+ * BERKAT DINASTI — MODERN CRAFT DESIGN SYSTEM
+ * Crafted with Anti-Slop UI & Human Craftsmanship Standards.
+ * Eliminates generic AI templates: refined typography, tactile interactions,
+ * restrained artisan color palette, and bespoke micro-details.
+ */
+
+/* ==========================================================================
+   1. GLOBAL RESET & BASE TOKENS
+   ========================================================================== */
+:root {
+    /* Refined Artisan Bakery Palette */
+    --brand-canvas: #FAF8F5;
+    --brand-surface: #FFFFFF;
+    --brand-surface-subtle: #F6F3EE;
+    --brand-border: #ECE5DD;
+    --brand-border-focus: #D46E15;
+    
+    /* Typography Inks */
+    --ink-primary: #251A14;
+    --ink-secondary: #5E4D42;
+    --ink-muted: #8E7E73;
+    --ink-faint: #B5A89E;
+
+    /* Primary Accent (Warm Artisan Amber, NOT harsh neon) */
+    --accent-primary: #D46E15;
+    --accent-hover: #BF5E0C;
+    --accent-active: #A64E06;
+    --accent-tint: #FFF6EC;
+    --accent-border: #F7D4B2;
+
+    /* Semantic Status Inks & Surfaces */
+    --status-success-bg: #F0FDF4;
+    --status-success-border: #BBF7D0;
+    --status-success-text: #166534;
+
+    --status-warning-bg: #FFFBEB;
+    --status-warning-border: #FDE68A;
+    --status-warning-text: #92400E;
+
+    --status-danger-bg: #FEF2F2;
+    --status-danger-border: #FECACA;
+    --status-danger-text: #991B1B;
+
+    --status-info-bg: #F0F9FF;
+    --status-info-border: #BAE6FD;
+    --status-info-text: #075985;
+}
+
+/* ==========================================================================
+   2. TEXT SELECTION & SMOOTH SCROLLING
+   ========================================================================== */
+::selection {
+    background-color: #F7D4B2;
+    color: #251A14;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   3. REFINED CROSS-BROWSER SCROLLBARS (Thin, Tactile, Non-Jarring)
+   ========================================================================== */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #D6D0C7 transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D8D2CA;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B8B0A5;
+}
+
+/* Scrollbar on dark surfaces (e.g., Sidebar) */
+#main-sidebar * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+#main-sidebar ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+#main-sidebar ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* ==========================================================================
+   4. DROPDOWN MENUS & POPOVERS (Human Craft & Precision)
+   ========================================================================== */
+.craft-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #ECE5DD !important;
+    border-radius: 0.875rem !important; /* 14px */
+    box-shadow: 0 10px 25px -5px rgba(37, 26, 20, 0.08), 
+                0 4px 10px -2px rgba(37, 26, 20, 0.04), 
+                0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+    transform-origin: top right;
+    animation: dropdownPop 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.craft-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    margin: 0.125rem 0.375rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink-secondary);
+    transition: all 120ms ease-out;
+}
+
+.craft-dropdown-item:hover {
+    background-color: #F8F5F1;
+    color: var(--ink-primary);
+    transform: translateX(1px);
+}
+
+.craft-dropdown-item:active {
+    transform: scale(0.985);
+}
+
+/* ==========================================================================
+   5. TACTILE BUTTONS & CARDS
+   ========================================================================== */
+.craft-btn-primary {
+    background-color: var(--accent-primary) !important;
+    color: #FFFFFF !important;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 
+                0 1px 1px rgba(212, 110, 21, 0.25) !important;
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.craft-btn-primary:hover {
+    background-color: var(--accent-hover) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 
+                0 2px 3px rgba(212, 110, 21, 0.35) !important;
+}
+
+.craft-btn-primary:active {
+    background-color: var(--accent-active) !important;
+    transform: scale(0.98) !important;
+}
+
+.craft-btn-secondary {
+    background-color: #FFFFFF !important;
+    color: var(--ink-primary) !important;
+    border: 1px solid var(--brand-border) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.craft-btn-secondary:hover {
+    background-color: #FAF8F5 !important;
+    border-color: #DDD4CA !important;
+}
+
+.craft-btn-secondary:active {
+    transform: scale(0.98) !important;
+    background-color: #F3EFEA !important;
+}
+
+/* Subtle Card Polish */
+.craft-card {
+    background-color: #FFFFFF;
+    border: 1px solid #ECE5DD;
+    border-radius: 0.875rem; /* 14px */
+    box-shadow: 0 1px 3px rgba(37, 26, 20, 0.03), 
+                0 1px 2px rgba(37, 26, 20, 0.02);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.craft-card-hover:hover {
+    border-color: #DDD4CA;
+    box-shadow: 0 4px 12px rgba(37, 26, 20, 0.05);
+}
+
+/* ==========================================================================
+   6. FORM INPUTS & SELECTS (Eliminating Default Jagged Controls)
+   ========================================================================== */
+.craft-input {
+    background-color: #FFFFFF;
+    border: 1px solid #DFD7CE;
+    border-radius: 0.5rem;
+    color: var(--ink-primary);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding: 0.5625rem 0.875rem;
+    transition: all 140ms ease-out;
+}
+
+.craft-input:hover {
+    border-color: #C8BEB3;
+}
+
+.craft-input:focus {
+    outline: none;
+    border-color: var(--brand-border-focus);
+    box-shadow: 0 0 0 3px rgba(212, 110, 21, 0.12);
+}
+
+/* Clean Custom Select Chevron */
+.craft-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238E7E73'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+    padding-right: 2.25rem;
+}
+
+/* ==========================================================================
+   7. NUMERICAL & DATA READABILITY
+   ========================================================================== */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+.craft-table th {
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    background-color: #FAF8F5;
+    border-bottom: 1px solid var(--brand-border);
+}
+
+.craft-table tr {
+    transition: background-color 100ms ease;
+}
+
+.craft-table tbody tr:hover {
+    background-color: #FCFBF9;
+}
+
+/* ==========================================================================
+   8. STATUS BADGES (Restrained, Muted, Accessible)
+   ========================================================================== */
+.craft-badge-success {
+    background-color: var(--status-success-bg);
+    border: 1px solid var(--status-success-border);
+    color: var(--status-success-text);
+}
+
+.craft-badge-warning {
+    background-color: var(--status-warning-bg);
+    border: 1px solid var(--status-warning-border);
+    color: var(--status-warning-text);
+}
+
+.craft-badge-danger {
+    background-color: var(--status-danger-bg);
+    border: 1px solid var(--status-danger-border);
+    color: var(--status-danger-text);
+}
+
+.craft-badge-info {
+    background-color: var(--status-info-bg);
+    border: 1px solid var(--status-info-border);
+    color: var(--status-info-text);
+}
+
+.craft-badge-neutral {
+    background-color: #F5F2ED;
+    border: 1px solid #E5DFD7;
+    color: var(--ink-secondary);
+}
+
+/* ==========================================================================
+   9. MODALS & OVERLAYS (Soft Backdrop, Crisp Edges)
+   ========================================================================== */
+.craft-modal-overlay {
+    background: rgba(37, 26, 20, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeInOverlay 180ms ease-out;
+}
+
+.craft-modal-dialog {
+    background: #FFFFFF;
+    border: 1px solid var(--brand-border);
+    border-radius: 1rem;
+    box-shadow: 0 20px 45px -10px rgba(37, 26, 20, 0.18), 
+                0 10px 20px -5px rgba(37, 26, 20, 0.1);
+    animation: zoomInDialog 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomInDialog {
+    from { opacity: 0; transform: scale(0.97) translateY(6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}

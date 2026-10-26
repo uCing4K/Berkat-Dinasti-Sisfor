@@ -177,6 +177,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Craft Design System -->
+    <link rel="stylesheet" href="css/modern-craft.css">
 
     <script>
         tailwind.config = {
@@ -220,22 +222,6 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             font-family: 'Inter', sans-serif;
             background-color: #FBF9F7;
             color: #1C1C1C;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F1EFEA;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D8D2CB;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #FF9B45;
         }
 
         /* Thermal Struk Print Style */
@@ -384,15 +370,15 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <div class="relative">
                         <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
                             <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
 
-                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-3 z-50 animate-in fade-in zoom-in-95 duration-150">
-                            <div class="px-4 pb-2 border-b border-[#F0ECE9] flex items-center justify-between">
-                                <span class="font-bold text-sm text-[#1C1C1C]">Notifikasi Sistem</span>
-                                <span class="text-[11px] bg-[#27AE60]/15 text-[#1B7A43] font-semibold px-2 py-0.5 rounded-full">Normal</span>
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
+                            <div class="px-4 py-2 border-b border-[#ECE5DD] flex items-center justify-between">
+                                <span class="font-semibold text-xs text-[#251A14]">Notifikasi Sistem</span>
+                                <span class="text-[10px] craft-badge-success font-medium px-2 py-0.5 rounded-full">Normal</span>
                             </div>
-                            <div class="p-3 text-xs text-[#544337] space-y-1">
+                            <div class="p-3.5 text-xs text-[#5E4D42] space-y-1.5">
                                 <p>• Profil toko tersinkronisasi otomatis.</p>
                                 <p>• Printer thermal siap mencetak (80mm).</p>
                             </div>
@@ -401,21 +387,25 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                     <!-- User Circle Icon with Popover -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna" id="userAvatarBtn">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
                             <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
                         </div>
 
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-[#F0ECE9] py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
-                                <p class="text-xs font-bold text-[#1C1C1C] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#828282]"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?> Toko</p>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
+                            <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
+                                <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?> Toko</p>
                             </div>
-                            <a href="pengaturan.php" class="block px-4 py-2 text-xs text-[#544337] hover:bg-[#F5F3F1] hover:text-[#1C1C1C] transition-colors">
-                                ⚙️ Pengaturan Toko
-                            </a>
-                            <div class="border-t border-[#F0ECE9] mt-1 pt-1">
-                                <button type="button" onclick="openLogoutModal()" class="w-full text-left px-4 py-2 text-xs text-[#EB5757] hover:bg-[#FFF0F0] font-medium transition-colors">
-                                    🚪 Keluar dari Akun
+                            <div class="py-1">
+                                <a href="pengaturan.php" class="craft-dropdown-item">
+                                    <span>⚙️</span>
+                                    <span>Pengaturan Toko</span>
+                                </a>
+                            </div>
+                            <div class="border-t border-[#ECE5DD] pt-1">
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
+                                    <span>🚪</span>
+                                    <span>Keluar dari Akun</span>
                                 </button>
                             </div>
                         </div>
@@ -910,23 +900,31 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
     <!-- MODAL POPOUT: LOGOUT -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <!-- Backdrop with subtle blur -->
+        <div onclick="closeLogoutModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
-            <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        <!-- Modal Card Container -->
+        <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
+            <!-- Top Icon -->
+            <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </div>
 
-            <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
-            <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
+            <!-- Title -->
+            <h3 class="text-base sm:text-lg font-bold text-[#251A14] tracking-tight">Keluar dari Akun?</h3>
+            <p class="text-xs text-[#8E7E73] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
                 Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
             </p>
 
-            <div class="space-y-2.5">
-                <a href="logout.php" class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+                <a href="logout.php" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
+                    </svg>
                     <span>Ya, Keluar</span>
                 </a>
-                <button type="button" onclick="closeLogoutModal()" class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
+                <button type="button" onclick="closeLogoutModal()" class="w-full craft-btn-secondary text-xs sm:text-sm py-2 px-4 rounded-lg">
                     Batal
                 </button>
             </div>

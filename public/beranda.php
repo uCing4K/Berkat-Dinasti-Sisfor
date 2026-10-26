@@ -670,6 +670,8 @@ if ($db_connected && $pdo) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Craft Design System -->
+    <link rel="stylesheet" href="css/modern-craft.css">
 
     <script>
         tailwind.config = {
@@ -713,22 +715,6 @@ if ($db_connected && $pdo) {
             font-family: 'Inter', sans-serif;
             background-color: #FBF9F7;
             color: #1C1C1C;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F1EFEA;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D8D2CB;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #FF9B45;
         }
 
         /* Continuous Vertical Timeline line */
@@ -866,53 +852,55 @@ if ($db_connected && $pdo) {
                     <div class="relative">
                         <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
                             <img src="assets/icons/bell.svg" alt="Notifikasi" class="w-5 h-5">
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9B45] rounded-full ring-2 ring-white"></span>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
-                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-3 z-50 animate-in fade-in zoom-in-95">
-                            <div class="px-4 pb-2 border-b border-[#F0ECE9] flex items-center justify-between">
-                                <h4 class="font-bold text-xs text-[#1C1C1C]">Notifikasi Operasional</h4>
-                                <span class="text-[10px] bg-[#FF9B45]/15 text-[#924C00] font-semibold px-2 py-0.5 rounded-full">3 Baru</span>
+                        <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
+                            <div class="px-4 py-2 border-b border-[#ECE5DD] flex items-center justify-between">
+                                <h4 class="font-semibold text-xs text-[#251A14]">Notifikasi Operasional</h4>
+                                <span class="text-[10px] craft-badge-warning font-medium px-2 py-0.5 rounded-full">3 Baru</span>
                             </div>
-                            <div class="divide-y divide-[#F0ECE9]/70 text-xs">
-                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
-                                    <p class="font-semibold text-[#1C1C1C]">Pesanan #ORD-089 Butuh Konfirmasi</p>
-                                    <p class="text-[11px] text-[#828282] mt-0.5">Ibu Sari • Deadline 15:00 hari ini</p>
+                            <div class="divide-y divide-[#F0ECE9]/70 text-xs py-1">
+                                <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
+                                    <p class="font-medium text-[#251A14]">Pesanan #ORD-089 Butuh Konfirmasi</p>
+                                    <p class="text-[11px] text-[#8E7E73] mt-0.5">Ibu Sari • Deadline 15:00 hari ini</p>
                                 </div>
-                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
-                                    <p class="font-semibold text-[#1C1C1C]">2 Batch Siap Diantar Driver</p>
-                                    <p class="text-[11px] text-[#828282] mt-0.5">Roti Sisir Butter & Sobek siap kirim</p>
+                                <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
+                                    <p class="font-medium text-[#251A14]">2 Batch Siap Diantar Driver</p>
+                                    <p class="text-[11px] text-[#8E7E73] mt-0.5">Roti Sisir Butter & Sobek siap kirim</p>
                                 </div>
-                                <div class="p-3 hover:bg-[#FFF8F2] transition-colors cursor-pointer">
-                                    <p class="font-semibold text-[#1C1C1C]">Stok Kardus Roti Hampir Habis</p>
-                                    <p class="text-[11px] text-[#828282] mt-0.5">Sisa 12 kardus di gudang kemasan</p>
+                                <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
+                                    <p class="font-medium text-[#251A14]">Stok Kardus Roti Hampir Habis</p>
+                                    <p class="text-[11px] text-[#8E7E73] mt-0.5">Sisa 12 kardus di gudang kemasan</p>
                                 </div>
                             </div>
-                            <div class="px-3 pt-2 text-center border-t border-[#F0ECE9]">
-                                <a href="pesanan.php" class="text-[11px] font-semibold text-[#FF9B45] hover:underline">Buka Semua di Pesanan →</a>
+                            <div class="px-3 pt-2 text-center border-t border-[#ECE5DD]">
+                                <a href="pesanan.php" class="text-[11px] font-semibold text-[#D46E15] hover:underline">Buka Semua di Pesanan →</a>
                             </div>
                         </div>
                     </div>
 
                     <!-- User Circle Icon with Dropdown -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-sm cursor-pointer hover:opacity-95 transition-opacity" title="Profil Pengguna">
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#924C00] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
                             <img src="assets/icons/header_user.svg" alt="User" class="w-4 h-4">
                         </div>
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-[#F0ECE9] py-2 z-50 animate-in fade-in zoom-in-95 text-xs">
-                            <div class="px-4 py-2 border-b border-[#F0ECE9]">
-                                <p class="font-bold text-[#1C1C1C]"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Administrator') ?></p>
-                                <p class="text-[#828282] text-[11px]"><?= htmlspecialchars($_SESSION['role'] ?? 'admin') ?> @ Berkat Dinasti</p>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
+                            <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
+                                <p class="font-semibold text-[#251A14]"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Administrator') ?></p>
+                                <p class="text-[#8E7E73] text-[11px] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'admin')) ?> @ Berkat Dinasti</p>
                             </div>
-                            <a href="pengaturan.php" class="flex items-center gap-2 px-4 py-2.5 text-[#544337] hover:bg-[#FFF8F2] transition-colors">
-                                <span>⚙️</span>
-                                <span>Pengaturan Akun & Toko</span>
-                            </a>
-                            <a href="reset-password.php" class="flex items-center gap-2 px-4 py-2.5 text-[#544337] hover:bg-[#FFF8F2] transition-colors">
-                                <span>🔑</span>
-                                <span>Ganti Password</span>
-                            </a>
-                            <div class="border-t border-[#F0ECE9] mt-1 pt-1">
-                                <button onclick="openLogoutModal()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-[#EB5757] hover:bg-red-50 transition-colors">
+                            <div class="py-1">
+                                <a href="pengaturan.php" class="craft-dropdown-item">
+                                    <span class="opacity-75">⚙️</span>
+                                    <span>Pengaturan Akun & Toko</span>
+                                </a>
+                                <a href="reset-password.php" class="craft-dropdown-item">
+                                    <span class="opacity-75">🔑</span>
+                                    <span>Ganti Password</span>
+                                </a>
+                            </div>
+                            <div class="border-t border-[#ECE5DD] pt-1">
+                                <button onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
                                     <span>🚪</span>
                                     <span>Keluar (Logout)</span>
                                 </button>
@@ -1409,22 +1397,22 @@ if ($db_connected && $pdo) {
     <!-- ============================================================== -->
     <!-- MODAL 1: ORDER DETAIL MODAL (INTERAKTIF DENGAN AKSI STATUS)    -->
     <!-- ============================================================== -->
-    <div id="orderDetailModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-xs transition-opacity duration-200">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
+    <div id="orderDetailModal" class="fixed inset-0 craft-modal-overlay z-50 flex items-center justify-center p-4 hidden">
+        <div class="craft-modal-dialog max-w-lg w-full p-6 relative max-h-[92vh] overflow-y-auto">
             <!-- Header -->
-            <div class="flex items-center justify-between pb-4 border-b border-[#F0ECE9]">
+            <div class="flex items-center justify-between pb-4 border-b border-[#ECE5DD]">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 rounded-full bg-[#FF9B45]"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#D46E15]"></span>
                     <div>
-                        <h3 class="font-bold text-lg text-[#1C1C1C]">Detail Pesanan</h3>
-                        <p id="modalOrderId" class="text-xs font-bold text-[#FF9B45] leading-tight">-</p>
+                        <h3 class="font-bold text-lg text-[#251A14]">Detail Pesanan</h3>
+                        <p id="modalOrderId" class="text-xs font-bold text-[#D46E15] tabular-nums leading-tight">-</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span id="modalStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#E2B93B]/20 text-[#886C12]">
+                    <span id="modalStatusBadge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                         Proses
                     </span>
-                    <button onclick="closeModal('orderDetailModal')" class="text-[#828282] hover:text-[#1C1C1C] p-1 rounded-lg">
+                    <button onclick="closeModal('orderDetailModal')" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#F5F2ED] transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -1433,15 +1421,15 @@ if ($db_connected && $pdo) {
             <!-- Content -->
             <div class="py-5 space-y-4">
                 <!-- Customer Info Card -->
-                <div class="bg-[#F9F7F5] border border-[#F0ECE9] rounded-xl p-3.5 space-y-2">
+                <div class="bg-[#FAF8F5] border border-[#ECE5DD] rounded-xl p-3.5 space-y-2">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-[10px] text-[#828282] uppercase font-semibold">Nama Pelanggan</p>
-                            <p id="modalCustomer" class="text-sm font-bold text-[#1C1C1C]">-</p>
+                            <p class="text-[10px] text-[#8E7E73] uppercase font-semibold">Nama Pelanggan</p>
+                            <p id="modalCustomer" class="text-sm font-bold text-[#251A14]">-</p>
                         </div>
-                        <a id="modalWaLink" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#27AE60]/10 hover:bg-[#27AE60]/20 text-[#1B7A43] rounded-lg text-xs font-semibold transition-colors">
+                        <a id="modalWaLink" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                            <span id="modalWa">-</span>
+                            <span id="modalWa" class="tabular-nums">-</span>
                         </a>
                     </div>
                     <div>
@@ -1516,19 +1504,19 @@ if ($db_connected && $pdo) {
     <!-- MODAL 2: TAMBAH PESANAN BARU (LENGKAP SESUAI FIGMA & PESANAN.PHP) -->
     <!-- ============================================================== -->
     <div id="orderModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <!-- Backdrop with blur -->
-        <div onclick="closeOrderModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <!-- Backdrop with subtle blur -->
+        <div onclick="closeOrderModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
         <!-- Modal Card Container -->
-        <div class="bg-white rounded-2xl max-w-[740px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="craft-modal-dialog max-w-[740px] w-full relative z-10 max-h-[90vh] flex flex-col overflow-hidden">
             
             <!-- Header (Sticky Top) -->
-            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#F0ECE9] shrink-0">
+            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#ECE5DD] shrink-0">
                 <div>
-                    <h3 class="text-xl font-bold text-[#1C1C1C]">Tambah Pesanan Baru</h3>
-                    <p class="text-[#828282] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
+                    <h3 class="text-xl font-bold text-[#251A14] tracking-tight">Tambah Pesanan Baru</h3>
+                    <p class="text-[#8E7E73] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
-                <button onclick="closeOrderModal()" class="text-[#828282] hover:text-[#1C1C1C] p-1.5 rounded-lg hover:bg-[#F5F3F1] transition-colors" title="Tutup">
+                <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#F5F2ED] transition-colors" title="Tutup">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -1540,12 +1528,12 @@ if ($db_connected && $pdo) {
                 <!-- Scrollable Body Content -->
                 <div class="p-6 sm:px-8 overflow-y-auto flex-1 space-y-6">
                 <div>
-                    <h4 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-wider mb-2.5">Data Pelanggan</h4>
+                    <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider mb-2.5">Data Pelanggan</h4>
                     
                     <!-- Customer Selector Dropdown -->
                     <div class="relative mb-2">
                         <select id="custSelect" name="id_pelanggan" onchange="onSelectCustomerChange(this)"
-                            class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3.5 py-2.5 text-xs text-[#1C1C1C] font-medium focus:border-[#FF9B45] focus:ring-1 focus:ring-[#FF9B45] focus:outline-none transition-colors">
+                            class="w-full bg-white border border-[#DFD7CE] rounded-lg px-3.5 py-2.5 text-xs text-[#251A14] font-medium craft-select focus:border-[#D46E15] focus:ring-2 focus:ring-[#D46E15]/15 focus:outline-none transition-colors">
                             <?php foreach ($customers_for_select as $cust): ?>
                                 <option value="<?= $cust['id'] ?>">
                                     <?= htmlspecialchars($cust['nama']) ?> (<?= htmlspecialchars($cust['no_wa']) ?>)
@@ -1784,30 +1772,30 @@ if ($db_connected && $pdo) {
     <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
     <!-- ============================================================== -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <!-- Backdrop with blur -->
-        <div onclick="closeLogoutModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <!-- Backdrop with subtle blur -->
+        <div onclick="closeLogoutModal()" class="fixed inset-0 craft-modal-overlay"></div>
 
         <!-- Modal Card Container -->
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 text-center">
+        <div class="craft-modal-dialog max-w-sm w-full p-6 sm:p-7 relative z-10 text-center">
             <!-- Top Icon -->
-            <div class="w-14 h-14 rounded-2xl bg-[#FFF0F0] text-[#EB5757] flex items-center justify-center mx-auto mb-4 shadow-2xs">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            <div class="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
                 </svg>
             </div>
 
             <!-- Title -->
-            <h3 class="text-base sm:text-lg font-bold text-[#1C1C1C]">Keluar dari Akun?</h3>
+            <h3 class="text-base sm:text-lg font-bold text-[#251A14] tracking-tight">Keluar dari Akun?</h3>
             
             <!-- Description -->
-            <p class="text-xs text-[#828282] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
-                Anda akan keluar dari sesi ini. Pastikan semua perubahan sudah tersimpan.
+            <p class="text-xs text-[#8E7E73] mt-1.5 mb-6 leading-relaxed max-w-[280px] mx-auto">
+                Anda akan keluar dari sesi ini. Pastikan semua perubahan transaksi sudah tersimpan.
             </p>
 
             <!-- Action Buttons -->
-            <div class="space-y-2.5">
+            <div class="space-y-2">
                 <a href="logout.php" 
-                    class="w-full bg-[#EB5757] hover:bg-[#D32F2F] text-white text-xs sm:text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors">
+                    class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs sm:text-sm font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-xs transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1"></path>
                     </svg>
@@ -1815,17 +1803,17 @@ if ($db_connected && $pdo) {
                 </a>
 
                 <button type="button" onclick="closeLogoutModal()" 
-                    class="w-full bg-white hover:bg-gray-50 text-[#544337] border border-[#E0E0E0] text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors">
+                    class="w-full craft-btn-secondary text-xs sm:text-sm py-2 px-4 rounded-lg">
                     Batal
                 </button>
             </div>
 
             <!-- Encrypted Session Note -->
-            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A0A0A0]">
+            <div class="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-[#A89C92]">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
-                <span>Sesi login terenkripsi Berkat Dinasti</span>
+                <span>Sesi aman terenkripsi Berkat Dinasti</span>
             </div>
         </div>
     </div>

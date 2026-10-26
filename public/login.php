@@ -126,7 +126,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="icon" type="image/png" href="assets/images/logo.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Craft Design System -->
+    <link rel="stylesheet" href="css/modern-craft.css">
     
     <script>
         tailwind.config = {
@@ -135,10 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     colors: {
                         brand: {
                             brown: '#3E2B21',
-                            orange: '#FF9B45',
-                            orangeHover: '#E88C3D',
+                            orange: '#D46E15',
+                            orangeHover: '#BF5E0C',
                             lightText: '#E8D7CD',
-                            bg: '#F9F7F5'
+                            bg: '#FAF8F5'
                         }
                     },
                     fontFamily: {
@@ -151,16 +154,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <style>
         body {
-            background-color: #F9F7F5;
+            background-color: #FAF8F5;
+            font-family: 'Inter', sans-serif;
         }
-        .focus-brand-orange:focus { 
-            outline: none; 
-            border-color: #FF9B45; 
-            box-shadow: 0 0 0 1px #FF9B45; 
-        }
-        /* Efek Glow pada logo seperti di Figma */
-        .logo-glow {
-            box-shadow: 0px 8px 10px -6px rgba(0, 0, 0, 0.10), 0px 20px 25px -5px rgba(0, 0, 0, 0.10), 0 0 35px rgba(255, 155, 69, 0.35);
+        .logo-box {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -181,15 +179,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="flex-1 flex flex-col justify-center items-center w-full z-10">
             <!-- Kotak Logo -->
-            <div class="relative w-32 h-32 mb-8">
-                <div class="absolute -inset-2 bg-brand-orange/20 blur-md rounded-2xl"></div>
-                <div class="relative w-full h-full bg-white rounded-2xl flex items-center justify-center p-2 logo-glow">
+            <div class="relative w-28 h-28 mb-6">
+                <div class="relative w-full h-full bg-white rounded-2xl flex items-center justify-center p-2.5 logo-box border border-white/20">
                     <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                 </div>
             </div>
 
-            <h1 class="text-white text-[36px] leading-[40px] font-bold text-center mb-3">Berkat Dinasti</h1>
-            <p class="text-brand-lightText text-[16px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
+            <h1 class="text-white text-[32px] leading-[38px] font-bold text-center mb-2 tracking-tight">Berkat Dinasti</h1>
+            <p class="text-brand-lightText text-[15px] text-center mb-6">Kelola Pesanan Rotimu dengan Mudah</p>
             
             <div class="bg-brand-orange/15 border border-brand-orange/20 rounded-full px-4 py-1.5 mb-8">
                 <span class="text-brand-orange text-xs font-semibold tracking-[0.6px] uppercase">Sistem Manajemen Pesanan</span>
@@ -209,28 +206,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Footer Kiri -->
         <div class="w-full pt-6 border-t border-white/10 flex justify-between items-center z-10">
             <div class="flex items-center gap-1.5 text-[#E8D7CD]/70 text-xs">
-                <svg class="w-4 h-4 text-[#27AE60]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Sistem Khusus Internal Admin
             </div>
-            <span class="text-[#828282] text-xs">v1.0.0</span>
+            <span class="text-[#8E7E73] text-xs">v1.0.0</span>
         </div>
     </div>
 
     <!-- RIGHT PANEL: Login Form -->
-    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-brand-bg overflow-y-auto">
-        <div class="w-full max-w-[440px] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] rounded-2xl p-8 lg:p-12 my-auto">
+    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#FAF8F5] overflow-y-auto">
+        <div class="w-full max-w-[420px] bg-white border border-[#ECE5DD] shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)] rounded-2xl p-8 lg:p-10 my-auto">
             
             <div class="mb-6">
-                <div class="w-10 h-10 bg-brand-orange/10 rounded-xl flex items-center justify-center mb-4">
-                    <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <div class="w-10 h-10 bg-[#FFF6EC] border border-[#F7D4B2] rounded-xl flex items-center justify-center mb-4">
+                    <svg class="w-5 h-5 text-[#D46E15]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <h2 class="text-[32px] leading-[40px] font-bold text-[#1D1D1D] mb-2">Selamat Datang</h2>
-                <p class="text-[#828282] text-sm leading-[20px]">Masuk ke akun Anda untuk mengelola pesanan bakery</p>
+                <h2 class="text-[28px] leading-[34px] font-bold text-[#251A14] tracking-tight mb-1.5">Selamat Datang</h2>
+                <p class="text-[#8E7E73] text-sm leading-[20px]">Masuk ke akun Anda untuk mengelola pesanan bakery</p>
             </div>
 
             <!-- Pesan Sukses Logout -->
             <?php if (!empty($success_message)): ?>
-                <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
+                <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
                     <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -242,8 +239,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Pesan Error Login -->
             <?php if (!empty($error_message)): ?>
-                <div class="mb-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
-                    <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
+                    <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                     <div class="text-sm font-medium leading-relaxed">
@@ -253,30 +250,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Form -->
-            <form action="" method="POST" class="space-y-5">
+            <form action="" method="POST" class="space-y-4">
                 <!-- Username -->
                 <div class="space-y-1.5">
-                    <label for="username" class="block text-[14px] font-semibold text-[#333333]">Username</label>
+                    <label for="username" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Username</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-[#828282]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-[#8E7E73]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </div>
                         <input type="text" id="username" name="username" value="<?= htmlspecialchars($username_val) ?>" placeholder="Masukkan username" required autocomplete="username"
-                            class="w-full pl-11 pr-4 py-3 bg-white border border-[#E0E0E0] rounded-lg text-[16px] text-[#1D1D1D] placeholder-[#828282] focus-brand-orange transition-colors">
+                            class="craft-input w-full pl-10 pr-4 py-2.5 text-sm">
                     </div>
                 </div>
 
                 <!-- Password -->
                 <div class="space-y-1.5">
-                    <label for="password" class="block text-[14px] font-semibold text-[#333333]">Password</label>
+                    <label for="password" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Password</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg class="w-5 h-5 text-[#828282]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-[#8E7E73]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                         <input type="password" id="password" name="password" placeholder="Masukkan password" required autocomplete="current-password"
-                            class="w-full pl-11 pr-11 py-3 bg-white border border-[#E0E0E0] rounded-lg text-[16px] text-[#1D1D1D] placeholder-[#828282] focus-brand-orange transition-colors">
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#828282] hover:text-[#333333] transition-colors focus:outline-none" title="Lihat/Sembunyikan password">
-                            <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="craft-input w-full pl-10 pr-10 py-2.5 text-sm">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8E7E73] hover:text-[#251A14] transition-colors focus:outline-none" title="Lihat/Sembunyikan password">
+                            <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
@@ -285,18 +282,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <!-- Remember Me & Lupa Password -->
-                <div class="flex items-center justify-between pt-1 pb-3">
+                <div class="flex items-center justify-between pt-1 pb-2">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#767676] text-brand-orange focus:ring-brand-orange cursor-pointer">
-                        <span class="text-[12px] text-[#4F4F4F]">Ingat saya</span>
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#DFD7CE] text-[#D46E15] focus:ring-[#D46E15]/20 cursor-pointer">
+                        <span class="text-xs text-[#5E4D42]">Ingat saya</span>
                     </label>
-                    <a href="reset-password.php" class="text-[14px] font-medium text-brand-orange hover:text-brand-orangeHover transition-colors">Lupa Password?</a>
+                    <a href="reset-password.php" class="text-xs font-medium text-[#D46E15] hover:text-[#BF5E0C] transition-colors">Lupa Password?</a>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full h-12 bg-brand-orange hover:bg-brand-orangeHover text-white font-semibold rounded-lg flex justify-center items-center transition-colors text-[16px] shadow-sm">
-                    Masuk
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <button type="submit" class="craft-btn-primary w-full h-11 text-sm font-medium rounded-lg flex justify-center items-center gap-2">
+                    <span>Masuk</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </form>
 

@@ -620,8 +620,8 @@ $varian_kemasan = count(array_unique(array_column($products, 'packaging_type')))
 
 // Dynamic Indonesian date helper
 $hariArr = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
-$bulanArr = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-$todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)date('n')] . ' ' . date('Y');
+$bulanArr = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'];
+$todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)date('n')] . ' ' . date('Y');
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -885,38 +885,38 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                         <p class="text-[#8E7E73] text-sm mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, roti manis, varian kemasan, dan batas minimal pemesanan produksi.</p>
                     </div>
 
-                    <!-- 3 KPI Cards Cluster (Dark Chocolate Espresso - Consistent with Beranda) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 shrink-0">
+                    <!-- 3 KPI Cards Cluster (Dark Chocolate Espresso - Identical Size with Pesanan) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
                         <!-- Card 1: Total Produk -->
-                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div>
-                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">TOTAL PRODUK</p>
-                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $total_katalog ?> Katalog</p>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">TOTAL PRODUK</span>
+                                <span class="font-bold text-base text-[#FAF8F5]"><?= $total_katalog ?> Katalog</span>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0 ml-3">
-                                <i class="fas fa-boxes text-sm"></i>
+                            <div class="w-8 h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
+                                <i class="fas fa-boxes text-xs"></i>
                             </div>
                         </div>
 
                         <!-- Card 2: Produk Aktif -->
-                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div>
-                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">PRODUK AKTIF</p>
-                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $produk_aktif ?> Siap Pesan</p>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">PRODUK AKTIF</span>
+                                <span class="font-bold text-base text-[#FAF8F5]"><?= $produk_aktif ?> Siap Pesan</span>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0 ml-3">
-                                <i class="fas fa-check-circle text-sm"></i>
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+                                <i class="fas fa-check-circle text-xs"></i>
                             </div>
                         </div>
 
                         <!-- Card 3: Varian Kemasan -->
-                        <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div>
-                                <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">VARIAN KEMASAN</p>
-                                <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $varian_kemasan ?> Tipe Box/Pcs</p>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
+                            <div class="pr-2">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">VARIAN KEMASAN</span>
+                                <span class="font-bold text-base text-[#FAF8F5]"><?= $varian_kemasan ?> Tipe Box/Pcs</span>
                             </div>
-                            <div class="w-9 h-9 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0 ml-3">
-                                <i class="fas fa-box text-sm"></i>
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                                <i class="fas fa-box text-xs"></i>
                             </div>
                         </div>
                     </div>

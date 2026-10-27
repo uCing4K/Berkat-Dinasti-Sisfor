@@ -87,29 +87,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $toast_message = "Catatan dapur baru berhasil ditambahkan!";
         }
     } elseif ($action === 'add_order') {
-        $custName = trim($_POST['customer_name'] ?? 'Pelanggan');
+        $custName = trim($_POST['customer_name'] ?? '');
+        $custWa = '0812-3456-7890';
+        $custAddress = trim($_POST['destination'] ?? 'Ambil di Toko');
+
+        if (!empty($_POST['nama_pelanggan_baru'])) {
+            $custName = trim($_POST['nama_pelanggan_baru']);
+            $custWa = trim($_POST['no_wa_baru'] ?? '0812-3456-7890');
+            $custAddress = trim($_POST['alamat_baru'] ?? $custAddress);
+        }
+        if (!$custName) $custName = 'Pelanggan';
+
         $itemsDesc = trim($_POST['items_desc'] ?? 'Roti Hajatan (10 box), Bolu Pisang (2 mika)');
+        $tglKirim = !empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d');
+        $waktuKirim = !empty($_POST['delivery_time']) ? $_POST['delivery_time'] : date('H:i');
+        $payStatus = $_POST['payment_status'] ?? 'Belum Bayar';
+        $bayarClass = ($payStatus === 'Lunas') ? 'bg-[#27AE60]/15 text-[#1B7A43]' : (($payStatus === 'Hutang') ? 'bg-[#E2B93B]/20 text-[#886C12]' : 'bg-[#828282]/15 text-[#544337]');
+
         $newId = 'ORD-' . date('ymd') . '-' . rand(10, 99);
         $newOrder = [
             'id' => $newId,
             'customer' => $custName,
+            'phone' => $custWa,
             'items' => $itemsDesc,
-            'destination' => trim($_POST['destination'] ?? 'Ambil di Toko'),
-            'time' => 'Hari Ini, ' . date('H:i'),
-            'date' => date('Y-m-d'),
-            'status' => 'menunggu',
+            'destination' => $custAddress,
+            'time' => 'Pukul ' . $waktuKirim,
+            'date' => $tglKirim,
+            'default_status' => 'menunggu',
             'is_urgent' => false,
-            'status_bayar' => $_POST['payment_status'] ?? 'Belum Bayar',
-            'bayar_class' => 'bg-[#828282]/15 text-[#544337]',
-            'courier_info' => 'Kurir Toko',
+            'status_bayar' => $payStatus,
+            'bayar_class' => $bayarClass,
+            'courier_info' => 'Kurir Toko (Siap Antar ' . $waktuKirim . ')',
             'total' => intval($_POST['grand_total'] ?? 144000)
         ];
         if (!isset($_SESSION['custom_orders'])) {
             $_SESSION['custom_orders'] = [];
         }
         $_SESSION['custom_orders'][] = $newOrder;
-        $toast_message = "Pesanan baru {$newId} berhasil dibuat dan masuk antrean!";
+        $toast_message = "Pesanan baru {$newId} untuk {$custName} berhasil dibuat dan masuk antrean!";
     }
+}
+
+// Master Pelanggan untuk Select & Autocomplete Pesanan Baru
+$customers_for_select = [
+    ['id' => 1, 'nama' => 'Ibu Sari Dewi', 'no_wa' => '0812-3456-7890', 'alamat' => 'Komplek Melati No. 4, Blok B'],
+    ['id' => 2, 'nama' => 'Pak Budi Santoso', 'no_wa' => '0823-4567-8901', 'alamat' => 'Jl. Kenanga No. 10, Blok C'],
+    ['id' => 3, 'nama' => 'Toko Maju Jaya', 'no_wa' => '0834-5678-9012', 'alamat' => 'Jl. Raya Industri No. 20, Ruko Sentra'],
+    ['id' => 4, 'nama' => 'Warung Pak Haji', 'no_wa' => '0856-7890-1234', 'alamat' => 'Jl. Pesantren No. 3'],
+    ['id' => 5, 'nama' => 'Ibu Ratna Sari', 'no_wa' => '0812-9988-7766', 'alamat' => 'Jl. Pandanwangi No. 12']
+];
+if ($db_connected && $pdo) {
+    try {
+        $stmtC = $pdo->query("SELECT id_pelanggan as id, nama_pelanggan as nama, no_telepon as no_wa, alamat FROM pelanggan ORDER BY nama_pelanggan ASC");
+        $dbCusts = $stmtC->fetchAll();
+        if (!empty($dbCusts)) {
+            $customers_for_select = $dbCusts;
+        }
+    } catch (Exception $e) {}
 }
 
 // Data Pesanan Kanban & Kalender
@@ -342,8 +376,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
-                <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+                <!-- Logo & Brand Header (Height 64px - Aligned with Topbar) -->
+                <div class="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
                     <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
@@ -637,7 +671,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <!-- Tombol Tambah Pesanan -->
                             <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                                 <i class="fas fa-plus text-xs"></i>
-                                <span>+ Tambah Pesanan</span>
+                                <span>Tambah Pesanan</span>
                             </button>
                         </div>
                     </div>
@@ -696,7 +730,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                             <button onclick="openOrderModal()" class="w-full py-2.5 mt-4 border border-dashed border-[#DDD3C5] hover:border-[#D46E15] text-[#8E7E73] hover:text-[#D46E15] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
                                 <i class="fas fa-plus text-xs"></i>
-                                <span>+ Tambah Kartu</span>
+                                <span>Tambah Kartu</span>
                             </button>
                         </div>
 
@@ -864,7 +898,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <button onclick="openNoteModal()" 
                                 class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-button-orange transition-colors self-start sm:self-auto">
                                 <i class="fas fa-plus text-xs"></i>
-                                <span>+ Tambah Catatan</span>
+                                <span>Tambah Catatan</span>
                             </button>
                         </div>
 
@@ -927,7 +961,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <!-- Button Tambah Pesanan -->
                         <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-plus text-xs"></i>
-                            <span>+ Tambah Pesanan</span>
+                            <span>Tambah Pesanan</span>
                         </button>
                     </div>
 
@@ -1081,19 +1115,20 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     </div>
 
     <!-- ============================================================== -->
-    <!-- MODAL POPOUT: TAMBAH PESANAN BARU (STICKY HEADER & FOOTER)     -->
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: TAMBAH PESANAN BARU (COMPACT & STICKY FOOTER)   -->
     <!-- ============================================================== -->
     <div id="orderModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <!-- Backdrop with blur -->
         <div onclick="closeOrderModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
 
-        <!-- Modal Card Container (Structured Header, Scroll Body, Sticky Footer) -->
-        <div class="bg-[#FDFBF7] rounded-2xl max-w-[720px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden border border-[#E2D7C8]">
+        <!-- Modal Card Container -->
+        <div class="bg-[#FDFBF7] rounded-2xl max-w-[740px] w-full shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh] overflow-hidden border border-[#E2D7C8]">
             
-            <!-- Sticky Header -->
+            <!-- Sticky Header (Compact) -->
             <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between shrink-0 bg-[#FDFBF7]">
                 <div>
-                    <h3 class="text-lg font-bold text-[#251A14]">Tambah Pesanan Baru</h3>
+                    <h3 class="text-lg font-bold text-[#251A14] tracking-tight">Tambah Pesanan Baru</h3>
                     <p class="text-[#8E7E73] text-xs mt-0.5">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
                 <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup" aria-label="Tutup Modal">
@@ -1101,169 +1136,215 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </button>
             </div>
 
-            <!-- Scrollable Body -->
-            <form id="orderForm" method="POST" action="pesanan.php" onsubmit="handleSaveOrder(event)" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Form with flex structure -->
+            <form id="orderForm" method="POST" action="pesanan.php" onsubmit="handleSaveOrder(event)" class="flex flex-col flex-1 overflow-hidden">
                 <input type="hidden" name="action" value="add_order">
                 <input type="hidden" name="grand_total" id="hiddenGrandTotal" value="144000">
                 <input type="hidden" name="items_desc" id="hiddenItemsDesc" value="Roti Hajatan Putih (10 box), Bolu Pisang Mika (2 mika)">
                 <input type="hidden" name="payment_status" id="selectedPaymentStatus" value="Belum Bayar">
 
-                <!-- SECTION 1: DATA PELANGGAN -->
-                <div>
-                    <label for="custSearchInput" class="text-xs font-bold text-[#251A14] uppercase tracking-wider block mb-2">Data Pelanggan</label>
-                    
-                    <!-- Search Input Pelanggan -->
-                    <div class="relative mb-2">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
-                            <i class="fas fa-search text-xs"></i>
+                <!-- Scrollable Body Content -->
+                <div class="px-6 py-4 overflow-y-auto flex-1 space-y-4">
+
+                    <!-- SECTION 1: DATA PELANGGAN -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Data Pelanggan</label>
+                            <button type="button" onclick="toggleNewCustomerForm()" id="btnToggleNewCust" 
+                                class="text-xs font-semibold text-[#D46E15] hover:text-[#B85207] flex items-center gap-1.5 transition-colors">
+                                <i class="fas fa-user-plus text-xs"></i>
+                                <span id="labelToggleNewCust">+ Tambah Pelanggan Baru</span>
+                            </button>
                         </div>
-                        <input type="text" id="custSearchInput" name="customer_name" value="Ibu Sari" 
-                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-9 pr-4 py-2 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
-                    </div>
-
-                    <!-- Detail Pelanggan Box (3 Columns) -->
-                    <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                            <p class="font-bold text-[#251A14] mt-0.5" id="previewCustName">Ibu Sari</p>
-                        </div>
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                            <p class="font-bold text-[#251A14] mt-0.5">0812-3456-7890</p>
-                        </div>
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                            <p class="font-medium text-[#251A14] mt-0.5">Komplek Melati No. 4, Blok B</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECTION 2: DETAIL PESANAN -->
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Detail Produk & Minimal Order</h4>
-                        <span class="text-xs text-[#8E7E73]" id="itemCountLabel">2 Item Dipilih</span>
-                    </div>
-
-                    <!-- Items Table -->
-                    <div class="border border-[#E2D7C8] rounded-xl overflow-hidden mb-3">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase">
-                                <tr>
-                                    <th class="px-3.5 py-2.5">Produk</th>
-                                    <th class="px-3.5 py-2.5">Kemasan</th>
-                                    <th class="px-3.5 py-2.5 w-24">Jumlah</th>
-                                    <th class="px-3.5 py-2.5">Harga Satuan</th>
-                                    <th class="px-3.5 py-2.5">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#EAE1D5] bg-[#FDFBF7]">
-                                <!-- Row 1: Roti Hajatan (Pricelist 10k) -->
-                                <tr id="orderRow1" class="hover:bg-[#F0E9DF] transition-colors">
-                                    <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#251A14]">Roti Hajatan (9 Pilihan Topping)</p>
-                                        <p class="text-[10px] text-[#27AE60] font-semibold">Min. 1 box</p>
-                                    </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Kardus Putih (10k)</td>
-                                    <td class="px-3.5 py-3">
-                                        <input type="number" id="qtyItem1" name="qty_item_1" value="10" min="0" onchange="calculateOrderTotal()" 
-                                            class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#27AE60] text-[#251A14] font-bold rounded text-center focus:outline-none transition-colors">
-                                    </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Rp 10.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal1">Rp 100.000</td>
-                                </tr>
-
-                                <!-- Row 2: Bolu Pisang Premium (Pricelist 22k) -->
-                                <tr id="orderRow2" class="hover:bg-[#F0E9DF] transition-colors">
-                                    <td class="px-3.5 py-3">
-                                        <p class="font-bold text-[#251A14]">Bolu Pisang Premium</p>
-                                        <p class="text-[10px] text-[#8E7E73]">Ready Fresh</p>
-                                    </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Mika (22k)</td>
-                                    <td class="px-3.5 py-3">
-                                        <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="0" onchange="calculateOrderTotal()" 
-                                            class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#251A14] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
-                                    </td>
-                                    <td class="px-3.5 py-3 text-[#544337]">Rp 22.000</td>
-                                    <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal2">Rp 44.000</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Validation Callout Alert (MOQ Warning) -->
-                    <div id="moqAlertBox" class="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3 flex items-start gap-2.5 hidden">
-                        <i class="fas fa-lock text-rose-600 mt-0.5 shrink-0"></i>
-                        <p class="text-xs text-rose-800 leading-relaxed">
-                            <strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- SECTION 3: PENGIRIMAN & PEMBAYARAN -->
-                <div>
-                    <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider mb-3">Pengiriman & Pembayaran</h4>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         
-                        <!-- Left: Tanggal & Waktu & Catatan -->
-                        <div class="space-y-3.5">
-                            <div>
-                                <label for="deliveryDateInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Tanggal Pengiriman</label>
-                                <input type="date" id="deliveryDateInput" name="delivery_date" value="<?= date('Y-m-d') ?>" 
-                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                        <!-- Search Bar with Live Autocomplete -->
+                        <div id="custSearchWrapper" class="relative mb-2.5">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-search text-xs"></i>
+                                </div>
+                                <input type="text" id="custSearchInput" name="customer_name" placeholder="Ketik nama atau No. WhatsApp pelanggan..." autocomplete="off"
+                                    oninput="handleCustomerSearch(this.value)" onfocus="handleCustomerSearchFocus()"
+                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?>"
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-9 py-2 text-xs text-[#251A14] font-medium placeholder-[#8E7E73] focus:border-[#D46E15] focus:outline-none transition-colors">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8E7E73] pointer-events-none">
+                                    <i class="fas fa-chevron-down text-[10px]"></i>
+                                </div>
                             </div>
-
-                            <div>
-                                <label for="deliveryDestinationInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Alamat Tujuan Pengiriman</label>
-                                <input type="text" id="deliveryDestinationInput" name="destination" value="Dikirim ke Komplek Melati No. 4" 
-                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                            
+                            <!-- Floating Dropdown Matches -->
+                            <div id="custSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl shadow-xl max-h-48 overflow-y-auto z-40 divide-y divide-[#EFE8DE]">
+                                <!-- Populated dynamically by JS -->
                             </div>
-
-                            <div>
-                                <label for="orderNotesTextarea" class="block text-xs font-semibold text-[#3E2B21] mb-1">Catatan Dapur / Driver</label>
-                                <textarea id="orderNotesTextarea" name="notes" rows="2" 
-                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg p-3 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">Roti hajatan kardus putih diikat rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
-                            </div>
+                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="<?= $customers_for_select[0]['id'] ?? 1 ?>">
                         </div>
 
-                        <!-- Right: Total Tagihan & Status Bayar -->
-                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between">
+                        <!-- New Customer Custom Inputs (Toggleable) -->
+                        <div id="newCustomerFields" class="hidden bg-[#FFF8F2] border border-[#D46E15]/30 rounded-xl p-3.5 space-y-2.5 mb-2.5">
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs font-bold text-[#924C00]">Form Input Pelanggan Baru</p>
+                                <button type="button" onclick="cancelNewCustomerForm()" class="text-[11px] text-[#8E7E73] hover:text-[#D46E15] font-medium">Batal / Gunakan Data Yang Ada</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <input type="text" id="inputNamaBaru" name="nama_pelanggan_baru" placeholder="Nama Lengkap Pelanggan *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                                <input type="text" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                            </div>
+                            <input type="text" id="inputAlamatBaru" name="alamat_baru" placeholder="Alamat Pengiriman Lengkap *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                        </div>
+
+                        <!-- Detail Pelanggan Box (3 Columns Preview) -->
+                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                             <div>
-                                <p class="text-[11px] font-bold text-[#8E7E73] uppercase tracking-wider">TOTAL TAGIHAN</p>
-                                <h3 class="text-2xl font-bold text-[#D46E15] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
-                                
-                                <div class="mt-4">
-                                    <label class="block text-xs font-semibold text-[#3E2B21] mb-2">Status Pembayaran</label>
-                                    <div class="grid grid-cols-3 gap-2">
-                                        <button type="button" onclick="selectPaymentStatus('Belum Bayar', this)" id="payBtn1" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#3E2B21] text-[#FAF8F5] shadow-2xs transition-colors">
-                                            Belum Bayar
-                                        </button>
-                                        <button type="button" onclick="selectPaymentStatus('Hutang', this)" id="payBtn2" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
-                                            Hutang
-                                        </button>
-                                        <button type="button" onclick="selectPaymentStatus('Lunas', this)" id="payBtn3" 
-                                            class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
-                                            Lunas
-                                        </button>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
+                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
+                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
+                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: DETAIL PESANAN -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Detail Produk & Minimal Order</h4>
+                            <span class="text-xs text-[#8E7E73]" id="itemCountLabel">2 Item Dipilih</span>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="border border-[#E2D7C8] rounded-xl overflow-hidden mb-3">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase">
+                                    <tr>
+                                        <th class="px-3.5 py-2.5">Produk</th>
+                                        <th class="px-3.5 py-2.5">Kemasan</th>
+                                        <th class="px-3.5 py-2.5 w-24">Jumlah</th>
+                                        <th class="px-3.5 py-2.5">Harga Satuan</th>
+                                        <th class="px-3.5 py-2.5">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#EAE1D5] bg-[#FDFBF7]">
+                                    <!-- Row 1: Roti Hajatan (Pricelist 10k) -->
+                                    <tr id="orderRow1" class="hover:bg-[#F0E9DF] transition-colors">
+                                        <td class="px-3.5 py-3">
+                                            <p class="font-bold text-[#251A14]">Roti Hajatan (9 Pilihan Topping)</p>
+                                            <p class="text-[10px] text-[#27AE60] font-semibold">Min. 1 box</p>
+                                        </td>
+                                        <td class="px-3.5 py-3 text-[#544337]">Kardus Putih (10k)</td>
+                                        <td class="px-3.5 py-3">
+                                            <input type="number" id="qtyItem1" name="qty_item_1" value="10" min="0" onchange="calculateOrderTotal()" 
+                                                class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#27AE60] text-[#251A14] font-bold rounded text-center focus:outline-none transition-colors">
+                                        </td>
+                                        <td class="px-3.5 py-3 text-[#544337]">Rp 10.000</td>
+                                        <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal1">Rp 100.000</td>
+                                    </tr>
+
+                                    <!-- Row 2: Bolu Pisang Premium (Pricelist 22k) -->
+                                    <tr id="orderRow2" class="hover:bg-[#F0E9DF] transition-colors">
+                                        <td class="px-3.5 py-3">
+                                            <p class="font-bold text-[#251A14]">Bolu Pisang Premium</p>
+                                            <p class="text-[10px] text-[#8E7E73]">Ready Fresh</p>
+                                        </td>
+                                        <td class="px-3.5 py-3 text-[#544337]">Mika (22k)</td>
+                                        <td class="px-3.5 py-3">
+                                            <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="0" onchange="calculateOrderTotal()" 
+                                                class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#251A14] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
+                                        </td>
+                                        <td class="px-3.5 py-3 text-[#544337]">Rp 22.000</td>
+                                        <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal2">Rp 44.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Validation Callout Alert (MOQ Warning) -->
+                        <div id="moqAlertBox" class="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3 flex items-start gap-2.5 hidden">
+                            <i class="fas fa-lock text-rose-600 mt-0.5 shrink-0"></i>
+                            <p class="text-xs text-rose-800 leading-relaxed">
+                                <strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: PENGIRIMAN & PEMBAYARAN -->
+                    <div>
+                        <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider mb-3">Pengiriman & Pembayaran</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            
+                            <!-- Left: Tanggal & Waktu & Catatan -->
+                            <div class="space-y-3.5">
+                                <div class="grid grid-cols-2 gap-2.5">
+                                    <div>
+                                        <label for="deliveryDateInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Tanggal Pengiriman</label>
+                                        <input type="date" id="deliveryDateInput" name="delivery_date" value="<?= date('Y-m-d') ?>" 
+                                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                     </div>
+                                    <div>
+                                        <label for="deliveryTimeInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Waktu Kirim</label>
+                                        <input type="time" id="deliveryTimeInput" name="delivery_time" value="14:00" 
+                                            class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="deliveryDestinationInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Alamat Tujuan Pengiriman</label>
+                                    <input type="text" id="deliveryDestinationInput" name="destination" value="Dikirim ke Komplek Melati No. 4" 
+                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label for="orderNotesTextarea" class="block text-xs font-semibold text-[#3E2B21] mb-1">Catatan Dapur / Driver</label>
+                                    <textarea id="orderNotesTextarea" name="notes" rows="2" 
+                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg p-3 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">Roti hajatan kardus putih diikat rapi, kurir motor obrok tiba sebelum 15:00.</textarea>
                                 </div>
                             </div>
 
-                            <div class="mt-4">
-                                <label for="paymentNoteInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Metode Pembayaran</label>
-                                <input type="text" id="paymentNoteInput" name="payment_note" value="Transfer BCA / QRIS" 
-                                    class="w-full bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                            <!-- Right: Total Tagihan & Status Bayar -->
+                            <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-2xl p-4 flex flex-col justify-between">
+                                <div>
+                                    <p class="text-[11px] font-bold text-[#8E7E73] uppercase tracking-wider">TOTAL TAGIHAN</p>
+                                    <h3 class="text-2xl font-bold text-[#D46E15] mt-0.5 tracking-tight" id="orderGrandTotal">Rp 144.000</h3>
+                                    
+                                    <div class="mt-4">
+                                        <label class="block text-xs font-semibold text-[#3E2B21] mb-2">Status Pembayaran</label>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <button type="button" onclick="selectPaymentStatus('Belum Bayar', this)" id="payBtn1" 
+                                                class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#3E2B21] text-[#FAF8F5] shadow-2xs transition-colors">
+                                                Belum Bayar
+                                            </button>
+                                            <button type="button" onclick="selectPaymentStatus('Hutang', this)" id="payBtn2" 
+                                                class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
+                                                Hutang
+                                            </button>
+                                            <button type="button" onclick="selectPaymentStatus('Lunas', this)" id="payBtn3" 
+                                                class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-[#FDFBF7] border border-[#DDD3C5] text-[#544337] hover:bg-[#E5DDD0] transition-colors">
+                                                Lunas
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label for="paymentNoteInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Metode Pembayaran</label>
+                                    <input type="text" id="paymentNoteInput" name="payment_note" value="Transfer BCA / QRIS" 
+                                        class="w-full bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                </div>
                             </div>
+
                         </div>
-
                     </div>
-                </div>
 
-                <!-- Sticky Footer Embedded in Form -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#E2D7C8]">
+                </div>
+                <!-- /Scrollable Body Content -->
+
+                <!-- STICKY MODAL FOOTER (PINNED TO BOTTOM) -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 py-3.5 border-t border-[#E2D7C8] bg-[#F5F1EB] shrink-0">
                     <div id="footerMoqWarning" class="flex items-center gap-1.5 text-xs text-[#27AE60] font-medium">
                         <i class="fas fa-check-circle text-xs"></i>
                         <span>Minimum order terpenuhi</span>
@@ -1433,9 +1514,114 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Data Pesanan untuk Frontend Interactivity
+        // Data Pesanan & Master Pelanggan untuk Frontend Interactivity
         const ordersData = <?= json_encode($master_orders) ?>;
+        const CUSTOMERS_DATA = <?= json_encode($customers_for_select, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
         let selectedDetailOrderId = null;
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // Customer Search & Autocomplete
+        function handleCustomerSearch(query) {
+            const resultsBox = document.getElementById('custSearchResults');
+            if (!resultsBox) return;
+
+            const q = (query || '').toLowerCase().trim();
+            const matched = CUSTOMERS_DATA.filter(c => 
+                c.nama.toLowerCase().includes(q) || (c.no_wa && c.no_wa.includes(q))
+            );
+
+            if (matched.length === 0) {
+                resultsBox.innerHTML = `
+                    <div class="p-3 text-xs text-[#8E7E73] text-center">
+                        <p>Pelanggan tidak ditemukan.</p>
+                        <button type="button" onclick="toggleNewCustomerForm(true)" class="mt-1 text-xs text-[#D46E15] font-semibold hover:underline">
+                            + Daftarkan sebagai Pelanggan Baru
+                        </button>
+                    </div>
+                `;
+            } else {
+                resultsBox.innerHTML = matched.map(c => `
+                    <div onclick="selectCustomerItem(${c.id})" class="px-3.5 py-2.5 hover:bg-[#FFF8F2] cursor-pointer flex items-center justify-between text-xs transition-colors">
+                        <div>
+                            <p class="font-bold text-[#251A14]">${escapeHtml(c.nama)}</p>
+                            <p class="text-[11px] text-[#8E7E73] mt-0.5"><i class="fab fa-whatsapp text-emerald-600 mr-1"></i>${escapeHtml(c.no_wa)}</p>
+                        </div>
+                        <span class="text-[10px] text-[#D46E15] font-semibold bg-[#D46E15]/10 px-2 py-0.5 rounded">Pilih</span>
+                    </div>
+                `).join('');
+            }
+            resultsBox.classList.remove('hidden');
+        }
+
+        function handleCustomerSearchFocus() {
+            const input = document.getElementById('custSearchInput');
+            if (input) handleCustomerSearch(input.value);
+        }
+
+        function selectCustomerItem(id) {
+            const cust = CUSTOMERS_DATA.find(c => c.id == id);
+            if (!cust) return;
+
+            document.getElementById('selectedCustomerId').value = cust.id;
+            document.getElementById('custSearchInput').value = cust.nama;
+            document.getElementById('previewCustName').textContent = cust.nama;
+            document.getElementById('previewCustWa').textContent = cust.no_wa || '-';
+            document.getElementById('previewCustAddress').textContent = cust.alamat || '-';
+            document.getElementById('deliveryDestinationInput').value = cust.alamat || '';
+            document.getElementById('custSearchResults').classList.add('hidden');
+        }
+
+        function toggleNewCustomerForm(forceOpen = false) {
+            const box = document.getElementById('newCustomerFields');
+            const btn = document.getElementById('labelToggleNewCust');
+            const searchWrap = document.getElementById('custSearchWrapper');
+            const resultsBox = document.getElementById('custSearchResults');
+            if (resultsBox) resultsBox.classList.add('hidden');
+
+            const willOpen = forceOpen ? true : box.classList.contains('hidden');
+            if (willOpen) {
+                box.classList.remove('hidden');
+                btn.textContent = 'Gunakan Pelanggan Terdaftar';
+                searchWrap.classList.add('opacity-40', 'pointer-events-none');
+                syncNewCustomerPreview();
+            } else {
+                box.classList.add('hidden');
+                btn.textContent = '+ Tambah Pelanggan Baru';
+                searchWrap.classList.remove('opacity-40', 'pointer-events-none');
+                const defaultCust = CUSTOMERS_DATA[0] || { nama: 'Ibu Sari Dewi', no_wa: '0812-3456-7890', alamat: 'Komplek Melati No. 4, Blok B' };
+                document.getElementById('previewCustName').textContent = defaultCust.nama;
+                document.getElementById('previewCustWa').textContent = defaultCust.no_wa;
+                document.getElementById('previewCustAddress').textContent = defaultCust.alamat;
+                document.getElementById('deliveryDestinationInput').value = defaultCust.alamat;
+            }
+        }
+
+        function cancelNewCustomerForm() {
+            toggleNewCustomerForm(false);
+        }
+
+        function syncNewCustomerPreview() {
+            const nama = document.getElementById('inputNamaBaru').value.trim() || 'Nama Pelanggan Baru';
+            const wa = document.getElementById('inputWaBaru').value.trim() || '08xx-xxxx-xxxx';
+            const alamat = document.getElementById('inputAlamatBaru').value.trim() || 'Alamat Pengiriman Lengkap';
+
+            document.getElementById('previewCustName').textContent = nama;
+            document.getElementById('previewCustWa').textContent = wa;
+            document.getElementById('previewCustAddress').textContent = alamat;
+            document.getElementById('deliveryDestinationInput').value = alamat;
+        }
+
+        document.addEventListener('click', function(e) {
+            const searchWrapper = document.getElementById('custSearchWrapper');
+            const resultsBox = document.getElementById('custSearchResults');
+            if (searchWrapper && resultsBox && !searchWrapper.contains(e.target)) {
+                resultsBox.classList.add('hidden');
+            }
+        });
 
         // Toggle Sidebar Mobile
         function toggleSidebar() {
@@ -1660,36 +1846,46 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
                 const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 
+                // Cek pesanan pada tanggal ini dari ordersData
+                const ordersOnDate = ordersData.filter(o => {
+                    if (!o.date) return false;
+                    return o.date === dateStr || (o.date.endsWith(`-${String(d).padStart(2, '0')}`) && o.date.includes(`-${String(month+1).padStart(2,'0')}-`));
+                });
+                const count = ordersOnDate.length;
+
                 let dayHtml = '';
                 if (isToday) {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#FF9B45] flex flex-col items-center justify-between min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
+                             class="cal-day-cell p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#D46E15] flex flex-col items-center justify-between min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
                             <span class="font-bold text-sm text-[#924C00]">${d}</span>
-                            <span class="text-[10px] font-bold text-white bg-[#FF9B45] px-1.5 py-0.5 rounded shadow-2xs">Hari Ini</span>
+                            <span class="text-[10px] font-bold text-white bg-[#D46E15] px-1.5 py-0.5 rounded shadow-2xs">${count > 0 ? count + ' Pesanan' : 'Hari Ini'}</span>
                         </div>
                     `;
-                } else if (d === 25) {
-                    dayHtml = `
-                        <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                            <span class="font-bold text-sm text-[#1C1C1C]">${d}</span>
-                            <span class="text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ Selesai</span>
-                        </div>
-                    `;
-                } else if (d === 27 || d === 29) {
-                    dayHtml = `
-                        <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-2.5 rounded-xl bg-[#FEF6EE] border border-[#FDE6D2] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                            <span class="font-bold text-sm text-[#D97706]">${d}</span>
-                            <span class="text-[10px] font-medium text-[#D97706] bg-white px-1 py-0.5 rounded">1 Pesanan</span>
-                        </div>
-                    `;
+                } else if (count > 0) {
+                    const allSelesai = ordersOnDate.every(o => o.current_status === 'selesai' || o.status === 'selesai');
+                    if (allSelesai) {
+                        dayHtml = `
+                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
+                                 class="cal-day-cell p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-sm text-[#1C1C1C]">${d}</span>
+                                <span class="text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ ${count} Selesai</span>
+                            </div>
+                        `;
+                    } else {
+                        dayHtml = `
+                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
+                                 class="cal-day-cell p-2.5 rounded-xl bg-[#FEF6EE] border border-[#FDE6D2] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-sm text-[#D97706]">${d}</span>
+                                <span class="text-[10px] font-semibold text-[#D97706] bg-white px-1.5 py-0.5 rounded shadow-2xs">${count} Pesanan</span>
+                            </div>
+                        `;
+                    }
                 } else {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-3 text-sm font-medium text-[#1C1C1C] rounded-xl hover:bg-[#FFF8F2] transition-colors cursor-pointer">
-                            ${d}
+                             class="cal-day-cell p-3 text-sm font-medium text-[#1C1C1C] rounded-xl hover:bg-[#FFF8F2] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-[64px]">
+                            <span>${d}</span>
                         </div>
                     `;
                 }
@@ -1708,13 +1904,107 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         }
 
         function selectDeliveryDate(cell, dateStr, dayNum) {
-            document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('ring-2', 'ring-[#FF9B45]'));
-            cell.classList.add('ring-2', 'ring-[#FF9B45]');
+            document.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('ring-2', 'ring-[#D46E15]', 'border-[#D46E15]'));
+            if (cell) {
+                cell.classList.add('ring-2', 'ring-[#D46E15]');
+            }
 
-            document.getElementById('deliveryScheduleTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${document.getElementById('calendarGridTitle').textContent}`;
-            document.getElementById('deliveryBatchBadge').textContent = 'Terpilih';
-            document.getElementById('deliveryCountLabel').textContent = 'Filter tanggal aktif';
-            showToast(`Menampilkan jadwal pengiriman tanggal ${dayNum}`);
+            const monthTitle = document.getElementById('calendarGridTitle').textContent;
+            document.getElementById('deliveryScheduleTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${monthTitle}`;
+            
+            // Filter matching orders from ordersData
+            const matchingOrders = ordersData.filter(o => {
+                if (!o.date) return false;
+                return o.date === dateStr || (o.date.endsWith(`-${String(dayNum).padStart(2, '0')}`) && o.date.includes(`-${String(currentCalDate.getMonth()+1).padStart(2,'0')}-`));
+            });
+
+            const grid = document.getElementById('deliveryCardsGrid');
+            const badge = document.getElementById('deliveryBatchBadge');
+            const countLabel = document.getElementById('deliveryCountLabel');
+
+            if (matchingOrders.length > 0) {
+                badge.textContent = `${matchingOrders.length} Batch Aktif`;
+                badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full';
+                countLabel.textContent = `${matchingOrders.length} Pengiriman Terjadwal`;
+
+                let cardsHtml = matchingOrders.map(ord => {
+                    const isLunas = (ord.status_bayar === 'Lunas');
+                    const bayarBadge = isLunas 
+                        ? '<span class="bg-[#27AE60]/15 text-[#1B7A43] px-2 py-0.5 rounded-full text-[10px] font-semibold">Lunas</span>'
+                        : '<span class="bg-[#8E7E73]/15 text-[#544337] px-2 py-0.5 rounded-full text-[10px] font-semibold">' + escapeHtml(ord.status_bayar || 'Belum Bayar') + '</span>';
+
+                    const courierBadge = ord.courier_info 
+                        ? `<span class="bg-[#D46E15]/15 text-[#B85207] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-motorcycle text-xs mr-1"></i> ${escapeHtml(ord.courier_info)}</span>`
+                        : `<span class="bg-[#E5DDD0] text-[#544337] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-store text-xs mr-1"></i> Ambil di Toko</span>`;
+
+                    return `
+                        <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="${ord.courier_info && ord.courier_info.toLowerCase().includes('ambil') ? 'toko' : 'kurir'}">
+                            <div>
+                                <div class="flex items-center justify-between text-xs mb-2">
+                                    <span class="font-mono text-[#D46E15] font-semibold">#${escapeHtml(ord.id)}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[#8E7E73]"><i class="far fa-clock text-[10px]"></i> ${escapeHtml(ord.time || '14:00')}</span>
+                                        ${bayarBadge}
+                                    </div>
+                                </div>
+                                <h4 class="text-[#251A14] font-bold text-sm">${escapeHtml(ord.customer || 'Pelanggan')}</h4>
+                                <p class="text-xs text-[#544337] mt-1">${escapeHtml(ord.items || '-')}</p>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#DDD3C5] text-xs">
+                                ${courierBadge}
+                                <button type="button" onclick="openOrderDetailById('${escapeHtml(ord.id)}')" class="text-[#D46E15] hover:text-[#B85207] font-semibold flex items-center gap-1">
+                                    <span>Detail</span>
+                                    <i class="fas fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Action panel card
+                cardsHtml += `
+                    <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-[#251A14] font-bold text-sm mb-1">Aksi Cepat Pengiriman</h4>
+                            <p class="text-xs text-[#8E7E73] leading-relaxed">Perbarui status semua pesanan tanggal ini atau cetak dokumen surat jalan untuk kurir obrok motor.</p>
+                        </div>
+                        <div class="space-y-2 mt-4">
+                            <form method="POST" action="pesanan.php">
+                                <input type="hidden" name="action" value="batch_siap_kirim">
+                                <button type="submit" class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-semibold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-button-orange transition-colors">
+                                    <i class="fas fa-check-double text-xs"></i>
+                                    <span>Konfirmasi Semua Siap Kirim</span>
+                                </button>
+                            </form>
+                            <button type="button" onclick="printDeliverySlip()" class="w-full bg-[#FDFBF7] hover:bg-[#E5DDD0] text-[#3E2B21] font-medium text-xs py-2.5 rounded-lg border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
+                                <i class="fas fa-print text-xs text-[#D46E15]"></i>
+                                <span>Cetak Surat Jalan (${dayNum} ${monthTitle})</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML = cardsHtml;
+            } else {
+                badge.textContent = 'Tidak Ada Pengiriman';
+                badge.className = 'bg-[#8E7E73]/15 text-[#544337] text-xs font-semibold px-2.5 py-0.5 rounded-full';
+                countLabel.textContent = '0 Pengiriman Terjadwal';
+
+                grid.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-[#EFE8DE]/60 border border-dashed border-[#DDD3C5] rounded-2xl p-8 text-center flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 rounded-full bg-[#DDD3C5]/50 flex items-center justify-center text-[#8E7E73] mb-3 text-lg">
+                            <i class="far fa-calendar-times"></i>
+                        </div>
+                        <h4 class="text-[#251A14] font-bold text-sm">Tidak Ada Jadwal Pengiriman</h4>
+                        <p class="text-xs text-[#8E7E73] mt-1 max-w-md">Belum ada pesanan bakery yang dijadwalkan untuk dikirim pada tanggal ${dayNum} ${monthTitle}.</p>
+                        <button type="button" onclick="openOrderModal(); const dt = document.getElementById('deliveryDateInput'); if (dt) dt.value='${dateStr}';" class="mt-4 bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 shadow-button-orange transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Tambah Pesanan Tanggal ${dayNum}</span>
+                        </button>
+                    </div>
+                `;
+            }
+
+            showToast(`Jadwal pengiriman tanggal ${dayNum} ditampilkan`);
         }
 
         function filterShippingType(type) {

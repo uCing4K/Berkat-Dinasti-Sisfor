@@ -292,11 +292,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     
     $statusLabel = match($new_status) {
+        'pending' => 'Menunggu Konfirmasi',
         'proses' => 'Sedang Diproses / Oven',
         'kirim' => 'Siap Kirim / Driver',
         'selesai' => 'Selesai',
         default => ucfirst($new_status)
     };
+    
+    // Deteksi Request AJAX
+    $is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') || (isset($_POST['is_ajax']) && $_POST['is_ajax'] == '1');
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'order_id' => $order_id,
+            'new_status' => $new_status,
+            'status_label' => $statusLabel,
+            'message' => "Status pesanan {$order_id} berhasil diubah menjadi: {$statusLabel}!"
+        ]);
+        exit();
+    }
     
     $_SESSION['flash_msg'] = "Status pesanan {$order_id} berhasil diubah menjadi: {$statusLabel}!";
     header("Location: beranda.php");
@@ -750,8 +765,8 @@ if ($db_connected && $pdo) {
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
-                <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+                <!-- Logo & Brand Header (Height 64px - Aligned with Topbar) -->
+                <div class="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
                     <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
@@ -1305,44 +1320,44 @@ if ($db_connected && $pdo) {
                                 <div class="text-[#251A14] font-medium py-1">18</div>
                                 <div class="text-[#251A14] font-medium py-1">19</div>
                                 <!-- 20 has delivery dot -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(20)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 20">
                                     <span class="text-[#251A14] font-medium">20</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
 
                                 <!-- Week 4 -->
-                                <div class="text-[#251A14] font-medium py-1">21</div>
-                                <div class="text-[#251A14] font-medium py-1">22</div>
-                                <div class="text-[#251A14] font-medium py-1">23</div>
+                                <div onclick="openDeliveryScheduleModal(21)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">21</div>
+                                <div onclick="openDeliveryScheduleModal(22)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">22</div>
+                                <div onclick="openDeliveryScheduleModal(23)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">23</div>
                                 <!-- 24 has delivery dot -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(24)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 24">
                                     <span class="text-[#251A14] font-medium">24</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
                                 <!-- 25 past highlight -->
-                                <div class="flex items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(25)" class="flex items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 25">
                                     <span class="w-7 h-7 rounded-full bg-[#EFE8DE] text-[#5E4D42] font-medium flex items-center justify-center">25</span>
                                 </div>
                                 <!-- 26 TODAY ACTIVE HIGHLIGHT (Signature Espresso Circle) -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(26)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Jadwal Hari Ini (Tgl 26)">
                                     <span class="w-7 h-7 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">26</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
                                 <!-- 27 has delivery dot -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(27)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 27">
                                     <span class="text-[#251A14] font-medium">27</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
 
                                 <!-- Week 5 -->
                                 <!-- 28 has delivery dot -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(28)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 28">
                                     <span class="text-[#251A14] font-medium">28</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
-                                <div class="text-[#251A14] font-medium py-1">29</div>
+                                <div onclick="openDeliveryScheduleModal(29)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">29</div>
                                 <!-- 30 has delivery dot -->
-                                <div class="flex flex-col items-center justify-center">
+                                <div onclick="openDeliveryScheduleModal(30)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 30">
                                     <span class="text-[#251A14] font-medium">30</span>
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                                 </div>
@@ -1523,11 +1538,11 @@ if ($db_connected && $pdo) {
         <!-- Modal Card Container -->
         <div class="craft-modal-dialog max-w-[740px] w-full relative z-10 max-h-[90vh] flex flex-col overflow-hidden bg-[#FDFBF7] border border-[#E2D7C8]">
             
-            <!-- Header (Sticky Top) -->
-            <div class="flex items-start justify-between p-6 sm:px-8 pb-4 border-b border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
+            <!-- Header (Sticky Top - Compact) -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
                 <div>
-                    <h3 class="text-xl font-bold text-[#251A14] tracking-tight">Tambah Pesanan Baru</h3>
-                    <p class="text-[#8E7E73] text-xs mt-1">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
+                    <h3 class="text-lg font-bold text-[#251A14] tracking-tight">Tambah Pesanan Baru</h3>
+                    <p class="text-[#8E7E73] text-xs mt-0.5">Isi detail pesanan, rincian produk bakery, dan jadwal pengiriman.</p>
                 </div>
                 <button onclick="closeOrderModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup">
                     <i class="fas fa-times text-base"></i>
@@ -1539,49 +1554,70 @@ if ($db_connected && $pdo) {
                 <input type="hidden" name="action" value="tambah_pesanan">
                 
                 <!-- Scrollable Body Content -->
-                <div class="p-6 sm:px-8 overflow-y-auto flex-1 space-y-6">
-                <div>
-                    <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider mb-2.5">Data Pelanggan</h4>
+                <div class="px-6 py-4 overflow-y-auto flex-1 space-y-4">
                     
-                    <!-- Customer Selector Dropdown -->
-                    <div class="relative mb-2">
-                        <select id="custSelect" name="id_pelanggan" onchange="onSelectCustomerChange(this)"
-                            class="w-full bg-[#FDFBF7] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-xs text-[#251A14] font-medium craft-select focus:border-[#D46E15] focus:ring-2 focus:ring-[#D46E15]/15 focus:outline-none transition-colors">
-                            <?php foreach ($customers_for_select as $cust): ?>
-                                <option value="<?= $cust['id'] ?>">
-                                    <?= htmlspecialchars($cust['nama']) ?> (<?= htmlspecialchars($cust['no_wa']) ?>)
-                                </option>
-                            <?php endforeach; ?>
-                            <option value="new">+ Tambah Pelanggan Baru</option>
-                        </select>
-                    </div>
+                    <!-- SECTION 1: DATA PELANGGAN -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Data Pelanggan</label>
+                            <button type="button" onclick="toggleNewCustomerForm()" id="btnToggleNewCust" 
+                                class="text-xs font-semibold text-[#D46E15] hover:text-[#B85207] flex items-center gap-1.5 transition-colors">
+                                <i class="fas fa-user-plus text-xs"></i>
+                                <span id="labelToggleNewCust">+ Tambah Pelanggan Baru</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Search Bar with Live Autocomplete -->
+                        <div id="custSearchWrapper" class="relative mb-2.5">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-search text-xs"></i>
+                                </div>
+                                <input type="text" id="custSearchInput" placeholder="Ketik nama atau No. WhatsApp pelanggan..." autocomplete="off"
+                                    oninput="handleCustomerSearch(this.value)" onfocus="handleCustomerSearchFocus()"
+                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? '') ?>"
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-9 py-2 text-xs text-[#251A14] font-medium placeholder-[#8E7E73] focus:border-[#D46E15] focus:outline-none transition-colors">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8E7E73] pointer-events-none">
+                                    <i class="fas fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Floating Dropdown Matches -->
+                            <div id="custSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl shadow-xl max-h-48 overflow-y-auto z-40 divide-y divide-[#EFE8DE]">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="<?= $customers_for_select[0]['id'] ?? 1 ?>">
+                        </div>
 
-                    <!-- New Customer Custom Inputs (Hidden by default) -->
-                    <div id="newCustomerFields" class="hidden bg-[#FFF8F2] border border-[#FF9B45]/30 rounded-xl p-3.5 space-y-2.5 mb-3">
-                        <p class="text-xs font-bold text-[#924C00]">Detail Pelanggan Baru</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <input type="text" name="nama_pelanggan_baru" placeholder="Nama Lengkap Pelanggan" class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#FF9B45]">
-                            <input type="text" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx)" class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#FF9B45]">
+                        <!-- New Customer Custom Inputs (Toggleable) -->
+                        <div id="newCustomerFields" class="hidden bg-[#FFF8F2] border border-[#D46E15]/30 rounded-xl p-3.5 space-y-2.5 mb-2.5">
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs font-bold text-[#924C00]">Form Input Pelanggan Baru</p>
+                                <button type="button" onclick="cancelNewCustomerForm()" class="text-[11px] text-[#8E7E73] hover:text-[#D46E15] font-medium">Batal / Gunakan Data Yang Ada</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <input type="text" id="inputNamaBaru" name="nama_pelanggan_baru" placeholder="Nama Lengkap Pelanggan *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                                <input type="text" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                            </div>
+                            <input type="text" id="inputAlamatBaru" name="alamat_baru" placeholder="Alamat Pengiriman Lengkap *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
                         </div>
-                        <input type="text" name="alamat_baru" placeholder="Alamat Pengiriman Lengkap" class="w-full bg-white border border-[#E0E0E0] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#FF9B45]">
-                    </div>
 
-                    <!-- Detail Pelanggan Box (3 Columns Preview) -->
-                    <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                            <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
-                        </div>
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                            <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
-                        </div>
-                        <div>
-                            <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                            <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                        <!-- Detail Pelanggan Box (3 Columns Preview) -->
+                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                            <div>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
+                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
+                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
+                            </div>
+                            <div>
+                                <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
+                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
                 <!-- SECTION 2: DETAIL PESANAN -->
                 <div>
@@ -1783,6 +1819,44 @@ if ($db_connected && $pdo) {
     </div>
 
     <!-- ============================================================== -->
+    <!-- MODAL 3: DETAIL JADWAL PENGIRIMAN KALENDER                    -->
+    <!-- ============================================================== -->
+    <div id="deliveryScheduleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeDeliveryScheduleModal()" class="fixed inset-0 craft-modal-overlay"></div>
+        <div class="craft-modal-dialog max-w-lg w-full relative z-10 bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center">
+                        <i class="far fa-calendar-alt text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-[#251A14]" id="delivModalTitle">Jadwal Pengiriman Roti</h3>
+                        <p class="text-xs text-[#8E7E73]" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
+                    </div>
+                </div>
+                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-6 space-y-3.5 max-h-[65vh] overflow-y-auto" id="delivModalBody">
+                <!-- Delivery Content Dynamic -->
+            </div>
+            <!-- Footer -->
+            <div class="px-6 py-3.5 border-t border-[#E2D7C8] bg-[#F5F1EB] flex items-center justify-between">
+                <a href="pesanan.php?tab=kalender" class="text-xs font-semibold text-[#D46E15] hover:text-[#B85207] flex items-center gap-1.5">
+                    <span>Lihat di Kalender Pesanan</span>
+                    <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+                <button type="button" onclick="closeDeliveryScheduleModal()" class="craft-btn-secondary text-xs px-4 py-2 rounded-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
     <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN (SESUAI FIGMA SCREENSHOT)   -->
     <!-- ============================================================== -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -1963,10 +2037,275 @@ if ($db_connected && $pdo) {
             document.body.style.overflow = 'hidden';
         }
 
-        // Status advance submit from Order Detail Modal
+        // Status advance submit from Order Detail Modal (via AJAX with seamless UI update)
         function submitStatusChange(newStatus) {
-            document.getElementById('modalNewStatusInput').value = newStatus;
-            document.getElementById('updateStatusForm').submit();
+            const orderId = document.getElementById('modalUpdateOrderId').value;
+            if (!orderId) return;
+
+            const formData = new FormData();
+            formData.append('action', 'update_status');
+            formData.append('order_id', orderId);
+            formData.append('new_status', newStatus);
+            formData.append('is_ajax', '1');
+
+            const statusMap = {
+                'pending': { label: 'Menunggu Konfirmasi', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200' },
+                'proses': { label: 'Oven/Proses', badgeClass: 'bg-orange-50 text-orange-800 border-orange-200' },
+                'kirim': { label: 'Siap Kirim', badgeClass: 'bg-blue-50 text-blue-800 border-blue-200' },
+                'selesai': { label: 'Selesai', badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
+            };
+            const targetInfo = statusMap[newStatus] || { label: newStatus, badgeClass: 'bg-gray-100 text-gray-800 border-gray-200' };
+
+            fetch('beranda.php', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update Modal Status Badge
+                    const modalBadge = document.getElementById('modalStatusBadge');
+                    if (modalBadge) {
+                        modalBadge.textContent = targetInfo.label;
+                        modalBadge.className = `px-2.5 py-1 rounded-full text-xs font-semibold border ${targetInfo.badgeClass}`;
+                    }
+
+                    // Update Table Row Status Badge if present
+                    document.querySelectorAll('.order-row').forEach(row => {
+                        const invCell = row.querySelector('.order-invoice');
+                        if (invCell && invCell.textContent.trim() === orderId) {
+                            const badge = row.querySelector('.order-status-badge');
+                            if (badge) {
+                                badge.textContent = targetInfo.label;
+                                badge.className = `order-status-badge px-2.5 py-1 rounded-full text-xs font-semibold border ${targetInfo.badgeClass}`;
+                            }
+                        }
+                    });
+
+                    // Update memory array
+                    const found = orders.find(o => o.id === orderId);
+                    if (found) found.status = newStatus;
+
+                    showToast(data.message || `Status berhasil diubah menjadi ${targetInfo.label}!`);
+                } else {
+                    showToast('Gagal memperbarui status');
+                }
+            })
+            .catch(() => {
+                // Fallback traditional form submit
+                document.getElementById('modalNewStatusInput').value = newStatus;
+                document.getElementById('updateStatusForm').submit();
+            });
+        }
+
+        // =========================================================================
+        // CUSTOMER AUTOCOMPLETE & NEW CUSTOMER LOGIC
+        // =========================================================================
+        let isNewCustomerMode = false;
+
+        function handleCustomerSearch(query) {
+            const resultsBox = document.getElementById('custSearchResults');
+            if (!resultsBox) return;
+
+            const q = (query || '').toLowerCase().trim();
+            const matched = CUSTOMERS_DATA.filter(c => 
+                c.nama.toLowerCase().includes(q) || (c.no_wa && c.no_wa.includes(q))
+            );
+
+            if (matched.length === 0) {
+                resultsBox.innerHTML = `
+                    <div class="p-3 text-xs text-[#8E7E73] text-center">
+                        <p>Pelanggan tidak ditemukan.</p>
+                        <button type="button" onclick="toggleNewCustomerForm(true)" class="mt-1 text-xs text-[#D46E15] font-semibold hover:underline">
+                            + Daftarkan sebagai Pelanggan Baru
+                        </button>
+                    </div>
+                `;
+            } else {
+                resultsBox.innerHTML = matched.map(c => `
+                    <div onclick="selectCustomerItem(${c.id})" class="px-3.5 py-2.5 hover:bg-[#FFF8F2] cursor-pointer flex items-center justify-between text-xs transition-colors">
+                        <div>
+                            <p class="font-bold text-[#251A14]">${escapeHtml(c.nama)}</p>
+                            <p class="text-[11px] text-[#8E7E73] mt-0.5"><i class="fab fa-whatsapp text-emerald-600 mr-1"></i>${escapeHtml(c.no_wa)}</p>
+                        </div>
+                        <span class="text-[10px] text-[#D46E15] font-semibold bg-[#D46E15]/10 px-2 py-0.5 rounded">Pilih</span>
+                    </div>
+                `).join('');
+            }
+            resultsBox.classList.remove('hidden');
+        }
+
+        function handleCustomerSearchFocus() {
+            const input = document.getElementById('custSearchInput');
+            handleCustomerSearch(input.value);
+        }
+
+        function selectCustomerItem(id) {
+            const cust = CUSTOMERS_DATA.find(c => c.id == id);
+            if (!cust) return;
+
+            document.getElementById('selectedCustomerId').value = cust.id;
+            document.getElementById('custSearchInput').value = cust.nama;
+            document.getElementById('previewCustName').textContent = cust.nama;
+            document.getElementById('previewCustWa').textContent = cust.no_wa;
+            document.getElementById('previewCustAddress').textContent = cust.alamat;
+
+            // Hide results
+            const resultsBox = document.getElementById('custSearchResults');
+            if (resultsBox) resultsBox.classList.add('hidden');
+
+            // Hide new customer fields if open
+            cancelNewCustomerForm();
+        }
+
+        function toggleNewCustomerForm(forceOpen = false) {
+            const fields = document.getElementById('newCustomerFields');
+            const searchWrap = document.getElementById('custSearchWrapper');
+            const label = document.getElementById('labelToggleNewCust');
+
+            if (forceOpen || fields.classList.contains('hidden')) {
+                fields.classList.remove('hidden');
+                searchWrap.classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('selectedCustomerId').value = '0';
+                label.textContent = 'Batal / Cari Data Yang Ada';
+                isNewCustomerMode = true;
+                syncNewCustomerPreview();
+            } else {
+                cancelNewCustomerForm();
+            }
+        }
+
+        function cancelNewCustomerForm() {
+            const fields = document.getElementById('newCustomerFields');
+            const searchWrap = document.getElementById('custSearchWrapper');
+            const label = document.getElementById('labelToggleNewCust');
+
+            fields.classList.add('hidden');
+            searchWrap.classList.remove('opacity-50', 'pointer-events-none');
+            label.textContent = '+ Tambah Pelanggan Baru';
+            isNewCustomerMode = false;
+
+            // Restore preview to selected customer
+            const selId = document.getElementById('selectedCustomerId').value;
+            const cust = CUSTOMERS_DATA.find(c => c.id == selId) || CUSTOMERS_DATA[0];
+            if (cust) {
+                document.getElementById('selectedCustomerId').value = cust.id;
+                document.getElementById('previewCustName').textContent = cust.nama;
+                document.getElementById('previewCustWa').textContent = cust.no_wa;
+                document.getElementById('previewCustAddress').textContent = cust.alamat;
+                document.getElementById('custSearchInput').value = cust.nama;
+            }
+        }
+
+        function syncNewCustomerPreview() {
+            const name = (document.getElementById('inputNamaBaru').value || '').trim();
+            const wa = (document.getElementById('inputWaBaru').value || '').trim();
+            const alamat = (document.getElementById('inputAlamatBaru').value || '').trim();
+
+            document.getElementById('previewCustName').textContent = name || 'Pelanggan Baru';
+            document.getElementById('previewCustWa').textContent = wa || '-';
+            document.getElementById('previewCustAddress').textContent = alamat || '-';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('custSearchWrapper');
+            const resultsBox = document.getElementById('custSearchResults');
+            if (wrap && resultsBox && !wrap.contains(e.target)) {
+                resultsBox.classList.add('hidden');
+            }
+        });
+
+        // =========================================================================
+        // DELIVERY SCHEDULE CALENDAR MODAL
+        // =========================================================================
+        const SCHEDULE_BY_DATE = {
+            20: [
+                { id: 'INV-20261020-001', cust: 'Toko Berkah Snack', phone: '0812-9988-1122', items: 'Roti Hajatan Putih (40 box)', time: '09:00 WIB', address: 'Jl. Ahmad Yani No. 12', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            24: [
+                { id: 'INV-20261024-002', cust: 'Ibu Ratna Sari', phone: '0813-7766-5544', items: 'Bolu Pisang Mika (10 mika), Roti Manis (30 pcs)', time: '13:30 WIB', address: 'Komplek Permata Hijau C-2', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            26: [
+                { id: 'INV-20261026-001', cust: 'Ibu Sari Dewi', phone: '0812-3456-7890', items: 'Roti Hajatan Putih (10 box), Bolu Pisang (2 mika)', time: '14:00 WIB', address: 'Komplek Melati No. 4, Blok B', courier: 'Kurir Obrok 1', status: 'Siap Kirim' },
+                { id: 'INV-20261026-002', cust: 'Pak Budi Santoso', phone: '0823-4567-8901', items: 'Roti Hajatan Batik (10 box)', time: '16:30 WIB', address: 'Jl. Kenanga No. 10, Blok C', courier: 'Kurir Obrok 2', status: 'Oven/Proses' }
+            ],
+            27: [
+                { id: 'INV-20261027-001', cust: 'Toko Maju Jaya', phone: '0834-5678-9012', items: 'Bolu Tanpa Pisang Putih (15 box), Roti Kopi (50 pcs)', time: '10:00 WIB', address: 'Jl. Raya Industri No. 20', courier: 'Kurir Obrok 1', status: 'Menunggu' }
+            ],
+            28: [
+                { id: 'INV-20261028-001', cust: 'Warung Pak Haji', phone: '0856-7890-1234', items: 'Roti Bijian Kecil (100 pcs)', time: '11:00 WIB', address: 'Jl. Pesantren No. 3', courier: 'Kurir Obrok 2', status: 'Menunggu' }
+            ],
+            30: [
+                { id: 'INV-20261030-001', cust: 'Ibu Maya Catering', phone: '0821-9988-7766', items: 'Roti Hajatan Mika (20 mika), Bolu Pisang (5 box)', time: '15:00 WIB', address: 'Jl. Ijen No. 15', courier: 'Kurir Obrok 1', status: 'Menunggu' }
+            ]
+        };
+
+        function openDeliveryScheduleModal(dayNum) {
+            const modal = document.getElementById('deliveryScheduleModal');
+            if (!modal) return;
+
+            document.getElementById('delivModalTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${document.getElementById('miniCalTitle').textContent}`;
+            const body = document.getElementById('delivModalBody');
+            const items = SCHEDULE_BY_DATE[dayNum] || [];
+
+            if (items.length === 0) {
+                body.innerHTML = `
+                    <div class="p-6 text-center text-xs text-[#8E7E73]">
+                        <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#D46E15] flex items-center justify-center mx-auto mb-3">
+                            <i class="far fa-calendar-times text-xl"></i>
+                        </div>
+                        <p class="font-bold text-[#251A14]">Belum Ada Pengiriman Terjadwal</p>
+                        <p class="mt-1 max-w-xs mx-auto">Tidak ada jadwal pengiriman roti untuk tanggal ${dayNum}. Semua armada kurir stand-by.</p>
+                        <button type="button" onclick="closeDeliveryScheduleModal(); openOrderModal();" class="mt-4 craft-btn-primary px-4 py-2 text-xs">
+                            + Tambah Pesanan untuk Tanggal Ini
+                        </button>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div class="flex items-center justify-between pb-2 border-b border-[#E2D7C8] text-xs">
+                        <span class="font-semibold text-[#544337]"><i class="fas fa-boxes mr-1 text-[#D46E15]"></i> Total: ${items.length} Pesanan Terjadwal</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">Kapasitas Trip Aman</span>
+                    </div>
+                    <div class="space-y-3">
+                        ${items.map(it => `
+                            <div class="p-3.5 bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] space-y-2 text-xs">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-mono font-bold text-[#D46E15]">${escapeHtml(it.id)}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${it.status === 'Selesai' ? 'bg-[#27AE60]/15 text-[#1B7A43]' : (it.status === 'Siap Kirim' ? 'bg-[#2F80ED]/15 text-[#2F80ED]' : 'bg-[#E2B93B]/20 text-[#886C12]')}">${escapeHtml(it.status)}</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#251A14]">${escapeHtml(it.cust)} <span class="text-[#8E7E73] font-normal text-[11px]">(${escapeHtml(it.phone)})</span></p>
+                                    <p class="text-[#544337] mt-0.5 font-medium">${escapeHtml(it.items)}</p>
+                                </div>
+                                <div class="pt-2 border-t border-[#DDD3C5] flex items-center justify-between text-[11px] text-[#786E65]">
+                                    <span><i class="far fa-clock mr-1"></i>${escapeHtml(it.time)}</span>
+                                    <span><i class="fas fa-motorcycle mr-1 text-[#D46E15]"></i>${escapeHtml(it.courier)}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeliveryScheduleModal() {
+            const modal = document.getElementById('deliveryScheduleModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
         }
 
         // Open Add Order Modal
@@ -1993,30 +2332,6 @@ if ($db_connected && $pdo) {
             if (modal) {
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
-            }
-        }
-
-        // Customer Selection Change Listener
-        function onSelectCustomerChange(selectElem) {
-            const val = selectElem.value;
-            const newFields = document.getElementById('newCustomerFields');
-            const previewName = document.getElementById('previewCustName');
-            const previewWa = document.getElementById('previewCustWa');
-            const previewAddress = document.getElementById('previewCustAddress');
-
-            if (val === 'new') {
-                newFields.classList.remove('hidden');
-                previewName.textContent = 'Pelanggan Baru';
-                previewWa.textContent = '-';
-                previewAddress.textContent = '-';
-            } else {
-                newFields.classList.add('hidden');
-                const cust = CUSTOMERS_DATA.find(c => c.id == val);
-                if (cust) {
-                    previewName.textContent = cust.nama;
-                    previewWa.textContent = cust.no_wa;
-                    previewAddress.textContent = cust.alamat;
-                }
             }
         }
 

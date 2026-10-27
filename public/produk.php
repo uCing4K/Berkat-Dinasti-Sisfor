@@ -702,8 +702,8 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
-                <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+                <!-- Logo & Brand Header (Height 64px - Aligned with Topbar) -->
+                <div class="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
                     <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
@@ -885,8 +885,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 shrink-0">
                         <!-- Card 1: Total Produk -->
                         <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#D46E15]"></div>
-                            <div class="pl-2">
+                            <div>
                                 <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">TOTAL PRODUK</p>
                                 <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $total_katalog ?> Katalog</p>
                             </div>
@@ -897,8 +896,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
                         <!-- Card 2: Produk Aktif -->
                         <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#27AE60]"></div>
-                            <div class="pl-2">
+                            <div>
                                 <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">PRODUK AKTIF</p>
                                 <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $produk_aktif ?> Siap Pesan</p>
                             </div>
@@ -909,8 +907,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
                         <!-- Card 3: Varian Kemasan -->
                         <div class="craft-card-espresso rounded-xl p-3.5 border border-white/10 relative overflow-hidden flex items-center justify-between min-w-[160px] shadow-lg">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#E2B93B]"></div>
-                            <div class="pl-2">
+                            <div>
                                 <p class="text-[#D8C7B8] text-[11px] font-semibold uppercase tracking-wider">VARIAN KEMASAN</p>
                                 <p class="text-[#FAF8F5] text-lg font-bold leading-tight mt-0.5"><?= $varian_kemasan ?> Tipe Box/Pcs</p>
                             </div>
@@ -974,7 +971,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                         <!-- Tambah Produk Button (Triggers Modal) -->
                         <button onclick="openProductModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                             <i class="fas fa-plus text-xs"></i>
-                            <span>+ Tambah Produk</span>
+                            <span>Tambah Produk</span>
                         </button>
                     </div>
                 </div>
@@ -982,40 +979,40 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 <!-- TABLE CARD (FULL WIDTH) -->
                 <div class="bg-[#FDFBF7] rounded-xl shadow-sm border border-[#E2D7C8] overflow-hidden mb-6">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse" id="productsTable">
+                        <table class="w-full text-left border-collapse border-b border-[#E2D7C8]" id="productsTable">
                             <thead>
                                 <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
-                                    <th class="px-3.5 py-3 w-12 text-center">NO</th>
-                                    <th class="px-3.5 py-3">NAMA PRODUK</th>
-                                    <th class="px-3.5 py-3">KATEGORI</th>
-                                    <th class="px-3.5 py-3">KEMASAN</th>
-                                    <th class="px-3.5 py-3">MINIMAL ORDER</th>
-                                    <th class="px-3.5 py-3">HARGA JUAL</th>
-                                    <th class="px-3.5 py-3 text-center">STATUS</th>
+                                    <th class="px-3.5 py-3 w-12 text-center border-r border-white/10">NO</th>
+                                    <th class="px-3.5 py-3 border-r border-white/10">NAMA PRODUK</th>
+                                    <th class="px-3.5 py-3 border-r border-white/10">KATEGORI</th>
+                                    <th class="px-3.5 py-3 border-r border-white/10">KEMASAN</th>
+                                    <th class="px-3.5 py-3 border-r border-white/10">MINIMAL ORDER</th>
+                                    <th class="px-3.5 py-3 border-r border-white/10">HARGA JUAL</th>
+                                    <th class="px-3.5 py-3 text-center border-r border-white/10">STATUS</th>
                                     <th class="px-3.5 py-3 text-center">AKSI</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-[#EAE1D5] text-xs sm:text-sm" id="productsTableBody">
+                            <tbody class="divide-y divide-[#E2D7C8] text-xs sm:text-sm" id="productsTableBody">
                                 <?php foreach ($products as $idx => $prod): ?>
-                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#F8F5F0]' : 'bg-[#FDFBF7]' ?> hover:bg-[#F0E9DF] transition-colors product-row"
+                                    <tr class="<?= $idx % 2 === 1 ? 'bg-[#F8F5F0]' : 'bg-[#FDFBF7]' ?> hover:bg-[#F0E9DF] transition-colors product-row border-b border-[#E2D7C8]"
                                         data-name="<?= strtolower(htmlspecialchars($prod['name'])) ?>"
                                         data-sku="<?= strtolower(htmlspecialchars($prod['sku'])) ?>"
                                         data-category="<?= htmlspecialchars($prod['category']) ?>"
                                         data-status="<?= htmlspecialchars($prod['status']) ?>">
                                         
                                         <!-- No -->
-                                        <td class="px-3.5 py-3 text-center text-[#8E7E73] font-medium row-number">
+                                        <td class="px-3.5 py-3 text-center text-[#8E7E73] font-medium row-number border-r border-[#E2D7C8]/60">
                                             <?= $idx + 1 ?>
                                         </td>
 
                                         <!-- Nama Produk -->
-                                        <td class="px-3.5 py-3 text-[#251A14] font-semibold max-w-[200px]">
+                                        <td class="px-3.5 py-3 text-[#251A14] font-semibold max-w-[200px] border-r border-[#E2D7C8]/60">
                                             <div class="truncate font-semibold text-[#251A14]" title="<?= htmlspecialchars($prod['name']) ?>"><?= htmlspecialchars($prod['name']) ?></div>
                                             <span class="text-[11px] text-[#8E7E73] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
                                         </td>
 
                                         <!-- Kategori -->
-                                        <td class="px-3.5 py-3 text-[#544337] whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-[#544337] whitespace-nowrap border-r border-[#E2D7C8]/60">
                                             <div class="flex items-center gap-1.5">
                                                 <?php if ($prod['category'] === 'Roti Hajatan'): ?>
                                                     <i class="fas fa-bread-slice text-[#D46E15] text-sm"></i>
@@ -1031,7 +1028,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                         </td>
 
                                         <!-- Kemasan Badge -->
-                                        <td class="px-3.5 py-3 whitespace-nowrap">
+                                        <td class="px-3.5 py-3 whitespace-nowrap border-r border-[#E2D7C8]/60">
                                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border <?= $prod['packaging_badge_class'] ?>">
                                                 <?php if ($prod['packaging_icon'] === 'mika'): ?>
                                                     <i class="far fa-window-restore text-xs"></i>
@@ -1045,18 +1042,18 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                                         </td>
 
                                         <!-- Minimal Order -->
-                                        <td class="px-3.5 py-3 text-[#3E2B21] font-medium whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-[#3E2B21] font-medium whitespace-nowrap border-r border-[#E2D7C8]/60">
                                             <?= htmlspecialchars($prod['min_order']) ?>
                                         </td>
 
                                         <!-- Harga Jual -->
-                                        <td class="px-3.5 py-3 whitespace-nowrap">
+                                        <td class="px-3.5 py-3 whitespace-nowrap border-r border-[#E2D7C8]/60">
                                             <span class="text-[#251A14] font-bold">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
                                             <span class="text-[#8E7E73] text-xs">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                         </td>
 
                                         <!-- Status dengan Quick Interactive Toggle -->
-                                        <td class="px-3.5 py-3 text-center whitespace-nowrap">
+                                        <td class="px-3.5 py-3 text-center whitespace-nowrap border-r border-[#E2D7C8]/60">
                                             <button type="button" onclick="toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
                                                 title="Klik untuk ubah status ke <?= $prod['status'] === 'Aktif' ? 'Nonaktif' : 'Aktif' ?>"
                                                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#8E7E73]/15 text-[#8E7E73] hover:bg-[#8E7E73]/25' ?>">

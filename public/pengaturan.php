@@ -261,15 +261,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
-                <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-5 flex items-center gap-3 border-b border-white/10 shrink-0">
-                    <div class="w-9 h-9 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                <!-- Logo & Brand Header (Height 64px - Aligned with Topbar) -->
+                <div class="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-white font-bold text-base tracking-tight leading-none">Berkat Dinasti</span>
-                        <span class="text-[#D8C7B8] text-[10px] tracking-wider uppercase font-semibold mt-1">Bakery & Pastry</span>
-                    </div>
+                    <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
@@ -757,7 +754,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <button onclick="openUserModal()" 
                                 class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                                 <i class="fas fa-user-plus text-xs"></i>
-                                <span>+ Tambah User Baru</span>
+                                <span>Tambah User Baru</span>
                             </button>
                         </div>
 

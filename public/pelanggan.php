@@ -321,15 +321,12 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
                 
-                <!-- Logo & Brand Header (Height 80px) -->
-                <div class="h-20 px-5 flex items-center gap-3 border-b border-white/10 shrink-0">
-                    <div class="w-9 h-9 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                <!-- Logo & Brand Header (Height 64px - Aligned with Topbar) -->
+                <div class="h-16 px-4 flex items-center gap-3 border-b border-white/10 shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-white p-0.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                         <img src="assets/images/logo.png" alt="Berkat Dinasti Logo" class="w-full h-full object-contain">
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-white font-bold text-base tracking-tight leading-none">Berkat Dinasti</span>
-                        <span class="text-[#D8C7B8] text-[10px] tracking-wider uppercase font-semibold mt-1">Bakery & Pastry</span>
-                    </div>
+                    <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
                     <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
@@ -604,7 +601,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         <button onclick="openCustomerModal()" 
                             class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-user-plus text-xs"></i>
-                            <span>+ Tambah Pelanggan</span>
+                            <span>Tambah Pelanggan</span>
                         </button>
                     </div>
                 </div>
@@ -641,10 +638,10 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                             <tbody class="divide-y divide-[#E2D7C8] text-xs md:text-sm">
                                 <?php foreach ($pelanggan_list as $idx => $cust): ?>
                                     <tr id="custRow-<?= $cust['id'] ?>" onclick="selectCustomer(<?= $cust['id'] ?>)" 
-                                        class="cursor-pointer transition-colors <?= $idx === 0 ? 'bg-[#EFE8DE] border-l-4 border-l-[#D46E15]' : ($idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]') ?> hover:bg-[#F0E9DF]">
+                                        class="cursor-pointer transition-colors <?= $idx === 0 ? 'bg-[#EFE8DE]' : ($idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]') ?> hover:bg-[#F0E9DF]">
                                         
                                         <!-- No Column -->
-                                        <td class="py-3.5 px-4 text-center">
+                                        <td class="py-3.5 px-4 text-center transition-all" <?= $idx === 0 ? 'style="box-shadow: inset 4px 0 0 0 #D46E15;"' : '' ?>>
                                             <span class="w-6 h-6 rounded-full <?= $idx === 0 ? 'bg-[#D46E15] text-white' : 'bg-[#E2D7C8] text-[#5E4D42]' ?> font-bold text-xs inline-flex items-center justify-center">
                                                 <?= $idx + 1 ?>
                                             </span>
@@ -694,7 +691,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                                         <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation()">
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- View -->
-                                                <button onclick="selectCustomer(<?= $cust['id'] ?>)" title="Lihat Profil" 
+                                                <button onclick="openCustomerDetailModal(<?= $cust['id'] ?>)" title="Lihat Informasi Lengkap" 
                                                     class="p-1.5 text-[#8E7E73] hover:text-[#D46E15] hover:bg-[#EFE8DE] rounded-lg transition-colors">
                                                     <i class="fas fa-eye text-xs"></i>
                                                 </button>
@@ -946,6 +943,106 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
     </form>
 
     <!-- ============================================================== -->
+    <!-- MODAL POPOUT: DETAIL LENGKAP PELANGGAN (EYE BUTTON)           -->
+    <!-- ============================================================== -->
+    <div id="customerDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop with subtle blur -->
+        <div onclick="closeCustomerDetailModal()" class="fixed inset-0 craft-modal-overlay"></div>
+
+        <!-- Modal Card Container -->
+        <div class="craft-modal-dialog max-w-2xl w-full p-6 sm:p-7 relative z-10 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col overflow-hidden bg-[#FDFBF7] border border-[#E2D7C8]">
+            <!-- Header (Sticky Top) -->
+            <div class="flex items-center justify-between pb-4 border-b border-[#E2D7C8] shrink-0">
+                <div class="flex items-center gap-3">
+                    <div id="modalDetailAvatar" class="w-11 h-11 rounded-full bg-[#D46E15]/20 text-[#924C00] font-bold text-sm flex items-center justify-center shrink-0">
+                        SD
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base sm:text-lg font-bold text-[#251A14]" id="modalDetailNama">Ibu Sari Dewi</h3>
+                            <span id="modalDetailTipe" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#D46E15]/15 text-[#924C00]">Pelanggan Reguler</span>
+                        </div>
+                        <p class="text-xs text-[#8E7E73] mt-0.5 flex items-center gap-2">
+                            <span>Terdaftar: <strong id="modalDetailMemberSince">14 Jan 2024</strong></span>
+                            <span>•</span>
+                            <span class="text-[#27AE60] font-semibold" id="modalDetailStatusTagihan">Lunas</span>
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeCustomerDetailModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Body Content -->
+            <div class="py-4 overflow-y-auto flex-1 space-y-4">
+                <!-- Info Cards Grid (3 Columns) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-[#EFE8DE] rounded-xl p-3.5 border border-[#DDD3C5]">
+                        <p class="text-[10px] uppercase font-bold text-[#8E7E73] tracking-wider">Total Pesanan</p>
+                        <p class="text-lg font-bold text-[#251A14] mt-1" id="modalDetailTotalOrder">12 Pesanan</p>
+                    </div>
+                    <div class="bg-[#EFE8DE] rounded-xl p-3.5 border border-[#DDD3C5]">
+                        <p class="text-[10px] uppercase font-bold text-[#8E7E73] tracking-wider">Total Akumulasi</p>
+                        <p class="text-lg font-bold text-[#D46E15] mt-1" id="modalDetailTotalBelanja">Rp 560.000</p>
+                    </div>
+                    <div class="bg-[#EFE8DE] rounded-xl p-3.5 border border-[#DDD3C5]">
+                        <p class="text-[10px] uppercase font-bold text-[#8E7E73] tracking-wider">Antrean Saat Ini</p>
+                        <p class="text-lg font-bold text-[#27AE60] mt-1" id="modalDetailAntrean">1 Siap Kirim</p>
+                    </div>
+                </div>
+
+                <!-- Kontak & Alamat Pengiriman -->
+                <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                            <p class="text-[10px] uppercase font-bold text-[#8E7E73]">Nomor WhatsApp</p>
+                            <p class="font-bold text-[#251A14] text-sm mt-0.5" id="modalDetailNoWa">0812-3456-7890</p>
+                        </div>
+                        <a id="modalDetailWaLink" href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#27AE60] hover:bg-[#219653] text-white text-xs font-semibold shadow-2xs transition-colors self-start sm:self-auto">
+                            <i class="fab fa-whatsapp text-sm"></i>
+                            <span>Chat WhatsApp</span>
+                        </a>
+                    </div>
+                    <div class="pt-2 border-t border-[#DDD3C5]">
+                        <p class="text-[10px] uppercase font-bold text-[#8E7E73]">Alamat Pengiriman Lengkap</p>
+                        <p class="text-xs text-[#251A14] font-medium mt-1 leading-relaxed" id="modalDetailAlamat">Jl. Mawar No. 5, RT 02/04, Sukajadi, Malang</p>
+                    </div>
+                    <div class="pt-2 border-t border-[#DDD3C5]">
+                        <p class="text-[10px] uppercase font-bold text-[#8E7E73]">Catatan Khusus Pengiriman</p>
+                        <p class="text-xs text-[#5E4D42] mt-1 italic" id="modalDetailCatatan">Roti hajatan diikat kardus putih rapi, kurir tiba sebelum jam 3 sore.</p>
+                    </div>
+                </div>
+
+                <!-- Riwayat Transaksi -->
+                <div>
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h4 class="text-xs font-bold text-[#251A14] uppercase tracking-wider">Riwayat Pesanan Pelanggan</h4>
+                        <span class="text-xs text-[#8E7E73]" id="modalDetailHistoryBadge">3 Transaksi Terakhir</span>
+                    </div>
+                    <div class="space-y-2.5" id="modalDetailHistoryList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-between pt-3.5 border-t border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
+                <button type="button" onclick="closeCustomerDetailModal(); openCustomerModal(selectedDetailCustId);" 
+                    class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] border border-[#DDD3C5] text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition-colors">
+                    <i class="fas fa-edit text-xs"></i>
+                    <span>Edit Pelanggan</span>
+                </button>
+                <button type="button" onclick="closeCustomerDetailModal()" 
+                    class="bg-[#3E2B21] hover:bg-[#2C1E17] text-white text-xs font-semibold px-5 py-2 rounded-xl transition-colors">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
     <!-- MODAL POPOUT: LOGOUT / KELUAR AKUN                             -->
     <!-- ============================================================== -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -1045,15 +1142,26 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
             document.getElementById('customerCountBadge').textContent = visibleCount + ' Pelanggan';
         }
 
+        let selectedDetailCustId = 1;
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
         // Select Customer and Update Bottom Panels
         function selectCustomer(id) {
             selectedCustomerId = id;
             const customer = customersData.find(c => c.id === id);
             if (!customer) return;
 
-            // Highlight table row
+            // Highlight table row cleanly without outer border
             document.querySelectorAll('#customersTable tbody tr').forEach((r, idx) => {
                 r.className = 'cursor-pointer transition-colors ' + (idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]') + ' hover:bg-[#F0E9DF]';
+                const firstCell = r.querySelector('td:first-child');
+                if (firstCell) {
+                    firstCell.style.boxShadow = '';
+                }
                 const noBadge = r.querySelector('td:first-child span');
                 if (noBadge) {
                     noBadge.className = 'w-6 h-6 rounded-full bg-[#E2D7C8] text-[#5E4D42] font-bold text-xs inline-flex items-center justify-center';
@@ -1062,10 +1170,14 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
 
             const activeRow = document.getElementById('custRow-' + id);
             if (activeRow) {
-                activeRow.className = 'cursor-pointer transition-colors bg-[#EFE8DE] border-l-4 border-l-[#D46E15]';
+                activeRow.className = 'cursor-pointer transition-colors bg-[#EFE8DE]';
+                const firstCell = activeRow.querySelector('td:first-child');
+                if (firstCell) {
+                    firstCell.style.boxShadow = 'inset 4px 0 0 0 #D46E15';
+                }
                 const noBadge = activeRow.querySelector('td:first-child span');
                 if (noBadge) {
-                    noBadge.className = 'w-6 h-6 rounded-full bg-[#D46E15] text-white font-bold text-xs inline-flex items-center justify-center';
+                    noBadge.className = 'w-6 h-6 rounded-full bg-[#D46E15] text-white font-bold text-xs inline-flex items-center justify-center shadow-xs';
                 }
             }
 
@@ -1116,6 +1228,70 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         Belum ada riwayat pesanan tercatat untuk pelanggan ini.
                     </div>
                 `;
+            }
+        }
+
+        // Open Full Detail Modal (Eye Button)
+        function openCustomerDetailModal(id) {
+            selectedDetailCustId = id;
+            const customer = customersData.find(c => c.id === id);
+            if (!customer) return;
+
+            selectCustomer(id);
+
+            document.getElementById('modalDetailAvatar').textContent = customer.avatar;
+            document.getElementById('modalDetailNama').textContent = customer.nama;
+            document.getElementById('modalDetailTipe').textContent = customer.tipe;
+            document.getElementById('modalDetailMemberSince').textContent = customer.member_since;
+            document.getElementById('modalDetailStatusTagihan').textContent = customer.tagihan;
+            document.getElementById('modalDetailStatusTagihan').className = 'font-semibold ' + (customer.tagihan.toLowerCase().includes('lunas') ? 'text-[#27AE60]' : 'text-[#EB5757]');
+            document.getElementById('modalDetailTotalOrder').textContent = customer.pesanan_count + ' Pesanan';
+            document.getElementById('modalDetailTotalBelanja').textContent = customer.total_transaksi;
+            document.getElementById('modalDetailAntrean').textContent = customer.antrean;
+            document.getElementById('modalDetailNoWa').textContent = customer.no_wa;
+            document.getElementById('modalDetailWaLink').href = 'https://wa.me/' + customer.wa_clean;
+            document.getElementById('modalDetailAlamat').textContent = customer.alamat;
+            document.getElementById('modalDetailCatatan').textContent = customer.catatan ? `"${customer.catatan}"` : 'Tidak ada catatan pengiriman khusus.';
+
+            const histList = document.getElementById('modalDetailHistoryList');
+            histList.innerHTML = '';
+            if (customer.history && customer.history.length > 0) {
+                document.getElementById('modalDetailHistoryBadge').textContent = `${customer.history.length} Transaksi Terdaftar`;
+                customer.history.forEach(ord => {
+                    histList.innerHTML += `
+                        <div class="bg-[#EFE8DE] rounded-xl p-3 border border-[#DDD3C5]">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-bold text-[#251A14]">${escapeHtml(ord.order_no)}</span>
+                                    <span class="${ord.status_bayar_class} text-[10px] font-semibold px-2 py-0.5 rounded-full">${escapeHtml(ord.status_bayar)}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-[#251A14] text-xs block">${escapeHtml(ord.amount)}</span>
+                                    <span class="${ord.delivery_status_class} text-[10px]">${escapeHtml(ord.delivery_status)}</span>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-[#8E7E73]">${escapeHtml(ord.date_time)}</p>
+                            <p class="text-xs text-[#5E4D42] mt-1 font-medium">${escapeHtml(ord.items)}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                document.getElementById('modalDetailHistoryBadge').textContent = '0 Transaksi';
+                histList.innerHTML = `<p class="text-xs text-[#8E7E73] p-3 text-center bg-[#EFE8DE] rounded-xl">Belum ada riwayat pesanan.</p>`;
+            }
+
+            const modal = document.getElementById('customerDetailModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeCustomerDetailModal() {
+            const modal = document.getElementById('customerDetailModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
             }
         }
 

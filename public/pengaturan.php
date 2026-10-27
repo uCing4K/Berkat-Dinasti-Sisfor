@@ -19,10 +19,10 @@ if (!isset($_SESSION['store_settings'])) {
         'name' => 'Berkat Dinasti Bakery',
         'phone' => '0341-551234',
         'wa' => '0812-3456-7890',
-        'address' => 'Jl. Terusan Ijen No. 42, Klojen, Kota Malang',
+        'address' => 'Jl. Panglima Sudirman No. 42, Ngaglik',
         'province' => 'Jawa Timur',
-        'city' => 'Kota Malang',
-        'postal' => '65115',
+        'city' => 'Kota Batu',
+        'postal' => '65311',
         'email' => 'admin@berkatdinasti.id',
         'footer' => 'Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah.',
         'paper_size' => '80',
@@ -719,15 +719,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         </div>
                                     </div>
 
-                                    <!-- Footer Message & Barcode -->
+                                    <!-- Footer Message -->
                                     <div class="pt-3 text-center text-[10px]">
-                                        <p class="italic text-[#5E4D42] mb-2 leading-tight" id="previewReceiptFooter">
+                                        <p class="italic text-[#5E4D42] mb-1.5 leading-tight" id="previewReceiptFooter">
                                             "<?= htmlspecialchars($store['footer']) ?>"
                                         </p>
-                                        <div class="font-mono text-center tracking-widest text-[#8E7E73] text-[10px] my-1">
-                                            ||||||||||||||||||||||||||||||||||||||||||||
-                                        </div>
-                                        <p class="text-[9px] text-[#8E7E73]">Berkat Dinasti — Kota Batu</p>
+                                        <p class="text-[9px] text-[#8E7E73] font-medium tracking-wide">Berkat Dinasti — Kota Batu</p>
                                     </div>
 
                                 </div>

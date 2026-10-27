@@ -55,7 +55,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_rekap') {
     if ($db_connected && $pdo) {
         try {
             $stmt = $pdo->prepare("
-                SELECT p.no_invoice, p.tgl_pesan, pel.nama_pelanggan, pel.no_wa, 
+                SELECT p.no_invoice, p.tgl_pesan, pel.nama as nama_pelanggan, pel.no_wa, 
                        CONCAT(COALESCE(p.tgl_kirim, p.tgl_pesan), ' ', COALESCE(p.waktu_kirim, '')) as deadline, 
                        p.grand_total, p.status_bayar, p.status, p.catatan 
                 FROM pesanan p 
@@ -156,27 +156,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $pdo->beginTransaction();
             
             if ($id_pelanggan <= 0 && !empty($nama_pelanggan_baru)) {
-                $stmtC = $pdo->prepare("INSERT INTO pelanggan (nama_pelanggan, no_wa, alamat, tipe_pelanggan) VALUES (?, ?, ?, 'retail')");
+                $stmtC = $pdo->prepare("INSERT INTO pelanggan (nama, no_wa, alamat, tipe) VALUES (?, ?, ?, 'retail')");
                 $stmtC->execute([$nama_pelanggan_baru, $no_wa_baru, $alamat_baru]);
                 $id_pelanggan = $pdo->lastInsertId();
                 $customer_display = $nama_pelanggan_baru;
                 $customer_wa = $no_wa_baru;
                 $customer_alamat = $alamat_baru;
             } elseif ($id_pelanggan > 0) {
-                $stmtC = $pdo->prepare("SELECT nama_pelanggan, no_wa, alamat FROM pelanggan WHERE id_pelanggan = ?");
+                $stmtC = $pdo->prepare("SELECT nama, no_wa, alamat FROM pelanggan WHERE id_pelanggan = ?");
                 $stmtC->execute([$id_pelanggan]);
                 $cRow = $stmtC->fetch();
                 if ($cRow) {
-                    $customer_display = $cRow['nama_pelanggan'];
+                    $customer_display = $cRow['nama'];
                     $customer_wa = $cRow['no_wa'];
                     $customer_alamat = $cRow['alamat'];
                 }
             } else {
-                $stmtC = $pdo->query("SELECT id_pelanggan, nama_pelanggan, no_wa, alamat FROM pelanggan LIMIT 1");
+                $stmtC = $pdo->query("SELECT id_pelanggan, nama, no_wa, alamat FROM pelanggan LIMIT 1");
                 $cRow = $stmtC->fetch();
                 if ($cRow) {
                     $id_pelanggan = $cRow['id_pelanggan'];
-                    $customer_display = $cRow['nama_pelanggan'];
+                    $customer_display = $cRow['nama'];
                     $customer_wa = $cRow['no_wa'];
                     $customer_alamat = $cRow['alamat'];
                 } else {
@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
     
-    // Simpan ke sesi agar tampil instan
+    // Simpan ke sesi agar tampil instan di Beranda
     if (!isset($_SESSION['session_orders'])) {
         $_SESSION['session_orders'] = [];
     }
@@ -240,18 +240,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         default => 'bg-[#828282]/15 text-[#544337]'
     };
     
+    $isToday = ($tgl_kirim == date('Y-m-d'));
+    $deadlineFormatted = $isToday ? ('Hari Ini, ' . substr($waktu_kirim, 0, 5)) : (date('d M Y, ', strtotime($tgl_kirim)) . substr($waktu_kirim, 0, 5));
+    
     array_unshift($_SESSION['session_orders'], [
         'id' => $no_invoice,
         'customer' => $customer_display,
         'product' => $itemSummaryStr,
-        'deadline' => 'Hari Ini, ' . substr($waktu_kirim, 0, 5),
-        'is_urgent' => true,
+        'deadline' => $deadlineFormatted,
+        'is_urgent' => $isToday,
         'status' => 'pending',
         'payment_status' => ucfirst(str_replace('_', ' ', $status_bayar)),
         'payment_class' => $p_class,
         'total' => 'Rp ' . number_format($grand_total, 0, ',', '.'),
         'no_wa' => $customer_wa,
         'alamat' => $customer_alamat
+    ]);
+    
+    // Sinkronkan juga ke custom_orders untuk page Pesanan (Kanban & Kalender)
+    if (!isset($_SESSION['custom_orders'])) {
+        $_SESSION['custom_orders'] = [];
+    }
+    array_unshift($_SESSION['custom_orders'], [
+        'id' => $no_invoice,
+        'customer' => $customer_display,
+        'phone' => $customer_wa,
+        'items' => $itemSummaryStr,
+        'destination' => $customer_alamat,
+        'time' => 'Pukul ' . substr($waktu_kirim, 0, 5),
+        'date' => $tgl_kirim,
+        'default_status' => 'menunggu',
+        'is_urgent' => $isToday,
+        'status_bayar' => ucfirst(str_replace('_', ' ', $status_bayar)),
+        'bayar_class' => $p_class,
+        'courier_info' => 'Kurir Toko (Siap Antar ' . substr($waktu_kirim, 0, 5) . ')',
+        'total' => $grand_total
     ]);
     
     $_SESSION['flash_msg'] = "Pesanan baru #{$no_invoice} berhasil disimpan dan otomatis masuk ke antrean oven & jadwal pengiriman!";
@@ -331,7 +354,7 @@ $customers_for_select = [
 
 if ($db_connected && $pdo) {
     try {
-        $stmtC = $pdo->query("SELECT id_pelanggan as id, nama_pelanggan as nama, no_wa, alamat FROM pelanggan ORDER BY nama_pelanggan ASC");
+        $stmtC = $pdo->query("SELECT id_pelanggan as id, nama, no_wa, alamat FROM pelanggan ORDER BY nama ASC");
         $dbCusts = $stmtC->fetchAll();
         if (!empty($dbCusts)) {
             $customers_for_select = $dbCusts;
@@ -499,7 +522,7 @@ if ($db_connected && $pdo) {
     try {
         $stmtOrders = $pdo->query("
             SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.tgl_kirim, p.waktu_kirim, p.grand_total, p.status, p.status_bayar, p.catatan,
-                   pel.nama_pelanggan, pel.no_wa, pel.alamat,
+                   pel.nama as nama_pelanggan, pel.no_wa, pel.alamat,
                    (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
                     FROM detail_pesanan dp 
                     JOIN varian_produk v ON dp.id_varian = v.id_varian 
@@ -514,7 +537,7 @@ if ($db_connected && $pdo) {
             $formattedOrders = [];
             foreach ($dbOrders as $o) {
                 $is_urgent = ($o['tgl_kirim'] == date('Y-m-d'));
-                $dl = $is_urgent ? 'Hari Ini, ' . substr($o['waktu_kirim'] ?? '14:00', 0, 5) : date('d M Y', strtotime($o['tgl_kirim'] ?? $o['tgl_pesan']));
+                $dl = $is_urgent ? 'Hari Ini, ' . substr($o['waktu_kirim'] ?? '14:00', 0, 5) : date('d M Y, ', strtotime($o['tgl_kirim'] ?? $o['tgl_pesan'])) . substr($o['waktu_kirim'] ?? '14:00', 0, 5);
                 $p_status = strtolower($o['status_bayar'] ?? 'belum_bayar');
                 $p_class = match($p_status) {
                     'lunas' => 'bg-[#27AE60]/15 text-[#1B7A43]',
@@ -543,6 +566,31 @@ if ($db_connected && $pdo) {
 
 if (!empty($_SESSION['session_orders'])) {
     $pending_orders = array_merge($_SESSION['session_orders'], $pending_orders);
+}
+
+// Sinkronkan juga jika ada pesanan baru dari page Pesanan
+if (!empty($_SESSION['custom_orders'])) {
+    $existingIds = array_column($pending_orders, 'id');
+    foreach ($_SESSION['custom_orders'] as $co) {
+        if (!in_array($co['id'], $existingIds)) {
+            $existingIds[] = $co['id'];
+            $isTodayCo = ($co['date'] == date('Y-m-d'));
+            $coDeadline = $isTodayCo ? ('Hari Ini, ' . str_replace('Pukul ', '', $co['time'])) : (date('d M Y, ', strtotime($co['date'])) . str_replace('Pukul ', '', $co['time']));
+            array_unshift($pending_orders, [
+                'id' => $co['id'],
+                'customer' => $co['customer'],
+                'product' => $co['items'],
+                'deadline' => $coDeadline,
+                'is_urgent' => $isTodayCo,
+                'status' => $co['default_status'] === 'menunggu' ? 'pending' : $co['default_status'],
+                'payment_status' => $co['status_bayar'],
+                'payment_class' => $co['bayar_class'],
+                'total' => 'Rp ' . number_format($co['total'], 0, ',', '.'),
+                'no_wa' => $co['phone'],
+                'alamat' => $co['destination']
+            ]);
+        }
+    }
 }
 
 // Sinkronkan status pesanan yang baru diubah secara live
@@ -578,7 +626,7 @@ $deliveries = [
 if ($db_connected && $pdo) {
     try {
         $stmtD = $pdo->query("
-            SELECT p.waktu_kirim, pel.nama_pelanggan, 
+            SELECT p.waktu_kirim, pel.nama as nama_pelanggan, 
                    COALESCE((SELECT GROUP_CONCAT(CONCAT(dp.qty, ' pcs ', v.nama_varian) SEPARATOR ', ')
                     FROM detail_pesanan dp 
                     JOIN varian_produk v ON dp.id_varian = v.id_varian 
@@ -611,6 +659,41 @@ if ($db_connected && $pdo) {
             $deliveries = $formattedD;
         }
     } catch (Exception $e) {}
+}
+
+// Sinkronkan pengiriman hari ini dari session
+$deliveryCustList = array_column($deliveries, 'customer');
+if (!empty($_SESSION['session_orders'])) {
+    foreach ($_SESSION['session_orders'] as $so) {
+        if (!empty($so['is_urgent']) || str_contains($so['deadline'] ?? '', 'Hari Ini')) {
+            if (!in_array($so['customer'], $deliveryCustList)) {
+                $deliveryCustList[] = $so['customer'];
+                array_unshift($deliveries, [
+                    'time' => preg_match('/\d{2}:\d{2}/', $so['deadline'] ?? '', $m) ? $m[0] : '14:00',
+                    'customer' => $so['customer'] ?? 'Pelanggan',
+                    'items' => $so['product'] ?? 'Pesanan Bakery',
+                    'status' => 'Menunggu Dapur',
+                    'status_class' => 'bg-[#828282]/15 text-[#544337]'
+                ]);
+            }
+        }
+    }
+}
+if (!empty($_SESSION['custom_orders'])) {
+    foreach ($_SESSION['custom_orders'] as $co) {
+        if (!empty($co['is_urgent']) || ($co['date'] ?? '') == date('Y-m-d')) {
+            if (!in_array($co['customer'], $deliveryCustList)) {
+                $deliveryCustList[] = $co['customer'];
+                array_unshift($deliveries, [
+                    'time' => preg_match('/\d{2}:\d{2}/', $co['time'] ?? '', $m) ? $m[0] : '14:00',
+                    'customer' => $co['customer'] ?? 'Pelanggan',
+                    'items' => $co['items'] ?? 'Pesanan Bakery',
+                    'status' => 'Menunggu Dapur',
+                    'status_class' => 'bg-[#828282]/15 text-[#544337]'
+                ]);
+            }
+        }
+    }
 }
 
 // -------------------------------------------------------------

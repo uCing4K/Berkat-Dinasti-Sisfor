@@ -968,12 +968,12 @@ if ($db_connected && $pdo) {
                             <span>Unduh Rekap Harian</span>
                         </a>
 
-                        <!-- Antrean Oven Link to Kanban -->
-                        <a href="pesanan.php?tab=kanban" 
-                            title="Buka alur produksi dan antrean oven" 
+                        <!-- Lihat Pesanan Link to Kanban -->
+                        <a href="pesanan.php" 
+                            title="Buka daftar dan alur manajemen pesanan" 
                             class="hidden md:flex bg-[#FFF6ED] hover:bg-[#FFEEDD] text-[#924C00] text-xs md:text-sm font-bold px-3.5 py-2.5 rounded-lg border border-[#F7D4B2] items-center gap-2 transition-colors shadow-2xs">
-                            <i class="fas fa-fire text-xs text-[#D46E15]"></i>
-                            <span>Antrean Oven</span>
+                            <i class="fas fa-clipboard-list text-xs text-[#D46E15]"></i>
+                            <span>Lihat Pesanan</span>
                         </a>
 
                         <!-- Tambah Pesanan Baru Button -->

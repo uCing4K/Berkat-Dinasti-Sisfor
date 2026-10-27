@@ -253,10 +253,10 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
     <div class="flex flex-1 w-full relative">
 
         <!-- MOBILE SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -269,7 +269,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
-                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
+                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
                         <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
@@ -278,37 +278,37 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-home w-5 text-center text-base"></i>
+                        <i class="fas fa-th-large w-5 text-center text-sm opacity-90"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-bread-slice w-5 text-center text-base"></i>
+                        <i class="fas fa-box-open w-5 text-center text-sm opacity-90"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-clipboard-list w-5 text-center text-base"></i>
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm opacity-90"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-users w-5 text-center text-base"></i>
+                        <i class="fas fa-users w-5 text-center text-sm opacity-90"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-chart-line w-5 text-center text-base"></i>
+                        <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan (Active) -->
                     <a href="pengaturan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
-                        <i class="fas fa-cog w-5 text-center text-base"></i>
+                        <i class="fas fa-cog w-5 text-center text-sm"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -316,17 +316,17 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/25 rounded-xl p-2.5 flex items-center justify-between border border-white/5">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
                         <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
@@ -431,6 +431,11 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         </button>
                     </div>
                 <?php endif; ?>
+                <!-- Toast In-Page Dinamis -->
+                <div id="dynamicToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#3E2B21] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-in slide-in-from-bottom-3 duration-200 border border-white/10">
+                    <span id="dynamicToastIcon" class="flex items-center text-[#D46E15] text-sm"><i class="fas fa-info-circle"></i></span>
+                    <span id="dynamicToastText">Fitur segera diimplementasi</span>
+                </div>
 
                 <!-- TAB SWITCHER BAR (PROFIL TOKO VS MANAJEMEN USER) -->
                 <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
@@ -593,20 +598,25 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <div class="mb-4">
                                             <label class="block text-xs font-semibold text-[#251A14] mb-2">Pilihan Ukuran Kertas Thermal:</label>
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                                <label class="border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-[#D46E15] transition-colors">
-                                                    <input type="radio" id="storePaperSize58" name="paper_size" value="58" <?= ($store['paper_size'] === '58') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
-                                                    <div>
-                                                        <p class="text-xs font-bold text-[#251A14]">58 mm (Mini Portable POS)</p>
-                                                        <p class="text-[11px] text-[#8E7E73] mt-0.5">Lebar 32 karakter per baris</p>
+                                                <label id="cardPaper58" onclick="setPaperSize('58')" 
+                                                    class="<?= ($store['paper_size'] === '58') ? 'border-2 border-[#D46E15] bg-[#EFE8DE]' : 'border border-[#DDD3C5] bg-[#EFE8DE]/50 hover:border-[#D46E15]' ?> rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all">
+                                                    <div class="flex items-center gap-3">
+                                                        <input type="radio" id="storePaperSize58" name="paper_size" value="58" <?= ($store['paper_size'] === '58') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
+                                                        <div>
+                                                            <p class="text-xs font-bold text-[#251A14]">58 mm (Mini Portable POS)</p>
+                                                            <p class="text-[11px] text-[#8E7E73] mt-0.5">Lebar 32 karakter per baris</p>
+                                                        </div>
                                                     </div>
+                                                    <i class="fas fa-receipt text-[#D46E15] text-base"></i>
                                                 </label>
 
-                                                <label class="border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer">
+                                                <label id="cardPaper80" onclick="setPaperSize('80')" 
+                                                    class="<?= ($store['paper_size'] !== '58') ? 'border-2 border-[#D46E15] bg-[#EFE8DE]' : 'border border-[#DDD3C5] bg-[#EFE8DE]/50 hover:border-[#D46E15]' ?> rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all">
                                                     <div class="flex items-center gap-3">
-                                                        <input type="radio" id="storePaperSize80" name="paper_size" value="80" <?= ($store['paper_size'] === '80') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
+                                                        <input type="radio" id="storePaperSize80" name="paper_size" value="80" <?= ($store['paper_size'] !== '58') ? 'checked' : '' ?> class="text-[#D46E15] focus:ring-[#D46E15]">
                                                         <div>
                                                             <p class="text-xs font-bold text-[#924C00]">80 mm (Standar Desktop Kasir)</p>
-                                                            <p class="text-[11px] text-[#5E4D42] mt-0.5">Lebar 48 karakter • Terpilih</p>
+                                                            <p class="text-[11px] text-[#5E4D42] mt-0.5">Lebar 48 karakter • Rekomendasi</p>
                                                         </div>
                                                     </div>
                                                     <i class="fas fa-receipt text-[#D46E15] text-base"></i>
@@ -626,10 +636,10 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                                         <!-- Test Print Actions -->
                                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-[#E2D7C8]">
-                                            <button type="button" onclick="printThermalReceipt()" 
+                                            <button type="button" onclick="testPrintThermal()" id="btnTestPrintForm"
                                                 class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-4 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center gap-2 transition-colors">
                                                 <i class="fas fa-print text-xs"></i>
-                                                <span>Test Print Nota Struk (80mm)</span>
+                                                <span id="lblTestPrintForm">Test Print Nota Struk (<?= ($store['paper_size'] === '58') ? '58mm' : '80mm' ?>)</span>
                                             </button>
 
                                             <button type="submit" 
@@ -652,21 +662,21 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 <div class="flex items-center justify-between pb-3 border-b border-[#E2D7C8] mb-4">
                                     <div class="flex items-center gap-2 text-xs font-bold text-[#251A14]">
                                         <i class="fas fa-receipt text-[#D46E15]"></i>
-                                        <span>Simulasi Cetak Nota 80mm</span>
+                                        <span id="lblSimulasiHeader"><?= ($store['paper_size'] === '58') ? 'Simulasi Cetak Nota 58mm' : 'Simulasi Cetak Nota 80mm' ?></span>
                                     </div>
                                     <span class="bg-[#EFE8DE] text-[#8E7E73] text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-[#DDD3C5]">
                                         THERMAL VIEW
                                     </span>
                                 </div>
 
-                                <!-- Receipt Paper Preview -->
-                                <div class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 text-[11px] leading-relaxed shadow-xs text-[#251A14]">
+                                <!-- Receipt Paper Preview (Dinamis 58mm vs 80mm) -->
+                                <div id="thermalPaperBox" class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 <?= ($store['paper_size'] === '58') ? 'text-[10px] max-w-[250px]' : 'text-[11px] max-w-[340px]' ?> leading-relaxed shadow-xs text-[#251A14] transition-all mx-auto">
                                     
                                     <!-- Store Header -->
                                     <div class="text-center pb-2 border-b border-dashed border-[#8E7E73]">
                                         <p class="font-bold text-xs uppercase tracking-wider" id="previewReceiptName"><?= htmlspecialchars($store['name']) ?></p>
                                         <p class="text-[10px] text-[#5E4D42]" id="previewReceiptAddress"><?= htmlspecialchars($store['address']) ?></p>
-                                        <p class="text-[10px] text-[#5E4D42]">Malang • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
+                                        <p class="text-[10px] text-[#5E4D42]">Kota Batu • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
                                     </div>
 
                                     <!-- Meta Order -->
@@ -717,14 +727,14 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <div class="font-mono text-center tracking-widest text-[#8E7E73] text-[10px] my-1">
                                             ||||||||||||||||||||||||||||||||||||||||||||
                                         </div>
-                                        <p class="text-[9px] text-[#8E7E73]">Berkat Dinasti — Kota Malang</p>
+                                        <p class="text-[9px] text-[#8E7E73]">Berkat Dinasti — Kota Batu</p>
                                     </div>
 
                                 </div>
 
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#E2D7C8] text-xs">
-                                    <span class="text-[#8E7E73]">Ukuran kertas: <strong class="text-[#251A14]">80 mm</strong></span>
-                                    <button type="button" onclick="printThermalReceipt()" class="text-[#D46E15] hover:text-[#B85207] font-bold">
+                                    <span class="text-[#8E7E73]">Ukuran kertas: <strong class="text-[#251A14]" id="lblUkuranKertasFooter"><?= ($store['paper_size'] === '58') ? '58 mm' : '80 mm' ?></strong></span>
+                                    <button type="button" onclick="testPrintThermal()" class="text-[#D46E15] hover:text-[#B85207] font-bold">
                                         Cetak Uji Coba &rarr;
                                     </button>
                                 </div>
@@ -984,7 +994,66 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 headerSubtitle.textContent = 'Profil Toko';
                 headerTitle.textContent = 'Pengaturan Toko';
             }
-        }engaturan Toko';
+        }
+
+        // Ukuran Kertas Thermal Dinamis (58mm vs 80mm)
+        function setPaperSize(size) {
+            const paper58 = document.getElementById('storePaperSize58');
+            const paper80 = document.getElementById('storePaperSize80');
+            const card58 = document.getElementById('cardPaper58');
+            const card80 = document.getElementById('cardPaper80');
+            const receiptBox = document.getElementById('thermalPaperBox');
+            const headerTitle = document.getElementById('lblSimulasiHeader');
+            const formBtnLabel = document.getElementById('lblTestPrintForm');
+            const footerPaperLabel = document.getElementById('lblUkuranKertasFooter');
+
+            if (size === '58') {
+                if (paper58) paper58.checked = true;
+                if (card58) {
+                    card58.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
+                }
+                if (card80) {
+                    card80.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
+                }
+                if (receiptBox) {
+                    receiptBox.className = 'thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-3 text-[10px] leading-relaxed shadow-xs text-[#251A14] transition-all max-w-[250px] mx-auto';
+                }
+                if (headerTitle) headerTitle.textContent = 'Simulasi Cetak Nota 58mm';
+                if (formBtnLabel) formBtnLabel.textContent = 'Test Print Nota Struk (58mm)';
+                if (footerPaperLabel) footerPaperLabel.textContent = '58 mm';
+            } else {
+                if (paper80) paper80.checked = true;
+                if (card80) {
+                    card80.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
+                }
+                if (card58) {
+                    card58.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
+                }
+                if (receiptBox) {
+                    receiptBox.className = 'thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 text-[11px] leading-relaxed shadow-xs text-[#251A14] transition-all max-w-[340px] mx-auto';
+                }
+                if (headerTitle) headerTitle.textContent = 'Simulasi Cetak Nota 80mm';
+                if (formBtnLabel) formBtnLabel.textContent = 'Test Print Nota Struk (80mm)';
+                if (footerPaperLabel) footerPaperLabel.textContent = '80 mm';
+            }
+        }
+
+        // Test Print Toast Notification
+        function testPrintThermal() {
+            showToast('Fitur segera diimplementasi', '<i class="fas fa-info-circle text-[#D46E15]"></i>');
+        }
+
+        function showToast(text, iconHtml = '<i class="fas fa-info-circle text-[#D46E15]"></i>') {
+            const toast = document.getElementById('dynamicToast');
+            const iconEl = document.getElementById('dynamicToastIcon');
+            const textEl = document.getElementById('dynamicToastText');
+            if (textEl) textEl.textContent = text;
+            if (iconEl) iconEl.innerHTML = iconHtml;
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
             }
         }
 
@@ -1019,7 +1088,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
         // Thermal Receipt Print
         function printThermalReceipt() {
-            window.print();
+            testPrintThermal();
         }
 
         // User Modal Open/Close
@@ -1089,6 +1158,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
             if (user && !user.contains(e.target) && !userBtn.contains(e.target)) {
                 user.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tab') === 'user') {
+                switchSettingTab('user');
             }
         });
     </script>

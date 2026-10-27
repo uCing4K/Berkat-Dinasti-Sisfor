@@ -360,6 +360,24 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             background-color: #EFE8DE !important;
             border: 2px dashed #D46E15 !important;
         }
+
+        .craft-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .craft-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .craft-scrollbar::-webkit-scrollbar-thumb {
+            background: #DDD3C5;
+            border-radius: 9999px;
+        }
+        .craft-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #D46E15;
+        }
+        .craft-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #DDD3C5 transparent;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
@@ -691,8 +709,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                                 <p class="text-[#8E7E73] text-xs mb-4">Pesanan baru masuk kasir</p>
 
-                                <!-- Kartu Pesanan Container -->
-                                <div class="space-y-3.5 order-cards-container" id="container-menunggu">
+                                <!-- Kartu Pesanan Container (Maks. 5 Kartu, Scrollable jika lebih) -->
+                                <div class="space-y-3.5 order-cards-container max-h-[620px] overflow-y-auto pr-1.5 craft-scrollbar" id="container-menunggu">
                                     <?php foreach ($orders_by_status['menunggu'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
                                              class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#E2B93B] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
@@ -746,7 +764,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                                 <p class="text-[#8E7E73] text-xs mb-4">Adonan, oven & pendinginan</p>
 
-                                <div class="space-y-3.5 order-cards-container" id="container-proses">
+                                <div class="space-y-3.5 order-cards-container max-h-[620px] overflow-y-auto pr-1.5 craft-scrollbar" id="container-proses">
                                     <?php foreach ($orders_by_status['proses'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
                                              class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#D46E15] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
@@ -795,7 +813,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                                 <p class="text-[#8E7E73] text-xs mb-4">Sudah dipacking mika / kardus</p>
 
-                                <div class="space-y-3.5 order-cards-container" id="container-kirim">
+                                <div class="space-y-3.5 order-cards-container max-h-[620px] overflow-y-auto pr-1.5 craft-scrollbar" id="container-kirim">
                                     <?php foreach ($orders_by_status['kirim'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
                                              class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#2F80ED] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
@@ -844,7 +862,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                                 <p class="text-[#8E7E73] text-xs mb-4">Diterima pelanggan / lunas</p>
 
-                                <div class="space-y-3.5 order-cards-container" id="container-selesai">
+                                <div class="space-y-3.5 order-cards-container max-h-[620px] overflow-y-auto pr-1.5 craft-scrollbar" id="container-selesai">
                                     <?php foreach ($orders_by_status['selesai'] as $ord): ?>
                                         <div id="card-<?= $ord['id'] ?>" draggable="true" ondragstart="drag(event, '<?= $ord['id'] ?>')" 
                                              class="bg-[#FDFBF7] rounded-xl p-4 border border-[#E2D7C8] border-l-4 border-l-[#27AE60] shadow-sm hover:shadow-md hover:border-[#D46E15] transition-all relative cursor-grab active:cursor-grabbing"
@@ -1665,8 +1683,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 kanbanView.classList.add('hidden');
                 calendarView.classList.remove('hidden');
 
-                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1]';
+                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm';
+                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
 
                 headerTitle.textContent = 'Pengiriman';
                 headerBreadcrumb.textContent = 'Kalendar';
@@ -1676,8 +1694,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 calendarView.classList.add('hidden');
                 kanbanView.classList.remove('hidden');
 
-                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#FF9B45] text-white shadow-xs';
-                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#828282] hover:text-[#1C1C1C] hover:bg-[#F5F3F1]';
+                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm';
+                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
 
                 headerTitle.textContent = 'Manage Pesanan';
                 headerBreadcrumb.textContent = 'Manajemen';

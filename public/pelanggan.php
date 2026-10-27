@@ -313,10 +313,10 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
     <div class="flex flex-1 w-full relative">
 
         <!-- MOBILE SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -329,7 +329,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                     <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
-                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
+                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
                         <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
@@ -338,37 +338,37 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-home w-5 text-center text-base"></i>
+                        <i class="fas fa-th-large w-5 text-center text-sm opacity-90"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-bread-slice w-5 text-center text-base"></i>
+                        <i class="fas fa-box-open w-5 text-center text-sm opacity-90"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-clipboard-list w-5 text-center text-base"></i>
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm opacity-90"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan (Active) -->
                     <a href="pelanggan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
-                        <i class="fas fa-users w-5 text-center text-base"></i>
+                        <i class="fas fa-users w-5 text-center text-sm"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-chart-line w-5 text-center text-base"></i>
+                        <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-cog w-5 text-center text-base"></i>
+                        <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -376,7 +376,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/25 rounded-xl p-2.5 flex items-center justify-between border border-white/5">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
@@ -386,7 +386,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                             <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
                         <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>

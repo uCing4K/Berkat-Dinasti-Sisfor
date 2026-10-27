@@ -157,10 +157,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <div class="flex flex-1 w-full relative">
 
         <!-- MOBILE SIDEBAR OVERLAY -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden hidden transition-opacity duration-300"></div>
+        <!-- MOBILE SIDEBAR OVERLAY -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
         <!-- ASIDE / SIDEBAR (Width 240px) -->
-        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+        <aside id="main-sidebar" class="fixed top-0 bottom-0 left-0 w-[240px] bg-[#3E2B21] border-r border-[#2C1E17] z-50 flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none">
             
             <!-- Top Logo & Navigation -->
             <div class="flex flex-col flex-1 overflow-y-auto">
@@ -173,7 +174,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <span class="text-white font-bold text-lg tracking-tight">Berkat Dinasti</span>
                     
                     <!-- Mobile Close Button -->
-                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1" aria-label="Tutup Menu">
+                    <button onclick="toggleSidebar()" class="ml-auto text-white/70 hover:text-white lg:hidden p-1">
                         <i class="fas fa-times text-base"></i>
                     </button>
                 </div>
@@ -182,37 +183,37 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <nav class="p-4 space-y-1.5 flex-1">
                     <!-- Beranda -->
                     <a href="beranda.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-home w-5 text-center text-base"></i>
+                        <i class="fas fa-th-large w-5 text-center text-sm opacity-90"></i>
                         <span>Beranda</span>
                     </a>
 
                     <!-- Produk -->
                     <a href="produk.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-bread-slice w-5 text-center text-base"></i>
+                        <i class="fas fa-box-open w-5 text-center text-sm opacity-90"></i>
                         <span>Produk</span>
                     </a>
 
                     <!-- Pesanan -->
                     <a href="pesanan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-clipboard-list w-5 text-center text-base"></i>
+                        <i class="fas fa-shopping-bag w-5 text-center text-sm opacity-90"></i>
                         <span>Pesanan</span>
                     </a>
 
                     <!-- Pelanggan -->
                     <a href="pelanggan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-users w-5 text-center text-base"></i>
+                        <i class="fas fa-users w-5 text-center text-sm opacity-90"></i>
                         <span>Pelanggan</span>
                     </a>
 
                     <!-- Laporan (Active) -->
                     <a href="laporan.php" class="bg-[#D46E15] text-white rounded-lg px-4 py-3 flex items-center gap-3 font-semibold text-sm transition-all shadow-sm">
-                        <i class="fas fa-chart-line w-5 text-center text-base"></i>
+                        <i class="fas fa-chart-line w-5 text-center text-sm"></i>
                         <span>Laporan</span>
                     </a>
 
                     <!-- Pengaturan -->
                     <a href="pengaturan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
-                        <i class="fas fa-cog w-5 text-center text-base"></i>
+                        <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
                 </nav>
@@ -220,7 +221,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             <!-- Bottom User Profile Card -->
             <div class="p-4 border-t border-white/10 shrink-0">
-                <div class="bg-black/25 rounded-xl p-2.5 flex items-center justify-between border border-white/5">
+                <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
                             BD
@@ -230,7 +231,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
                         </div>
                     </div>
-                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/60 hover:text-white transition-colors shrink-0">
+                    <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
                         <i class="fas fa-sign-out-alt text-base"></i>
                     </button>
                 </div>
@@ -324,7 +325,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 
                 <!-- Toast In-Page -->
                 <div id="dynamicToast" class="hidden fixed bottom-6 right-6 z-50 bg-[#3E2B21] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-in slide-in-from-bottom-3 duration-200 border border-white/10">
-                    <span id="dynamicToastIcon">✨</span>
+                    <span id="dynamicToastIcon" class="flex items-center text-[#D46E15] text-sm"><i class="fas fa-check-circle"></i></span>
                     <span id="dynamicToastText">Aksi berhasil dijalankan</span>
                 </div>
 
@@ -474,9 +475,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                             </div>
 
-                            <!-- Bar Chart Visual Container -->
+                            <!-- Bar Chart Visual Container (12 Bulan Interaktif) -->
                             <div class="pt-4 pb-2">
-                                <div class="h-56 flex items-end justify-between gap-3 md:gap-6 px-2 relative border-b border-[#E2D7C8]">
+                                <div class="h-56 flex items-end justify-between gap-1 sm:gap-1.5 md:gap-2 px-1 relative border-b border-[#E2D7C8]" id="chartBarsContainer">
                                     
                                     <!-- Y-Axis Background Grid Lines -->
                                     <div class="absolute inset-0 flex flex-col justify-between pointer-events-none text-[10px] text-[#A6978A]" id="chartYAxis">
@@ -487,41 +488,42 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         <div class="flex justify-between"><span>0</span></div>
                                     </div>
 
-                                    <!-- Bars -->
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer" title="Mei: Rp 3.4 jt (36 order)">
-                                        <div id="barMei" class="w-full max-w-[48px] bg-[#E8D7CD] hover:bg-[#D46E15] rounded-t-lg transition-all" style="height: 68%;"></div>
-                                        <span class="text-xs text-[#8E7E73] font-medium">Mei</span>
-                                    </div>
+                                    <!-- 12 Months Bars (Dihasilkan Dinamis & Interaktif) -->
+                                    <?php 
+                                    $monthsList = [
+                                        ['code' => 'Jan', 'label' => 'Jan', 'omset' => 2800000, 'omsetFmt' => '2.8 jt', 'order' => 28, 'h_omset' => 56, 'h_order' => 47],
+                                        ['code' => 'Feb', 'label' => 'Feb', 'omset' => 3100000, 'omsetFmt' => '3.1 jt', 'order' => 31, 'h_omset' => 62, 'h_order' => 52],
+                                        ['code' => 'Mar', 'label' => 'Mar', 'omset' => 3000000, 'omsetFmt' => '3.0 jt', 'order' => 30, 'h_omset' => 60, 'h_order' => 50],
+                                        ['code' => 'Apr', 'label' => 'Apr', 'omset' => 3500000, 'omsetFmt' => '3.5 jt', 'order' => 35, 'h_omset' => 70, 'h_order' => 58],
+                                        ['code' => 'Mei', 'label' => 'Mei', 'omset' => 3400000, 'omsetFmt' => '3.4 jt', 'order' => 36, 'h_omset' => 68, 'h_order' => 60],
+                                        ['code' => 'Jun', 'label' => 'Jun', 'omset' => 3750000, 'omsetFmt' => '3.75 jt', 'order' => 40, 'h_omset' => 75, 'h_order' => 67],
+                                        ['code' => 'Jul', 'label' => 'Jul', 'omset' => 4100000, 'omsetFmt' => '4.1 jt', 'order' => 45, 'h_omset' => 82, 'h_order' => 75],
+                                        ['code' => 'Agu', 'label' => 'Agu', 'omset' => 3600000, 'omsetFmt' => '3.6 jt', 'order' => 38, 'h_omset' => 72, 'h_order' => 63],
+                                        ['code' => 'Sep', 'label' => 'Sep', 'omset' => 3820000, 'omsetFmt' => '3.82 jt', 'order' => 42, 'h_omset' => 76, 'h_order' => 70],
+                                        ['code' => 'Okt', 'label' => 'Okt', 'omset' => 4250000, 'omsetFmt' => '4.25 jt', 'order' => 48, 'h_omset' => 85, 'h_order' => 80, 'active' => true],
+                                        ['code' => 'Nov', 'label' => 'Nov', 'omset' => 4400000, 'omsetFmt' => '4.4 jt', 'order' => 46, 'h_omset' => 88, 'h_order' => 77],
+                                        ['code' => 'Des', 'label' => 'Des', 'omset' => 4950000, 'omsetFmt' => '4.95 jt', 'order' => 54, 'h_omset' => 98, 'h_order' => 90],
+                                    ];
+                                    ?>
+                                    <?php foreach ($monthsList as $idx => $m): 
+                                        $isActive = !empty($m['active']);
+                                    ?>
+                                        <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end z-10 group cursor-pointer relative" 
+                                             id="monthCol-<?= $idx ?>" onclick="selectChartMonth(<?= $idx ?>)" title="<?= $m['code'] ?>: Rp <?= $m['omsetFmt'] ?> (<?= $m['order'] ?> order)">
+                                            
+                                            <?php if ($isActive): ?>
+                                                <div class="absolute -top-7 bg-[#3E2B21] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap border border-white/10 z-20" id="chartActiveBarPill">
+                                                    <span>★</span>
+                                                    <span class="text-[#D46E15]" id="chartActiveBarValue"><?= $m['omsetFmt'] ?></span>
+                                                </div>
+                                            <?php endif; ?>
 
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer" title="Jun: Rp 3.75 jt (40 order)">
-                                        <div id="barJun" class="w-full max-w-[48px] bg-[#E8D7CD] hover:bg-[#D46E15] rounded-t-lg transition-all" style="height: 75%;"></div>
-                                        <span class="text-xs text-[#8E7E73] font-medium">Jun</span>
-                                    </div>
-
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer" title="Jul: Rp 4.1 jt (45 order)">
-                                        <div id="barJul" class="w-full max-w-[48px] bg-[#E8D7CD] hover:bg-[#D46E15] rounded-t-lg transition-all" style="height: 84%;"></div>
-                                        <span class="text-xs text-[#8E7E73] font-medium">Jul</span>
-                                    </div>
-
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer" title="Agu: Rp 3.6 jt (38 order)">
-                                        <div id="barAgu" class="w-full max-w-[48px] bg-[#E8D7CD] hover:bg-[#D46E15] rounded-t-lg transition-all" style="height: 72%;"></div>
-                                        <span class="text-xs text-[#8E7E73] font-medium">Agu</span>
-                                    </div>
-
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 group cursor-pointer" title="Sep: Rp 4.0 jt (44 order)">
-                                        <div id="barSep" class="w-full max-w-[48px] bg-[#E8D7CD] hover:bg-[#D46E15] rounded-t-lg transition-all" style="height: 88%;"></div>
-                                        <span class="text-xs text-[#8E7E73] font-medium">Sep</span>
-                                    </div>
-
-                                    <!-- Bar Aktif -->
-                                    <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end z-10 relative cursor-pointer" title="Okt (Aktif): Rp 4.25 jt (48 order)">
-                                        <div class="absolute -top-7 bg-[#3E2B21] text-white text-[10px] font-bold py-0.5 px-2.5 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap border border-white/10" id="chartActiveBarPill">
-                                            <span>Tertinggi ★</span>
-                                            <span class="text-[#D46E15]" id="chartActiveBarValue">4.25 jt</span>
+                                            <div id="chartBar-<?= $idx ?>" 
+                                                 class="w-full max-w-[26px] sm:max-w-[34px] <?= $isActive ? 'bg-[#D46E15] shadow-xs' : 'bg-[#E8D7CD] group-hover:bg-[#D46E15]/60' ?> rounded-t-md sm:rounded-t-lg transition-all" 
+                                                 style="height: <?= $m['h_omset'] ?>%;"></div>
+                                            <span id="chartLabel-<?= $idx ?>" class="text-[10px] sm:text-xs <?= $isActive ? 'text-[#924C00] font-bold' : 'text-[#8E7E73] font-medium' ?>"><?= $m['label'] ?></span>
                                         </div>
-                                        <div id="barOkt" class="w-full max-w-[48px] bg-[#D46E15] rounded-t-lg transition-all shadow-xs" style="height: 94%;"></div>
-                                        <span class="text-xs text-[#924C00] font-bold">Okt (Aktif)</span>
-                                    </div>
+                                    <?php endforeach; ?>
 
                                 </div>
                             </div>
@@ -770,13 +772,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             user.classList.toggle('hidden');
         }
 
-        function showToast(text) {
+        function showToast(text, iconHtml = '<i class="fas fa-check-circle text-base"></i>') {
             const toast = document.getElementById('dynamicToast');
-            document.getElementById('dynamicToastText').textContent = text;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            const iconEl = document.getElementById('dynamicToastIcon');
+            const textEl = document.getElementById('dynamicToastText');
+            if (textEl) textEl.textContent = text;
+            if (iconEl) iconEl.innerHTML = iconHtml;
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            }
         }
 
         // Apply Period Filter (Dynamic recalculation of KPIs, Date Range, and Table rows)
@@ -842,8 +849,85 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             showToast('Berkas Excel/CSV laporan berhasil diunduh!');
         }
 
-        // Switch Chart Mode (Omset vs Jumlah Pesanan)
+        // 12 Months Interactive Dataset
+        const monthsData = [
+            { code: 'Jan', name: 'Januari', omset: 2800000, omsetFmt: '2.8 jt', orders: 28, heightOmset: '56%', heightOrder: '47%', piutang: 300000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Feb', name: 'Februari', omset: 3100000, omsetFmt: '3.1 jt', orders: 31, heightOmset: '62%', heightOrder: '52%', piutang: 350000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Mar', name: 'Maret', omset: 3000000, omsetFmt: '3.0 jt', orders: 30, heightOmset: '60%', heightOrder: '50%', piutang: 400000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Apr', name: 'April', omset: 3500000, omsetFmt: '3.5 jt', orders: 35, heightOmset: '70%', heightOrder: '58%', piutang: 450000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Mei', name: 'Mei', omset: 3400000, omsetFmt: '3.4 jt', orders: 36, heightOmset: '68%', heightOrder: '60%', piutang: 480000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Jun', name: 'Juni', omset: 3750000, omsetFmt: '3.75 jt', orders: 40, heightOmset: '75%', heightOrder: '67%', piutang: 520000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Jul', name: 'Juli', omset: 4100000, omsetFmt: '4.1 jt', orders: 45, heightOmset: '82%', heightOrder: '75%', piutang: 600000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Agu', name: 'Agustus', omset: 3600000, omsetFmt: '3.6 jt', orders: 38, heightOmset: '72%', heightOrder: '63%', piutang: 400000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Sep', name: 'September', omset: 3820000, omsetFmt: '3.82 jt', orders: 42, heightOmset: '76%', heightOrder: '70%', piutang: 320000, pending: 0, desc: 'Semua pesanan selesai & lunas' },
+            { code: 'Okt', name: 'Oktober', omset: 4250000, omsetFmt: '4.25 jt', orders: 48, heightOmset: '85%', heightOrder: '80%', piutang: 850000, pending: 6, desc: '5 antrean oven, 1 tertunda' },
+            { code: 'Nov', name: 'November', omset: 4400000, omsetFmt: '4.4 jt', orders: 46, heightOmset: '88%', heightOrder: '77%', piutang: 750000, pending: 3, desc: 'Booking order aktif' },
+            { code: 'Des', name: 'Desember', omset: 4950000, omsetFmt: '4.95 jt', orders: 54, heightOmset: '98%', heightOrder: '90%', piutang: 900000, pending: 8, desc: 'Peak season akhir tahun' }
+        ];
+
+        let selectedMonthIndex = 9; // Default Okt
         let currentChartMode = 'omset';
+
+        function selectChartMonth(idx) {
+            selectedMonthIndex = idx;
+            const m = monthsData[idx];
+
+            // Update bar colors and labels
+            monthsData.forEach((_, i) => {
+                const b = document.getElementById(`chartBar-${i}`);
+                const l = document.getElementById(`chartLabel-${i}`);
+                if (b) {
+                    if (i === idx) {
+                        b.className = 'w-full max-w-[26px] sm:max-w-[34px] bg-[#D46E15] shadow-xs rounded-t-md sm:rounded-t-lg transition-all';
+                    } else {
+                        b.className = 'w-full max-w-[26px] sm:max-w-[34px] bg-[#E8D7CD] group-hover:bg-[#D46E15]/60 rounded-t-md sm:rounded-t-lg transition-all';
+                    }
+                }
+                if (l) {
+                    if (i === idx) {
+                        l.className = 'text-[10px] sm:text-xs text-[#924C00] font-bold';
+                    } else {
+                        l.className = 'text-[10px] sm:text-xs text-[#8E7E73] font-medium';
+                    }
+                }
+            });
+
+            // Move active pill
+            let pill = document.getElementById('chartActiveBarPill');
+            const targetCol = document.getElementById(`monthCol-${idx}`);
+            if (targetCol) {
+                if (!pill) {
+                    pill = document.createElement('div');
+                    pill.id = 'chartActiveBarPill';
+                    pill.className = 'absolute -top-7 bg-[#3E2B21] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap border border-white/10 z-20';
+                }
+                const valText = currentChartMode === 'omset' ? m.omsetFmt : m.orders + ' Ord';
+                pill.innerHTML = `<span>★</span><span class="text-[#D46E15]" id="chartActiveBarValue">${valText}</span>`;
+                targetCol.prepend(pill);
+            }
+
+            // Update KPI cards
+            const kpiPemasukan = document.getElementById('kpiPemasukan');
+            const kpiPesanan = document.getElementById('kpiPesanan');
+            const kpiPiutang = document.getElementById('kpiPiutang');
+            const kpiPending = document.getElementById('kpiPending');
+            const kpiPendingDesc = document.getElementById('kpiPendingDesc');
+            const dateRangeText = document.getElementById('dateRangeText');
+
+            if (kpiPemasukan) kpiPemasukan.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(m.omset);
+            if (kpiPesanan) kpiPesanan.textContent = m.orders + ' Order';
+            if (kpiPiutang) kpiPiutang.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(m.piutang);
+            if (kpiPending) kpiPending.textContent = m.pending + ' Order';
+            if (kpiPendingDesc) kpiPendingDesc.textContent = m.desc;
+
+            const monthNum = String(idx + 1).padStart(2, '0');
+            const daysInMonth = new Date(2026, idx + 1, 0).getDate();
+            if (dateRangeText) dateRangeText.textContent = `01/${monthNum}/2026 — ${daysInMonth}/${monthNum}/2026`;
+
+            showToast(`Menampilkan data bulan: ${m.name} 2026`, '<i class="fas fa-calendar-check text-[#D46E15]"></i>');
+        }
+
+        // Switch Chart Mode (Omset vs Jumlah Pesanan)
         function toggleChartMode(mode) {
             currentChartMode = mode;
             const btnOmset = document.getElementById('btnChartOmset');
@@ -851,14 +935,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const title = document.getElementById('chartTitle');
             const subtitle = document.getElementById('chartSubtitle');
             const yAxis = document.getElementById('chartYAxis');
-            const activeVal = document.getElementById('chartActiveBarValue');
-
-            const barMei = document.getElementById('barMei');
-            const barJun = document.getElementById('barJun');
-            const barJul = document.getElementById('barJul');
-            const barAgu = document.getElementById('barAgu');
-            const barSep = document.getElementById('barSep');
-            const barOkt = document.getElementById('barOkt');
 
             if (mode === 'omset') {
                 btnOmset.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D46E15] text-white shadow-2xs transition-all';
@@ -875,14 +951,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="flex justify-between"><span>0</span></div>
                     `;
                 }
-                if (activeVal) activeVal.textContent = '4.25 jt';
-                if (barMei) barMei.style.height = '68%';
-                if (barJun) barJun.style.height = '75%';
-                if (barJul) barJul.style.height = '84%';
-                if (barAgu) barAgu.style.height = '72%';
-                if (barSep) barSep.style.height = '88%';
-                if (barOkt) barOkt.style.height = '94%';
-                showToast('Menampilkan grafik: Omset Pemasukan');
+                monthsData.forEach((m, i) => {
+                    const b = document.getElementById(`chartBar-${i}`);
+                    if (b) b.style.height = m.heightOmset;
+                });
+                const activeVal = document.getElementById('chartActiveBarValue');
+                if (activeVal) activeVal.textContent = monthsData[selectedMonthIndex].omsetFmt;
+                showToast('Menampilkan grafik: Omset Pemasukan', '<i class="fas fa-chart-line text-[#D46E15]"></i>');
             } else {
                 btnOrder.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#D46E15] text-white shadow-2xs transition-all';
                 btnOmset.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-[#8E7E73] hover:text-[#251A14] transition-all';
@@ -898,14 +973,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="flex justify-between"><span>0</span></div>
                     `;
                 }
-                if (activeVal) activeVal.textContent = '48 Order';
-                if (barMei) barMei.style.height = '60%';
-                if (barJun) barJun.style.height = '67%';
-                if (barJul) barJul.style.height = '75%';
-                if (barAgu) barAgu.style.height = '63%';
-                if (barSep) barSep.style.height = '73%';
-                if (barOkt) barOkt.style.height = '80%';
-                showToast('Menampilkan grafik: Jumlah Pesanan');
+                monthsData.forEach((m, i) => {
+                    const b = document.getElementById(`chartBar-${i}`);
+                    if (b) b.style.height = m.heightOrder;
+                });
+                const activeVal = document.getElementById('chartActiveBarValue');
+                if (activeVal) activeVal.textContent = monthsData[selectedMonthIndex].orders + ' Ord';
+                showToast('Menampilkan grafik: Jumlah Pesanan', '<i class="fas fa-boxes text-[#D46E15]"></i>');
             }
         }
 

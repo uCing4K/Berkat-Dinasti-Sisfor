@@ -1103,16 +1103,15 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                             Menampilkan <span id="visibleCount" class="font-semibold text-[#251A14]"><?= count($products) ?></span> dari <span class="font-semibold text-[#251A14]"><?= count($products) ?></span> produk bakery
                         </p>
 
-                        <!-- Pagination Buttons -->
-                        <div class="flex items-center gap-1.5 text-xs font-semibold">
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Sebelumnya" disabled>
+                        <!-- Pagination Buttons (Sesuai jumlah halaman aktif: < 1 > jika hanya 1 halaman) -->
+                        <div class="flex items-center gap-1.5 text-xs font-semibold" id="paginationControls">
+                            <button id="prevPageBtn" onclick="changePage(currentPage - 1)" class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Sebelumnya" disabled>
                                 <i class="fas fa-chevron-left text-xs"></i>
                             </button>
-                            <button class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shadow-xs">1</button>
-                            <?php if (count($products) > 10): ?>
-                            <button class="w-8 h-8 rounded-lg text-[#251A14] hover:bg-[#EFE8DE] flex items-center justify-center transition-colors">2</button>
-                            <?php endif; ?>
-                            <button class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Berikutnya" disabled>
+                            <div id="pageNumbersContainer" class="flex items-center gap-1.5">
+                                <button class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shadow-xs">1</button>
+                            </div>
+                            <button id="nextPageBtn" onclick="changePage(currentPage + 1)" class="w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60" title="Berikutnya" disabled>
                                 <i class="fas fa-chevron-right text-xs"></i>
                             </button>
                         </div>
@@ -1578,14 +1577,78 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
             document.getElementById('quickToggleStatusForm').submit();
         }
 
-        // Live Filter Function (Search, Category, Status)
-        function filterProducts() {
+        let currentPage = 1;
+        const itemsPerPage = 15;
+
+        function updatePagination(totalItems) {
+            const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const container = document.getElementById('pageNumbersContainer');
+            if (container) {
+                container.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = (i === currentPage)
+                        ? 'w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shadow-xs cursor-default'
+                        : 'w-8 h-8 rounded-lg text-[#251A14] hover:bg-[#EFE8DE] flex items-center justify-center transition-colors cursor-pointer';
+                    btn.textContent = i;
+                    btn.onclick = () => changePage(i);
+                    container.appendChild(btn);
+                }
+            }
+
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            if (prevBtn) {
+                prevBtn.disabled = (currentPage <= 1);
+                prevBtn.className = (currentPage <= 1)
+                    ? 'w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60'
+                    : 'w-8 h-8 rounded-lg flex items-center justify-center text-[#251A14] bg-[#EFE8DE] hover:bg-[#E5DDD0] transition-colors cursor-pointer';
+            }
+            if (nextBtn) {
+                nextBtn.disabled = (currentPage >= totalPages);
+                nextBtn.className = (currentPage >= totalPages)
+                    ? 'w-8 h-8 rounded-lg flex items-center justify-center text-[#8E7E73] bg-[#EFE8DE] cursor-not-allowed opacity-60'
+                    : 'w-8 h-8 rounded-lg flex items-center justify-center text-[#251A14] bg-[#EFE8DE] hover:bg-[#E5DDD0] transition-colors cursor-pointer';
+            }
+        }
+
+        function changePage(newPage) {
+            const rows = document.querySelectorAll('.product-row');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const categoryVal = document.getElementById('categoryFilter').value;
+            const statusVal = document.getElementById('statusFilter').value;
+            
+            let matchCount = 0;
+            rows.forEach((row) => {
+                const name = (row.getAttribute('data-name') || '').toLowerCase();
+                const sku = (row.getAttribute('data-sku') || '').toLowerCase();
+                const category = row.getAttribute('data-category') || '';
+                const status = row.getAttribute('data-status') || '';
+                if ((!searchVal || name.includes(searchVal) || sku.includes(searchVal)) &&
+                    (!categoryVal || category === categoryVal) &&
+                    (!statusVal || status === statusVal)) {
+                    matchCount++;
+                }
+            });
+            const totalPages = Math.max(1, Math.ceil(matchCount / itemsPerPage));
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            filterProducts(false);
+        }
+
+        // Live Filter Function (Search, Category, Status, Pagination)
+        function filterProducts(resetPage = true) {
+            if (resetPage) currentPage = 1;
+
             const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
             const categoryVal = document.getElementById('categoryFilter').value;
             const statusVal = document.getElementById('statusFilter').value;
 
             const rows = document.querySelectorAll('.product-row');
-            let visibleCount = 0;
+            const matchingRows = [];
 
             rows.forEach((row) => {
                 const name = (row.getAttribute('data-name') || '').toLowerCase();
@@ -1598,10 +1661,24 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
                 const matchesStatus = !statusVal || status === statusVal;
 
                 if (matchesSearch && matchesCategory && matchesStatus) {
+                    matchingRows.push(row);
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const totalMatches = matchingRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalMatches / itemsPerPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            matchingRows.forEach((row, idx) => {
+                if (idx >= startIndex && idx < endIndex) {
                     row.style.display = '';
-                    visibleCount++;
                     const numCell = row.querySelector('.row-number');
-                    if (numCell) numCell.textContent = visibleCount;
+                    if (numCell) numCell.textContent = idx + 1;
                 } else {
                     row.style.display = 'none';
                 }
@@ -1609,17 +1686,19 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
             // Update visible count summary
             const visibleCountEl = document.getElementById('visibleCount');
-            if (visibleCountEl) visibleCountEl.textContent = visibleCount;
+            if (visibleCountEl) visibleCountEl.textContent = totalMatches;
 
             // Show or hide empty state row
             const emptyStateRow = document.getElementById('emptyStateRow');
             if (emptyStateRow) {
-                if (visibleCount === 0) {
+                if (totalMatches === 0) {
                     emptyStateRow.classList.remove('hidden');
                 } else {
                     emptyStateRow.classList.add('hidden');
                 }
             }
+
+            updatePagination(totalMatches);
         }
 
         // Reset Filter function

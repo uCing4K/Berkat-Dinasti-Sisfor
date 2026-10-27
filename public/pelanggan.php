@@ -398,19 +398,18 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
 
             <!-- TOP HEADER (Height 64px) -->
             <header class="h-16 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-[#E2D7C8] sticky top-0 z-30 px-4 md:px-8 flex items-center justify-between">
-                
-                <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
+                      <!-- Left: Hamburger (Mobile) + Breadcrumb & Title -->
                 <div class="flex items-center gap-3 md:gap-4">
                     <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg" aria-label="Buka Menu">
-                        <i class="fas fa-bars text-lg"></i>
+                        <i class="fas fa-bars text-lg text-[#3E2B21]"></i>
                     </button>
 
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#3E2B21] transition-colors">Beranda</a>
-                            <span class="text-[#8E7E73]">/</span>
-                            <span class="text-[#D46E15] font-semibold">Pelanggan</span>
+                            <span class="text-[#8E7E73]">Pelanggan</span>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <span class="text-[#3E2B21] font-semibold">Data Pelanggan</span>
                         </div>
                         <!-- Section Heading -->
                         <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5">Data Pelanggan & Mitra</h1>
@@ -418,19 +417,19 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 </div>
 
                 <!-- Right: Date Indicator, Notification Bell, User Avatar -->
-                <div class="flex items-center gap-3 md:gap-4 relative">
+                <div class="flex items-center gap-3 md:gap-5">
                     
                     <!-- Date Button (Dinamis) -->
-                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium border border-[#DDD3C5]">
-                        <i class="far fa-calendar-alt text-[#D46E15] text-sm"></i>
+                    <div class="hidden sm:flex items-center gap-2 bg-[#EFE8DE] text-[#3E2B21] px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-semibold border border-[#DDD3C5]">
+                        <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
                         <span><?= $todayFormatted ?></span>
                     </div>
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
-                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#3E2B21] hover:bg-[#EFE8DE] rounded-lg transition-colors" title="Notifikasi" id="notificationBtn">
-                            <i class="far fa-bell text-[#3E2B21] text-lg"></i>
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-[#FDFBF7]"></span>
+                        <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors cursor-pointer" title="Notifikasi" id="notificationBtn">
+                            <i class="far fa-bell text-[#3E2B21] text-base"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
 
                         <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 sm:w-96 craft-dropdown py-2 z-50">
@@ -461,30 +460,33 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
 
                     <!-- User Circle Icon with Popover -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-9 h-9 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:bg-[#B85207] transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
-                            <i class="fas fa-user text-white text-xs"></i>
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#3E2B21] border border-white/20 flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
+                            <i class="fas fa-user text-xs text-[#FAF8F5]"></i>
                         </div>
 
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> Toko</p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
                                 <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
-                                    <i class="fas fa-cog text-[#8E7E73]"></i>
-                                    <span>Pengaturan Toko</span>
+                                    <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
+                                    <span>Pengaturan Akun & Toko</span>
+                                </a>
+                                <a href="pengaturan.php?tab=user" class="craft-dropdown-item flex items-center gap-2">
+                                    <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
+                                    <span>Manajemen User</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>Keluar dari Akun</span>
+                                    <i class="fas fa-sign-out-alt text-xs text-[#991B1B]"></i>
+                                    <span>Keluar (Logout)</span>
                                 </button>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </header>
 

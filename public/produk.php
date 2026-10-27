@@ -809,8 +809,8 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
                     <!-- Notification Bell with Popover -->
                     <div class="relative">
-                        <button onclick="toggleNotifPopover()" class="relative p-2 text-[#544337] hover:bg-[#EFE8DE] rounded-lg transition-colors cursor-pointer" title="Notifikasi">
-                            <i class="far fa-bell text-lg"></i>
+                        <button onclick="toggleNotifPopover()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors cursor-pointer" title="Notifikasi" id="notificationBtn">
+                            <i class="far fa-bell text-[#3E2B21] text-base"></i>
                             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
                         <div id="notifPopover" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
@@ -833,24 +833,28 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('j') . ' ' . $bulanArr[(int)
 
                     <!-- User Circle Icon with Dropdown -->
                     <div class="relative">
-                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#D46E15] flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna">
-                            <i class="fas fa-user text-xs"></i>
+                        <div onclick="toggleUserDropdown()" class="w-8 h-8 rounded-full bg-[#3E2B21] border border-white/20 flex items-center justify-center text-white shadow-xs cursor-pointer hover:opacity-95 transition-all active:scale-95" title="Profil Pengguna" id="userAvatarBtn">
+                            <i class="fas fa-user text-xs text-[#FAF8F5]"></i>
                         </div>
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#8E7E73] capitalize"><?= htmlspecialchars($_SESSION['role'] ?? 'Admin') ?></p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
-                                <a href="pengaturan.php" class="craft-dropdown-item">
+                                <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
                                     <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
-                                    <span>Pengaturan Akun</span>
+                                    <span>Pengaturan Akun & Toko</span>
+                                </a>
+                                <a href="pengaturan.php?tab=user" class="craft-dropdown-item flex items-center gap-2">
+                                    <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
+                                    <span>Manajemen User</span>
                                 </a>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
-                                <button onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70">
-                                    <i class="fas fa-sign-out-alt text-xs text-rose-600"></i>
-                                    <span>Keluar / Logout</span>
+                                <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
+                                    <i class="fas fa-sign-out-alt text-xs text-[#991B1B]"></i>
+                                    <span>Keluar (Logout)</span>
                                 </button>
                             </div>
                         </div>

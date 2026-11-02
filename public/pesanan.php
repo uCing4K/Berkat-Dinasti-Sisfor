@@ -116,9 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $no_wa_baru = trim($_POST['no_wa_baru'] ?? '');
         $alamat_baru = trim($_POST['alamat_baru'] ?? '');
 
-        $custName = !empty($nama_pelanggan_baru) ? $nama_pelanggan_baru : trim($_POST['customer_name'] ?? 'Pelanggan');
-        $custWa = !empty($no_wa_baru) ? $no_wa_baru : '0812-3456-7890';
-        $custAddress = !empty($alamat_baru) ? $alamat_baru : trim($_POST['destination'] ?? 'Ambil di Toko');
+        $custName = !empty($nama_pelanggan_baru) ? $nama_pelanggan_baru : trim($_POST['customer_name'] ?? '');
+        $custWa = !empty($no_wa_baru) ? $no_wa_baru : trim($_POST['customer_wa'] ?? '0812-3456-7890');
+        $custAddress = !empty($alamat_baru) ? $alamat_baru : trim($_POST['customer_address'] ?? $_POST['destination'] ?? 'Ambil di Toko');
 
         $raw_items = $_POST['items'] ?? [];
         $processed_items = [];
@@ -188,12 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $itemsDesc = implode(', ', array_map(fn($p) => "{$p['nama']} ({$p['qty']} pcs)", $processed_items));
         }
 
-        $tglKirim = !empty($_POST['tgl_kirim']) ? $_POST['tgl_kirim'] : (!empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d'));
+        $tglKirim = !empty($_POST['tgl_kirim']) ? $_POST['tgl_kirim'] : (!empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d', strtotime('+4 days')));
         
-        // Validasi Tanggal Pre-Order (PO): Tidak boleh memilih tanggal lampau / mundur ke belakang
-        $today = date('Y-m-d');
-        if (strtotime($tglKirim) < strtotime($today)) {
-            $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tglKirim)) . ") tidak valid! Sistem roti Berkat Dinasti berbasis Pre-Order (PO) sehingga tanggal selesai/kirim tidak boleh tanggal yang sudah lewat (minimal hari ini).";
+        // Validasi Tanggal Pre-Order (PO): Minimal 4 hari dari hari pemesanan (H-4 sebelum acara)
+        $minDeliveryDate = date('Y-m-d', strtotime('+4 days'));
+        if (strtotime($tglKirim) < strtotime($minDeliveryDate)) {
+            $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tglKirim)) . ") tidak valid! Sistem bakery Berkat Dinasti berbasis Pre-Order (PO) paling cepat 4 hari sebelum pengiriman (minimal tanggal " . date('d M Y', strtotime($minDeliveryDate)) . ").";
             header("Location: pesanan.php?view=tambah_pesanan");
             exit();
         }
@@ -242,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $custWa = $no_wa_baru;
                     $custAddress = $alamat_baru;
                 } elseif ($id_pelanggan > 0) {
-                    $stmtC = $pdo->prepare("SELECT nama, no_wa, alamat FROM pelanggan WHERE id_pelanggan = ?");
+                    $stmtC = $pdo->prepare("SELECT id_pelanggan, nama, no_wa, alamat FROM pelanggan WHERE id_pelanggan = ?");
                     $stmtC->execute([$id_pelanggan]);
                     $cRow = $stmtC->fetch();
                     if ($cRow) {
@@ -251,15 +251,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $custAddress = $cRow['alamat'];
                     }
                 } else {
-                    $stmtC = $pdo->query("SELECT id_pelanggan, nama, no_wa, alamat FROM pelanggan LIMIT 1");
-                    $cRow = $stmtC->fetch();
-                    if ($cRow) {
-                        $id_pelanggan = $cRow['id_pelanggan'];
-                        $custName = $cRow['nama'];
-                        $custWa = $cRow['no_wa'];
-                        $custAddress = $cRow['alamat'];
-                    } else {
-                        $id_pelanggan = 1;
+                    $postedName = trim($_POST['customer_name'] ?? '');
+                    if (!empty($postedName)) {
+                        $stmtFind = $pdo->prepare("SELECT id_pelanggan, nama, no_wa, alamat FROM pelanggan WHERE nama LIKE ? LIMIT 1");
+                        $stmtFind->execute(["%{$postedName}%"]);
+                        $cRow = $stmtFind->fetch();
+                        if ($cRow) {
+                            $id_pelanggan = $cRow['id_pelanggan'];
+                            $custName = $cRow['nama'];
+                            $custWa = $cRow['no_wa'];
+                            $custAddress = $cRow['alamat'];
+                        }
+                    }
+                    if ($id_pelanggan <= 0) {
+                        $stmtC = $pdo->query("SELECT id_pelanggan, nama, no_wa, alamat FROM pelanggan LIMIT 1");
+                        $cRow = $stmtC->fetch();
+                        if ($cRow) {
+                            $id_pelanggan = $cRow['id_pelanggan'];
+                            $custName = $cRow['nama'];
+                            $custWa = $cRow['no_wa'];
+                            $custAddress = $cRow['alamat'];
+                        } else {
+                            $id_pelanggan = 1;
+                        }
                     }
                 }
 
@@ -354,15 +368,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Master Pelanggan untuk Select & Autocomplete Pesanan Baru
 $customers_for_select = [
-    ['id' => 1, 'nama' => 'Ibu Sari Dewi', 'no_wa' => '0812-3456-7890', 'alamat' => 'Komplek Melati No. 4, Blok B'],
-    ['id' => 2, 'nama' => 'Pak Budi Santoso', 'no_wa' => '0823-4567-8901', 'alamat' => 'Jl. Kenanga No. 10, Blok C'],
-    ['id' => 3, 'nama' => 'Toko Maju Jaya', 'no_wa' => '0834-5678-9012', 'alamat' => 'Jl. Raya Industri No. 20, Ruko Sentra'],
-    ['id' => 4, 'nama' => 'Warung Pak Haji', 'no_wa' => '0856-7890-1234', 'alamat' => 'Jl. Pesantren No. 3'],
-    ['id' => 5, 'nama' => 'Ibu Ratna Sari', 'no_wa' => '0812-9988-7766', 'alamat' => 'Jl. Pandanwangi No. 12']
+    ['id' => 1, 'id_pelanggan' => 1, 'nama' => 'Ibu Sari Dewi', 'no_wa' => '0812-3456-7890', 'alamat' => 'Komplek Melati No. 4, Blok B'],
+    ['id' => 2, 'id_pelanggan' => 2, 'nama' => 'Pak Budi Santoso', 'no_wa' => '0823-4567-8901', 'alamat' => 'Jl. Kenanga No. 10, Blok C'],
+    ['id' => 3, 'id_pelanggan' => 3, 'nama' => 'Toko Maju Jaya', 'no_wa' => '0834-5678-9012', 'alamat' => 'Jl. Raya Industri No. 20, Ruko Sentra'],
+    ['id' => 4, 'id_pelanggan' => 4, 'nama' => 'Warung Pak Haji', 'no_wa' => '0856-7890-1234', 'alamat' => 'Jl. Pesantren No. 3'],
+    ['id' => 5, 'id_pelanggan' => 5, 'nama' => 'Ibu Ratna Sari', 'no_wa' => '0812-9988-7766', 'alamat' => 'Jl. Pandanwangi No. 12']
 ];
 if ($db_connected && $pdo) {
     try {
-        $stmtC = $pdo->query("SELECT id_pelanggan as id, nama, no_wa, alamat FROM pelanggan ORDER BY nama ASC");
+        $stmtC = $pdo->query("SELECT id_pelanggan, id_pelanggan as id, nama, no_wa, alamat FROM pelanggan ORDER BY nama ASC");
         $dbCusts = $stmtC->fetchAll();
         if (!empty($dbCusts)) {
             $customers_for_select = $dbCusts;
@@ -1118,12 +1132,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                             <select id="pos_id_pelanggan" name="id_pelanggan" onchange="syncPosCustomerInfo()" 
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                                 <?php foreach ($customers_for_select as $c): ?>
-                                                    <option value="<?= $c['id_pelanggan'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
+                                                    <option value="<?= $c['id_pelanggan'] ?? $c['id'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
                                                         <?= htmlspecialchars($c['nama']) ?> (<?= htmlspecialchars($c['no_wa']) ?>)
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
+                                        <input type="hidden" name="customer_name" id="pos_hidden_customer_name" value="">
+                                        <input type="hidden" name="customer_wa" id="pos_hidden_customer_wa" value="">
+                                        <input type="hidden" name="customer_address" id="pos_hidden_customer_address" value="">
 
                                         <!-- New Customer Form (Hidden by default) -->
                                         <div id="posNewCustBox" class="hidden space-y-2 p-2.5 bg-white border border-[#DDD3C5] rounded-xl mt-1.5">
@@ -1145,14 +1162,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         </div>
                                     </div>
 
-                                    <!-- Delivery Date & Time (PO Rule: Min Today) -->
+                                    <!-- Delivery Date & Time (PO Rule: Min H+4 Lead Time) -->
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="block font-bold text-[#544337] text-[10px] mb-1">Tgl Kirim / PO</label>
+                                            <div class="flex items-center justify-between mb-1">
+                                                <label class="block font-bold text-[#544337] text-[10px]">Tgl Kirim / PO</label>
+                                                <span class="text-[9px] font-bold text-[#D46E15] bg-[#D46E15]/10 border border-[#D46E15]/20 px-1.5 py-0.2 rounded">Min. H+4</span>
+                                            </div>
                                             <input type="date" id="pos_tgl_kirim" name="tgl_kirim" 
-                                                min="<?= date('Y-m-d') ?>" 
-                                                value="<?= htmlspecialchars($_GET['date'] ?? $_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+1 day'))) ?>" required
+                                                min="<?= date('Y-m-d', strtotime('+4 days')) ?>" 
+                                                value="<?= htmlspecialchars($_GET['date'] ?? $_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+4 days'))) ?>" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                            <p class="text-[9px] text-[#8E7E73] mt-0.5">Paling cepat: <?= date('d M Y', strtotime('+4 days')) ?></p>
                                         </div>
                                         <div>
                                             <label class="block font-bold text-[#544337] text-[10px] mb-1">Waktu Kirim</label>
@@ -3050,6 +3071,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             updatePosCategoryCounts();
             renderPosProducts();
             renderPosCart();
+            syncPosCustomerInfo();
         }
 
         function updatePosCategoryCounts() {
@@ -3377,13 +3399,28 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (lbl) lbl.textContent = 'Tambah Pelanggan Baru';
                 const idPelangganSelect = document.getElementById('pos_id_pelanggan');
                 if (idPelangganSelect && CUSTOMERS_DATA.length > 0) {
-                    idPelangganSelect.value = CUSTOMERS_DATA[0].id_pelanggan;
+                    idPelangganSelect.value = CUSTOMERS_DATA[0].id_pelanggan || CUSTOMERS_DATA[0].id;
                 }
+                syncPosCustomerInfo();
             }
         }
 
         function syncPosCustomerInfo() {
-            // Synced via HTML data attributes
+            const sel = document.getElementById('pos_id_pelanggan');
+            if (!sel) return;
+            const opt = sel.options[sel.selectedIndex];
+            if (opt) {
+                const fullName = opt.textContent.trim();
+                const name = fullName.includes('(') ? fullName.split('(')[0].trim() : fullName;
+                const wa = opt.getAttribute('data-wa') || '';
+                const address = opt.getAttribute('data-address') || '';
+                const hName = document.getElementById('pos_hidden_customer_name');
+                const hWa = document.getElementById('pos_hidden_customer_wa');
+                const hAddr = document.getElementById('pos_hidden_customer_address');
+                if (hName) hName.value = name;
+                if (hWa) hWa.value = wa;
+                if (hAddr) hAddr.value = address;
+            }
         }
 
         function formatRupiahNumber(num) {

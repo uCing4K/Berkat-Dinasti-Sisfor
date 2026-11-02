@@ -829,7 +829,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="pesanan.php" class="text-[#8E7E73] hover:underline">Pesanan</a>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <a href="pesanan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pesanan</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb">Manajemen</span>
                         </div>
@@ -1532,7 +1534,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <button type="button" onclick="toggleNewCustomerForm()" id="btnToggleNewCust" 
                                 class="text-xs font-semibold text-[#D46E15] hover:text-[#B85207] flex items-center gap-1.5 transition-colors">
                                 <i class="fas fa-user-plus text-xs"></i>
-                                <span id="labelToggleNewCust">+ Tambah Pelanggan Baru</span>
+                                <span id="labelToggleNewCust">Tambah Pelanggan Baru</span>
                             </button>
                         </div>
                         
@@ -1673,7 +1675,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <button type="button" onclick="addOrderProductRow()" 
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#D46E15] text-[#D46E15] hover:bg-[#D46E15]/10 text-xs font-semibold transition-all">
                                 <i class="fas fa-plus text-[10px]"></i>
-                                <span>+ Tambah Produk</span>
+                                <span>Tambah Produk</span>
                             </button>
                             <span class="text-[11px] text-[#8E7E73]">Pilih varian atau produk lain dari katalog</span>
                         </div>
@@ -2012,7 +2014,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 syncNewCustomerPreview();
             } else {
                 box.classList.add('hidden');
-                btn.textContent = '+ Tambah Pelanggan Baru';
+                btn.textContent = 'Tambah Pelanggan Baru';
                 searchWrap.classList.remove('opacity-40', 'pointer-events-none');
                 const defaultCust = CUSTOMERS_DATA[0] || { nama: 'Ibu Sari Dewi', no_wa: '0812-3456-7890', alamat: 'Komplek Melati No. 4, Blok B' };
                 document.getElementById('previewCustName').textContent = defaultCust.nama;

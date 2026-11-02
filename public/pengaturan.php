@@ -353,21 +353,33 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
         /* Thermal Struk Print Style */
         @media print {
+            @page {
+                margin: 0;
+                size: auto;
+            }
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
             body * {
                 visibility: hidden;
             }
-            #printableThermalReceipt, #printableThermalReceipt * {
+            #actualReceiptSlip, #actualReceiptSlip * {
                 visibility: visible;
             }
-            #printableThermalReceipt {
+            #actualReceiptSlip {
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 80mm;
+                max-width: 100%;
                 margin: 0;
-                padding: 10px;
-                background: white;
-                color: black;
+                padding: 8px 12px;
+                background: white !important;
+                color: black !important;
+                border: none !important;
+                box-shadow: none !important;
             }
         }
     </style>
@@ -473,7 +485,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <span class="text-[#8E7E73]">Pengaturan</span>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <a href="pengaturan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pengaturan</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <span class="text-[#3E2B21] font-semibold" id="headerSubtitle"><?= $active_tab === 'user' ? 'Manajemen User' : 'Profil Toko' ?></span>
                         </div>
@@ -799,7 +813,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 </div>
 
                                 <!-- Receipt Paper Preview (Dinamis 58mm vs 80mm) -->
-                                <div id="thermalPaperBox" class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 <?= ($store['paper_size'] === '58') ? 'text-[10px] max-w-[250px]' : 'text-[11px] max-w-[340px]' ?> leading-relaxed shadow-xs text-[#251A14] transition-all mx-auto">
+                                <div id="actualReceiptSlip" class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 <?= ($store['paper_size'] === '58') ? 'text-[10px] max-w-[250px]' : 'text-[11px] max-w-[340px]' ?> leading-relaxed shadow-xs text-[#251A14] transition-all mx-auto">
                                     
                                     <!-- Store Header -->
                                     <div class="text-center pb-2 border-b border-dashed border-[#8E7E73]">
@@ -1043,6 +1057,88 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
         </div>
     </div>
 
+    <!-- MODAL POPOUT: UJI COBA CETAK THERMAL -->
+    <div id="testThermalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeTestThermalModal()" class="fixed inset-0 craft-modal-overlay"></div>
+        <div class="craft-modal-dialog max-w-md w-full relative z-10 max-h-[90vh] flex flex-col overflow-hidden bg-[#FDFBF7] border border-[#E2D7C8]">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-[#E2D7C8] shrink-0 bg-[#FDFBF7]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/10 text-[#D46E15] flex items-center justify-center">
+                        <i class="fas fa-print text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-[#251A14]">Uji Coba Cetak Thermal</h3>
+                        <p class="text-[11px] text-[#8E7E73]">Simulasi Cetak Nota Kasir & Integrasi Bluetooth</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeTestThermalModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-5 overflow-y-auto space-y-4">
+                <!-- Device Status Badge -->
+                <div class="bg-white rounded-xl border border-[#E2D7C8] p-3 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-semibold text-[#251A14]" id="modalPrinterStatus">Printer Thermal: Siap Mencetak</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200" id="modalPaperBadge">
+                        80 mm ESC/POS
+                    </span>
+                </div>
+
+                <!-- Live Receipt Preview inside Modal -->
+                <div class="bg-neutral-100 rounded-xl p-3 border border-[#E2D7C8] flex justify-center">
+                    <div id="modalReceiptPreview" class="bg-white p-3.5 rounded border border-[#DDD3C5] font-mono text-[11px] text-[#251A14] w-full max-w-[280px] shadow-sm leading-tight space-y-2">
+                        <div class="text-center pb-2 border-b border-dashed border-neutral-300">
+                            <p class="font-bold text-xs uppercase" id="mPreName"><?= htmlspecialchars($store['name']) ?></p>
+                            <p class="text-[10px] text-neutral-600" id="mPreAddr"><?= htmlspecialchars($store['address']) ?></p>
+                            <p class="text-[10px] text-neutral-600">Kota Batu • WA: <span id="mPreWa"><?= htmlspecialchars($store['wa']) ?></span></p>
+                        </div>
+                        <div class="py-1 border-b border-dashed border-neutral-300 text-[10px] space-y-0.5">
+                            <div class="flex justify-between"><span>Nota: INV-TEST-<?= date('md') ?></span><span><?= date('d/m/y H:i') ?></span></div>
+                            <div class="flex justify-between"><span>Kasir: Admin</span><span>Plg: Ibu Sari Dewi</span></div>
+                        </div>
+                        <div class="py-1 border-b border-dashed border-neutral-300 space-y-1 text-[10px]">
+                            <div class="flex justify-between"><span>10x Roti Hajatan (Kardus)</span><span class="font-bold">Rp 100.000</span></div>
+                            <div class="flex justify-between"><span>2x Bolu Pisang (Mika)</span><span class="font-bold">Rp 44.000</span></div>
+                        </div>
+                        <div class="py-1 border-b border-dashed border-neutral-300 text-[10px] space-y-0.5">
+                            <div class="flex justify-between font-bold text-xs"><span>TOTAL:</span><span class="text-[#D46E15]">Rp 144.000</span></div>
+                            <div class="flex justify-between text-emerald-600 font-bold"><span>Status:</span><span>LUNAS (CASH)</span></div>
+                        </div>
+                        <div class="text-center text-[9px] text-neutral-500 pt-1 italic" id="mPreFooter">
+                            "<?= htmlspecialchars($store['footer']) ?>"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integration Note -->
+                <div class="bg-[#FFF0E6] border border-[#FFD8BF] rounded-xl p-3 flex items-start gap-2.5 text-xs text-[#924C00]">
+                    <i class="fas fa-info-circle text-[#D46E15] mt-0.5 shrink-0"></i>
+                    <p class="leading-relaxed text-[11px]">
+                        <strong>Dukungan Cetak Fleksibel:</strong> Tekan <strong>Cetak via Browser</strong> untuk langsung mencetak dengan thermal driver di perangkat ini, atau <strong>Kirim ke Bluetooth App</strong> untuk memicu bridge data cetak ke aplikasi thermal mobile via Bluetooth.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="px-5 py-3.5 border-t border-[#E2D7C8] bg-white flex flex-col sm:flex-row items-center gap-2 justify-end">
+                <button type="button" onclick="simulateBluetoothSend()" class="w-full sm:w-auto bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
+                    <i class="fab fa-bluetooth-b text-[#0082FC]"></i>
+                    <span>Kirim ke Bluetooth App</span>
+                </button>
+                <button type="button" onclick="executeDirectPrint()" class="w-full sm:w-auto bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-button-orange active:scale-95 flex items-center justify-center gap-2 transition-all">
+                    <i class="fas fa-print"></i>
+                    <span>Cetak via Browser</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL POPOUT: LOGOUT -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <!-- Backdrop with subtle blur -->
@@ -1171,12 +1267,64 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
         }
 
-        // Test Print Toast Notification & Native Browser Print
+        // Test Print Modal & Handlers
         function testPrintThermal() {
-            showToast('Membuka dialog cetak struk kasir thermal...', '<i class="fas fa-print text-[#D46E15]"></i>');
+            const modal = document.getElementById('testThermalModal');
+            if (modal) {
+                // Sync latest settings to modal preview
+                const name = document.getElementById('storeNameInput') ? document.getElementById('storeNameInput').value : 'BERKAT DINASTI';
+                const addr = document.getElementById('storeAddressInput') ? document.getElementById('storeAddressInput').value : 'Jl. Diponegoro No. 45, Batu';
+                const wa = document.getElementById('storeWaInput') ? document.getElementById('storeWaInput').value : '0812-3456-7890';
+                const foot = document.getElementById('storeFooterInput') ? document.getElementById('storeFooterInput').value : 'Terima kasih atas pesanan Anda';
+                const is58 = document.getElementById('paper58') && document.getElementById('paper58').checked;
+
+                const mPreName = document.getElementById('mPreName');
+                const mPreAddr = document.getElementById('mPreAddr');
+                const mPreWa = document.getElementById('mPreWa');
+                const mPreFooter = document.getElementById('mPreFooter');
+                const mPaperBadge = document.getElementById('modalPaperBadge');
+
+                if (mPreName) mPreName.textContent = name;
+                if (mPreAddr) mPreAddr.textContent = addr;
+                if (mPreWa) mPreWa.textContent = wa;
+                if (mPreFooter) mPreFooter.textContent = `"${foot}"`;
+                if (mPaperBadge) mPaperBadge.textContent = is58 ? '58 mm ESC/POS' : '80 mm ESC/POS';
+
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                executeDirectPrint();
+            }
+        }
+
+        function closeTestThermalModal() {
+            const modal = document.getElementById('testThermalModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function executeDirectPrint() {
+            closeTestThermalModal();
+            showToast('Membuka dialog cetak thermal browser...', '<i class="fas fa-print text-[#D46E15]"></i>');
             setTimeout(() => {
                 window.print();
             }, 300);
+        }
+
+        function simulateBluetoothSend() {
+            showToast('Sinyal ESC/POS dikirim ke Aplikasi Bluetooth Printer (Port 9100 / Bluetooth RFCOMM)!', '<i class="fab fa-bluetooth-b text-[#0082FC]"></i>');
+            const printerStatus = document.getElementById('modalPrinterStatus');
+            if (printerStatus) {
+                printerStatus.innerHTML = '<span class="text-blue-600 font-bold">Bluetooth: Transmitting Data...</span>';
+                setTimeout(() => {
+                    printerStatus.innerHTML = '<span class="text-emerald-600 font-bold">Bluetooth: Cetak Berhasil!</span>';
+                    setTimeout(() => {
+                        printerStatus.textContent = 'Printer Thermal: Siap Mencetak';
+                    }, 2500);
+                }, 1000);
+            }
         }
 
         function showToast(text, iconHtml = '<i class="fas fa-info-circle text-[#D46E15]"></i>') {

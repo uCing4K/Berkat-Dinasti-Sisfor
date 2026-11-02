@@ -337,7 +337,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <span class="text-[#8E7E73]">Laporan</span>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <a href="laporan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Laporan</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <span class="text-[#3E2B21] font-semibold">Keuangan & Analitik</span>
                         </div>

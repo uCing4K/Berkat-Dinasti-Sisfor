@@ -29,11 +29,12 @@ if (file_exists($configFile)) {
 
 // Helper Metadata Kemasan
 function getBerkatPackagingMeta($nv, $isi = 1) {
-    $nvLower = strtolower($nv);
+    $nvClean = trim(preg_replace('/\s*\(\d+.*pcs\)/i', '', $nv));
+    $nvLower = strtolower($nvClean);
     if (strpos($nvLower, 'mika') !== false) {
         return [
             'type' => 'Mika',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Mika ({$isi} pcs)" : $nv,
+            'label' => 'Mika',
             'badge' => 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]',
             'icon' => 'mika',
             'unit' => 'mika'
@@ -41,7 +42,7 @@ function getBerkatPackagingMeta($nv, $isi = 1) {
     } elseif (strpos($nvLower, 'batik') !== false) {
         return [
             'type' => 'Kardus Batik',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Batik ({$isi} pcs)" : $nv,
+            'label' => 'Kardus Batik',
             'badge' => 'bg-[#FFF0E6] text-[#924C00] border-[#FFD8BF]',
             'icon' => 'kardus',
             'unit' => 'box'
@@ -49,7 +50,7 @@ function getBerkatPackagingMeta($nv, $isi = 1) {
     } elseif (strpos($nvLower, 'coklat') !== false) {
         return [
             'type' => 'Kardus Coklat',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Coklat ({$isi} pcs)" : $nv,
+            'label' => 'Kardus Coklat',
             'badge' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
             'icon' => 'kardus',
             'unit' => 'box'
@@ -57,7 +58,7 @@ function getBerkatPackagingMeta($nv, $isi = 1) {
     } elseif (strpos($nvLower, 'putih') !== false) {
         return [
             'type' => 'Kardus Putih',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus Putih ({$isi} pcs)" : $nv,
+            'label' => 'Kardus Putih',
             'badge' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
             'icon' => 'kardus',
             'unit' => 'box'
@@ -65,7 +66,7 @@ function getBerkatPackagingMeta($nv, $isi = 1) {
     } elseif (strpos($nvLower, 'kardus') !== false) {
         return [
             'type' => 'Kardus',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Kardus ({$isi} pcs)" : $nv,
+            'label' => 'Kardus',
             'badge' => 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]',
             'icon' => 'kardus',
             'unit' => 'box'
@@ -73,7 +74,7 @@ function getBerkatPackagingMeta($nv, $isi = 1) {
     } else {
         return [
             'type' => 'Satuan',
-            'label' => ($isi > 1 && strpos($nvLower, 'pcs') === false) ? "Satuan ({$isi} pcs)" : $nv,
+            'label' => 'Satuan',
             'badge' => 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]',
             'icon' => 'satuan',
             'unit' => 'pcs'
@@ -824,7 +825,9 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <a href="produk.php" class="text-[#8E7E73] hover:underline">Produk</a>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <a href="produk.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Produk</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <span class="text-[#3E2B21] font-semibold">Daftar Produk</span>
                         </div>

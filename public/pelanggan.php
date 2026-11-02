@@ -540,7 +540,9 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                     <div>
                         <!-- Breadcrumbs -->
                         <div class="flex items-center gap-1.5 text-xs">
-                            <span class="text-[#8E7E73]">Pelanggan</span>
+                            <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
+                            <span class="text-[#D8C7B8]">/</span>
+                            <a href="pelanggan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pelanggan</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <span class="text-[#3E2B21] font-semibold">Data Pelanggan</span>
                         </div>

@@ -410,11 +410,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($db_connected && $pdo && $prod_id > 0) {
         try {
             $statusDb = ($status === 'Aktif') ? 'tersedia' : 'tidak_tersedia';
-            $stmtUp = $pdo->prepare("UPDATE produk SET nama_produk = ?, deskripsi = ?, status = ? WHERE id_produk = ?");
-            $stmtUp->execute([$nama, $deskripsi, $statusDb, $prod_id]);
+            
+            // Periksa apakah prod_id merujuk pada id_varian atau id_produk
+            $stmtCheck = $pdo->prepare("SELECT id_varian, id_produk FROM varian_produk WHERE id_varian = ?");
+            $stmtCheck->execute([$prod_id]);
+            $vRow = $stmtCheck->fetch();
 
-            $stmtUpV = $pdo->prepare("UPDATE varian_produk SET nama_varian = ?, harga = ?, min_order = ? WHERE id_produk = ?");
-            $stmtUpV->execute([$packaging_label, $harga, $moq, $prod_id]);
+            if ($vRow) {
+                $actualIdProduk = $vRow['id_produk'];
+                $actualIdVarian = $vRow['id_varian'];
+
+                $stmtUp = $pdo->prepare("UPDATE produk SET nama_produk = ?, deskripsi = ?, status = ? WHERE id_produk = ?");
+                $stmtUp->execute([$nama, $deskripsi, $statusDb, $actualIdProduk]);
+
+                $stmtUpV = $pdo->prepare("UPDATE varian_produk SET nama_varian = ?, harga = ?, min_order = ? WHERE id_varian = ?");
+                $stmtUpV->execute([$packaging_label, $harga, $moq, $actualIdVarian]);
+            } else {
+                $stmtUp = $pdo->prepare("UPDATE produk SET nama_produk = ?, deskripsi = ?, status = ? WHERE id_produk = ?");
+                $stmtUp->execute([$nama, $deskripsi, $statusDb, $prod_id]);
+
+                $stmtUpV = $pdo->prepare("UPDATE varian_produk SET nama_varian = ?, harga = ?, min_order = ? WHERE id_produk = ?");
+                $stmtUpV->execute([$packaging_label, $harga, $moq, $prod_id]);
+            }
         } catch (Exception $e) {}
     }
 
@@ -453,10 +470,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     // Sync ke DB
     if ($db_connected && $pdo && $prod_id > 0) {
         try {
-            $stmtDelV = $pdo->prepare("DELETE FROM varian_produk WHERE id_produk = ?");
-            $stmtDelV->execute([$prod_id]);
-            $stmtDelP = $pdo->prepare("DELETE FROM produk WHERE id_produk = ?");
-            $stmtDelP->execute([$prod_id]);
+            $stmtCheck = $pdo->prepare("SELECT id_varian, id_produk FROM varian_produk WHERE id_varian = ?");
+            $stmtCheck->execute([$prod_id]);
+            $vRow = $stmtCheck->fetch();
+
+            if ($vRow) {
+                $idProdukParent = $vRow['id_produk'];
+                $stmtDelV = $pdo->prepare("DELETE FROM varian_produk WHERE id_varian = ?");
+                $stmtDelV->execute([$prod_id]);
+
+                // Jika sudah tidak ada varian lain untuk produk ini, hapus master produk
+                $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM varian_produk WHERE id_produk = ?");
+                $stmtCount->execute([$idProdukParent]);
+                if (intval($stmtCount->fetchColumn()) === 0) {
+                    $stmtDelP = $pdo->prepare("DELETE FROM produk WHERE id_produk = ?");
+                    $stmtDelP->execute([$idProdukParent]);
+                }
+            } else {
+                $stmtDelV = $pdo->prepare("DELETE FROM varian_produk WHERE id_produk = ?");
+                $stmtDelV->execute([$prod_id]);
+                $stmtDelP = $pdo->prepare("DELETE FROM produk WHERE id_produk = ?");
+                $stmtDelP->execute([$prod_id]);
+            }
         } catch (Exception $e) {}
     }
 

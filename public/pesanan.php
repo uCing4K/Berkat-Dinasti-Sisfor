@@ -120,17 +120,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $custWa = !empty($no_wa_baru) ? $no_wa_baru : '0812-3456-7890';
         $custAddress = !empty($alamat_baru) ? $alamat_baru : trim($_POST['destination'] ?? 'Ambil di Toko');
 
-        $qty1 = max(0, intval($_POST['qty_item_1'] ?? 10));
-        $qty2 = max(0, intval($_POST['qty_item_2'] ?? 2));
-        $grand_total = intval($_POST['grand_total'] ?? ($qty1 * 10000 + $qty2 * 22000));
-        if ($grand_total <= 0) $grand_total = 144000;
+        $raw_items = $_POST['items'] ?? [];
+        $processed_items = [];
+        $calculated_total = 0;
+
+        if (!empty($raw_items) && is_array($raw_items)) {
+            foreach ($raw_items as $it) {
+                $nama_it = trim($it['nama'] ?? '');
+                $qty_it = max(0, intval($it['qty'] ?? 0));
+                $hrg_it = max(0, intval($it['harga'] ?? 0));
+                $kemasan_it = trim($it['kemasan'] ?? '');
+                $id_var = intval($it['id_varian'] ?? 1);
+                if ($qty_it > 0) {
+                    $sub = $qty_it * $hrg_it;
+                    $calculated_total += $sub;
+                    $processed_items[] = [
+                        'nama' => $nama_it ?: 'Roti Pesanan',
+                        'id_varian' => $id_var,
+                        'kemasan' => $kemasan_it,
+                        'qty' => $qty_it,
+                        'harga' => $hrg_it,
+                        'subtotal' => $sub
+                    ];
+                }
+            }
+        }
+
+        // Fallback untuk backward compatibility
+        if (empty($processed_items)) {
+            $qty1 = max(0, intval($_POST['qty_item_1'] ?? 0));
+            $qty2 = max(0, intval($_POST['qty_item_2'] ?? 0));
+            if ($qty1 > 0) {
+                $processed_items[] = [
+                    'nama' => 'Roti Hajatan (9 Pilihan Topping)',
+                    'id_varian' => 1,
+                    'kemasan' => 'Kardus Putih',
+                    'qty' => $qty1,
+                    'harga' => 10000,
+                    'subtotal' => $qty1 * 10000
+                ];
+                $calculated_total += ($qty1 * 10000);
+            }
+            if ($qty2 > 0) {
+                $processed_items[] = [
+                    'nama' => 'Bolu Pisang Premium',
+                    'id_varian' => 7,
+                    'kemasan' => 'Mika',
+                    'qty' => $qty2,
+                    'harga' => 22000,
+                    'subtotal' => $qty2 * 22000
+                ];
+                $calculated_total += ($qty2 * 22000);
+            }
+        }
+
+        if (empty($processed_items)) {
+            $processed_items[] = [
+                'nama' => 'Roti Hajatan (9 Pilihan Topping)',
+                'id_varian' => 1,
+                'kemasan' => 'Kardus Putih',
+                'qty' => 10,
+                'harga' => 10000,
+                'subtotal' => 100000
+            ];
+            $calculated_total = 100000;
+        }
+
+        $grand_total = intval($_POST['grand_total'] ?? $calculated_total);
+        if ($grand_total <= 0) $grand_total = $calculated_total;
 
         $itemsDesc = trim($_POST['items_desc'] ?? '');
         if (empty($itemsDesc)) {
-            $descParts = [];
-            if ($qty1 > 0) $descParts[] = "Roti Hajatan Putih ({$qty1} box)";
-            if ($qty2 > 0) $descParts[] = "Bolu Pisang Mika ({$qty2} mika)";
-            $itemsDesc = !empty($descParts) ? implode(', ', $descParts) : 'Pesanan Bakery Berkat Dinasti';
+            $itemsDesc = implode(', ', array_map(fn($p) => "{$p['nama']} ({$p['qty']} pcs)", $processed_items));
         }
 
         $tglKirim = !empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d');
@@ -226,11 +287,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     INSERT INTO detail_pesanan (id_pesanan, id_varian, qty, harga_satuan, subtotal)
                     VALUES (?, ?, ?, ?, ?)
                 ");
-                if ($qty1 > 0) {
-                    $stmtDetail->execute([$newOrderId, 1, $qty1, 10000, $qty1 * 10000]);
-                }
-                if ($qty2 > 0) {
-                    $stmtDetail->execute([$newOrderId, 7, $qty2, 22000, $qty2 * 22000]);
+                foreach ($processed_items as $pi) {
+                    $stmtDetail->execute([
+                        $newOrderId,
+                        $pi['id_varian'],
+                        $pi['qty'],
+                        $pi['harga'],
+                        $pi['subtotal']
+                    ]);
                 }
 
                 $pdo->commit();
@@ -300,6 +364,31 @@ if ($db_connected && $pdo) {
         $dbCusts = $stmtC->fetchAll();
         if (!empty($dbCusts)) {
             $customers_for_select = $dbCusts;
+        }
+    } catch (Exception $e) {}
+}
+
+// Master Produk untuk Order Items Dinamis
+$products_for_select = [
+    ['id_varian' => 1, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Putih', 'harga' => 10000, 'min_order' => 1],
+    ['id_varian' => 2, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Batik', 'harga' => 11000, 'min_order' => 1],
+    ['id_varian' => 3, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Mika', 'harga' => 10500, 'min_order' => 1],
+    ['id_varian' => 7, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Mika', 'harga' => 22000, 'min_order' => 1],
+    ['id_varian' => 8, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Kardus Putih', 'harga' => 23000, 'min_order' => 1],
+    ['id_varian' => 9, 'nama' => 'Bolu Tanpa Pisang', 'kemasan' => 'Kardus Putih', 'harga' => 20000, 'min_order' => 1]
+];
+if ($db_connected && $pdo) {
+    try {
+        $stmtP = $pdo->query("
+            SELECT v.id_varian, v.id_produk, p.nama_produk as nama, v.nama_varian as kemasan, v.harga, v.min_order 
+            FROM varian_produk v 
+            JOIN produk p ON v.id_produk = p.id_produk 
+            WHERE p.status = 'tersedia' 
+            ORDER BY p.nama_produk ASC
+        ");
+        $dbProds = $stmtP->fetchAll();
+        if (!empty($dbProds)) {
+            $products_for_select = $dbProds;
         }
     } catch (Exception $e) {}
 }
@@ -1507,55 +1596,92 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- Items Table -->
-                        <div class="border border-[#E2D7C8] rounded-xl overflow-hidden mb-3">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase">
+                        <div class="border border-[#E2D7C8] rounded-xl overflow-x-auto mb-3 shadow-2xs">
+                            <table class="w-full text-left text-xs min-w-[560px]">
+                                <thead class="bg-[#3E2B21] text-[#FAF8F5] font-semibold uppercase text-xs">
                                     <tr>
                                         <th class="px-3.5 py-2.5">Produk</th>
                                         <th class="px-3.5 py-2.5">Kemasan</th>
                                         <th class="px-3.5 py-2.5 w-24">Jumlah</th>
                                         <th class="px-3.5 py-2.5">Harga Satuan</th>
                                         <th class="px-3.5 py-2.5">Subtotal</th>
+                                        <th class="px-3 py-2.5 text-center w-10">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#EAE1D5] bg-[#FDFBF7]">
+                                <tbody id="orderItemsTableBody" class="divide-y divide-[#EAE1D5] bg-[#FDFBF7]">
                                     <!-- Row 1: Roti Hajatan (Pricelist 10k) -->
-                                    <tr id="orderRow1" class="hover:bg-[#F0E9DF] transition-colors">
+                                    <tr class="order-product-row" data-min-order="1" data-price="10000">
                                         <td class="px-3.5 py-3">
-                                            <p class="font-bold text-[#251A14]">Roti Hajatan (9 Pilihan Topping)</p>
-                                            <p class="text-[10px] text-[#27AE60] font-semibold">Min. 1 box</p>
+                                            <input type="hidden" name="items[0][nama]" value="Roti Hajatan (9 Pilihan Topping)" class="item-name-input">
+                                            <input type="hidden" name="items[0][id_varian]" value="1" class="item-varian-input">
+                                            <p class="font-bold text-[#1C1C1C] item-title">Roti Hajatan (9 Pilihan Topping)</p>
+                                            <p class="text-[10px] text-[#27AE60] font-semibold item-moq-label">Ready Stock (Min. 1 box)</p>
                                         </td>
-                                        <td class="px-3.5 py-3 text-[#544337]">Kardus Putih (10k)</td>
+                                        <td class="px-3.5 py-3 text-[#544337]">
+                                            <span class="item-kemasan-text">Kardus Putih</span>
+                                            <input type="hidden" name="items[0][kemasan]" value="Kardus Putih" class="item-kemasan-input">
+                                        </td>
                                         <td class="px-3.5 py-3">
-                                            <input type="number" id="qtyItem1" name="qty_item_1" value="10" min="0" onchange="calculateOrderTotal()" 
-                                                class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#27AE60] text-[#251A14] font-bold rounded text-center focus:outline-none transition-colors">
+                                            <input type="number" name="items[0][qty]" value="10" min="1" oninput="calculateOrderTotal()" 
+                                                class="item-qty-input w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                                         </td>
-                                        <td class="px-3.5 py-3 text-[#544337]">Rp 10.000</td>
-                                        <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal1">Rp 100.000</td>
+                                        <td class="px-3.5 py-3 text-[#544337]">
+                                            <span class="item-price-text">Rp 10.000</span>
+                                            <input type="hidden" name="items[0][harga]" value="10000" class="item-price-input">
+                                        </td>
+                                        <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 100.000</td>
+                                        <td class="px-3 py-3 text-center">
+                                            <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                                                <i class="far fa-trash-alt text-xs"></i>
+                                            </button>
+                                        </td>
                                     </tr>
 
                                     <!-- Row 2: Bolu Pisang Premium (Pricelist 22k) -->
-                                    <tr id="orderRow2" class="hover:bg-[#F0E9DF] transition-colors">
+                                    <tr class="order-product-row" data-min-order="1" data-price="22000">
                                         <td class="px-3.5 py-3">
-                                            <p class="font-bold text-[#251A14]">Bolu Pisang Premium</p>
-                                            <p class="text-[10px] text-[#8E7E73]">Ready Fresh</p>
+                                            <input type="hidden" name="items[1][nama]" value="Bolu Pisang Premium" class="item-name-input">
+                                            <input type="hidden" name="items[1][id_varian]" value="7" class="item-varian-input">
+                                            <p class="font-bold text-[#1C1C1C] item-title">Bolu Pisang Premium</p>
+                                            <p class="text-[10px] text-[#8E7E73] item-moq-label">Ready Fresh</p>
                                         </td>
-                                        <td class="px-3.5 py-3 text-[#544337]">Mika (22k)</td>
+                                        <td class="px-3.5 py-3 text-[#544337]">
+                                            <span class="item-kemasan-text">Mika</span>
+                                            <input type="hidden" name="items[1][kemasan]" value="Mika" class="item-kemasan-input">
+                                        </td>
                                         <td class="px-3.5 py-3">
-                                            <input type="number" id="qtyItem2" name="qty_item_2" value="2" min="0" onchange="calculateOrderTotal()" 
-                                                class="w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#251A14] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
+                                            <input type="number" name="items[1][qty]" value="2" min="1" oninput="calculateOrderTotal()" 
+                                                class="item-qty-input w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
                                         </td>
-                                        <td class="px-3.5 py-3 text-[#544337]">Rp 22.000</td>
-                                        <td class="px-3.5 py-3 font-bold text-[#251A14]" id="subtotal2">Rp 44.000</td>
+                                        <td class="px-3.5 py-3 text-[#544337]">
+                                            <span class="item-price-text">Rp 22.000</span>
+                                            <input type="hidden" name="items[1][harga]" value="22000" class="item-price-input">
+                                        </td>
+                                        <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp 44.000</td>
+                                        <td class="px-3 py-3 text-center">
+                                            <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                                                <i class="far fa-trash-alt text-xs"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
+                        <!-- Button Tambah Produk Baru Dinamis -->
+                        <div class="flex items-center justify-between mb-4">
+                            <button type="button" onclick="addOrderProductRow()" 
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-[#D46E15] text-[#D46E15] hover:bg-[#D46E15]/10 text-xs font-semibold transition-all">
+                                <i class="fas fa-plus text-[10px]"></i>
+                                <span>+ Tambah Produk</span>
+                            </button>
+                            <span class="text-[11px] text-[#8E7E73]">Pilih varian atau produk lain dari katalog</span>
+                        </div>
+
                         <!-- Validation Callout Alert (MOQ Warning) -->
                         <div id="moqAlertBox" class="bg-rose-50 border border-rose-200 text-rose-800 rounded-xl p-3 flex items-start gap-2.5 hidden">
                             <i class="fas fa-lock text-rose-600 mt-0.5 shrink-0"></i>
-                            <p class="text-xs text-rose-800 leading-relaxed">
+                            <p class="text-xs text-rose-800 leading-relaxed" id="moqAlertMessage">
                                 <strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.
                             </p>
                         </div>
@@ -1811,6 +1937,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         // Data Pesanan & Master Pelanggan untuk Frontend Interactivity
         const ordersData = <?= json_encode($master_orders) ?>;
         const CUSTOMERS_DATA = <?= json_encode($customers_for_select, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        const PRODUCTS_DATA = <?= json_encode($products_for_select, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        let productRowCounter = 2;
         let selectedDetailOrderId = null;
 
         function escapeHtml(str) {
@@ -2146,6 +2274,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     return o.date === dateStr || (o.date.endsWith(`-${String(d).padStart(2, '0')}`) && o.date.includes(`-${String(month+1).padStart(2,'0')}-`));
                 });
                 const count = ordersOnDate.length;
+                let dayTotalPcs = 0;
+                ordersOnDate.forEach(ord => {
+                    const matches = (ord.items || '').matchAll(/(\d+)\s*(pcs|box|mika|biji)/gi);
+                    let pcs = 0;
+                    for (const m of matches) pcs += parseInt(m[1], 10);
+                    if (pcs === 0 && ord.total_qty) pcs = parseInt(ord.total_qty, 10);
+                    dayTotalPcs += (pcs > 0 ? pcs : 10);
+                });
+                const isOverload = (dayTotalPcs > 150);
 
                 let dayHtml = '';
                 if (isToday) {
@@ -2153,7 +2290,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
                              class="cal-day-cell p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#D46E15] flex flex-col items-center justify-between min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
                             <span class="font-bold text-sm text-[#924C00]">${d}</span>
-                            <span class="text-[10px] font-bold text-white bg-[#D46E15] px-1.5 py-0.5 rounded shadow-2xs">${count > 0 ? count + ' Pesanan' : 'Hari Ini'}</span>
+                            <span class="text-[10px] font-bold ${isOverload ? 'text-amber-950 bg-amber-300' : 'text-white bg-[#D46E15]'} px-1.5 py-0.5 rounded shadow-2xs">${isOverload ? '⚠️ ' + dayTotalPcs + ' pcs' : (count > 0 ? count + ' Pesanan' : 'Hari Ini')}</span>
                         </div>
                     `;
                 } else if (count > 0) {
@@ -2164,6 +2301,14 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                  class="cal-day-cell p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
                                 <span class="font-bold text-sm text-[#1C1C1C]">${d}</span>
                                 <span class="text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ ${count} Selesai</span>
+                            </div>
+                        `;
+                    } else if (isOverload) {
+                        dayHtml = `
+                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
+                                 class="cal-day-cell p-2.5 rounded-xl bg-amber-50 border border-amber-300 flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-sm text-amber-900">${d}</span>
+                                <span class="text-[10px] font-bold text-amber-900 bg-amber-200 px-1.5 py-0.5 rounded shadow-2xs">⚠️ ${dayTotalPcs} pcs</span>
                             </div>
                         `;
                     } else {
@@ -2212,14 +2357,29 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 return o.date === dateStr || (o.date.endsWith(`-${String(dayNum).padStart(2, '0')}`) && o.date.includes(`-${String(currentCalDate.getMonth()+1).padStart(2,'0')}-`));
             });
 
+            let totalPcs = 0;
+            matchingOrders.forEach(ord => {
+                const matches = (ord.items || '').matchAll(/(\d+)\s*(pcs|box|mika|biji)/gi);
+                let pcs = 0;
+                for (const m of matches) pcs += parseInt(m[1], 10);
+                if (pcs === 0 && ord.total_qty) pcs = parseInt(ord.total_qty, 10);
+                totalPcs += (pcs > 0 ? pcs : 10);
+            });
+            const isDayOverload = (totalPcs > 150);
+
             const grid = document.getElementById('deliveryCardsGrid');
             const badge = document.getElementById('deliveryBatchBadge');
             const countLabel = document.getElementById('deliveryCountLabel');
 
             if (matchingOrders.length > 0) {
-                badge.textContent = `${matchingOrders.length} Batch Aktif`;
-                badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full';
-                countLabel.textContent = `${matchingOrders.length} Pengiriman Terjadwal`;
+                if (isDayOverload) {
+                    badge.textContent = `⚠️ Overload (${totalPcs}/150 pcs)`;
+                    badge.className = 'bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-full';
+                } else {
+                    badge.textContent = `${matchingOrders.length} Batch Aktif (${totalPcs} pcs)`;
+                    badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full';
+                }
+                countLabel.textContent = `${matchingOrders.length} Pengiriman Terjadwal (${totalPcs} pcs)`;
 
                 let cardsHtml = matchingOrders.map(ord => {
                     const isLunas = (ord.status_bayar === 'Lunas');
@@ -2277,7 +2437,27 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
                     </div>
                 `;
-                grid.innerHTML = cardsHtml;
+
+                let overloadBanner = '';
+                if (isDayOverload) {
+                    const extraTrips = Math.ceil(totalPcs / 150);
+                    overloadBanner = `
+                        <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-amber-50 border border-amber-300 rounded-xl p-3.5 mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-amber-900 shadow-2xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center shrink-0 shadow-inner">
+                                    <i class="fas fa-motorcycle text-base"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-sm text-[#924C00]">Kapasitas Armada Kurir Obrok Overload!</p>
+                                    <p class="text-amber-800/90 mt-0.5">Muatan tanggal ini mencapai <strong>${totalPcs} pcs</strong> (batas standar <strong>150 pcs per trip motor obrok</strong>). Diperlukan <strong>${extraTrips} trip perjalanan</strong> atau armada kurir tambahan.</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider shrink-0 text-center">Butuh ${extraTrips} Trip Motor</span>
+                        </div>
+                    `;
+                }
+
+                grid.innerHTML = overloadBanner + cardsHtml;
             } else {
                 badge.textContent = 'Tidak Ada Pengiriman';
                 badge.className = 'bg-[#8E7E73]/15 text-[#544337] text-xs font-semibold px-2.5 py-0.5 rounded-full';
@@ -2360,44 +2540,186 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             document.body.style.overflow = '';
         }
 
-        // Calculation & MOQ Validation in Modal
+        function addOrderProductRow() {
+            const tbody = document.getElementById('orderItemsTableBody');
+            if (!tbody) return;
+            const rowIndex = productRowCounter++;
+            
+            const defaultProd = PRODUCTS_DATA[2] || PRODUCTS_DATA[0] || {
+                id_varian: 1, nama: 'Roti Hajatan (9 Pilihan Topping)', kemasan: 'Kardus Putih', harga: 10000, min_order: 1
+            };
+
+            const tr = document.createElement('tr');
+            tr.className = 'order-product-row';
+            tr.setAttribute('data-min-order', defaultProd.min_order || 1);
+            tr.setAttribute('data-price', defaultProd.harga || 10000);
+
+            let optionsHtml = '';
+            PRODUCTS_DATA.forEach(p => {
+                const isSelected = p.id_varian == defaultProd.id_varian ? 'selected' : '';
+                optionsHtml += `<option value="${p.id_varian}" data-price="${p.harga}" data-kemasan="${p.kemasan}" data-name="${p.nama}" data-min-order="${p.min_order || 1}" ${isSelected}>${p.nama} (${p.kemasan})</option>`;
+            });
+
+            tr.innerHTML = `
+                <td class="px-3.5 py-3">
+                    <input type="hidden" name="items[${rowIndex}][nama]" value="${defaultProd.nama}" class="item-name-input">
+                    <input type="hidden" name="items[${rowIndex}][id_varian]" value="${defaultProd.id_varian}" class="item-varian-input">
+                    <select onchange="onProductSelectRowChange(this, ${rowIndex})" 
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none mb-1">
+                        ${optionsHtml}
+                    </select>
+                    <p class="text-[10px] text-[#828282] item-moq-label">${defaultProd.min_order > 1 ? 'Min. ' + defaultProd.min_order + ' pcs' : 'Ready Stock'}</p>
+                </td>
+                <td class="px-3.5 py-3 text-[#544337]">
+                    <span class="item-kemasan-text">${defaultProd.kemasan}</span>
+                    <input type="hidden" name="items[${rowIndex}][kemasan]" value="${defaultProd.kemasan}" class="item-kemasan-input">
+                </td>
+                <td class="px-3.5 py-3">
+                    <input type="number" name="items[${rowIndex}][qty]" value="1" min="1" oninput="calculateOrderTotal()" 
+                        class="item-qty-input w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors">
+                </td>
+                <td class="px-3.5 py-3 text-[#544337]">
+                    <span class="item-price-text">Rp ${new Intl.NumberFormat('id-ID').format(defaultProd.harga)}</span>
+                    <input type="hidden" name="items[${rowIndex}][harga]" value="${defaultProd.harga}" class="item-price-input">
+                </td>
+                <td class="px-3.5 py-3 font-bold text-[#1C1C1C] item-subtotal-text">Rp ${new Intl.NumberFormat('id-ID').format(defaultProd.harga)}</td>
+                <td class="px-3 py-3 text-center">
+                    <button type="button" onclick="removeOrderProductRow(this)" class="text-[#8E7E73] hover:text-[#EB5757] p-1 transition-colors" title="Hapus Item">
+                        <i class="far fa-trash-alt text-xs"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+            calculateOrderTotal();
+        }
+
+        function onProductSelectRowChange(selectElem, rowIndex) {
+            const tr = selectElem.closest('tr');
+            const selectedOpt = selectElem.options[selectElem.selectedIndex];
+            const price = parseFloat(selectedOpt.getAttribute('data-price')) || 0;
+            const kemasan = selectedOpt.getAttribute('data-kemasan') || '';
+            const name = selectedOpt.getAttribute('data-name') || '';
+            const minOrder = parseInt(selectedOpt.getAttribute('data-min-order')) || 1;
+            const idVarian = selectElem.value;
+
+            tr.setAttribute('data-min-order', minOrder);
+            tr.setAttribute('data-price', price);
+
+            tr.querySelector('.item-name-input').value = name;
+            tr.querySelector('.item-varian-input').value = idVarian;
+            tr.querySelector('.item-kemasan-input').value = kemasan;
+            tr.querySelector('.item-kemasan-text').textContent = kemasan;
+            tr.querySelector('.item-price-input').value = price;
+            tr.querySelector('.item-price-text').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(price);
+            
+            const moqLabel = tr.querySelector('.item-moq-label');
+            if (minOrder > 1) {
+                moqLabel.textContent = `Min. ${minOrder} pcs`;
+                moqLabel.className = 'text-[10px] text-[#EB5757] font-semibold item-moq-label';
+            } else {
+                moqLabel.textContent = 'Ready Stock';
+                moqLabel.className = 'text-[10px] text-[#828282] item-moq-label';
+            }
+
+            calculateOrderTotal();
+        }
+
+        function removeOrderProductRow(btn) {
+            const tbody = document.getElementById('orderItemsTableBody');
+            const rows = tbody.querySelectorAll('.order-product-row');
+            if (rows.length <= 1) {
+                alert('Pesanan harus memiliki minimal 1 produk bakery.');
+                return;
+            }
+            btn.closest('tr').remove();
+            calculateOrderTotal();
+        }
+
+        // Calculation & MOQ Validation in Modal (Dynamic items)
         function calculateOrderTotal() {
-            const q1 = parseInt(document.getElementById('qtyItem1').value) || 0;
-            const q2 = parseInt(document.getElementById('qtyItem2').value) || 0;
+            const rows = document.querySelectorAll('#orderItemsTableBody .order-product-row');
+            let grandTotal = 0;
+            let moqViolations = [];
+            let itemDescriptions = [];
 
-            const sub1 = q1 * 10000;
-            const sub2 = q2 * 22000;
-            const total = sub1 + sub2;
+            rows.forEach(tr => {
+                const qtyInput = tr.querySelector('.item-qty-input');
+                const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+                const price = parseFloat(tr.getAttribute('data-price')) || 0;
+                const minOrder = parseInt(tr.getAttribute('data-min-order')) || 1;
+                const subtotal = qty * price;
+                grandTotal += subtotal;
 
-            document.getElementById('subtotal1').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(sub1);
-            document.getElementById('subtotal2').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(sub2);
-            document.getElementById('orderGrandTotal').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
-            document.getElementById('hiddenGrandTotal').value = total;
-            document.getElementById('hiddenItemsDesc').value = `Roti Hajatan Putih (${q1} box), Bolu Pisang Mika (${q2} mika)`;
+                const subText = tr.querySelector('.item-subtotal-text');
+                if (subText) subText.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(subtotal);
 
-            const qtyInput1 = document.getElementById('qtyItem1');
+                const nameInput = tr.querySelector('.item-name-input');
+                const prodName = nameInput ? nameInput.value : 'Produk';
+
+                if (qty > 0) {
+                    itemDescriptions.push(`${prodName} (${qty} pcs)`);
+                }
+
+                if (minOrder > 1 && qty < minOrder) {
+                    moqViolations.push({
+                        name: prodName,
+                        qty: qty,
+                        minOrder: minOrder
+                    });
+                    if (qtyInput) qtyInput.className = 'item-qty-input w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors';
+                } else if (qty < 1) {
+                    if (qtyInput) qtyInput.className = 'item-qty-input w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors';
+                } else {
+                    if (qtyInput) qtyInput.className = 'item-qty-input w-16 px-2 py-1 bg-[#EFE8DE] border border-[#DDD3C5] text-[#1C1C1C] font-semibold rounded text-center focus:outline-none focus:border-[#D46E15] transition-colors';
+                }
+            });
+
+            const countLabel = document.getElementById('itemCountLabel');
+            if (countLabel) countLabel.textContent = `${rows.length} Item Dipilih`;
+
+            const grandTotalElem = document.getElementById('orderGrandTotal');
+            if (grandTotalElem) grandTotalElem.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(grandTotal);
+
+            const hiddenGrandTotal = document.getElementById('hiddenGrandTotal');
+            if (hiddenGrandTotal) hiddenGrandTotal.value = grandTotal;
+
+            const hiddenItemsDesc = document.getElementById('hiddenItemsDesc');
+            if (hiddenItemsDesc) hiddenItemsDesc.value = itemDescriptions.join(', ');
+
             const alertBox = document.getElementById('moqAlertBox');
+            const alertMsg = document.getElementById('moqAlertMessage');
             const submitBtn = document.getElementById('submitOrderBtn');
             const lockIcon = document.getElementById('submitLockIcon');
             const footerWarning = document.getElementById('footerMoqWarning');
-            const currentMoqQty = document.getElementById('currentMoqQty');
 
-            if (currentMoqQty) currentMoqQty.textContent = q1;
-
-            if (q1 < 1 && q2 < 1) {
-                qtyInput1.className = 'w-16 px-2 py-1 border-2 border-[#EB5757] text-[#EB5757] font-bold rounded text-center focus:outline-none transition-colors';
-                alertBox.classList.remove('hidden');
-                submitBtn.disabled = true;
-                submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
-                lockIcon.textContent = '🔒';
-                footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Minimal pesan 1 box roti / bolu</span>';
+            if (grandTotal <= 0) {
+                if (alertBox) alertBox.classList.remove('hidden');
+                if (alertMsg) alertMsg.innerHTML = '<strong>Pesanan Kosong</strong> — Masukkan minimal 1 box produk sebelum menyimpan pesanan.';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
+                }
+                if (lockIcon) lockIcon.textContent = '🔒';
+                if (footerWarning) footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Minimal pesan 1 box roti / bolu</span>';
+            } else if (moqViolations.length > 0) {
+                const firstV = moqViolations[0];
+                if (alertBox) alertBox.classList.remove('hidden');
+                if (alertMsg) alertMsg.innerHTML = `<strong>${firstV.name}</strong> — Jumlah pesanan ${firstV.qty} pcs (Minimum order ${firstV.minOrder} pcs). Pesanan tidak dapat disimpan sebelum memenuhi jumlah minimum.`;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
+                }
+                if (lockIcon) lockIcon.textContent = '🔒';
+                if (footerWarning) footerWarning.innerHTML = `<span class="text-[#EB5757]">ⓘ Minimum order ${firstV.minOrder} pcs belum terpenuhi</span>`;
             } else {
-                qtyInput1.className = 'w-16 px-2 py-1 border border-[#27AE60] text-[#1C1C1C] font-bold rounded text-center focus:outline-none transition-colors';
-                alertBox.classList.add('hidden');
-                submitBtn.disabled = false;
-                submitBtn.className = 'bg-[#D46E15] hover:bg-[#B85207] text-white cursor-pointer text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95';
-                lockIcon.textContent = '✓';
-                footerWarning.innerHTML = '<span class="text-[#27AE60]">✓ Minimum order terpenuhi</span>';
+                if (alertBox) alertBox.classList.add('hidden');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.className = 'bg-[#D46E15] hover:bg-[#B85207] text-white cursor-pointer text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95';
+                }
+                if (lockIcon) lockIcon.textContent = '✓';
+                if (footerWarning) footerWarning.innerHTML = '<span class="text-[#27AE60]">✓ Minimum order terpenuhi</span>';
             }
 
             // Validasi tanggal PO di modal pesanan
@@ -2405,10 +2727,12 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (dateInput && dateInput.value) {
                 const todayStr = new Date().toISOString().split('T')[0];
                 if (dateInput.value < todayStr) {
-                    submitBtn.disabled = true;
-                    submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
-                    lockIcon.textContent = '🔒';
-                    footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Tanggal PO tidak boleh lewat</span>';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
+                    }
+                    if (lockIcon) lockIcon.textContent = '🔒';
+                    if (footerWarning) footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Tanggal PO tidak boleh lewat</span>';
                 }
             }
         }

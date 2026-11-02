@@ -7,6 +7,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Proteksi RBAC: Hanya role 'admin' yang berhak mengakses Pengaturan Toko & Manajemen Akun
+if (isset($_SESSION['role']) && strtolower($_SESSION['role']) !== 'admin') {
+    $_SESSION['flash_error'] = "Akses ditolak! Halaman Pengaturan Sistem hanya dapat diakses oleh Administrator.";
+    header("Location: beranda.php");
+    exit();
+}
+
 // Inisialisasi Database Connection (PDO) & Handler Backend
 $db_connected = false;
 $pdo = null;

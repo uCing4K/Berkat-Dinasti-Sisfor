@@ -2370,6 +2370,29 @@ if ($db_connected && $pdo) {
             const body = document.getElementById('delivModalBody');
             const items = SCHEDULE_BY_DATE[dayNum] || [];
 
+            let totalPcsDay = 0;
+            items.forEach(it => {
+                const matches = (it.items || '').matchAll(/(\d+)\s*(pcs|box|mika|biji)/gi);
+                let pcs = 0;
+                for (const m of matches) pcs += parseInt(m[1], 10);
+                totalPcsDay += (pcs > 0 ? pcs : 10);
+            });
+            const isOverload = totalPcsDay > 150;
+            const extraTrips = Math.ceil(totalPcsDay / 150);
+            const capacityBadge = isOverload
+                ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-200 text-amber-900 border border-amber-300">⚠️ Overload: ${totalPcsDay}/150 pcs (Butuh ${extraTrips} Trip)</span>`
+                : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">✓ Kapasitas Aman (${totalPcsDay}/150 pcs)</span>`;
+
+            const overloadBanner = isOverload ? `
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 text-xs text-amber-900 flex items-center gap-2.5 shadow-2xs">
+                    <i class="fas fa-motorcycle text-amber-700 text-base shrink-0"></i>
+                    <div>
+                        <p class="font-bold">Perhatian Kapasitas Motor Obrok:</p>
+                        <p class="mt-0.5 text-amber-800">Muatan tanggal ini (<strong>${totalPcsDay} pcs</strong>) melebihi batas aman 150 pcs per trip motor. Diperlukan <strong>${extraTrips} trip pengiriman</strong>.</p>
+                    </div>
+                </div>
+            ` : '';
+
             if (items.length === 0) {
                 body.innerHTML = `
                     <div class="p-6 text-center text-xs text-[#8E7E73]">
@@ -2387,8 +2410,9 @@ if ($db_connected && $pdo) {
                 body.innerHTML = `
                     <div class="flex items-center justify-between pb-2 border-b border-[#E2D7C8] text-xs">
                         <span class="font-semibold text-[#544337]"><i class="fas fa-boxes mr-1 text-[#D46E15]"></i> Total: ${items.length} Pesanan Terjadwal</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">Kapasitas Trip Aman</span>
+                        ${capacityBadge}
                     </div>
+                    ${overloadBanner}
                     <div class="space-y-3">
                         ${items.map(it => `
                             <div class="p-3.5 bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] space-y-2 text-xs">
@@ -2744,20 +2768,20 @@ if ($db_connected && $pdo) {
             }
             for (let day = 1; day <= totalDays; day++) {
                 const isToday = isThisMonth && today.getDate() === day;
-                const hasDelivery = [2, 5, 9, 14, 18, 22, 26, 28].includes(day);
+                const hasDelivery = [2, 5, 9, 14, 18, 22, 26, 28, 30].includes(day) || Boolean(SCHEDULE_BY_DATE[day]);
 
                 if (isToday) {
-                    html += `<div class="flex flex-col items-center justify-center">
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform p-0.5" title="Klik untuk lihat jadwal pengiriman">
                         <span class="w-6 h-6 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">${day}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                     </div>`;
                 } else if (hasDelivery) {
-                    html += `<div class="flex flex-col items-center justify-center">
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform p-0.5" title="Klik untuk lihat jadwal pengiriman">
                         <span class="text-[#251A14] font-medium">${day}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
                     </div>`;
                 } else {
-                    html += `<div class="text-[#1B1C1B] font-medium py-1">${day}</div>`;
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="text-[#1B1C1B] font-medium py-1 cursor-pointer hover:text-[#D46E15] transition-colors">${day}</div>`;
                 }
             }
             const currentCells = firstDay + totalDays;

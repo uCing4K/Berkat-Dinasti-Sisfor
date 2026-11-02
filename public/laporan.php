@@ -7,13 +7,26 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Coba koneksi database jika config tersedia
+// Inisialisasi Database Connection (PDO) & Handler Backend
+$db_connected = false;
+$pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     require_once $configFile;
+    try {
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
+            $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+            $db_connected = true;
+        }
+    } catch (Exception $e) {
+        $db_connected = false;
+    }
 }
 
-// Dataset Riwayat Pesanan Laporan Sesuai Figma
+// Dataset Default Riwayat Pesanan Laporan Sesuai Figma
 $orders_report = [
     [
         'no' => 1,
@@ -77,6 +90,70 @@ $orders_report = [
         'status_bayar_class' => 'bg-[#27AE60]/15 text-[#1B7A43]'
     ]
 ];
+
+// Metrik KPI Keuangan Default
+$kpi_pemasukan_raw = 4250000;
+$kpi_orders_count = 48;
+$kpi_piutang_raw = 850000;
+$kpi_pending_count = 6;
+
+// Query Riwayat Transaksi & Metrik Riil dari MySQL jika terhubung
+if ($db_connected && $pdo) {
+    try {
+        $stmtRep = $pdo->query("
+            SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.waktu_kirim, p.grand_total, p.status_bayar, p.status,
+                   pel.nama as nama_pelanggan,
+                   (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
+                    FROM detail_pesanan dp 
+                    JOIN varian_produk v ON dp.id_varian = v.id_varian 
+                    WHERE dp.id_pesanan = p.id_pesanan) as item_summary
+            FROM pesanan p
+            LEFT JOIN pelanggan pel ON p.id_pelanggan = pel.id_pelanggan
+            ORDER BY p.id_pesanan DESC
+            LIMIT 50
+        ");
+        $repRows = $stmtRep->fetchAll();
+        if (!empty($repRows)) {
+            $dynReport = [];
+            $noIdx = 1;
+            foreach ($repRows as $rr) {
+                $payStat = strtolower($rr['status_bayar'] ?? 'belum_bayar');
+                $payCls = match($payStat) {
+                    'lunas' => 'bg-[#27AE60]/15 text-[#1B7A43]',
+                    'hutang', 'dp' => 'bg-[#E2B93B]/20 text-[#886C12]',
+                    default => 'bg-[#828282]/15 text-[#544337]'
+                };
+                $waktu = !empty($rr['waktu_kirim']) ? substr($rr['waktu_kirim'], 0, 5) . ' WIB' : '14:00 WIB';
+                $dynReport[] = [
+                    'no' => $noIdx++,
+                    'tanggal' => date('d M Y', strtotime($rr['tgl_pesan'])),
+                    'jam' => $waktu,
+                    'order_id' => '#' . $rr['no_invoice'],
+                    'customer' => $rr['nama_pelanggan'] ?? 'Pelanggan Walk-in',
+                    'items' => !empty($rr['item_summary']) ? $rr['item_summary'] : 'Pesanan Bakery Berkat Dinasti',
+                    'total' => 'Rp ' . number_format((float)$rr['grand_total'], 0, ',', '.'),
+                    'total_raw' => floatval($rr['grand_total']),
+                    'status_bayar' => ucfirst(str_replace('_', ' ', $payStat)),
+                    'status_bayar_class' => $payCls
+                ];
+            }
+            $orders_report = $dynReport;
+        }
+
+        // Metrik Riil
+        $sRev = $pdo->query("SELECT COALESCE(SUM(grand_total), 0) FROM pesanan WHERE status_bayar = 'lunas'");
+        $kpi_pemasukan_raw = floatval($sRev->fetchColumn());
+
+        $sOrd = $pdo->query("SELECT COUNT(*) FROM pesanan");
+        $kpi_orders_count = intval($sOrd->fetchColumn());
+
+        $sPiut = $pdo->query("SELECT COALESCE(SUM(total_hutang), 0) FROM pelanggan");
+        $kpi_piutang_raw = floatval($sPiut->fetchColumn());
+
+        $sPend = $pdo->query("SELECT COUNT(*) FROM pesanan WHERE status IN ('pending', 'proses')");
+        $kpi_pending_count = intval($sPend->fetchColumn());
+    } catch (Exception $e) {}
+}
 
 // Helper Tanggal Dinamis Bahasa Indonesia
 $daysIndo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
@@ -396,12 +473,12 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <i class="fas fa-wallet text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPemasukan">Rp 4.250.000</h3>
+                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPemasukan"><?= 'Rp ' . number_format($kpi_pemasukan_raw, 0, ',', '.') ?></h3>
                         </div>
                         <div class="mt-4">
                             <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#27AE60]/20 text-[#27AE60] border border-[#27AE60]/30">
-                                <i class="fas fa-arrow-up text-[9px]"></i>
-                                <span>+12% vs bln lalu</span>
+                                <i class="fas fa-check-circle text-[9px]"></i>
+                                <span>Total Lunas Realtime</span>
                             </span>
                         </div>
                     </div>
@@ -415,10 +492,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <i class="fas fa-clipboard-check text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPesanan">48 Order</h3>
+                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPesanan"><?= $kpi_orders_count ?> Order</h3>
                         </div>
                         <div class="mt-4">
-                            <span class="text-xs text-[#D8C7B8]">Rata-rata 1.6 order/hari</span>
+                            <span class="text-xs text-[#D8C7B8]">Akumulasi seluruh transaksi</span>
                         </div>
                     </div>
 
@@ -431,10 +508,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <i class="fas fa-exclamation-triangle text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FF8585] tracking-tight mt-1" id="kpiPiutang">Rp 850.000</h3>
+                            <h3 class="text-2xl font-bold text-[#FF8585] tracking-tight mt-1" id="kpiPiutang"><?= 'Rp ' . number_format($kpi_piutang_raw, 0, ',', '.') ?></h3>
                         </div>
                         <div class="mt-4">
-                            <span class="text-xs text-[#D8C7B8]">Dari 8 pesanan aktif</span>
+                            <span class="text-xs text-[#D8C7B8]">Piutang tertagih pelanggan</span>
                         </div>
                     </div>
 
@@ -447,7 +524,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <i class="fas fa-hourglass-half text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#E2B93B] tracking-tight mt-1" id="kpiPending">6 Order</h3>
+                            <h3 class="text-2xl font-bold text-[#E2B93B] tracking-tight mt-1" id="kpiPending"><?= $kpi_pending_count ?> Order</h3>
                         </div>
                         <div class="mt-4">
                             <span class="text-xs text-[#D8C7B8]" id="kpiPendingDesc">5 antrean oven, 1 tertunda</span>

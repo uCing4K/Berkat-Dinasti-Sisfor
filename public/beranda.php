@@ -103,6 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $alamat_baru = trim($_POST['alamat_baru'] ?? '');
     
     $tgl_kirim = !empty($_POST['tgl_kirim']) ? $_POST['tgl_kirim'] : date('Y-m-d');
+    
+    // Validasi Tanggal Pre-Order (PO): Tidak boleh memilih tanggal lampau / mundur ke belakang
+    $today = date('Y-m-d');
+    if (strtotime($tgl_kirim) < strtotime($today)) {
+        $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tgl_kirim)) . ") tidak valid! Sistem roti Berkat Dinasti berbasis Pre-Order (PO) sehingga tanggal selesai/kirim tidak boleh tanggal yang sudah lewat (minimal hari ini).";
+        header("Location: beranda.php");
+        exit();
+    }
+    
     $waktu_kirim = !empty($_POST['waktu_kirim']) ? $_POST['waktu_kirim'] : '14:00:00';
     $status_bayar = in_array($_POST['status_bayar'] ?? '', ['belum_bayar', 'hutang', 'lunas', 'dp']) ? $_POST['status_bayar'] : 'belum_bayar';
     $metode_bayar = in_array($_POST['metode_bayar'] ?? '', ['cash', 'transfer']) ? $_POST['metode_bayar'] : 'cash';
@@ -144,9 +153,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $grand_total = 100000;
     }
     
+    // Penomoran invoice otomatis standar: INV-YYYYMMDD-XXXX (4 digit urut per hari)
     $dateCode = date('Ymd');
-    $randNum = rand(100, 999);
-    $no_invoice = "INV-{$dateCode}-{$randNum}";
+    $seq = 1;
+    if ($db_connected && $pdo) {
+        try {
+            $stmtInv = $pdo->prepare("SELECT COUNT(*) FROM pesanan WHERE DATE(tgl_pesan) = CURDATE() OR no_invoice LIKE ?");
+            $stmtInv->execute(["INV-{$dateCode}-%"]);
+            $seq = intval($stmtInv->fetchColumn()) + 1;
+        } catch (Exception $e) {}
+    }
+    $no_invoice = "INV-{$dateCode}-" . str_pad($seq, 4, '0', STR_PAD_LEFT);
     $customer_display = 'Ibu Sari Dewi';
     $customer_wa = '0812-3456-7890';
     $customer_alamat = 'Komplek Melati No. 4, Blok B';
@@ -411,32 +428,32 @@ if ($db_connected && $pdo) {
         // Total Pesanan Hari Ini
         $s1 = $pdo->query("SELECT COUNT(*) FROM pesanan WHERE DATE(tgl_pesan) = CURDATE()");
         $cToday = $s1->fetchColumn();
-        if ($cToday > 0) {
-            $kpi_data['total_orders'] = $cToday;
-            $kpi_data['orders_diff'] = 'Terbaru hari ini';
+        if ($cToday !== false) {
+            $kpi_data['total_orders'] = (int)$cToday;
+            $kpi_data['orders_diff'] = $cToday > 0 ? 'Terbaru hari ini' : 'Belum ada hari ini';
         }
         
         // Pesanan Perlu Tindakan / Proses
         $s2 = $pdo->query("SELECT COUNT(*) FROM pesanan WHERE status IN ('pending', 'proses')");
         $cPending = $s2->fetchColumn();
-        if ($cPending > 0) {
-            $kpi_data['pending_orders'] = $cPending;
-            $kpi_data['pending_note'] = 'Perlu proses & oven';
+        if ($cPending !== false) {
+            $kpi_data['pending_orders'] = (int)$cPending;
+            $kpi_data['pending_note'] = $cPending > 0 ? 'Perlu proses & oven' : 'Dapur stand-by';
         }
         
         // Total Pemasukan Bulan Berjalan
         $s3 = $pdo->query("SELECT COALESCE(SUM(grand_total), 0) FROM pesanan WHERE status_bayar = 'lunas' AND MONTH(tgl_pesan) = MONTH(CURDATE()) AND YEAR(tgl_pesan) = YEAR(CURDATE())");
         $cRev = $s3->fetchColumn();
-        if ($cRev > 0) {
-            $kpi_data['total_revenue'] = 'Rp ' . number_format($cRev, 0, ',', '.');
+        if ($cRev !== false) {
+            $kpi_data['total_revenue'] = 'Rp ' . number_format((float)$cRev, 0, ',', '.');
             $kpi_data['revenue_target'] = 'Bulan ini (Lunas)';
         }
         
         // Pelanggan Baru 7 Hari Terakhir
         $s4 = $pdo->query("SELECT COUNT(*) FROM pelanggan WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
         $cCust = $s4->fetchColumn();
-        if ($cCust > 0) {
-            $kpi_data['new_customers'] = $cCust;
+        if ($cCust !== false) {
+            $kpi_data['new_customers'] = (int)$cCust;
             $kpi_data['customers_note'] = '7 hari terakhir';
         }
     } catch (Exception $e) {}
@@ -1032,6 +1049,22 @@ if ($db_connected && $pdo) {
                         </button>
                     </div>
                     <?php unset($_SESSION['flash_msg']); ?>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['flash_error'])): ?>
+                    <!-- FLASH ERROR ALERT -->
+                    <div id="flashErrorAlert" class="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-6 flex items-center justify-between text-sm text-rose-800 shadow-xs animate-in fade-in slide-in-from-top-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                                <i class="fas fa-exclamation-triangle text-rose-600 text-base"></i>
+                            </div>
+                            <span class="font-medium"><?= htmlspecialchars($_SESSION['flash_error']) ?></span>
+                        </div>
+                        <button onclick="document.getElementById('flashErrorAlert').remove()" class="text-rose-600/70 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-100/50 transition-colors">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    <?php unset($_SESSION['flash_error']); ?>
                 <?php endif; ?>
                 
                 <!-- TOP BANNER: Greeting & Operational Actions -->
@@ -1807,14 +1840,18 @@ if ($db_connected && $pdo) {
                         <!-- Left: Tanggal & Waktu & Catatan -->
                         <div class="space-y-3.5">
                             <div>
-                                <label class="block text-xs font-semibold text-[#333333] mb-1">Tanggal Pengiriman</label>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-semibold text-[#333333]">Tanggal Pengiriman (PO)</label>
+                                    <span class="text-[10px] text-[#D46E15] font-medium"><i class="fas fa-info-circle mr-0.5"></i> Min. Hari Ini</span>
+                                </div>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8E7E73]">
                                         <i class="far fa-calendar-alt text-xs"></i>
                                     </div>
-                                    <input type="date" name="tgl_kirim" value="<?= date('Y-m-d') ?>" 
+                                    <input type="date" name="tgl_kirim" id="berandaTglKirim" value="<?= date('Y-m-d') ?>" min="<?= date('Y-m-d') ?>" onchange="validateBerandaDeliveryDate(this)"
                                         class="w-full bg-white border border-[#E0E0E0] rounded-lg pl-9 pr-3.5 py-2 text-xs text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
                                 </div>
+                                <p id="berandaDateWarning" class="text-[11px] text-[#EB5757] mt-1 hidden"><i class="fas fa-exclamation-circle mr-1"></i>Tanggal pengiriman tidak boleh mundur ke belakang (sistem PO)!</p>
                             </div>
 
                             <div>
@@ -2582,6 +2619,33 @@ if ($db_connected && $pdo) {
                 lockIcon.innerHTML = '<i class="fas fa-check text-xs mr-1"></i>';
                 footerWarning.classList.add('hidden');
             }
+
+            // Validasi tanggal PO (tidak boleh tanggal lampau)
+            const dateInput = document.getElementById('berandaTglKirim');
+            if (dateInput && dateInput.value) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (dateInput.value < todayStr) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
+                    lockIcon.innerHTML = '<i class="fas fa-calendar-times text-xs mr-1"></i>';
+                }
+            }
+        }
+
+        // Validasi Live Tanggal PO Pengiriman di Beranda
+        function validateBerandaDeliveryDate(input) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const warningEl = document.getElementById('berandaDateWarning');
+            if (input.value && input.value < todayStr) {
+                if (warningEl) warningEl.classList.remove('hidden');
+                input.classList.add('border-[#EB5757]', 'bg-rose-50');
+                input.classList.remove('border-[#E0E0E0]', 'bg-white');
+            } else {
+                if (warningEl) warningEl.classList.add('hidden');
+                input.classList.remove('border-[#EB5757]', 'bg-rose-50');
+                input.classList.add('border-[#E0E0E0]', 'bg-white');
+            }
+            calculateOrderTotal();
         }
 
         // Payment status segmented button

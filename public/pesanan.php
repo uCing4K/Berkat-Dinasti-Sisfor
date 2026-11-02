@@ -7,10 +7,23 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Coba koneksi database jika config tersedia
+// Inisialisasi Database Connection (PDO) & Handler Backend
+$db_connected = false;
+$pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     require_once $configFile;
+    try {
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
+            $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+            $db_connected = true;
+        }
+    } catch (Exception $e) {
+        $db_connected = false;
+    }
 }
 
 // Inisialisasi Session Overrides jika belum ada
@@ -51,6 +64,8 @@ if (!isset($_SESSION['kitchen_notes'])) {
 // POST Action Handlers (AJAX & Form)
 $toast_message = $_SESSION['flash_msg'] ?? null;
 unset($_SESSION['flash_msg']);
+$error_message = $_SESSION['flash_error'] ?? null;
+unset($_SESSION['flash_error']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -119,6 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $tglKirim = !empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d');
+        
+        // Validasi Tanggal Pre-Order (PO): Tidak boleh memilih tanggal lampau / mundur ke belakang
+        $today = date('Y-m-d');
+        if (strtotime($tglKirim) < strtotime($today)) {
+            $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tglKirim)) . ") tidak valid! Sistem roti Berkat Dinasti berbasis Pre-Order (PO) sehingga tanggal selesai/kirim tidak boleh tanggal yang sudah lewat (minimal hari ini).";
+            header("Location: pesanan.php");
+            exit();
+        }
+
         $waktuKirim = !empty($_POST['delivery_time']) ? $_POST['delivery_time'] : '14:00';
         $waktuKirimSql = strlen($waktuKirim) === 5 ? ($waktuKirim . ':00') : $waktuKirim;
 
@@ -137,9 +161,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default => 'bg-[#828282]/15 text-[#544337]'
         };
 
+        // Penomoran invoice otomatis standar: INV-YYYYMMDD-XXXX (4 digit urut per hari)
         $dateCode = date('Ymd');
-        $randNum = rand(100, 999);
-        $no_invoice = "INV-{$dateCode}-{$randNum}";
+        $seq = 1;
+        if ($db_connected && $pdo) {
+            try {
+                $stmtInv = $pdo->prepare("SELECT COUNT(*) FROM pesanan WHERE DATE(tgl_pesan) = CURDATE() OR no_invoice LIKE ?");
+                $stmtInv->execute(["INV-{$dateCode}-%"]);
+                $seq = intval($stmtInv->fetchColumn()) + 1;
+            } catch (Exception $e) {}
+        }
+        $no_invoice = "INV-{$dateCode}-" . str_pad($seq, 4, '0', STR_PAD_LEFT);
 
         if ($db_connected && $pdo) {
             try {
@@ -815,6 +847,19 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <span class="text-sm font-medium"><?= htmlspecialchars($toast_message) ?></span>
                         </div>
                         <button onclick="document.getElementById('toastNotification').remove()" class="text-emerald-700 hover:text-emerald-900 p-1">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Error Notification Banner -->
+                <?php if ($error_message): ?>
+                    <div id="errorNotification" class="mb-6 bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-exclamation-triangle text-rose-600 text-base"></i>
+                            <span class="text-sm font-medium"><?= htmlspecialchars($error_message) ?></span>
+                        </div>
+                        <button onclick="document.getElementById('errorNotification').remove()" class="text-rose-700 hover:text-rose-900 p-1">
                             <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
@@ -1526,9 +1571,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <div class="space-y-3.5">
                                 <div class="grid grid-cols-2 gap-2.5">
                                     <div>
-                                        <label for="deliveryDateInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Tanggal Pengiriman</label>
-                                        <input type="date" id="deliveryDateInput" name="delivery_date" value="<?= date('Y-m-d') ?>" 
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label for="deliveryDateInput" class="block text-xs font-semibold text-[#3E2B21]">Tanggal Kirim (PO)</label>
+                                            <span class="text-[10px] text-[#D46E15] font-medium"><i class="fas fa-info-circle mr-0.5"></i> Min. Hari Ini</span>
+                                        </div>
+                                        <input type="date" id="deliveryDateInput" name="delivery_date" value="<?= date('Y-m-d') ?>" min="<?= date('Y-m-d') ?>" onchange="validatePesananDeliveryDate(this)"
                                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                        <p id="pesananDateWarning" class="text-[10px] text-[#EB5757] mt-1 hidden"><i class="fas fa-exclamation-circle mr-1"></i>Tanggal tidak boleh lampau!</p>
                                     </div>
                                     <div>
                                         <label for="deliveryTimeInput" class="block text-xs font-semibold text-[#3E2B21] mb-1">Waktu Kirim</label>
@@ -2350,6 +2399,34 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 lockIcon.textContent = '✓';
                 footerWarning.innerHTML = '<span class="text-[#27AE60]">✓ Minimum order terpenuhi</span>';
             }
+
+            // Validasi tanggal PO di modal pesanan
+            const dateInput = document.getElementById('deliveryDateInput');
+            if (dateInput && dateInput.value) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (dateInput.value < todayStr) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'bg-[#D8D2CB] text-white cursor-not-allowed text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs';
+                    lockIcon.textContent = '🔒';
+                    footerWarning.innerHTML = '<span class="text-[#EB5757]">ⓘ Tanggal PO tidak boleh lewat</span>';
+                }
+            }
+        }
+
+        // Live validation tanggal PO di pesanan.php
+        function validatePesananDeliveryDate(input) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const warningEl = document.getElementById('pesananDateWarning');
+            if (input.value && input.value < todayStr) {
+                if (warningEl) warningEl.classList.remove('hidden');
+                input.classList.add('border-[#EB5757]', 'bg-rose-50');
+                input.classList.remove('border-[#DDD3C5]', 'bg-[#EFE8DE]');
+            } else {
+                if (warningEl) warningEl.classList.add('hidden');
+                input.classList.remove('border-[#EB5757]', 'bg-rose-50');
+                input.classList.add('border-[#DDD3C5]', 'bg-[#EFE8DE]');
+            }
+            calculateOrderTotal();
         }
 
         function selectPaymentStatus(status, btn) {

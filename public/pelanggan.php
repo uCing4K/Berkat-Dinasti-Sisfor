@@ -7,10 +7,23 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Coba koneksi database jika config tersedia
+// Inisialisasi Database Connection (PDO) & Handler Backend
+$db_connected = false;
+$pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     require_once $configFile;
+    try {
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
+            $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+            $db_connected = true;
+        }
+    } catch (Exception $e) {
+        $db_connected = false;
+    }
 }
 
 // Default Dataset Pelanggan jika belum ada di Session
@@ -175,9 +188,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($avatar)) $avatar = 'PL';
 
         $alamat_short = strlen($alamat) > 30 ? substr($alamat, 0, 27) . '...' : $alamat;
+        $dbTipe = (stripos($tipe, 'reseller') !== false) ? 'reseller' : 'retail';
 
         if ($edit_id > 0) {
-            // Update customer
+            // Update customer ke MySQL jika terhubung
+            if ($db_connected && $pdo) {
+                try {
+                    $stmtUp = $pdo->prepare("UPDATE pelanggan SET nama = ?, no_wa = ?, alamat = ?, tipe = ?, catatan = ? WHERE id_pelanggan = ?");
+                    $stmtUp->execute([$nama, $no_wa, $alamat, $dbTipe, $catatan, $edit_id]);
+                } catch (Exception $e) {}
+            }
+
+            // Update customer di session
             foreach ($_SESSION['pelanggan_list'] as &$c) {
                 if ($c['id'] === $edit_id) {
                     $c['nama'] = $nama;
@@ -194,8 +216,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($c);
             $toast_message = "Data pelanggan \"{$nama}\" berhasil diperbarui!";
         } else {
-            // Tambah pelanggan baru
+            // Tambah pelanggan baru ke MySQL jika terhubung
             $new_id = time();
+            if ($db_connected && $pdo) {
+                try {
+                    $stmtIns = $pdo->prepare("INSERT INTO pelanggan (nama, no_wa, alamat, tipe, catatan) VALUES (?, ?, ?, ?, ?)");
+                    $stmtIns->execute([$nama, $no_wa, $alamat, $dbTipe, $catatan]);
+                    $new_id = intval($pdo->lastInsertId());
+                } catch (Exception $e) {}
+            }
+
             $new_cust = [
                 'id' => $new_id,
                 'avatar' => $avatar,
@@ -221,6 +251,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'delete_customer') {
         $del_id = intval($_POST['customer_id'] ?? 0);
         if ($del_id > 0) {
+            if ($db_connected && $pdo) {
+                try {
+                    $stmtDel = $pdo->prepare("DELETE FROM pelanggan WHERE id_pelanggan = ?");
+                    $stmtDel->execute([$del_id]);
+                } catch (Exception $e) {}
+            }
             $_SESSION['pelanggan_list'] = array_values(array_filter($_SESSION['pelanggan_list'], function($c) use ($del_id) {
                 return $c['id'] !== $del_id;
             }));
@@ -230,6 +266,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pelanggan_list = $_SESSION['pelanggan_list'];
+
+// Sinkronisasi data pelanggan riil dari database MySQL jika terhubung
+if ($db_connected && $pdo) {
+    try {
+        $stmtList = $pdo->query("
+            SELECT p.id_pelanggan as id, p.nama, p.no_wa, p.alamat, p.tipe, p.total_transaksi, p.total_hutang, p.catatan, p.created_at,
+                   (SELECT COUNT(*) FROM pesanan WHERE id_pelanggan = p.id_pelanggan) as pesanan_count,
+                   (SELECT COUNT(*) FROM pesanan WHERE id_pelanggan = p.id_pelanggan AND status IN ('pending', 'proses')) as antrean
+            FROM pelanggan p
+            ORDER BY p.id_pelanggan DESC
+        ");
+        $dbRows = $stmtList->fetchAll();
+        if (!empty($dbRows)) {
+            $dbCustList = [];
+            foreach ($dbRows as $r) {
+                $words = explode(' ', trim($r['nama']));
+                $av = '';
+                foreach ($words as $w) {
+                    if (!empty($w)) $av .= strtoupper(substr($w, 0, 1));
+                    if (strlen($av) >= 2) break;
+                }
+                if (empty($av)) $av = 'PL';
+                
+                $wa_clean = preg_replace('/[^0-9]/', '', $r['no_wa']);
+                if (substr($wa_clean, 0, 1) === '0') {
+                    $wa_clean = '62' . substr($wa_clean, 1);
+                }
+                
+                $al = $r['alamat'] ?? '-';
+                $al_short = strlen($al) > 30 ? substr($al, 0, 27) . '...' : $al;
+                $totRaw = floatval($r['total_transaksi'] ?? 0);
+                $hutangRaw = floatval($r['total_hutang'] ?? 0);
+                $isHutang = ($hutangRaw > 0);
+                
+                // Fetch riwayat pesanan pelanggan dari DB
+                $historyList = [];
+                try {
+                    $stmtH = $pdo->prepare("
+                        SELECT no_invoice as order_no, status_bayar, grand_total as amount, status as delivery_status, 
+                               tgl_pesan, tgl_kirim, waktu_kirim, catatan,
+                               (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
+                                FROM detail_pesanan dp 
+                                JOIN varian_produk v ON dp.id_varian = v.id_varian 
+                                WHERE dp.id_pesanan = pesanan.id_pesanan) as item_summary
+                        FROM pesanan 
+                        WHERE id_pelanggan = ? 
+                        ORDER BY id_pesanan DESC 
+                        LIMIT 5
+                    ");
+                    $stmtH->execute([$r['id']]);
+                    $hRows = $stmtH->fetchAll();
+                    foreach ($hRows as $h) {
+                        $pBayar = strtolower($h['status_bayar'] ?? 'belum_bayar');
+                        $pBayarCls = match($pBayar) {
+                            'lunas' => 'bg-[#27AE60]/15 text-[#1B7A43]',
+                            'hutang', 'dp' => 'bg-[#EB5757]/15 text-[#EB5757]',
+                            default => 'bg-[#E2B93B]/20 text-[#886C12]'
+                        };
+                        $dStat = ucfirst($h['delivery_status'] ?? 'Pending');
+                        $historyList[] = [
+                            'order_no' => '#' . $h['order_no'],
+                            'status_bayar' => ucfirst(str_replace('_', ' ', $pBayar)),
+                            'status_bayar_class' => $pBayarCls,
+                            'amount' => 'Rp ' . number_format((float)$h['amount'], 0, ',', '.'),
+                            'delivery_status' => $dStat . ' >',
+                            'delivery_status_class' => ($h['delivery_status'] === 'selesai') ? 'text-[#27AE60] font-semibold' : 'text-[#924C00] font-semibold',
+                            'date_time' => '📅 ' . date('d M Y', strtotime($h['tgl_pesan'])),
+                            'items' => !empty($h['item_summary']) ? $h['item_summary'] : 'Pesanan Bakery Berkat Dinasti'
+                        ];
+                    }
+                } catch (Exception $eH) {}
+
+                $dbCustList[] = [
+                    'id' => intval($r['id']),
+                    'avatar' => $av,
+                    'nama' => $r['nama'],
+                    'no_wa' => $r['no_wa'],
+                    'wa_clean' => $wa_clean,
+                    'alamat' => $al,
+                    'alamat_short' => $al_short,
+                    'pesanan_count' => intval($r['pesanan_count']),
+                    'tagihan' => $isHutang ? 'Hutang' : 'Lunas',
+                    'tagihan_class' => $isHutang ? 'bg-[#EB5757]/15 text-[#EB5757]' : 'bg-[#27AE60]/15 text-[#1B7A43]',
+                    'total_transaksi' => 'Rp ' . number_format($totRaw, 0, ',', '.'),
+                    'total_raw' => $totRaw,
+                    'tipe' => ($r['tipe'] === 'reseller') ? 'Mitra Reseller' : 'Pelanggan Reguler',
+                    'member_since' => 'Sejak ' . date('M Y', strtotime($r['created_at'] ?? 'now')),
+                    'catatan' => $r['catatan'] ?: 'Pelanggan terdaftar.',
+                    'antrean' => intval($r['antrean']),
+                    'history' => $historyList
+                ];
+            }
+            $pelanggan_list = $dbCustList;
+            $_SESSION['pelanggan_list'] = $pelanggan_list;
+        }
+    } catch (Exception $e) {}
+}
 
 // Helper Tanggal Dinamis Bahasa Indonesia
 $daysIndo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];

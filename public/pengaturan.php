@@ -7,10 +7,23 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
-// Coba koneksi database jika config tersedia
+// Inisialisasi Database Connection (PDO) & Handler Backend
+$db_connected = false;
+$pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     require_once $configFile;
+    try {
+        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
+            $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ]);
+            $db_connected = true;
+        }
+    } catch (Exception $e) {
+        $db_connected = false;
+    }
 }
 
 // Inisialisasi Session Store Settings
@@ -85,17 +98,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'save_store_settings') {
-        $_SESSION['store_settings']['name'] = trim($_POST['store_name'] ?? 'Berkat Dinasti Bakery');
-        $_SESSION['store_settings']['phone'] = trim($_POST['store_phone'] ?? '');
-        $_SESSION['store_settings']['wa'] = trim($_POST['store_wa'] ?? '');
-        $_SESSION['store_settings']['address'] = trim($_POST['store_address'] ?? '');
-        $_SESSION['store_settings']['province'] = trim($_POST['store_province'] ?? 'Jawa Timur');
-        $_SESSION['store_settings']['city'] = trim($_POST['store_city'] ?? 'Kota Malang');
-        $_SESSION['store_settings']['postal'] = trim($_POST['store_postal'] ?? '');
-        $_SESSION['store_settings']['email'] = trim($_POST['store_email'] ?? '');
-        $_SESSION['store_settings']['footer'] = trim($_POST['store_footer'] ?? '');
-        $_SESSION['store_settings']['paper_size'] = trim($_POST['paper_size'] ?? '80');
-        $_SESSION['store_settings']['auto_print'] = isset($_POST['auto_print']);
+        $sName = trim($_POST['store_name'] ?? 'Berkat Dinasti Bakery');
+        $sPhone = trim($_POST['store_phone'] ?? '');
+        $sWa = trim($_POST['store_wa'] ?? '');
+        $sAddr = trim($_POST['store_address'] ?? '');
+        $sProv = trim($_POST['store_province'] ?? 'Jawa Timur');
+        $sCity = trim($_POST['store_city'] ?? 'Kota Batu');
+        $sPost = trim($_POST['store_postal'] ?? '');
+        $sEmail = trim($_POST['store_email'] ?? '');
+        $sFooter = trim($_POST['store_footer'] ?? '');
+        $sPaper = trim($_POST['paper_size'] ?? '80');
+        $sAuto = isset($_POST['auto_print']);
+
+        $_SESSION['store_settings']['name'] = $sName;
+        $_SESSION['store_settings']['phone'] = $sPhone;
+        $_SESSION['store_settings']['wa'] = $sWa;
+        $_SESSION['store_settings']['address'] = $sAddr;
+        $_SESSION['store_settings']['province'] = $sProv;
+        $_SESSION['store_settings']['city'] = $sCity;
+        $_SESSION['store_settings']['postal'] = $sPost;
+        $_SESSION['store_settings']['email'] = $sEmail;
+        $_SESSION['store_settings']['footer'] = $sFooter;
+        $_SESSION['store_settings']['paper_size'] = $sPaper;
+        $_SESSION['store_settings']['auto_print'] = $sAuto;
+
+        if ($db_connected && $pdo) {
+            $settingsToSave = [
+                'nama_toko' => $sName,
+                'telepon_toko' => $sPhone,
+                'wa_toko' => $sWa,
+                'alamat_toko' => $sAddr,
+                'email_toko' => $sEmail,
+                'footer_struk' => $sFooter,
+                'printer_paper_size' => $sPaper
+            ];
+            foreach ($settingsToSave as $k => $v) {
+                try {
+                    $stmtS = $pdo->prepare("INSERT INTO setting (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+                    $stmtS->execute([$k, $v]);
+                } catch (Exception $e) {}
+            }
+        }
 
         $toast_message = "Pengaturan profil toko & format struk kasir berhasil disimpan!";
     } elseif ($action === 'save_user') {
@@ -105,11 +148,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $subtext = trim($_POST['subtext'] ?? 'Staf Operasional');
         $role = trim($_POST['role'] ?? 'Karyawan');
         $status = trim($_POST['status'] ?? 'Aktif');
+        $rawPassword = trim($_POST['password'] ?? '');
+
+        $dbRole = (stripos($role, 'pemilik') !== false || stripos($role, 'admin') !== false) ? 'admin' : 'kasir';
+        $dbStatus = (strtolower($status) === 'aktif') ? 'aktif' : 'nonaktif';
 
         // Initial avatar
         $avatar = strtoupper(substr($nama, 0, 1) . substr($username, 0, 1));
 
         if ($user_id > 0) {
+            // Update user di MySQL jika terhubung
+            if ($db_connected && $pdo) {
+                try {
+                    if (!empty($rawPassword)) {
+                        $hash = password_hash($rawPassword, PASSWORD_BCRYPT);
+                        $stmtU = $pdo->prepare("UPDATE pengguna SET nama_lengkap = ?, username = ?, role = ?, status = ?, password = ? WHERE id_user = ?");
+                        $stmtU->execute([$nama, $username, $dbRole, $dbStatus, $hash, $user_id]);
+                    } else {
+                        $stmtU = $pdo->prepare("UPDATE pengguna SET nama_lengkap = ?, username = ?, role = ?, status = ? WHERE id_user = ?");
+                        $stmtU->execute([$nama, $username, $dbRole, $dbStatus, $user_id]);
+                    }
+                } catch (Exception $e) {}
+            }
+
             foreach ($_SESSION['users_list'] as &$u) {
                 if ($u['id'] === $user_id) {
                     $u['nama'] = $nama;
@@ -125,8 +186,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($u);
             $toast_message = "Data pengguna \"{$nama}\" berhasil diperbarui!";
         } else {
+            // Tambah user baru di MySQL jika terhubung
+            $new_user_id = time();
+            $defaultPass = !empty($rawPassword) ? $rawPassword : 'dinasti123';
+            $hash = password_hash($defaultPass, PASSWORD_BCRYPT);
+            if ($db_connected && $pdo) {
+                try {
+                    $stmtInsU = $pdo->prepare("INSERT INTO pengguna (nama_lengkap, username, password, role, status) VALUES (?, ?, ?, ?, ?)");
+                    $stmtInsU->execute([$nama, $username, $hash, $dbRole, $dbStatus]);
+                    $new_user_id = intval($pdo->lastInsertId());
+                } catch (Exception $e) {}
+            }
+
             $new_user = [
-                'id' => time(),
+                'id' => $new_user_id,
                 'nama' => $nama,
                 'subtext' => $subtext,
                 'avatar' => $avatar,
@@ -140,11 +213,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'is_locked' => false
             ];
             $_SESSION['users_list'][] = $new_user;
-            $toast_message = "Pengguna baru \"{$nama}\" berhasil didaftarkan!";
+            $toast_message = "Pengguna baru \"{$nama}\" berhasil didaftarkan! (Password: " . htmlspecialchars($defaultPass) . ")";
         }
     } elseif ($action === 'delete_user') {
         $del_id = intval($_POST['user_id'] ?? 0);
         if ($del_id > 1) { // Proteksi admin id 1
+            if ($db_connected && $pdo) {
+                try {
+                    $stmtDelU = $pdo->prepare("DELETE FROM pengguna WHERE id_user = ? AND id_user > 1");
+                    $stmtDelU->execute([$del_id]);
+                } catch (Exception $e) {}
+            }
             $_SESSION['users_list'] = array_values(array_filter($_SESSION['users_list'], function($u) use ($del_id) {
                 return $u['id'] !== $del_id;
             }));
@@ -154,6 +233,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $store = $_SESSION['store_settings'];
+
+// Sinkronisasi User Riil dari Database MySQL jika terhubung
+if ($db_connected && $pdo) {
+    try {
+        $stmtUsers = $pdo->query("SELECT id_user as id, nama_lengkap as nama, username, role, status, email, no_hp FROM pengguna ORDER BY id_user ASC");
+        $uRows = $stmtUsers->fetchAll();
+        if (!empty($uRows)) {
+            $dbUsersList = [];
+            foreach ($uRows as $ur) {
+                $words = explode(' ', trim($ur['nama']));
+                $av = '';
+                foreach ($words as $w) {
+                    if (!empty($w)) $av .= strtoupper(substr($w, 0, 1));
+                    if (strlen($av) >= 2) break;
+                }
+                if (empty($av)) $av = 'ST';
+                $isOwner = ($ur['id'] == 1 || strtolower($ur['role']) === 'admin');
+                $roleLabel = $isOwner ? 'Pemilik (Owner)' : 'Karyawan';
+                $statusLabel = (strtolower($ur['status']) === 'aktif') ? 'Aktif' : 'Nonaktif';
+                $dbUsersList[] = [
+                    'id' => intval($ur['id']),
+                    'nama' => $ur['nama'],
+                    'subtext' => !empty($ur['email']) ? $ur['email'] : ($isOwner ? 'admin@berkatdinasti.id' : 'Staf Operasional Bakery'),
+                    'avatar' => $av,
+                    'avatar_bg' => $isOwner ? 'bg-[#3E2B21]' : 'bg-[#FF9B45]',
+                    'username' => $ur['username'],
+                    'role' => $roleLabel,
+                    'role_class' => $isOwner ? 'bg-[#3E2B21] text-white' : 'bg-[#FF9B45]/15 text-[#924C00]',
+                    'status' => $statusLabel,
+                    'status_class' => ($statusLabel === 'Aktif') ? 'text-[#27AE60]' : 'text-[#828282]',
+                    'dot_class' => ($statusLabel === 'Aktif') ? 'bg-[#27AE60]' : 'bg-[#828282]',
+                    'is_locked' => ($ur['id'] == 1)
+                ];
+            }
+            $_SESSION['users_list'] = $dbUsersList;
+        }
+    } catch (Exception $e) {}
+}
+
 $users_list = $_SESSION['users_list'];
 $active_tab = $_GET['tab'] ?? 'profil';
 
@@ -899,6 +1017,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     </div>
                 </div>
 
+                <div>
+                    <label for="userPasswordInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Password Akun</label>
+                    <input type="password" id="userPasswordInput" name="password" placeholder="Kosongkan jika tidak diubah / Default: dinasti123" 
+                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
+                    <p class="text-[10px] text-[#8E7E73] mt-1">Default password staf baru: <span class="text-[#D46E15] font-semibold">dinasti123</span></p>
+                </div>
+
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E2D7C8] mt-6">
                     <button type="button" onclick="closeUserModal()" class="craft-btn-secondary text-xs font-semibold px-4 py-2.5 rounded-xl">
                         Batal
@@ -1039,9 +1164,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
         }
 
-        // Test Print Toast Notification
+        // Test Print Toast Notification & Native Browser Print
         function testPrintThermal() {
-            showToast('Fitur segera diimplementasi', '<i class="fas fa-info-circle text-[#D46E15]"></i>');
+            showToast('Membuka dialog cetak struk kasir thermal...', '<i class="fas fa-print text-[#D46E15]"></i>');
+            setTimeout(() => {
+                window.print();
+            }, 300);
         }
 
         function showToast(text, iconHtml = '<i class="fas fa-info-circle text-[#D46E15]"></i>') {

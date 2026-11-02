@@ -6,6 +6,7 @@ Selamat datang di pusat dokumentasi **Sistem Informasi Berkat Dinasti**. File in
 
 ## 🗂️ Modul Dokumentasi Terstruktur (Final)
 
+- [[Laporan_Progress_Proyek|📋 Laporan Progress Proyek (Latar Belakang, Masalah, Fungsional, Progress Web)]]
 - [[01-Architecture/README|01. Arsitektur Sistem & DFD]]
   - DFD Level 0 (Context Diagram), Level 1 (Overview), Level 2 (Sub-proses 1.0 - 7.0).
   - Kamus Data Store (Tabel T1 - T13 / D1 - D7).

@@ -2144,7 +2144,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
             </div>
 
-            <div class="pt-4 mt-5 border-t border-[#E2D7C8] flex justify-end">
+            <div class="pt-4 mt-5 border-t border-[#E2D7C8] flex items-center justify-between">
+                <button type="button" onclick="handlePrintReceipt(selectedDetailOrderId, this)" class="bg-[#D46E15] hover:bg-[#B85207] text-white px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-button-orange active:scale-95 transition-all">
+                    <i class="fas fa-print"></i>
+                    <span>Cetak Struk Thermal</span>
+                </button>
                 <button type="button" onclick="closeOrderDetailModal()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] px-4 py-2 rounded-lg text-xs font-semibold">
                     Tutup
                 </button>
@@ -2227,6 +2231,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             </div>
         </div>
     </div>
+
+    <!-- BLUETOOTH PRINT BRIDGE & ESC/POS ENGINE -->
+    <script src="assets/js/bluetooth-print.js"></script>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>

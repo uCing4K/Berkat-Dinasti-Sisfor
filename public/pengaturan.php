@@ -1126,15 +1126,21 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             </div>
 
             <!-- Footer Actions -->
-            <div class="px-5 py-3.5 border-t border-[#E2D7C8] bg-white flex flex-col sm:flex-row items-center gap-2 justify-end">
-                <button type="button" onclick="simulateBluetoothSend()" class="w-full sm:w-auto bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
-                    <i class="fab fa-bluetooth-b text-[#0082FC]"></i>
-                    <span>Kirim ke Bluetooth App</span>
+            <div class="px-5 py-3.5 border-t border-[#E2D7C8] bg-white flex flex-col sm:flex-row items-center gap-2 justify-between">
+                <button type="button" onclick="window.printBridge.downloadRawEscpos('test', (document.getElementById('paper58') && document.getElementById('paper58').checked ? '58' : '80'))" class="w-full sm:w-auto text-[#8E7E73] hover:text-[#251A14] text-xs font-medium px-2.5 py-2 rounded-xl hover:bg-[#EFE8DE] flex items-center justify-center gap-1.5 transition-colors" title="Download file biner ESC/POS (.bin) untuk pengujian manual">
+                    <i class="fas fa-file-download text-amber-600"></i>
+                    <span>Unduh Raw .bin</span>
                 </button>
-                <button type="button" onclick="executeDirectPrint()" class="w-full sm:w-auto bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-button-orange active:scale-95 flex items-center justify-center gap-2 transition-all">
-                    <i class="fas fa-print"></i>
-                    <span>Cetak via Browser</span>
-                </button>
+                <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                    <button type="button" onclick="handleTestPrintBluetooth(this)" class="w-full sm:w-auto bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
+                        <i class="fab fa-bluetooth-b text-[#0082FC]"></i>
+                        <span>Kirim ke Bluetooth App</span>
+                    </button>
+                    <button type="button" onclick="executeDirectPrint()" class="w-full sm:w-auto bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-button-orange active:scale-95 flex items-center justify-center gap-2 transition-all">
+                        <i class="fas fa-print"></i>
+                        <span>Cetak via Browser</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1169,6 +1175,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             </div>
         </div>
     </div>
+
+    <!-- BLUETOOTH PRINT BRIDGE & ESC/POS ENGINE -->
+    <script src="assets/js/bluetooth-print.js"></script>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -1289,6 +1298,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 if (mPreWa) mPreWa.textContent = wa;
                 if (mPreFooter) mPreFooter.textContent = `"${foot}"`;
                 if (mPaperBadge) mPaperBadge.textContent = is58 ? '58 mm ESC/POS' : '80 mm ESC/POS';
+
+                // Asynchronous check bridge daemon status
+                if (window.printBridge) {
+                    window.printBridge.checkBridgeStatus().then(st => {
+                        const pStat = document.getElementById('modalPrinterStatus');
+                        if (pStat && !pStat.innerHTML.includes('spin')) {
+                            if (st.online) {
+                                pStat.innerHTML = `<span class="text-emerald-600 font-semibold"><i class="fas fa-check-circle"></i> Bridge Online (${st.deviceName || 'Port 8080'})</span>`;
+                            } else {
+                                pStat.innerHTML = `<span class="text-[#8E7E73]"><i class="fas fa-satellite-dish text-amber-500"></i> Bridge Standby (Port 8080)</span>`;
+                            }
+                        }
+                    }).catch(() => {});
+                }
 
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';

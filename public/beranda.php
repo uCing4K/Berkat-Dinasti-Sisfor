@@ -1931,7 +1931,11 @@ if ($db_connected && $pdo) {
                     </button>
                 </div>
 
-                <div class="flex items-center justify-end pt-2">
+                <div class="flex items-center justify-between pt-2">
+                    <button type="button" onclick="handlePrintReceipt(document.getElementById('modalUpdateOrderId').value, this)" class="bg-[#D46E15] hover:bg-[#B85207] text-white px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-button-orange active:scale-95 transition-all">
+                        <i class="fas fa-print"></i>
+                        <span>Cetak Struk Thermal</span>
+                    </button>
                     <button type="button" onclick="closeModal('orderDetailModal')" class="px-4 py-2 bg-[#F5F3F1] text-[#1B1C1B] rounded-lg text-xs font-medium hover:bg-[#EAE8E6] transition-colors">
                         Tutup
                     </button>
@@ -2315,6 +2319,9 @@ if ($db_connected && $pdo) {
             </div>
         </div>
     </div>
+
+    <!-- BLUETOOTH PRINT BRIDGE & ESC/POS ENGINE -->
+    <script src="assets/js/bluetooth-print.js"></script>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>

@@ -1180,42 +1180,42 @@ if ($db_connected && $pdo) {
 
                     <!-- RIGHT: KERANJANG PESANAN (FIXED IN PLACE / ZERO WINDOW SCROLL) -->
                     <div class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0">
-                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border border-[#3E2B21]/20 shadow-xl overflow-hidden">
+                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-sm overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
-                            <!-- 1. RICH CHOCOLATE HEADER -->
-                            <div class="p-3.5 sm:p-4 bg-[#3E2B21] text-white flex items-center justify-between shrink-0 shadow-xs border-b border-[#2C1E17]">
+                            <!-- 1. ARTISANAL BAKERY HEADER: Soft Oat Cream with Signature Caramel Accent Bar -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between shrink-0 shadow-2xs">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-xl bg-[#D46E15] text-white flex items-center justify-center shrink-0 shadow-xs">
-                                        <i class="fas fa-shopping-basket text-sm"></i>
+                                    <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center shrink-0 shadow-2xs">
+                                        <i class="fas fa-shopping-basket text-xs"></i>
                                     </div>
                                     <div>
-                                        <h3 class="text-xs sm:text-sm font-bold text-white leading-tight">Keranjang Pesanan</h3>
-                                        <span id="posCartItemBadge" class="text-[10px] text-[#D8C7B8] font-medium">0 Produk (0 pcs)</span>
+                                        <h3 class="text-xs sm:text-sm font-bold text-[#251A14] leading-tight">Keranjang Pesanan</h3>
+                                        <span id="posCartItemBadge" class="text-[10px] font-semibold text-[#8E7E73] bg-[#EAE2D5] px-2 py-0.5 rounded-full">0 Produk (0 pcs)</span>
                                     </div>
                                 </div>
-                                <button type="button" onclick="clearPosCart()" id="btnClearPosCart" class="text-xs text-rose-300 hover:text-white font-semibold hidden transition-colors flex items-center gap-1.5 bg-white/10 hover:bg-rose-600/80 px-2.5 py-1 rounded-lg">
+                                <button type="button" onclick="clearPosCart()" id="btnClearPosCart" class="text-xs text-rose-600 hover:text-rose-700 font-semibold hidden transition-colors flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-rose-50 border border-transparent hover:border-rose-200">
                                     <i class="fas fa-trash-alt text-[10px]"></i>
                                     <span>Kosongkan</span>
                                 </button>
                             </div>
 
                             <!-- 2. SCROLLABLE MIDDLE BODY (Daftar Produk & Form Pemesan) -->
-                            <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF7F2]">
+                            <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF6F0]">
                                 <!-- Cart Items List (Starts with 0 items) -->
-                                <div class="p-3 sm:p-3.5 space-y-2 bg-white" id="posCartList">
+                                <div class="p-3 sm:p-3.5 space-y-2 bg-[#FAF6F0]" id="posCartList">
                                     <!-- Populated dynamically by JavaScript -->
                                 </div>
 
                                 <!-- Hidden Input Container for POST items -->
                                 <div id="posHiddenItemsInputs"></div>
 
-                                <!-- Order Details & Customer Form (Compact) -->
-                                <div class="p-3 sm:p-3.5 space-y-3 bg-[#FAF7F2] text-xs">
+                                <!-- Order Details & Customer Form (Compact, Soft Sandstone Tone) -->
+                                <div class="p-3 sm:p-3.5 space-y-3 bg-[#F5F0E6] text-xs">
                                     <!-- Customer Section -->
                                     <div>
                                         <div class="flex items-center justify-between mb-1.5">
-                                            <label class="font-bold text-[#251A14] uppercase tracking-wider text-[10px]">Data Pelanggan</label>
+                                            <label class="font-bold text-[#544337] uppercase tracking-wider text-[10px]">Data Pelanggan</label>
                                             <button type="button" onclick="togglePosNewCustomer()" id="btnTogglePosNewCust" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-[11px] flex items-center gap-1 transition-colors">
                                                 <i class="fas fa-user-plus text-[10px]"></i>
                                                 <span id="lblPosToggleCust">Tambah Pelanggan Baru</span>
@@ -1239,17 +1239,17 @@ if ($db_connected && $pdo) {
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-1">Nama Lengkap</label>
                                                 <input type="text" id="pos_nama_baru" name="nama_pelanggan_baru" placeholder="Cth: Ibu Dewi Lestari" 
-                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
                                                 <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
-                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-1">Alamat Pengiriman</label>
                                                 <textarea id="pos_alamat_baru" name="alamat_baru" rows="2" placeholder="Cth: Jl. Panglima Sudirman No. 12, Kota Batu" 
-                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
+                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -1257,14 +1257,14 @@ if ($db_connected && $pdo) {
                                     <!-- Delivery Date & Time (PO Rule: Min Today) -->
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Tgl Kirim / PO</label>
+                                            <label class="block font-bold text-[#544337] text-[10px] mb-1">Tgl Kirim / PO</label>
                                             <input type="date" id="pos_tgl_kirim" name="tgl_kirim" 
                                                 min="<?= date('Y-m-d') ?>" 
                                                 value="<?= htmlspecialchars($_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+1 day'))) ?>" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
                                         <div>
-                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Waktu Kirim</label>
+                                            <label class="block font-bold text-[#544337] text-[10px] mb-1">Waktu Kirim</label>
                                             <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
@@ -1273,7 +1273,7 @@ if ($db_connected && $pdo) {
                                     <!-- Payment Status & Method -->
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Status Bayar</label>
+                                            <label class="block font-bold text-[#544337] text-[10px] mb-1">Status Bayar</label>
                                             <select id="pos_status_bayar" name="status_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                                 <option value="lunas">Lunas</option>
                                                 <option value="dp">DP / Uang Muka</option>
@@ -1281,7 +1281,7 @@ if ($db_connected && $pdo) {
                                             </select>
                                         </div>
                                         <div>
-                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Metode Bayar</label>
+                                            <label class="block font-bold text-[#544337] text-[10px] mb-1">Metode Bayar</label>
                                             <select id="pos_metode_bayar" name="metode_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                                 <option value="cash">Tunai (Cash)</option>
                                                 <option value="transfer">Transfer Bank</option>
@@ -1291,41 +1291,48 @@ if ($db_connected && $pdo) {
 
                                     <!-- Notes -->
                                     <div>
-                                        <label class="block font-bold text-[#251A14] text-[10px] mb-1">Catatan Khusus (Opsional)</label>
+                                        <label class="block font-bold text-[#544337] text-[10px] mb-1">Catatan Khusus (Opsional)</label>
                                         <input type="text" id="pos_catatan" name="catatan" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
                                             class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 3. RICH CHOCOLATE FOOTER -->
-                            <div class="p-3.5 sm:p-4 bg-[#3E2B21] border-t border-[#2C1E17] space-y-3 shrink-0 shadow-lg text-white">
+                            <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Elevated Total Ticket Card -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-t-2 border-[#E2D7C8] space-y-3 shrink-0 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
                                 <div class="space-y-1.5 text-xs">
-                                    <div class="flex justify-between text-[#D8C7B8]">
+                                    <div class="flex justify-between text-[#7A695D]">
                                         <span>Subtotal:</span>
-                                        <span id="posSummarySubtotal" class="font-mono font-semibold text-white">Rp 0</span>
+                                        <span id="posSummarySubtotal" class="font-mono font-semibold text-[#251A14]">Rp 0</span>
                                     </div>
-                                    <div class="flex justify-between text-[#D8C7B8] text-[11px]">
+                                    <div class="flex justify-between text-[#7A695D] text-[11px]">
                                         <span>Ongkir (Malang & Batu):</span>
-                                        <span class="font-semibold text-emerald-400">Rp 0 (Gratis)</span>
+                                        <span class="font-semibold text-emerald-700 bg-emerald-100/70 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px]">Rp 0 (Bebas Ongkir)</span>
                                     </div>
-                                    <div class="flex justify-between items-baseline text-xs font-bold pt-2 border-t border-white/15">
-                                        <span class="text-white">Grand Total:</span>
-                                        <span id="posSummaryGrandTotal" class="text-lg text-[#FBA94B] font-mono font-extrabold tracking-tight">Rp 0</span>
+                                </div>
+
+                                <!-- Elevated Grand Total Ticket Card -->
+                                <div class="bg-white rounded-xl p-3 border border-[#E2D7C8] flex items-center justify-between shadow-2xs">
+                                    <div>
+                                        <span class="text-[10px] font-bold text-[#8E7E73] uppercase tracking-wider block">Grand Total</span>
+                                        <span class="text-[11px] text-[#544337] font-medium">Bebas Ongkir Malang & Batu</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span id="posSummaryGrandTotal" class="text-xl font-bold font-mono text-[#D46E15] tracking-tight">Rp 0</span>
                                     </div>
                                 </div>
 
                                 <!-- MOQ Alert Box -->
-                                <div id="posMoqWarning" class="hidden p-2 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-[11px] leading-snug">
+                                <div id="posMoqWarning" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] leading-snug">
                                     <div class="flex items-start gap-1.5">
-                                        <i class="fas fa-exclamation-circle text-rose-400 mt-0.5 shrink-0"></i>
+                                        <i class="fas fa-exclamation-circle text-rose-600 mt-0.5 shrink-0"></i>
                                         <span id="posMoqWarningText">Minimal order belum tercapai untuk beberapa produk.</span>
                                     </div>
                                 </div>
 
                                 <!-- Submit Button: DISABLED IF NO PRODUCTS -->
                                 <button type="submit" id="btnPosSubmitOrder" disabled 
-                                    class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40">
+                                    class="w-full bg-[#E5DDD0] text-[#A8988B] border border-[#DDD3C5] font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                     <i class="fas fa-check"></i>
                                     <span id="btnPosSubmitText">Pilih Produk Terlebih Dahulu</span>
                                 </button>
@@ -3300,7 +3307,7 @@ if ($db_connected && $pdo) {
             if (posCart.length === 0) {
                 listEl.innerHTML = `
                     <div id="posCartEmpty" class="py-8 px-4 text-center">
-                        <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#8E7E73] flex items-center justify-center mx-auto mb-2.5">
+                        <div class="w-12 h-12 rounded-full bg-[#EAE2D5] text-[#8E7E73] flex items-center justify-center mx-auto mb-2.5">
                             <i class="fas fa-shopping-basket text-lg"></i>
                         </div>
                         <p class="text-xs font-bold text-[#251A14]">Keranjang Masih Kosong</p>
@@ -3311,7 +3318,7 @@ if ($db_connected && $pdo) {
                 `;
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40';
+                    submitBtn.className = 'w-full bg-[#E5DDD0] text-[#A8988B] border border-[#DDD3C5] font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed';
                 }
                 if (submitText) submitText.textContent = 'Pilih Produk Terlebih Dahulu';
                 if (moqWarning) moqWarning.classList.add('hidden');
@@ -3364,7 +3371,7 @@ if ($db_connected && $pdo) {
                 }
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40';
+                    submitBtn.className = 'w-full bg-[#E5DDD0] text-[#A8988B] border border-[#DDD3C5] font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed';
                 }
                 if (submitText) submitText.textContent = 'Penuhi Batas Minimal Order (MOQ)';
             } else {

@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $toast_message = "Catatan dapur baru berhasil ditambahkan!";
         }
-    } elseif ($action === 'add_order') {
+    } elseif ($action === 'add_order' || $action === 'tambah_pesanan') {
         $id_pelanggan = intval($_POST['id_pelanggan'] ?? 0);
         $nama_pelanggan_baru = trim($_POST['nama_pelanggan_baru'] ?? '');
         $no_wa_baru = trim($_POST['no_wa_baru'] ?? '');
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($raw_items as $it) {
                 $nama_it = trim($it['nama'] ?? '');
                 $qty_it = max(0, intval($it['qty'] ?? 0));
-                $hrg_it = max(0, intval($it['harga'] ?? 0));
+                $hrg_it = max(0, floatval($it['harga'] ?? 0));
                 $kemasan_it = trim($it['kemasan'] ?? '');
                 $id_var = intval($it['id_varian'] ?? 1);
                 if ($qty_it > 0) {
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Fallback untuk backward compatibility
+        // Fallback untuk backward compatibility modal lama
         if (empty($processed_items)) {
             $qty1 = max(0, intval($_POST['qty_item_1'] ?? 0));
             $qty2 = max(0, intval($_POST['qty_item_2'] ?? 0));
@@ -175,15 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($processed_items)) {
-            $processed_items[] = [
-                'nama' => 'Roti Hajatan (9 Pilihan Topping)',
-                'id_varian' => 1,
-                'kemasan' => 'Kardus Putih',
-                'qty' => 10,
-                'harga' => 10000,
-                'subtotal' => 100000
-            ];
-            $calculated_total = 100000;
+            $_SESSION['flash_error'] = "Gagal menyimpan pesanan: Belum ada produk yang dipilih! Silakan pilih minimal 1 produk dari katalog.";
+            header("Location: pesanan.php?view=tambah_pesanan");
+            exit();
         }
 
         $grand_total = intval($_POST['grand_total'] ?? $calculated_total);
@@ -194,27 +188,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $itemsDesc = implode(', ', array_map(fn($p) => "{$p['nama']} ({$p['qty']} pcs)", $processed_items));
         }
 
-        $tglKirim = !empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d');
+        $tglKirim = !empty($_POST['tgl_kirim']) ? $_POST['tgl_kirim'] : (!empty($_POST['delivery_date']) ? $_POST['delivery_date'] : date('Y-m-d'));
         
         // Validasi Tanggal Pre-Order (PO): Tidak boleh memilih tanggal lampau / mundur ke belakang
         $today = date('Y-m-d');
         if (strtotime($tglKirim) < strtotime($today)) {
             $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tglKirim)) . ") tidak valid! Sistem roti Berkat Dinasti berbasis Pre-Order (PO) sehingga tanggal selesai/kirim tidak boleh tanggal yang sudah lewat (minimal hari ini).";
-            header("Location: pesanan.php");
+            header("Location: pesanan.php?view=tambah_pesanan");
             exit();
         }
 
-        $waktuKirim = !empty($_POST['delivery_time']) ? $_POST['delivery_time'] : '14:00';
+        $waktuKirim = !empty($_POST['waktu_kirim']) ? $_POST['waktu_kirim'] : (!empty($_POST['delivery_time']) ? $_POST['delivery_time'] : '09:00');
         $waktuKirimSql = strlen($waktuKirim) === 5 ? ($waktuKirim . ':00') : $waktuKirim;
 
-        $catatan = trim($_POST['notes'] ?? '');
-        $payStatus = trim($_POST['payment_status'] ?? 'Belum Bayar');
+        $catatan = trim($_POST['catatan'] ?? $_POST['notes'] ?? '');
+        $payStatus = trim($_POST['status_bayar'] ?? $_POST['payment_status'] ?? 'belum_bayar');
         $dbStatusBayar = match(strtolower(str_replace(' ', '_', $payStatus))) {
             'lunas' => 'lunas',
             'hutang' => 'hutang',
             'dp' => 'dp',
             default => 'belum_bayar'
         };
+
+        $metodeBayar = in_array(strtolower($_POST['metode_bayar'] ?? $_POST['payment_method'] ?? ''), ['cash', 'transfer']) ? strtolower($_POST['metode_bayar'] ?? $_POST['payment_method']) : 'cash';
 
         $bayarClass = match($dbStatusBayar) {
             'lunas' => 'bg-[#27AE60]/15 text-[#1B7A43]',
@@ -269,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $stmtOrder = $pdo->prepare("
                     INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan)
-                    VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, 'cash', ?)
+                    VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?)
                 ");
                 $stmtOrder->execute([
                     $id_pelanggan,
@@ -279,6 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $grand_total,
                     $grand_total,
                     $dbStatusBayar,
+                    $metodeBayar,
                     $catatan
                 ]);
                 $newOrderId = $pdo->lastInsertId();
@@ -296,6 +293,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $pi['subtotal']
                     ]);
                 }
+
+                try {
+                    $stmtLog = $pdo->prepare("INSERT INTO tracking_log (id_pesanan, status, keterangan) VALUES (?, 'pending', ?)");
+                    $stmtLog->execute([$newOrderId, "Pesanan #{$no_invoice} berhasil dibuat dari Pesanan"]);
+                } catch (Exception $eL) {}
 
                 $pdo->commit();
             } catch (Exception $e) {
@@ -344,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'alamat' => $custAddress
         ]);
 
-        $_SESSION['flash_msg'] = "Pesanan baru #{$no_invoice} untuk {$custName} berhasil dibuat dan langsung masuk antrean!";
+        $_SESSION['flash_msg'] = "Pesanan baru #{$no_invoice} untuk {$custName} berhasil dibuat dan otomatis masuk ke antrean!";
         header("Location: pesanan.php");
         exit();
     }
@@ -370,28 +372,45 @@ if ($db_connected && $pdo) {
 
 // Master Produk untuk Order Items Dinamis
 $products_for_select = [
-    ['id_varian' => 1, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Putih', 'harga' => 10000, 'min_order' => 1],
-    ['id_varian' => 2, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Batik', 'harga' => 11000, 'min_order' => 1],
-    ['id_varian' => 3, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Mika', 'harga' => 10500, 'min_order' => 1],
-    ['id_varian' => 7, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Mika', 'harga' => 22000, 'min_order' => 1],
-    ['id_varian' => 8, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Kardus Putih', 'harga' => 23000, 'min_order' => 1],
-    ['id_varian' => 9, 'nama' => 'Bolu Tanpa Pisang', 'kemasan' => 'Kardus Putih', 'harga' => 20000, 'min_order' => 1]
+    ['id' => 1, 'id_varian' => 1, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Putih', 'harga' => 10000, 'min_order' => 1, 'kategori' => 'Roti Hajatan'],
+    ['id' => 1, 'id_varian' => 2, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Coklat', 'harga' => 10000, 'min_order' => 1, 'kategori' => 'Roti Hajatan'],
+    ['id' => 1, 'id_varian' => 3, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Kardus Batik', 'harga' => 11000, 'min_order' => 1, 'kategori' => 'Roti Hajatan'],
+    ['id' => 1, 'id_varian' => 4, 'nama' => 'Roti Hajatan (9 Pilihan Topping)', 'kemasan' => 'Mika', 'harga' => 11000, 'min_order' => 1, 'kategori' => 'Roti Hajatan'],
+    ['id' => 2, 'id_varian' => 6, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Kardus Coklat', 'harga' => 21000, 'min_order' => 1, 'kategori' => 'Bolu Premium'],
+    ['id' => 2, 'id_varian' => 7, 'nama' => 'Bolu Pisang Premium', 'kemasan' => 'Mika', 'harga' => 22000, 'min_order' => 1, 'kategori' => 'Bolu Premium'],
+    ['id' => 3, 'id_varian' => 8, 'nama' => 'Bolu Tanpa Pisang Premium', 'kemasan' => 'Kardus Putih', 'harga' => 19000, 'min_order' => 1, 'kategori' => 'Bolu Premium'],
+    ['id' => 3, 'id_varian' => 9, 'nama' => 'Bolu Tanpa Pisang Premium', 'kemasan' => 'Mika', 'harga' => 20000, 'min_order' => 1, 'kategori' => 'Bolu Premium'],
+    ['id' => 4, 'id_varian' => 10, 'nama' => 'Roti Kopi', 'kemasan' => 'Satuan', 'harga' => 4000, 'min_order' => 50, 'kategori' => 'Roti Manis'],
+    ['id' => 5, 'id_varian' => 11, 'nama' => 'Roti Bijian Besar', 'kemasan' => 'Satuan', 'harga' => 4000, 'min_order' => 20, 'kategori' => 'Roti Manis'],
+    ['id' => 6, 'id_varian' => 5, 'nama' => 'Roti Bijian Kecil', 'kemasan' => 'Satuan', 'harga' => 3000, 'min_order' => 50, 'kategori' => 'Roti Manis']
 ];
+
+$categories_for_select = ['Semua', 'Roti Hajatan', 'Bolu Premium', 'Roti Manis'];
+
 if ($db_connected && $pdo) {
     try {
         $stmtP = $pdo->query("
-            SELECT v.id_varian, v.id_produk, p.nama_produk as nama, v.nama_varian as kemasan, v.harga, v.min_order 
+            SELECT v.id_varian, v.id_produk as id, p.nama_produk as nama, v.nama_varian as kemasan, v.harga, v.min_order, COALESCE(k.nama_kategori, 'Roti Manis') as kategori
             FROM varian_produk v 
             JOIN produk p ON v.id_produk = p.id_produk 
+            LEFT JOIN kategori k ON p.id_kategori = k.id_kategori
             WHERE p.status = 'tersedia' 
-            ORDER BY p.nama_produk ASC
+            ORDER BY k.id_kategori ASC, p.nama_produk ASC, v.harga ASC
         ");
         $dbProds = $stmtP->fetchAll();
         if (!empty($dbProds)) {
             $products_for_select = $dbProds;
         }
+
+        $stmtK = $pdo->query("SELECT nama_kategori FROM kategori ORDER BY id_kategori ASC");
+        $dbCats = $stmtK->fetchAll(PDO::FETCH_COLUMN);
+        if (!empty($dbCats)) {
+            $categories_for_select = array_merge(['Semua'], $dbCats);
+        }
     } catch (Exception $e) {}
 }
+
+$is_tambah_view = (isset($_GET['view']) && $_GET['view'] === 'tambah_pesanan') || (isset($_GET['action']) && $_GET['action'] === 'tambah_pesanan');
 
 // Data Pesanan Kanban & Kalender
 $active_tab = $_GET['tab'] ?? 'kanban';
@@ -833,10 +852,12 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <span class="text-[#D8C7B8]">/</span>
                             <a href="pesanan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pesanan</a>
                             <span class="text-[#D8C7B8]">/</span>
-                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb">Manajemen</span>
+                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb"><?= $is_tambah_view ? 'Tambah Pesanan Baru' : 'Manajemen' ?></span>
                         </div>
                         <!-- Section Heading -->
-                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">Manage Pesanan</h1>
+                        <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">
+                            <?= $is_tambah_view ? 'Tambah Pesanan Baru' : 'Manage Pesanan' ?>
+                        </h1>
                     </div>
                 </div>
 
@@ -962,6 +983,247 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <span id="dynamicToastText">Aksi berhasil dijalankan</span>
                 </div>
                 
+                <?php if ($is_tambah_view): ?>
+                <!-- ============================================================== -->
+                <!-- FULL PAGE: TAMBAH PESANAN BARU (POS KASIR BAKERY)             -->
+                <!-- ============================================================== -->
+                <div class="space-y-6">
+                    <!-- Top Navigation Bar & Action -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#FDFBF7] p-4 sm:p-5 rounded-2xl border border-[#E2D7C8] shadow-card">
+                        <div class="flex items-center gap-3">
+                            <a href="pesanan.php" class="w-10 h-10 rounded-xl bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] flex items-center justify-center border border-[#DDD3C5] transition-all hover:scale-105 active:scale-95 shadow-2xs" title="Kembali ke Manajemen Pesanan">
+                                <i class="fas fa-arrow-left text-sm"></i>
+                            </a>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D46E15]/10 text-[#D46E15] uppercase tracking-wider">POS Kasir Bakery</span>
+                                    <span class="text-xs text-[#8E7E73]">• Pre-Order Form</span>
+                                </div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-[#251A14] tracking-tight mt-0.5">Tambah Pesanan Baru</h2>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="pesanan.php" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-[#544337] bg-white border border-[#DDD3C5] hover:bg-[#EFE8DE] transition-colors flex items-center gap-1.5 shadow-2xs">
+                                <i class="fas fa-columns text-xs text-[#D46E15]"></i>
+                                <span>Kembali ke Kanban</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Main Grid: 2 Columns (Catalog on Left, Order Cart on Right) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        
+                        <!-- LEFT: KATALOG PRODUK (KOTAK KATEGORI & PRODUK) -->
+                        <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+                            
+                            <!-- Category Filter Boxes & Search -->
+                            <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-5 shadow-card space-y-4">
+                                <!-- Search Input -->
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                        <i class="fas fa-search text-xs"></i>
+                                    </div>
+                                    <input type="text" id="posProductSearch" oninput="filterPosProducts()" placeholder="Cari nama roti, topping, atau kemasan..." 
+                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
+                                </div>
+
+                                <!-- Category Kotak-Kotak (Category Cards Grid) -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-xs font-bold text-[#544337] uppercase tracking-wider">Kategori Produk:</label>
+                                        <span class="text-[11px] text-[#8E7E73]" id="posVisibleCount">Menampilkan semua item</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="posCategoryCards">
+                                        <?php 
+                                        $catIcons = [
+                                            'Semua' => 'fas fa-th-large',
+                                            'Roti Hajatan' => 'fas fa-box-open',
+                                            'Bolu Premium' => 'fas fa-birthday-cake',
+                                            'Roti Manis' => 'fas fa-bread-slice'
+                                        ];
+                                        foreach ($categories_for_select as $cat): 
+                                            $ico = $catIcons[$cat] ?? 'fas fa-cookie-bite';
+                                            $isActive = ($cat === 'Semua');
+                                        ?>
+                                            <button type="button" onclick="selectPosCategory('<?= htmlspecialchars($cat) ?>')" 
+                                                data-category="<?= htmlspecialchars($cat) ?>"
+                                                class="pos-category-btn p-3 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 <?= $isActive ? 'bg-[#D46E15] text-white border-[#D46E15] shadow-sm' : 'bg-white text-[#3E2B21] border-[#E2D7C8] hover:border-[#D46E15]/60 hover:bg-[#FDFBF7]' ?>">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <i class="<?= $ico ?> text-sm <?= $isActive ? 'text-white' : 'text-[#D46E15]' ?>"></i>
+                                                    <span class="cat-count-badge text-[10px] font-bold px-1.5 py-0.5 rounded <?= $isActive ? 'bg-white/20 text-white' : 'bg-[#EFE8DE] text-[#8E7E73]' ?>">
+                                                        0
+                                                    </span>
+                                                </div>
+                                                <span class="text-xs font-bold leading-tight"><?= htmlspecialchars($cat) ?></span>
+                                            </button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Grid Cards (Kotak-Kotak Produk) -->
+                            <div id="posProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
+                                <!-- Populated dynamically via JavaScript -->
+                            </div>
+
+                            <!-- Empty Filter State -->
+                            <div id="posProductsEmpty" class="hidden bg-[#FDFBF7] rounded-2xl border border-dashed border-[#DDD3C5] p-8 text-center">
+                                <i class="fas fa-cookie text-3xl text-[#8E7E73]/40 mb-3"></i>
+                                <h4 class="text-sm font-bold text-[#251A14]">Tidak Ada Produk Ditemukan</h4>
+                                <p class="text-xs text-[#8E7E73] mt-1">Coba sesuaikan kata kunci pencarian atau pilih kategori lain.</p>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: KERANJANG PESANAN & FORM CHECKOUT -->
+                        <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-20 space-y-4">
+                            <form id="posOrderForm" method="POST" action="pesanan.php" class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-card flex flex-col overflow-hidden">
+                                <input type="hidden" name="action" value="tambah_pesanan">
+                                
+                                <!-- Panel Header -->
+                                <div class="p-4 border-b border-[#E2D7C8] bg-white flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-shopping-basket text-[#D46E15] text-base"></i>
+                                        <h3 class="text-sm font-bold text-[#251A14]">Keranjang Pesanan</h3>
+                                        <span id="posCartItemBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#EFE8DE] text-[#544337]">0 Produk</span>
+                                    </div>
+                                    <button type="button" onclick="clearPosCart()" id="btnClearPosCart" class="text-xs text-rose-600 hover:text-rose-700 font-semibold hidden transition-colors">
+                                        Kosongkan
+                                    </button>
+                                </div>
+
+                                <!-- Cart Items List (Starts with 0 items) -->
+                                <div class="p-4 max-h-[300px] overflow-y-auto space-y-2.5 border-b border-[#E2D7C8]" id="posCartList">
+                                    <!-- Populated dynamically by JavaScript -->
+                                </div>
+
+                                <!-- Hidden Input Container for POST items -->
+                                <div id="posHiddenItemsInputs"></div>
+
+                                <!-- Order Details Form -->
+                                <div class="p-4 space-y-3.5 bg-[#FAF7F2] text-xs border-b border-[#E2D7C8]">
+                                    <!-- Customer Section -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="font-bold text-[#251A14] uppercase tracking-wider text-[11px]">Data Pelanggan</label>
+                                            <button type="button" onclick="togglePosNewCustomer()" id="btnTogglePosNewCust" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-[11px] flex items-center gap-1 transition-colors">
+                                                <i class="fas fa-user-plus text-[10px]"></i>
+                                                <span id="lblPosToggleCust">Tambah Pelanggan Baru</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Existing Customer Select -->
+                                        <div id="posCustSelectWrapper">
+                                            <select id="pos_id_pelanggan" name="id_pelanggan" onchange="syncPosCustomerInfo()" 
+                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <?php foreach ($customers_for_select as $c): ?>
+                                                    <option value="<?= $c['id_pelanggan'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
+                                                        <?= htmlspecialchars($c['nama']) ?> (<?= htmlspecialchars($c['no_wa']) ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <!-- New Customer Form (Hidden by default) -->
+                                        <div id="posNewCustBox" class="hidden space-y-2 p-3 bg-white border border-[#DDD3C5] rounded-xl">
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Nama Lengkap</label>
+                                                <input type="text" id="pos_nama_baru" name="nama_pelanggan_baru" placeholder="Cth: Ibu Dewi Lestari" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
+                                                <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Alamat Pengiriman</label>
+                                                <textarea id="pos_alamat_baru" name="alamat_baru" rows="2" placeholder="Cth: Jl. Panglima Sudirman No. 12, Kota Batu" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delivery Date & Time (PO Rule: Min Today) -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[11px] mb-1">Tgl Kirim / PO</label>
+                                            <input type="date" id="pos_tgl_kirim" name="tgl_kirim" 
+                                                min="<?= date('Y-m-d') ?>" 
+                                                value="<?= htmlspecialchars($_GET['date'] ?? $_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+1 day'))) ?>" required
+                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[11px] mb-1">Waktu Kirim</label>
+                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
+                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Status & Method -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[11px] mb-1">Status Bayar</label>
+                                            <select id="pos_status_bayar" name="status_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <option value="lunas">Lunas</option>
+                                                <option value="dp">DP / Uang Muka</option>
+                                                <option value="belum_bayar">Belum Bayar</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[11px] mb-1">Metode Bayar</label>
+                                            <select id="pos_metode_bayar" name="metode_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <option value="cash">Tunai (Cash)</option>
+                                                <option value="transfer">Transfer Bank</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notes -->
+                                    <div>
+                                        <label class="block font-bold text-[#251A14] text-[11px] mb-1">Catatan Khusus (Opsional)</label>
+                                        <input type="text" id="pos_catatan" name="catatan" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
+                                            class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <!-- Panel Summary & Submit Button -->
+                                <div class="p-4 bg-white space-y-3">
+                                    <div class="space-y-1.5 text-xs">
+                                        <div class="flex justify-between text-[#8E7E73]">
+                                            <span>Subtotal:</span>
+                                            <span id="posSummarySubtotal" class="font-mono font-semibold text-[#251A14]">Rp 0</span>
+                                        </div>
+                                        <div class="flex justify-between text-[#8E7E73]">
+                                            <span>Ongkir (Malang & Batu):</span>
+                                            <span class="font-semibold text-emerald-600">Rp 0 (Gratis)</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm font-bold pt-2 border-t border-[#E2D7C8]">
+                                            <span class="text-[#251A14]">Grand Total:</span>
+                                            <span id="posSummaryGrandTotal" class="text-base text-[#D46E15] font-mono font-bold">Rp 0</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- MOQ Alert Box -->
+                                    <div id="posMoqWarning" class="hidden p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] leading-relaxed">
+                                        <div class="flex items-start gap-1.5">
+                                            <i class="fas fa-exclamation-circle text-rose-600 mt-0.5 shrink-0"></i>
+                                            <span id="posMoqWarningText">Minimal order belum tercapai untuk beberapa produk.</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button: DISABLED IF NO PRODUCTS -->
+                                    <button type="submit" id="btnPosSubmitOrder" disabled 
+                                        class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]">
+                                        <i class="fas fa-check"></i>
+                                        <span id="btnPosSubmitText">Pilih Produk Terlebih Dahulu</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <?php else: ?>
+                
                 <!-- TOP BANNER: TITLE, STATS, & OMSET (Dark Chocolate Espresso Cards) -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div>
@@ -1050,10 +1312,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </button>
 
                             <!-- Tombol Tambah Pesanan -->
-                            <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                            <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                                 <i class="fas fa-plus text-xs"></i>
                                 <span>Tambah Pesanan</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -1109,10 +1371,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                             </div>
 
-                            <button onclick="openOrderModal()" class="w-full py-2.5 mt-4 border border-dashed border-[#DDD3C5] hover:border-[#D46E15] text-[#8E7E73] hover:text-[#D46E15] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                            <a href="pesanan.php?view=tambah_pesanan" class="w-full py-2.5 mt-4 border border-dashed border-[#DDD3C5] hover:border-[#D46E15] text-[#8E7E73] hover:text-[#D46E15] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
                                 <i class="fas fa-plus text-xs"></i>
                                 <span>Tambah Kartu</span>
-                            </button>
+                            </a>
                         </div>
 
                         <!-- SWIMLANE 2: PROSES DAPUR (OVEN & BAKING) -->
@@ -1340,10 +1602,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- Button Tambah Pesanan -->
-                        <button onclick="openOrderModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                        <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan</span>
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Main Big Calendar Card -->
@@ -1490,6 +1752,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
 
                 </div>
+
+                <?php endif; ?>
 
             </main>
         </div>
@@ -2472,10 +2736,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
                         <h4 class="text-[#251A14] font-bold text-sm">Tidak Ada Jadwal Pengiriman</h4>
                         <p class="text-xs text-[#8E7E73] mt-1 max-w-md">Belum ada pesanan bakery yang dijadwalkan untuk dikirim pada tanggal ${dayNum} ${monthTitle}.</p>
-                        <button type="button" onclick="openOrderModal(); const dt = document.getElementById('deliveryDateInput'); if (dt) dt.value='${dateStr}';" class="mt-4 bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 shadow-button-orange transition-colors">
+                        <a href="pesanan.php?view=tambah_pesanan&date=${dateStr}" class="mt-4 bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 shadow-button-orange transition-colors">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan Tanggal ${dayNum}</span>
-                        </button>
+                        </a>
                     </div>
                 `;
             }
@@ -2528,18 +2792,17 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             document.body.style.overflow = '';
         }
 
-        // Modal Open / Close Order Modal
+        // Modal Open / Close Order Modal (Redirects to Full Page POS)
         function openOrderModal() {
-            const modal = document.getElementById('orderModal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            calculateOrderTotal();
+            window.location.href = 'pesanan.php?view=tambah_pesanan';
         }
 
         function closeOrderModal() {
             const modal = document.getElementById('orderModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
         }
 
         function addOrderProductRow() {
@@ -2768,6 +3031,356 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             // Form submitting naturally to backend POST
         }
 
+        // ==============================================================
+        // FULL PAGE POS ORDER LOGIC (DYNAMIC CATEGORIES & PRODUCTS GRID)
+        // ==============================================================
+        let posActiveCategory = 'Semua';
+        let posCart = []; // Starts strictly with 0 products!
+
+        function initPos() {
+            updatePosCategoryCounts();
+            renderPosProducts();
+            renderPosCart();
+        }
+
+        function updatePosCategoryCounts() {
+            const counts = { 'Semua': PRODUCTS_DATA.length };
+            PRODUCTS_DATA.forEach(p => {
+                const cat = p.kategori || 'Roti Manis';
+                counts[cat] = (counts[cat] || 0) + 1;
+            });
+
+            document.querySelectorAll('.pos-category-btn').forEach(btn => {
+                const cat = btn.getAttribute('data-category');
+                const badge = btn.querySelector('.cat-count-badge');
+                if (badge && counts[cat] !== undefined) {
+                    badge.textContent = counts[cat];
+                } else if (badge) {
+                    badge.textContent = '0';
+                }
+            });
+        }
+
+        function selectPosCategory(cat) {
+            posActiveCategory = cat;
+            document.querySelectorAll('.pos-category-btn').forEach(btn => {
+                const isSelected = btn.getAttribute('data-category') === cat;
+                const icon = btn.querySelector('i');
+                const title = btn.querySelector('span.text-xs');
+                const badge = btn.querySelector('.cat-count-badge');
+
+                if (isSelected) {
+                    btn.className = 'pos-category-btn p-3 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 bg-[#D46E15] text-white border-[#D46E15] shadow-sm';
+                    if (icon) icon.className = icon.className.replace('text-[#D46E15]', 'text-white');
+                    if (title) title.className = 'text-xs font-bold leading-tight text-white';
+                    if (badge) badge.className = 'cat-count-badge text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/20 text-white';
+                } else {
+                    btn.className = 'pos-category-btn p-3 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 bg-white text-[#3E2B21] border-[#E2D7C8] hover:border-[#D46E15]/60 hover:bg-[#FDFBF7]';
+                    if (icon) icon.className = icon.className.replace('text-white', 'text-[#D46E15]');
+                    if (title) title.className = 'text-xs font-bold leading-tight text-[#3E2B21]';
+                    if (badge) badge.className = 'cat-count-badge text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EFE8DE] text-[#8E7E73]';
+                }
+            });
+            renderPosProducts();
+        }
+
+        function filterPosProducts() {
+            renderPosProducts();
+        }
+
+        function renderPosProducts() {
+            const grid = document.getElementById('posProductsGrid');
+            const empty = document.getElementById('posProductsEmpty');
+            const visibleCountEl = document.getElementById('posVisibleCount');
+            const searchInput = document.getElementById('posProductSearch');
+            const search = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+            if (!grid) return;
+
+            const filtered = PRODUCTS_DATA.filter(p => {
+                const matchCat = (posActiveCategory === 'Semua') || (p.kategori === posActiveCategory);
+                const matchSearch = !search || 
+                    (p.nama && p.nama.toLowerCase().includes(search)) || 
+                    (p.kemasan && p.kemasan.toLowerCase().includes(search)) || 
+                    (p.kategori && p.kategori.toLowerCase().includes(search));
+                return matchCat && matchSearch;
+            });
+
+            if (visibleCountEl) {
+                visibleCountEl.textContent = `Menampilkan ${filtered.length} produk`;
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                if (empty) empty.classList.remove('hidden');
+                return;
+            }
+
+            if (empty) empty.classList.add('hidden');
+
+            grid.innerHTML = filtered.map(p => {
+                const inCart = posCart.find(c => c.id_varian === p.id_varian);
+                const inCartQty = inCart ? inCart.qty : 0;
+                const minOrder = parseInt(p.min_order, 10) || 1;
+                const moqText = minOrder > 1 ? `Min. ${minOrder} pcs` : 'Ready Stock';
+
+                let badgeStyle = 'bg-[#F5F3F1] text-[#544337] border-[#EBE8E5]';
+                const kemLower = (p.kemasan || '').toLowerCase();
+                if (kemLower.includes('mika')) badgeStyle = 'bg-[#EBF3FC] text-[#2F80ED] border-[#D5E6F9]';
+                else if (kemLower.includes('batik')) badgeStyle = 'bg-[#FFF0E6] text-[#924C00] border-[#FFD8BF]';
+                else if (kemLower.includes('coklat')) badgeStyle = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
+
+                return `
+                    <div onclick="addPosItem(${p.id_varian})" 
+                        class="group bg-white rounded-xl border ${inCartQty > 0 ? 'border-[#D46E15] ring-2 ring-[#D46E15]/20 shadow-xs' : 'border-[#E2D7C8]'} p-3.5 hover:border-[#D46E15] hover:shadow-card active:scale-[0.98] transition-all cursor-pointer flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1.5 mb-1.5">
+                                <span class="text-[10px] font-semibold text-[#8E7E73] truncate">${escapeHtml(p.kategori || 'Bakery')}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeStyle} shrink-0">
+                                    ${escapeHtml(p.kemasan || 'Kemasan')}
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-xs sm:text-sm text-[#251A14] group-hover:text-[#D46E15] transition-colors leading-snug line-clamp-2">
+                                ${escapeHtml(p.nama)}
+                            </h4>
+                            <p class="text-[10px] text-[#8E7E73] mt-1 flex items-center gap-1">
+                                <i class="fas fa-box text-[9px] text-[#D46E15]"></i>
+                                <span>${moqText}</span>
+                            </p>
+                        </div>
+
+                        <div class="pt-3 mt-3 border-t border-[#F2ECE4] flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-[#8E7E73] block leading-none">Harga</span>
+                                <span class="font-mono font-bold text-xs sm:text-sm text-[#D46E15]">Rp ${formatRupiahNumber(p.harga)}</span>
+                            </div>
+
+                            ${inCartQty > 0 ? `
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#27AE60] text-white shadow-2xs">
+                                    <i class="fas fa-check text-[9px]"></i>
+                                    <span>${inCartQty} di pesanan</span>
+                                </span>
+                            ` : `
+                                <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#D46E15]/10 text-[#D46E15] group-hover:bg-[#D46E15] group-hover:text-white transition-all shadow-2xs">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                    <span>Pilih</span>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addPosItem(id_varian) {
+            const prod = PRODUCTS_DATA.find(p => p.id_varian === id_varian);
+            if (!prod) return;
+
+            const existing = posCart.find(c => c.id_varian === id_varian);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                const minOrder = parseInt(prod.min_order, 10) || 1;
+                posCart.push({
+                    id_varian: prod.id_varian,
+                    nama: prod.nama,
+                    kemasan: prod.kemasan,
+                    harga: parseFloat(prod.harga) || 10000,
+                    min_order: minOrder,
+                    qty: minOrder > 1 ? minOrder : 1
+                });
+            }
+
+            renderPosProducts();
+            renderPosCart();
+        }
+
+        function removePosItem(id_varian) {
+            posCart = posCart.filter(c => c.id_varian !== id_varian);
+            renderPosProducts();
+            renderPosCart();
+        }
+
+        function updatePosQty(id_varian, newQty) {
+            const item = posCart.find(c => c.id_varian === id_varian);
+            if (!item) return;
+            const qty = parseInt(newQty, 10);
+            if (isNaN(qty) || qty <= 0) {
+                removePosItem(id_varian);
+                return;
+            }
+            item.qty = qty;
+            renderPosProducts();
+            renderPosCart();
+        }
+
+        function clearPosCart() {
+            if (posCart.length === 0) return;
+            posCart = [];
+            renderPosProducts();
+            renderPosCart();
+        }
+
+        function renderPosCart() {
+            const listEl = document.getElementById('posCartList');
+            const badgeEl = document.getElementById('posCartItemBadge');
+            const clearBtn = document.getElementById('btnClearPosCart');
+            const subtotalEl = document.getElementById('posSummarySubtotal');
+            const grandTotalEl = document.getElementById('posSummaryGrandTotal');
+            const submitBtn = document.getElementById('btnPosSubmitOrder');
+            const submitText = document.getElementById('btnPosSubmitText');
+            const moqWarning = document.getElementById('posMoqWarning');
+            const moqWarningText = document.getElementById('posMoqWarningText');
+            const hiddenInputs = document.getElementById('posHiddenItemsInputs');
+
+            if (!listEl) return;
+
+            let subtotal = 0;
+            let moqViolations = [];
+
+            posCart.forEach(item => {
+                subtotal += (item.qty * item.harga);
+                if (item.qty < item.min_order) {
+                    moqViolations.push(`${item.nama} (${item.kemasan}) min. ${item.min_order} pcs`);
+                }
+            });
+
+            const totalQty = posCart.reduce((acc, it) => acc + it.qty, 0);
+
+            if (badgeEl) badgeEl.textContent = `${posCart.length} Produk (${totalQty} pcs)`;
+            if (clearBtn) {
+                if (posCart.length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            if (subtotalEl) subtotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
+            if (grandTotalEl) grandTotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
+
+            // If empty:
+            if (posCart.length === 0) {
+                listEl.innerHTML = `
+                    <div id="posCartEmpty" class="py-8 px-4 text-center">
+                        <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#8E7E73] flex items-center justify-center mx-auto mb-2.5">
+                            <i class="fas fa-shopping-basket text-lg"></i>
+                        </div>
+                        <p class="text-xs font-bold text-[#251A14]">Keranjang Masih Kosong</p>
+                        <p class="text-[11px] text-[#8E7E73] mt-1 max-w-[220px] mx-auto">
+                            Klik produk pada katalog di sebelah kiri untuk memasukkannya ke dalam pesanan.
+                        </p>
+                    </div>
+                `;
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]';
+                }
+                if (submitText) submitText.textContent = 'Pilih Produk Terlebih Dahulu';
+                if (moqWarning) moqWarning.classList.add('hidden');
+                if (hiddenInputs) hiddenInputs.innerHTML = '';
+                return;
+            }
+
+            // Render items list
+            listEl.innerHTML = posCart.map(item => {
+                const itemSubtotal = item.qty * item.harga;
+                const isMoqErr = item.qty < item.min_order;
+
+                return `
+                    <div class="bg-white rounded-xl border ${isMoqErr ? 'border-rose-300 bg-rose-50/20' : 'border-[#E2D7C8]'} p-3 space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <h5 class="text-xs font-bold text-[#251A14] truncate">${escapeHtml(item.nama)}</h5>
+                                    <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-[#EFE8DE] text-[#544337]">${escapeHtml(item.kemasan)}</span>
+                                </div>
+                                <p class="text-[10px] text-[#8E7E73] mt-0.5">Rp ${formatRupiahNumber(item.harga)} / item</p>
+                            </div>
+                            <button type="button" onclick="removePosItem(${item.id_varian})" title="Hapus produk ini" class="text-[#8E7E73] hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1.5 border-t border-[#F5F1EB]">
+                            <!-- Stepper -->
+                            <div class="flex items-center rounded-lg border border-[#DDD3C5] bg-[#FAF7F2] overflow-hidden">
+                                <button type="button" onclick="updatePosQty(${item.id_varian}, ${item.qty - 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">−</button>
+                                <input type="number" min="1" value="${item.qty}" onchange="updatePosQty(${item.id_varian}, this.value)" class="w-10 h-6 text-center text-xs font-bold bg-transparent text-[#251A14] border-x border-[#DDD3C5] focus:outline-none">
+                                <button type="button" onclick="updatePosQty(${item.id_varian}, ${item.qty + 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">+</button>
+                            </div>
+
+                            <div class="text-right">
+                                ${isMoqErr ? `<p class="text-[9px] font-bold text-rose-600">Min. ${item.min_order} pcs</p>` : ''}
+                                <span class="font-mono font-bold text-xs text-[#251A14]">Rp ${formatRupiahNumber(itemSubtotal)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // MOQ check & button state
+            if (moqViolations.length > 0) {
+                if (moqWarning) {
+                    moqWarning.classList.remove('hidden');
+                    moqWarningText.innerHTML = `<strong>Batas Minimal Order:</strong> ${moqViolations.join(', ')}`;
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]';
+                }
+                if (submitText) submitText.textContent = 'Penuhi Batas Minimal Order (MOQ)';
+            } else {
+                if (moqWarning) moqWarning.classList.add('hidden');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.className = 'w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all cursor-pointer';
+                }
+                if (submitText) submitText.textContent = `Simpan Pesanan • Rp ${formatRupiahNumber(subtotal)}`;
+            }
+
+            // Hidden inputs for PHP $_POST['items']
+            if (hiddenInputs) {
+                hiddenInputs.innerHTML = posCart.map((item, idx) => `
+                    <input type="hidden" name="items[${idx}][id_varian]" value="${item.id_varian}">
+                    <input type="hidden" name="items[${idx}][nama]" value="${escapeHtml(item.nama)}">
+                    <input type="hidden" name="items[${idx}][kemasan]" value="${escapeHtml(item.kemasan)}">
+                    <input type="hidden" name="items[${idx}][harga]" value="${item.harga}">
+                    <input type="hidden" name="items[${idx}][qty]" value="${item.qty}">
+                    <input type="hidden" name="items[${idx}][subtotal]" value="${item.qty * item.harga}">
+                `).join('');
+            }
+        }
+
+        function togglePosNewCustomer() {
+            const box = document.getElementById('posNewCustBox');
+            const selectWrap = document.getElementById('posCustSelectWrapper');
+            const lbl = document.getElementById('lblPosToggleCust');
+            if (!box || !selectWrap) return;
+
+            const isHidden = box.classList.contains('hidden');
+            if (isHidden) {
+                box.classList.remove('hidden');
+                selectWrap.classList.add('opacity-40', 'pointer-events-none');
+                if (lbl) lbl.textContent = 'Pilih Pelanggan Terdaftar';
+                const idPelangganSelect = document.getElementById('pos_id_pelanggan');
+                if (idPelangganSelect) idPelangganSelect.value = '0';
+            } else {
+                box.classList.add('hidden');
+                selectWrap.classList.remove('opacity-40', 'pointer-events-none');
+                if (lbl) lbl.textContent = 'Tambah Pelanggan Baru';
+                const idPelangganSelect = document.getElementById('pos_id_pelanggan');
+                if (idPelangganSelect && CUSTOMERS_DATA.length > 0) {
+                    idPelangganSelect.value = CUSTOMERS_DATA[0].id_pelanggan;
+                }
+            }
+        }
+
+        function syncPosCustomerInfo() {
+            // Synced via HTML data attributes
+        }
+
+        function formatRupiahNumber(num) {
+            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         // Logout Modal Open / Close
         function openLogoutModal() {
             const modal = document.getElementById('logoutModal');
@@ -2811,8 +3424,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
         // Initial setup
         document.addEventListener('DOMContentLoaded', function() {
-            calculateOrderTotal();
-            renderInteractiveCalendar();
+            if (document.getElementById('posProductsGrid')) {
+                initPos();
+            }
+            if (typeof calculateOrderTotal === 'function') calculateOrderTotal();
+            if (typeof renderInteractiveCalendar === 'function') renderInteractiveCalendar();
         });
     </script>
 </body>

@@ -565,56 +565,82 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                             </div>
 
-                            <!-- Bar Chart Visual Container (12 Bulan Interaktif) -->
-                            <div class="pt-4 pb-2">
-                                <div class="h-56 flex items-end justify-between gap-1 sm:gap-1.5 md:gap-2 px-1 relative border-b border-[#E2D7C8]" id="chartBarsContainer">
-                                    
-                                    <!-- Y-Axis Background Grid Lines -->
-                                    <div class="absolute inset-0 flex flex-col justify-between pointer-events-none text-[10px] text-[#A6978A]" id="chartYAxis">
-                                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>5 jt</span></div>
-                                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>4 jt</span></div>
-                                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>3 jt</span></div>
-                                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>2 jt</span></div>
-                                        <div class="flex justify-between"><span>0</span></div>
+                            <!-- Bar Chart Visual Container (12 Bulan Interaktif & Compact - Bebas Tabrakan) -->
+                            <div class="pt-4 pb-1">
+                                <div class="flex items-start gap-2">
+                                    <!-- Y-Axis Dedicated Column (Tidak Menimpa Bar) -->
+                                    <div class="w-9 sm:w-11 shrink-0 flex flex-col justify-between text-right pr-2 text-[10px] text-[#8E7E73] font-semibold select-none h-44 py-0" id="chartYAxis">
+                                        <span>5 jt</span>
+                                        <span>4 jt</span>
+                                        <span>3 jt</span>
+                                        <span>2 jt</span>
+                                        <span>0</span>
                                     </div>
 
-                                    <!-- 12 Months Bars (Dihasilkan Dinamis & Interaktif) -->
-                                    <?php 
-                                    $monthsList = [
-                                        ['code' => 'Jan', 'label' => 'Jan', 'omset' => 2800000, 'omsetFmt' => '2.8 jt', 'order' => 28, 'h_omset' => 56, 'h_order' => 47],
-                                        ['code' => 'Feb', 'label' => 'Feb', 'omset' => 3100000, 'omsetFmt' => '3.1 jt', 'order' => 31, 'h_omset' => 62, 'h_order' => 52],
-                                        ['code' => 'Mar', 'label' => 'Mar', 'omset' => 3000000, 'omsetFmt' => '3.0 jt', 'order' => 30, 'h_omset' => 60, 'h_order' => 50],
-                                        ['code' => 'Apr', 'label' => 'Apr', 'omset' => 3500000, 'omsetFmt' => '3.5 jt', 'order' => 35, 'h_omset' => 70, 'h_order' => 58],
-                                        ['code' => 'Mei', 'label' => 'Mei', 'omset' => 3400000, 'omsetFmt' => '3.4 jt', 'order' => 36, 'h_omset' => 68, 'h_order' => 60],
-                                        ['code' => 'Jun', 'label' => 'Jun', 'omset' => 3750000, 'omsetFmt' => '3.75 jt', 'order' => 40, 'h_omset' => 75, 'h_order' => 67],
-                                        ['code' => 'Jul', 'label' => 'Jul', 'omset' => 4100000, 'omsetFmt' => '4.1 jt', 'order' => 45, 'h_omset' => 82, 'h_order' => 75],
-                                        ['code' => 'Agu', 'label' => 'Agu', 'omset' => 3600000, 'omsetFmt' => '3.6 jt', 'order' => 38, 'h_omset' => 72, 'h_order' => 63],
-                                        ['code' => 'Sep', 'label' => 'Sep', 'omset' => 3820000, 'omsetFmt' => '3.82 jt', 'order' => 42, 'h_omset' => 76, 'h_order' => 70],
-                                        ['code' => 'Okt', 'label' => 'Okt', 'omset' => 4250000, 'omsetFmt' => '4.25 jt', 'order' => 48, 'h_omset' => 85, 'h_order' => 80, 'active' => true],
-                                        ['code' => 'Nov', 'label' => 'Nov', 'omset' => 4400000, 'omsetFmt' => '4.4 jt', 'order' => 46, 'h_omset' => 88, 'h_order' => 77],
-                                        ['code' => 'Des', 'label' => 'Des', 'omset' => 4950000, 'omsetFmt' => '4.95 jt', 'order' => 54, 'h_omset' => 98, 'h_order' => 90],
-                                    ];
-                                    ?>
-                                    <?php foreach ($monthsList as $idx => $m): 
-                                        $isActive = !empty($m['active']);
-                                    ?>
-                                        <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end z-10 group cursor-pointer relative" 
-                                             id="monthCol-<?= $idx ?>" onclick="selectChartMonth(<?= $idx ?>)" title="<?= $m['code'] ?>: Rp <?= $m['omsetFmt'] ?> (<?= $m['order'] ?> order)">
-                                            
-                                            <?php if ($isActive): ?>
-                                                <div class="absolute -top-7 bg-[#3E2B21] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap border border-white/10 z-20" id="chartActiveBarPill">
-                                                    <span>★</span>
-                                                    <span class="text-[#D46E15]" id="chartActiveBarValue"><?= $m['omsetFmt'] ?></span>
-                                                </div>
-                                            <?php endif; ?>
+                                    <!-- Chart Canvas Area (Grid + Bars + Month Labels) -->
+                                    <div class="flex-1 min-w-0 relative flex flex-col">
+                                        <!-- Upper Canvas: Grid Lines + Bars -->
+                                        <div class="h-44 relative border-b border-[#E2D7C8]" id="chartCanvasArea">
+                                            <!-- Background Dashed Grid Lines -->
+                                            <div class="absolute inset-0 flex flex-col justify-between pointer-events-none select-none" id="chartGridLines">
+                                                <div class="border-b border-dashed border-[#E2D7C8] w-full"></div>
+                                                <div class="border-b border-dashed border-[#E2D7C8] w-full"></div>
+                                                <div class="border-b border-dashed border-[#E2D7C8] w-full"></div>
+                                                <div class="border-b border-dashed border-[#E2D7C8] w-full"></div>
+                                                <div></div>
+                                            </div>
 
-                                            <div id="chartBar-<?= $idx ?>" 
-                                                 class="w-full max-w-[26px] sm:max-w-[34px] <?= $isActive ? 'bg-[#D46E15] shadow-xs' : 'bg-[#E8D7CD] group-hover:bg-[#D46E15]/60' ?> rounded-t-md sm:rounded-t-lg transition-all" 
-                                                 style="height: <?= $m['h_omset'] ?>%;"></div>
-                                            <span id="chartLabel-<?= $idx ?>" class="text-[10px] sm:text-xs <?= $isActive ? 'text-[#924C00] font-bold' : 'text-[#8E7E73] font-medium' ?>"><?= $m['label'] ?></span>
+                                            <!-- 12 Months Bars -->
+                                            <div class="absolute inset-0 flex items-end justify-between gap-1 sm:gap-2 px-1" id="chartBarsContainer">
+                                                <?php 
+                                                $monthsList = [
+                                                    ['code' => 'Jan', 'label' => 'Jan', 'omset' => 2800000, 'omsetFmt' => '2.8 jt', 'order' => 28, 'h_omset' => 56, 'h_order' => 47],
+                                                    ['code' => 'Feb', 'label' => 'Feb', 'omset' => 3100000, 'omsetFmt' => '3.1 jt', 'order' => 31, 'h_omset' => 62, 'h_order' => 52],
+                                                    ['code' => 'Mar', 'label' => 'Mar', 'omset' => 3000000, 'omsetFmt' => '3.0 jt', 'order' => 30, 'h_omset' => 60, 'h_order' => 50],
+                                                    ['code' => 'Apr', 'label' => 'Apr', 'omset' => 3500000, 'omsetFmt' => '3.5 jt', 'order' => 35, 'h_omset' => 70, 'h_order' => 58],
+                                                    ['code' => 'Mei', 'label' => 'Mei', 'omset' => 3400000, 'omsetFmt' => '3.4 jt', 'order' => 36, 'h_omset' => 68, 'h_order' => 60],
+                                                    ['code' => 'Jun', 'label' => 'Jun', 'omset' => 3750000, 'omsetFmt' => '3.75 jt', 'order' => 40, 'h_omset' => 75, 'h_order' => 67],
+                                                    ['code' => 'Jul', 'label' => 'Jul', 'omset' => 4100000, 'omsetFmt' => '4.1 jt', 'order' => 45, 'h_omset' => 82, 'h_order' => 75],
+                                                    ['code' => 'Agu', 'label' => 'Agu', 'omset' => 3600000, 'omsetFmt' => '3.6 jt', 'order' => 38, 'h_omset' => 72, 'h_order' => 63],
+                                                    ['code' => 'Sep', 'label' => 'Sep', 'omset' => 3820000, 'omsetFmt' => '3.82 jt', 'order' => 42, 'h_omset' => 76, 'h_order' => 70],
+                                                    ['code' => 'Okt', 'label' => 'Okt', 'omset' => 4250000, 'omsetFmt' => '4.25 jt', 'order' => 48, 'h_omset' => 85, 'h_order' => 80, 'active' => true],
+                                                    ['code' => 'Nov', 'label' => 'Nov', 'omset' => 4400000, 'omsetFmt' => '4.4 jt', 'order' => 46, 'h_omset' => 88, 'h_order' => 77],
+                                                    ['code' => 'Des', 'label' => 'Des', 'omset' => 4950000, 'omsetFmt' => '4.95 jt', 'order' => 54, 'h_omset' => 98, 'h_order' => 90],
+                                                ];
+                                                ?>
+                                                <?php foreach ($monthsList as $idx => $m): 
+                                                    $isActive = !empty($m['active']);
+                                                ?>
+                                                    <div class="flex-1 flex flex-col items-center h-full justify-end z-10 group cursor-pointer relative" 
+                                                         id="monthCol-<?= $idx ?>" onclick="selectChartMonth(<?= $idx ?>)" title="<?= $m['code'] ?>: Rp <?= $m['omsetFmt'] ?> (<?= $m['order'] ?> order)">
+                                                        
+                                                        <?php if ($isActive): ?>
+                                                            <div class="absolute -top-7 bg-[#3E2B21] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap border border-white/10 z-20" id="chartActiveBarPill">
+                                                                <span>★</span>
+                                                                <span class="text-[#D46E15]" id="chartActiveBarValue"><?= $m['omsetFmt'] ?></span>
+                                                            </div>
+                                                        <?php endif; ?>
+
+                                                        <div id="chartBar-<?= $idx ?>" 
+                                                             class="w-full max-w-[22px] sm:max-w-[28px] <?= $isActive ? 'bg-[#D46E15] shadow-xs' : 'bg-[#E8D7CD] group-hover:bg-[#D46E15]/60' ?> rounded-t-md sm:rounded-t-lg transition-all" 
+                                                             style="height: <?= $m['h_omset'] ?>%;"></div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
                                         </div>
-                                    <?php endforeach; ?>
 
+                                        <!-- Month Labels Row (Di Bawah Garis Nol, Sejajar Bar) -->
+                                        <div class="flex items-center justify-between gap-1 sm:gap-2 px-1 pt-2 select-none">
+                                            <?php foreach ($monthsList as $idx => $m): 
+                                                $isActive = !empty($m['active']);
+                                            ?>
+                                                <span id="chartLabel-<?= $idx ?>" onclick="selectChartMonth(<?= $idx ?>)" 
+                                                    class="flex-1 text-center text-[10px] sm:text-xs cursor-pointer transition-colors <?= $isActive ? 'text-[#924C00] font-bold' : 'text-[#8E7E73] font-medium hover:text-[#251A14]' ?>">
+                                                    <?= $m['label'] ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1034,11 +1060,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (subtitle) subtitle.textContent = 'Analisis omset per bulan dalam juta rupiah (Tahun 2026)';
                 if (yAxis) {
                     yAxis.innerHTML = `
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>5 jt</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>4 jt</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>3 jt</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>2 jt</span></div>
-                        <div class="flex justify-between"><span>0</span></div>
+                        <span>5 jt</span>
+                        <span>4 jt</span>
+                        <span>3 jt</span>
+                        <span>2 jt</span>
+                        <span>0</span>
                     `;
                 }
                 monthsData.forEach((m, i) => {
@@ -1056,11 +1082,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (subtitle) subtitle.textContent = 'Analisis jumlah pesanan per bulan dalam satuan order (Tahun 2026)';
                 if (yAxis) {
                     yAxis.innerHTML = `
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>60 ord</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>45 ord</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>30 ord</span></div>
-                        <div class="border-b border-dashed border-[#E2D7C8] pb-0.5 flex justify-between"><span>15 ord</span></div>
-                        <div class="flex justify-between"><span>0</span></div>
+                        <span>60 ord</span>
+                        <span>45 ord</span>
+                        <span>30 ord</span>
+                        <span>15 ord</span>
+                        <span>0</span>
                     `;
                 }
                 monthsData.forEach((m, i) => {

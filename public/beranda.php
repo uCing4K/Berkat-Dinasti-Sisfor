@@ -872,6 +872,19 @@ if ($db_connected && $pdo) {
             scrollbar-width: thin;
             scrollbar-color: #DDD3C5 transparent;
         }
+
+        <?php if ($is_tambah_view): ?>
+        @media (min-width: 1024px) {
+            body {
+                overflow: hidden !important;
+            }
+            .pos-main-container {
+                height: calc(100vh - 4rem) !important;
+                max-height: calc(100vh - 4rem) !important;
+                overflow: hidden !important;
+            }
+        }
+        <?php endif; ?>
     </style>
 </head>
 <body class="min-h-screen bg-[#F5F1EB] flex flex-col antialiased selection:bg-[#D46E15] selection:text-white">
@@ -1065,7 +1078,7 @@ if ($db_connected && $pdo) {
             </header>
 
             <!-- MAIN CONTENT CONTAINER -->
-            <main class="flex-1 p-4 md:p-8 w-full min-w-0">
+            <main class="flex-1 p-4 md:p-6 w-full min-w-0 <?= $is_tambah_view ? 'pos-main-container flex flex-col' : 'md:p-8' ?>">
 
                 <?php if (isset($_SESSION['flash_msg'])): ?>
                     <!-- FLASH NOTIFICATION ALERT -->
@@ -1103,225 +1116,221 @@ if ($db_connected && $pdo) {
                 <!-- ============================================================== -->
                 <!-- FULL PAGE: TAMBAH PESANAN BARU (POS KASIR BAKERY)             -->
                 <!-- ============================================================== -->
-                <div class="space-y-4">
-                    <!-- Main Grid: 2 Columns (Catalog on Left, Fixed Cart on Right) -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                <div class="flex-1 flex flex-col lg:flex-row gap-5 lg:min-h-0 lg:overflow-hidden">
+                    <!-- LEFT: KATALOG PRODUK (SCROLLS INDEPENDENTLY ON LEFT) -->
+                    <div class="flex-1 lg:h-full lg:overflow-y-auto craft-scrollbar space-y-4 lg:pr-1">
                         
-                        <!-- LEFT: KATALOG PRODUK (KOTAK KATEGORI & PRODUK) -->
-                        <div class="lg:col-span-7 xl:col-span-8 space-y-4">
-                            
-                            <!-- Category Filter Boxes & Search -->
-                            <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-5 shadow-card space-y-3.5">
-                                <!-- Search Input -->
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
-                                        <i class="fas fa-search text-xs"></i>
-                                    </div>
-                                    <input type="text" id="posProductSearch" oninput="filterPosProducts()" placeholder="Cari nama roti, topping, atau kemasan..." 
-                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
+                        <!-- Category Filter Boxes & Search -->
+                        <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-5 shadow-card space-y-3.5">
+                            <!-- Search Input -->
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-search text-xs"></i>
                                 </div>
-
-                                <!-- Category Kotak-Kotak (Category Cards Grid) -->
-                                <div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <label class="block text-xs font-bold text-[#544337] uppercase tracking-wider">Kategori Produk:</label>
-                                        <span class="text-[11px] text-[#8E7E73]" id="posVisibleCount">Menampilkan semua item</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="posCategoryCards">
-                                        <?php 
-                                        $catIcons = [
-                                            'Semua' => 'fas fa-th-large',
-                                            'Roti Hajatan' => 'fas fa-box-open',
-                                            'Bolu Premium' => 'fas fa-birthday-cake',
-                                            'Roti Manis' => 'fas fa-bread-slice'
-                                        ];
-                                        foreach ($categories_for_select as $cat): 
-                                            $ico = $catIcons[$cat] ?? 'fas fa-cookie-bite';
-                                            $isActive = ($cat === 'Semua');
-                                        ?>
-                                            <button type="button" onclick="selectPosCategory('<?= htmlspecialchars($cat) ?>')" 
-                                                data-category="<?= htmlspecialchars($cat) ?>"
-                                                class="pos-category-btn p-3 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 <?= $isActive ? 'bg-[#D46E15] text-white border-[#D46E15] shadow-sm' : 'bg-white text-[#3E2B21] border-[#E2D7C8] hover:border-[#D46E15]/60 hover:bg-[#FDFBF7]' ?>">
-                                                <div class="flex items-center justify-between mb-2">
-                                                    <i class="<?= $ico ?> text-sm <?= $isActive ? 'text-white' : 'text-[#D46E15]' ?>"></i>
-                                                    <span class="cat-count-badge text-[10px] font-bold px-1.5 py-0.5 rounded <?= $isActive ? 'bg-white/20 text-white' : 'bg-[#EFE8DE] text-[#8E7E73]' ?>">
-                                                        0
-                                                    </span>
-                                                </div>
-                                                <span class="text-xs font-bold leading-tight"><?= htmlspecialchars($cat) ?></span>
-                                            </button>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
+                                <input type="text" id="posProductSearch" oninput="filterPosProducts()" placeholder="Cari nama roti, topping, atau kemasan..." 
+                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                             </div>
 
-                            <!-- Product Grid Cards (Kotak-Kotak Produk) -->
-                            <div id="posProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
-                                <!-- Populated dynamically via JavaScript -->
-                            </div>
-
-                            <!-- Empty Filter State -->
-                            <div id="posProductsEmpty" class="hidden bg-[#FDFBF7] rounded-2xl border border-dashed border-[#DDD3C5] p-8 text-center">
-                                <i class="fas fa-cookie text-3xl text-[#8E7E73]/40 mb-3"></i>
-                                <h4 class="text-sm font-bold text-[#251A14]">Tidak Ada Produk Ditemukan</h4>
-                                <p class="text-xs text-[#8E7E73] mt-1">Coba sesuaikan kata kunci pencarian atau pilih kategori lain.</p>
+                            <!-- Category Kotak-Kotak (Category Cards Grid) -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-xs font-bold text-[#544337] uppercase tracking-wider">Kategori Produk:</label>
+                                    <span class="text-[11px] text-[#8E7E73]" id="posVisibleCount">Menampilkan semua item</span>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="posCategoryCards">
+                                    <?php 
+                                    $catIcons = [
+                                        'Semua' => 'fas fa-th-large',
+                                        'Roti Hajatan' => 'fas fa-box-open',
+                                        'Bolu Premium' => 'fas fa-birthday-cake',
+                                        'Roti Manis' => 'fas fa-bread-slice'
+                                    ];
+                                    foreach ($categories_for_select as $cat): 
+                                        $ico = $catIcons[$cat] ?? 'fas fa-cookie-bite';
+                                        $isActive = ($cat === 'Semua');
+                                    ?>
+                                        <button type="button" onclick="selectPosCategory('<?= htmlspecialchars($cat) ?>')" 
+                                            data-category="<?= htmlspecialchars($cat) ?>"
+                                            class="pos-category-btn p-3 rounded-xl border text-left flex flex-col justify-between transition-all duration-150 <?= $isActive ? 'bg-[#D46E15] text-white border-[#D46E15] shadow-sm' : 'bg-white text-[#3E2B21] border-[#E2D7C8] hover:border-[#D46E15]/60 hover:bg-[#FDFBF7]' ?>">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <i class="<?= $ico ?> text-sm <?= $isActive ? 'text-white' : 'text-[#D46E15]' ?>"></i>
+                                                <span class="cat-count-badge text-[10px] font-bold px-1.5 py-0.5 rounded <?= $isActive ? 'bg-white/20 text-white' : 'bg-[#EFE8DE] text-[#8E7E73]' ?>">
+                                                    0
+                                                </span>
+                                            </div>
+                                            <span class="text-xs font-bold leading-tight"><?= htmlspecialchars($cat) ?></span>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- RIGHT: KERANJANG PESANAN (FIXED/STICKY DI KANAN, SCROLLABLE BODY) -->
-                        <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[76px] self-start w-full">
-                            <form id="posOrderForm" method="POST" action="beranda.php" class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-card flex flex-col lg:max-h-[calc(100vh-5.5rem)] overflow-hidden">
-                                <input type="hidden" name="action" value="tambah_pesanan">
-                                
-                                <!-- 1. STICKY HEADER KERANJANG -->
-                                <div class="p-3.5 sm:p-4 border-b border-[#E2D7C8] bg-white flex items-center justify-between shrink-0 shadow-2xs z-10">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] flex items-center justify-center shrink-0">
-                                            <i class="fas fa-shopping-basket text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-xs sm:text-sm font-bold text-[#251A14] leading-tight">Keranjang Pesanan</h3>
-                                            <span id="posCartItemBadge" class="text-[10px] text-[#8E7E73] font-medium">0 Produk (0 pcs)</span>
-                                        </div>
+                        <!-- Product Grid Cards (Kotak-Kotak Produk) -->
+                        <div id="posProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 pb-4">
+                            <!-- Populated dynamically via JavaScript -->
+                        </div>
+
+                        <!-- Empty Filter State -->
+                        <div id="posProductsEmpty" class="hidden bg-[#FDFBF7] rounded-2xl border border-dashed border-[#DDD3C5] p-8 text-center">
+                            <i class="fas fa-cookie text-3xl text-[#8E7E73]/40 mb-3"></i>
+                            <h4 class="text-sm font-bold text-[#251A14]">Tidak Ada Produk Ditemukan</h4>
+                            <p class="text-xs text-[#8E7E73] mt-1">Coba sesuaikan kata kunci pencarian atau pilih kategori lain.</p>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: KERANJANG PESANAN (FIXED IN PLACE / ZERO WINDOW SCROLL) -->
+                    <div class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0">
+                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border border-[#3E2B21]/20 shadow-xl overflow-hidden">
+                            <input type="hidden" name="action" value="tambah_pesanan">
+                            
+                            <!-- 1. RICH CHOCOLATE HEADER -->
+                            <div class="p-3.5 sm:p-4 bg-[#3E2B21] text-white flex items-center justify-between shrink-0 shadow-xs border-b border-[#2C1E17]">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-[#D46E15] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <i class="fas fa-shopping-basket text-sm"></i>
                                     </div>
-                                    <button type="button" onclick="clearPosCart()" id="btnClearPosCart" class="text-xs text-rose-600 hover:text-rose-700 font-semibold hidden transition-colors flex items-center gap-1">
-                                        <i class="fas fa-trash-alt text-[10px]"></i>
-                                        <span>Kosongkan</span>
-                                    </button>
+                                    <div>
+                                        <h3 class="text-xs sm:text-sm font-bold text-white leading-tight">Keranjang Pesanan</h3>
+                                        <span id="posCartItemBadge" class="text-[10px] text-[#D8C7B8] font-medium">0 Produk (0 pcs)</span>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="clearPosCart()" id="btnClearPosCart" class="text-xs text-rose-300 hover:text-white font-semibold hidden transition-colors flex items-center gap-1.5 bg-white/10 hover:bg-rose-600/80 px-2.5 py-1 rounded-lg">
+                                    <i class="fas fa-trash-alt text-[10px]"></i>
+                                    <span>Kosongkan</span>
+                                </button>
+                            </div>
+
+                            <!-- 2. SCROLLABLE MIDDLE BODY (Daftar Produk & Form Pemesan) -->
+                            <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF7F2]">
+                                <!-- Cart Items List (Starts with 0 items) -->
+                                <div class="p-3 sm:p-3.5 space-y-2 bg-white" id="posCartList">
+                                    <!-- Populated dynamically by JavaScript -->
                                 </div>
 
-                                <!-- 2. SCROLLABLE MIDDLE BODY (Daftar Produk & Form Pemesan) -->
-                                <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain">
-                                    <!-- Cart Items List (Starts with 0 items) -->
-                                    <div class="p-3 sm:p-3.5 space-y-2" id="posCartList">
-                                        <!-- Populated dynamically by JavaScript -->
+                                <!-- Hidden Input Container for POST items -->
+                                <div id="posHiddenItemsInputs"></div>
+
+                                <!-- Order Details & Customer Form (Compact) -->
+                                <div class="p-3 sm:p-3.5 space-y-3 bg-[#FAF7F2] text-xs">
+                                    <!-- Customer Section -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="font-bold text-[#251A14] uppercase tracking-wider text-[10px]">Data Pelanggan</label>
+                                            <button type="button" onclick="togglePosNewCustomer()" id="btnTogglePosNewCust" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-[11px] flex items-center gap-1 transition-colors">
+                                                <i class="fas fa-user-plus text-[10px]"></i>
+                                                <span id="lblPosToggleCust">Tambah Pelanggan Baru</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Existing Customer Select -->
+                                        <div id="posCustSelectWrapper">
+                                            <select id="pos_id_pelanggan" name="id_pelanggan" onchange="syncPosCustomerInfo()" 
+                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <?php foreach ($customers_for_select as $c): ?>
+                                                    <option value="<?= $c['id_pelanggan'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
+                                                        <?= htmlspecialchars($c['nama']) ?> (<?= htmlspecialchars($c['no_wa']) ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <!-- New Customer Form (Hidden by default) -->
+                                        <div id="posNewCustBox" class="hidden space-y-2 p-2.5 bg-white border border-[#DDD3C5] rounded-xl mt-1.5">
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Nama Lengkap</label>
+                                                <input type="text" id="pos_nama_baru" name="nama_pelanggan_baru" placeholder="Cth: Ibu Dewi Lestari" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
+                                                <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Alamat Pengiriman</label>
+                                                <textarea id="pos_alamat_baru" name="alamat_baru" rows="2" placeholder="Cth: Jl. Panglima Sudirman No. 12, Kota Batu" 
+                                                    class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Hidden Input Container for POST items -->
-                                    <div id="posHiddenItemsInputs"></div>
-
-                                    <!-- Order Details & Customer Form (Compact) -->
-                                    <div class="p-3 sm:p-3.5 space-y-3 bg-[#FAF7F2] text-xs">
-                                        <!-- Customer Section -->
+                                    <!-- Delivery Date & Time (PO Rule: Min Today) -->
+                                    <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <label class="font-bold text-[#251A14] uppercase tracking-wider text-[10px]">Data Pelanggan</label>
-                                                <button type="button" onclick="togglePosNewCustomer()" id="btnTogglePosNewCust" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-[11px] flex items-center gap-1 transition-colors">
-                                                    <i class="fas fa-user-plus text-[10px]"></i>
-                                                    <span id="lblPosToggleCust">Tambah Pelanggan Baru</span>
-                                                </button>
-                                            </div>
-
-                                            <!-- Existing Customer Select -->
-                                            <div id="posCustSelectWrapper">
-                                                <select id="pos_id_pelanggan" name="id_pelanggan" onchange="syncPosCustomerInfo()" 
-                                                    class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                    <?php foreach ($customers_for_select as $c): ?>
-                                                        <option value="<?= $c['id_pelanggan'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
-                                                            <?= htmlspecialchars($c['nama']) ?> (<?= htmlspecialchars($c['no_wa']) ?>)
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-
-                                            <!-- New Customer Form (Hidden by default) -->
-                                            <div id="posNewCustBox" class="hidden space-y-2 p-2.5 bg-white border border-[#DDD3C5] rounded-xl mt-1.5">
-                                                <div>
-                                                    <label class="block text-[10px] font-bold text-[#544337] mb-1">Nama Lengkap</label>
-                                                    <input type="text" id="pos_nama_baru" name="nama_pelanggan_baru" placeholder="Cth: Ibu Dewi Lestari" 
-                                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
-                                                    <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
-                                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-[10px] font-bold text-[#544337] mb-1">Alamat Pengiriman</label>
-                                                    <textarea id="pos_alamat_baru" name="alamat_baru" rows="2" placeholder="Cth: Jl. Panglima Sudirman No. 12, Kota Batu" 
-                                                        class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
-                                                </div>
-                                            </div>
+                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Tgl Kirim / PO</label>
+                                            <input type="date" id="pos_tgl_kirim" name="tgl_kirim" 
+                                                min="<?= date('Y-m-d') ?>" 
+                                                value="<?= htmlspecialchars($_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+1 day'))) ?>" required
+                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
-
-                                        <!-- Delivery Date & Time (PO Rule: Min Today) -->
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label class="block font-bold text-[#251A14] text-[10px] mb-1">Tgl Kirim / PO</label>
-                                                <input type="date" id="pos_tgl_kirim" name="tgl_kirim" 
-                                                    min="<?= date('Y-m-d') ?>" 
-                                                    value="<?= htmlspecialchars($_GET['tgl_kirim'] ?? date('Y-m-d', strtotime('+1 day'))) ?>" required
-                                                    class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-[#251A14] text-[10px] mb-1">Waktu Kirim</label>
-                                                <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
-                                                    class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                            </div>
-                                        </div>
-
-                                        <!-- Payment Status & Method -->
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label class="block font-bold text-[#251A14] text-[10px] mb-1">Status Bayar</label>
-                                                <select id="pos_status_bayar" name="status_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                    <option value="lunas">Lunas</option>
-                                                    <option value="dp">DP / Uang Muka</option>
-                                                    <option value="belum_bayar">Belum Bayar</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block font-bold text-[#251A14] text-[10px] mb-1">Metode Bayar</label>
-                                                <select id="pos_metode_bayar" name="metode_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                    <option value="cash">Tunai (Cash)</option>
-                                                    <option value="transfer">Transfer Bank</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- Notes -->
                                         <div>
-                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Catatan Khusus (Opsional)</label>
-                                            <input type="text" id="pos_catatan" name="catatan" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
+                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Waktu Kirim</label>
+                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- 3. STICKY FOOTER KERANJANG & SUBMIT -->
-                                <div class="p-3.5 sm:p-4 bg-white border-t border-[#E2D7C8] space-y-2.5 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] z-10">
-                                    <div class="space-y-1 text-xs">
-                                        <div class="flex justify-between text-[#8E7E73]">
-                                            <span>Subtotal:</span>
-                                            <span id="posSummarySubtotal" class="font-mono font-semibold text-[#251A14]">Rp 0</span>
+                                    <!-- Payment Status & Method -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Status Bayar</label>
+                                            <select id="pos_status_bayar" name="status_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <option value="lunas">Lunas</option>
+                                                <option value="dp">DP / Uang Muka</option>
+                                                <option value="belum_bayar">Belum Bayar</option>
+                                            </select>
                                         </div>
-                                        <div class="flex justify-between text-[#8E7E73] text-[11px]">
-                                            <span>Ongkir (Malang & Batu):</span>
-                                            <span class="font-semibold text-emerald-600">Rp 0 (Gratis)</span>
-                                        </div>
-                                        <div class="flex justify-between items-baseline text-xs font-bold pt-1.5 border-t border-[#E2D7C8]">
-                                            <span class="text-[#251A14]">Grand Total:</span>
-                                            <span id="posSummaryGrandTotal" class="text-base text-[#D46E15] font-mono font-bold">Rp 0</span>
+                                        <div>
+                                            <label class="block font-bold text-[#251A14] text-[10px] mb-1">Metode Bayar</label>
+                                            <select id="pos_metode_bayar" name="metode_bayar" class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <option value="cash">Tunai (Cash)</option>
+                                                <option value="transfer">Transfer Bank</option>
+                                            </select>
                                         </div>
                                     </div>
 
-                                    <!-- MOQ Alert Box -->
-                                    <div id="posMoqWarning" class="hidden p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] leading-snug">
-                                        <div class="flex items-start gap-1.5">
-                                            <i class="fas fa-exclamation-circle text-rose-600 mt-0.5 shrink-0"></i>
-                                            <span id="posMoqWarningText">Minimal order belum tercapai untuk beberapa produk.</span>
-                                        </div>
+                                    <!-- Notes -->
+                                    <div>
+                                        <label class="block font-bold text-[#251A14] text-[10px] mb-1">Catatan Khusus (Opsional)</label>
+                                        <input type="text" id="pos_catatan" name="catatan" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
+                                            class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                     </div>
-
-                                    <!-- Submit Button: DISABLED IF NO PRODUCTS -->
-                                    <button type="submit" id="btnPosSubmitOrder" disabled 
-                                        class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]">
-                                        <i class="fas fa-check"></i>
-                                        <span id="btnPosSubmitText">Pilih Produk Terlebih Dahulu</span>
-                                    </button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+
+                            <!-- 3. RICH CHOCOLATE FOOTER -->
+                            <div class="p-3.5 sm:p-4 bg-[#3E2B21] border-t border-[#2C1E17] space-y-3 shrink-0 shadow-lg text-white">
+                                <div class="space-y-1.5 text-xs">
+                                    <div class="flex justify-between text-[#D8C7B8]">
+                                        <span>Subtotal:</span>
+                                        <span id="posSummarySubtotal" class="font-mono font-semibold text-white">Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between text-[#D8C7B8] text-[11px]">
+                                        <span>Ongkir (Malang & Batu):</span>
+                                        <span class="font-semibold text-emerald-400">Rp 0 (Gratis)</span>
+                                    </div>
+                                    <div class="flex justify-between items-baseline text-xs font-bold pt-2 border-t border-white/15">
+                                        <span class="text-white">Grand Total:</span>
+                                        <span id="posSummaryGrandTotal" class="text-lg text-[#FBA94B] font-mono font-extrabold tracking-tight">Rp 0</span>
+                                    </div>
+                                </div>
+
+                                <!-- MOQ Alert Box -->
+                                <div id="posMoqWarning" class="hidden p-2 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-[11px] leading-snug">
+                                    <div class="flex items-start gap-1.5">
+                                        <i class="fas fa-exclamation-circle text-rose-400 mt-0.5 shrink-0"></i>
+                                        <span id="posMoqWarningText">Minimal order belum tercapai untuk beberapa produk.</span>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button: DISABLED IF NO PRODUCTS -->
+                                <button type="submit" id="btnPosSubmitOrder" disabled 
+                                    class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40">
+                                    <i class="fas fa-check"></i>
+                                    <span id="btnPosSubmitText">Pilih Produk Terlebih Dahulu</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <?php else: ?>
@@ -3302,7 +3311,7 @@ if ($db_connected && $pdo) {
                 `;
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]';
+                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40';
                 }
                 if (submitText) submitText.textContent = 'Pilih Produk Terlebih Dahulu';
                 if (moqWarning) moqWarning.classList.add('hidden');
@@ -3355,14 +3364,14 @@ if ($db_connected && $pdo) {
                 }
                 if (submitBtn) {
                     submitBtn.disabled = true;
-                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#C9BFB5]';
+                    submitBtn.className = 'w-full bg-[#D46E15] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-[#544337] disabled:text-white/40';
                 }
                 if (submitText) submitText.textContent = 'Penuhi Batas Minimal Order (MOQ)';
             } else {
                 if (moqWarning) moqWarning.classList.add('hidden');
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.className = 'w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all cursor-pointer';
+                    submitBtn.className = 'w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-bold text-xs sm:text-sm py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-button-orange active:scale-95 transition-all cursor-pointer';
                 }
                 if (submitText) submitText.textContent = `Simpan Pesanan • Rp ${formatRupiahNumber(subtotal)}`;
             }

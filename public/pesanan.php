@@ -426,8 +426,10 @@ if ($db_connected && $pdo) {
 
 $is_tambah_view = (isset($_GET['view']) && $_GET['view'] === 'tambah_pesanan') || (isset($_GET['action']) && $_GET['action'] === 'tambah_pesanan');
 
-// Data Pesanan Kanban & Kalender
-$active_tab = $_GET['tab'] ?? 'kanban';
+// Data Pesanan: Kanban, Tabel, & Kalender
+$req_tab = strtolower(trim($_GET['tab'] ?? 'kanban'));
+if ($req_tab === 'table') $req_tab = 'tabel';
+$active_tab = in_array($req_tab, ['kanban', 'tabel', 'kalender']) ? $req_tab : 'kanban';
 
 // Master Dataset Pesanan
 $master_orders = [
@@ -879,7 +881,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <span class="text-[#D8C7B8]">/</span>
                             <a href="pesanan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pesanan</a>
                             <span class="text-[#D8C7B8]">/</span>
-                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb"><?= $is_tambah_view ? 'Tambah Pesanan Baru' : 'Manajemen' ?></span>
+                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb"><?= $is_tambah_view ? 'Tambah Pesanan Baru' : ($active_tab === 'tabel' ? 'Tabel' : ($active_tab === 'kalender' ? 'Kalendar' : 'Manajemen')) ?></span>
                         </div>
                         <!-- Section Heading -->
                         <div class="flex items-center gap-2 mt-0.5">
@@ -889,7 +891,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </a>
                             <?php endif; ?>
                             <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight" id="headerTitle">
-                                <?= $is_tambah_view ? 'Tambah Pesanan Baru' : 'Manage Pesanan' ?>
+                                <?= $is_tambah_view ? 'Tambah Pesanan Baru' : ($active_tab === 'tabel' ? 'Daftar Pesanan' : ($active_tab === 'kalender' ? 'Pengiriman' : 'Manage Pesanan')) ?>
                             </h1>
                         </div>
                     </div>
@@ -1264,7 +1266,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </span>
                         </div>
                         <p class="text-[#8E7E73] text-sm mt-1" id="pageSubtitle">
-                            Kelola status dan alur pengiriman pesanan roti secara real-time
+                            <?= $active_tab === 'tabel' ? 'Tabel data pesanan lengkap dengan pencarian, filter status, ekspor CSV/Excel, dan aksi cepat.' : ($active_tab === 'kalender' ? 'Pantau penjadwalan produksi dapur, rute kurir, dan pengiriman harian.' : 'Kelola status dan alur pengiriman pesanan roti secara real-time') ?>
                         </p>
                     </div>
 
@@ -1305,16 +1307,23 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
                 </div>
 
-                <!-- TAB SWITCHER BAR (KANBAN BOARD VS KALENDER PENGIRIMAN) -->
+                <!-- TAB SWITCHER BAR (KANBAN BOARD VS TABEL PESANAN VS KALENDER PENGIRIMAN) -->
                 <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
                     <!-- Tab 1: Kanban Board -->
                     <button onclick="switchTab('kanban')" id="tabBtnKanban" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
                         <i class="fas fa-columns text-xs"></i>
                         <span>Kanban Board</span>
                     </button>
 
-                    <!-- Tab 2: Kalender Pengiriman -->
+                    <!-- Tab 2: Tabel Pesanan -->
+                    <button onclick="switchTab('tabel')" id="tabBtnTabel" 
+                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'tabel' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        <i class="fas fa-table-list text-xs"></i>
+                        <span>Tabel Pesanan</span>
+                    </button>
+
+                    <!-- Tab 3: Kalender Pengiriman -->
                     <button onclick="switchTab('kalender')" id="tabBtnKalender" 
                         class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
                         <i class="far fa-calendar-alt text-xs"></i>
@@ -1325,7 +1334,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- ============================================================== -->
                 <!-- TAB CONTENT 1: KANBAN BOARD (4 SWIMLANES + CATATAN DAPUR)       -->
                 <!-- ============================================================== -->
-                <div id="kanbanView" class="<?= $active_tab === 'kalender' ? 'hidden' : '' ?>">
+                <div id="kanbanView" class="<?= $active_tab === 'kanban' ? '' : 'hidden' ?>">
                     
                     <!-- Action Bar: Unduh Rekap & Tambah Pesanan -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -1593,9 +1602,296 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- TAB CONTENT 2: KALENDER PENGIRIMAN                             -->
+                <!-- TAB CONTENT 2: TABEL PESANAN (DATA TABLE MODEL RODEO POS)       -->
                 <!-- ============================================================== -->
-                <div id="calendarView" class="<?= $active_tab !== 'kalender' ? 'hidden' : '' ?>">
+                <div id="tableView" class="<?= $active_tab === 'tabel' ? '' : 'hidden' ?>">
+                    
+                    <!-- Search & Filter Card -->
+                    <div class="bg-white rounded-2xl border border-[#E2D7C8] p-4 mb-5 shadow-xs">
+                        <div class="flex flex-col lg:flex-row lg:items-center gap-3">
+                            <!-- Input Pencarian Cepat -->
+                            <div class="relative flex-1">
+                                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E7E73] text-xs"></i>
+                                <input type="text" id="tableSearchInput" oninput="filterTableOrders()" 
+                                    placeholder="Cari no. invoice, nama pelanggan, no telepon, atau alamat..." 
+                                    class="w-full bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-[#251A14] placeholder-[#A89C92] focus:outline-none transition-colors">
+                            </div>
+
+                            <!-- Filter Controls -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                <!-- Filter Status Dapur -->
+                                <select id="tableStatusFilter" onchange="filterTableOrders()" 
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
+                                    <option value="">Semua Status Dapur</option>
+                                    <option value="menunggu">Menunggu Konfirmasi</option>
+                                    <option value="proses">Proses Dapur</option>
+                                    <option value="kirim">Siap Kirim</option>
+                                    <option value="selesai">Selesai</option>
+                                </select>
+
+                                <!-- Filter Pembayaran -->
+                                <select id="tablePayFilter" onchange="filterTableOrders()" 
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
+                                    <option value="">Semua Pembayaran</option>
+                                    <option value="lunas">Lunas</option>
+                                    <option value="hutang">Hutang / DP</option>
+                                    <option value="belum">Belum Bayar</option>
+                                </select>
+
+                                <!-- Filter Pengiriman -->
+                                <select id="tableCourierFilter" onchange="filterTableOrders()" 
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
+                                    <option value="">Semua Pengiriman</option>
+                                    <option value="kurir">Kurir Toko</option>
+                                    <option value="ambil">Ambil Sendiri</option>
+                                </select>
+
+                                <!-- Filter Tanggal Kirim -->
+                                <input type="date" id="tableDateFilter" onchange="filterTableOrders()" 
+                                    title="Filter Tanggal Kirim"
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2.5 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
+
+                                <!-- Tombol Reset -->
+                                <button type="button" onclick="resetTableFilters()" 
+                                    class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] hover:text-[#251A14] text-xs font-semibold px-3 py-2 rounded-xl border border-[#DDD3C5] flex items-center gap-1.5 transition-colors" title="Reset Semua Filter">
+                                    <i class="fas fa-undo-alt text-[10px]"></i>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Main Card -->
+                    <div class="bg-white rounded-2xl border border-[#E2D7C8] shadow-xs overflow-hidden mb-8">
+                        <!-- Card Header (Hasil Pencarian & Export Buttons) -->
+                        <div class="px-5 py-3.5 border-b border-[#E2D7C8] bg-[#FDFBF7] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-[#D46E15]/10 text-[#D46E15] flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list text-sm"></i>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-sm font-bold text-[#251A14]">Hasil Pencarian</h3>
+                                    <span id="tableOrdersCount" class="bg-[#D46E15] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                                        <?= count($master_orders) ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Export Action Buttons -->
+                            <div class="flex items-center gap-2 self-end sm:self-auto">
+                                <button type="button" onclick="exportTableToCSV()" 
+                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format CSV">
+                                    <i class="fas fa-file-csv text-base"></i>
+                                    <span>Export CSV</span>
+                                </button>
+                                <button type="button" onclick="exportTableToExcel()" 
+                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format Excel (.xls)">
+                                    <i class="fas fa-file-excel text-base"></i>
+                                    <span>Export Excel</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sticky / Floating Bulk Action Bar -->
+                        <div id="bulkActionBar" class="hidden bg-[#251A14] text-white px-5 py-2.5 flex items-center justify-between text-xs transition-all">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-[#D46E15] animate-pulse"></span>
+                                <span id="selectedCountText" class="font-bold text-[#FF9B45]">0 pesanan dipilih</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="bulkPrintReceipts()" class="bg-[#D46E15] hover:bg-[#B85207] text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-colors">
+                                    <i class="fas fa-print text-xs"></i> <span>Cetak Struk Terpilih</span>
+                                </button>
+                                <button type="button" onclick="bulkExportSelected()" class="bg-[#107C41] hover:bg-[#0C6133] text-white px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-colors">
+                                    <i class="fas fa-file-download text-xs"></i> <span>Export Terpilih</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Table Responsive -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse" id="ordersDataTable">
+                                <thead>
+                                    <tr class="border-b border-[#E2D7C8] bg-[#F7F4EE] text-[11px] font-semibold text-[#8E7E73] uppercase tracking-wider">
+                                        <th class="py-3.5 px-4 w-10 text-center">
+                                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" 
+                                                class="w-4 h-4 rounded text-[#D46E15] focus:ring-[#D46E15] border-[#DDD3C5] cursor-pointer" title="Pilih Semua">
+                                        </th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337]">ORDER ID</th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337]">CUSTOMER</th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337] text-right">TOTAL</th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337] text-center">TANGGAL</th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337] text-center">STATUS</th>
+                                        <th class="py-3.5 px-4 text-xs font-bold text-[#544337] text-center">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#E2D7C8]/70 text-xs bg-white">
+                                    <?php foreach ($master_orders as $ord): 
+                                        $idParts = explode('-', $ord['id'], 2);
+                                        $idPrefix = $idParts[0];
+                                        $idSuffix = isset($idParts[1]) ? ('-' . $idParts[1]) : '';
+                                        
+                                        $courierText = $ord['courier_info'] ?? 'Kurir Toko';
+                                        $isAmbil = str_contains(strtolower($courierText), 'ambil') || str_contains(strtolower($ord['destination'] ?? ''), 'ambil');
+                                        $serviceTag = $isAmbil ? 'AMBIL SENDIRI' : 'KURIR TOKO';
+                                        $serviceTagClass = $isAmbil 
+                                            ? 'bg-amber-50 text-amber-800 border-amber-200/70' 
+                                            : 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
+
+                                        $statusKey = strtolower($ord['current_status'] ?? $ord['default_status'] ?? 'menunggu');
+                                        $statusTagInfo = match($statusKey) {
+                                            'proses' => ['label' => 'PROSES DAPUR', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                            'kirim' => ['label' => 'SIAP KIRIM', 'class' => 'bg-sky-50 text-sky-800 border-sky-200/70'],
+                                            'selesai' => ['label' => 'SELESAI', 'class' => 'bg-emerald-50 text-emerald-800 border-emerald-200/70'],
+                                            default => ['label' => 'MENUNGGU', 'class' => 'bg-yellow-50 text-yellow-800 border-yellow-200/70']
+                                        };
+
+                                        $payText = strtolower($ord['status_bayar'] ?? 'belum');
+                                        $payTagInfo = match(true) {
+                                            str_contains($payText, 'lunas') => ['label' => 'LUNAS', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70'],
+                                            str_contains($payText, 'hutang') || str_contains($payText, 'dp') => ['label' => 'HUTANG', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                            default => ['label' => 'BELUM', 'class' => 'bg-rose-50 text-rose-700 border-rose-200/70']
+                                        };
+                                        $payFilterKey = str_contains($payText, 'lunas') ? 'lunas' : (str_contains($payText, 'hutang') || str_contains($payText, 'dp') ? 'hutang' : 'belum');
+                                        $courierFilterKey = $isAmbil ? 'ambil' : 'kurir';
+                                    ?>
+                                    <tr class="order-table-row hover:bg-[#FDFBF7] transition-colors border-b border-[#E2D7C8]/70"
+                                        data-id="<?= htmlspecialchars($ord['id']) ?>"
+                                        data-customer="<?= htmlspecialchars(strtolower($ord['customer'])) ?>"
+                                        data-phone="<?= htmlspecialchars(strtolower($ord['phone'])) ?>"
+                                        data-items="<?= htmlspecialchars(strtolower($ord['items'])) ?>"
+                                        data-destination="<?= htmlspecialchars(strtolower($ord['destination'])) ?>"
+                                        data-status="<?= $statusKey ?>"
+                                        data-pay="<?= $payFilterKey ?>"
+                                        data-courier="<?= $courierFilterKey ?>"
+                                        data-date="<?= $ord['date'] ?>">
+                                        
+                                        <!-- Checkbox -->
+                                        <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                            <input type="checkbox" class="order-table-checkbox w-4 h-4 rounded text-[#D46E15] focus:ring-[#D46E15] border-[#DDD3C5] cursor-pointer" 
+                                                data-id="<?= htmlspecialchars($ord['id']) ?>" onchange="updateSelectedCount()">
+                                        </td>
+
+                                        <!-- Order ID -->
+                                        <td class="py-3 px-4 cursor-pointer" onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                            <div class="flex flex-col group">
+                                                <span class="font-bold text-[#D46E15] font-mono text-xs group-hover:underline"><?= htmlspecialchars($idPrefix) ?></span>
+                                                <span class="font-mono text-[#544337] text-xs leading-none"><?= htmlspecialchars($idSuffix) ?></span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Customer -->
+                                        <td class="py-3 px-4 cursor-pointer" onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                            <div class="space-y-0.5">
+                                                <div class="font-semibold text-xs text-[#251A14] flex items-center gap-1.5">
+                                                    <i class="fas fa-user text-[#8E7E73] text-[10px]"></i>
+                                                    <span><?= htmlspecialchars($ord['customer']) ?></span>
+                                                </div>
+                                                <div class="text-[11px] text-[#8E7E73] flex items-center gap-1.5 font-mono">
+                                                    <i class="fas fa-phone text-[#8E7E73] text-[10px]"></i>
+                                                    <span><?= htmlspecialchars($ord['phone']) ?></span>
+                                                </div>
+                                                <?php if (!empty($ord['destination'])): ?>
+                                                <div class="text-[10px] text-[#8E7E73] truncate max-w-[220px]" title="<?= htmlspecialchars($ord['destination']) ?>">
+                                                    <i class="fas fa-map-marker-alt text-amber-600 text-[10px]"></i> <?= htmlspecialchars($ord['destination']) ?>
+                                                </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+
+                                        <!-- Total -->
+                                        <td class="py-3 px-4 text-right cursor-pointer" onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                            <span class="font-bold font-mono text-[#D46E15] text-xs sm:text-sm tabular-nums block">
+                                                Rp <?= number_format($ord['total'], 0, ',', '.') ?>
+                                            </span>
+                                            <span class="text-[10px] text-[#8E7E73] truncate max-w-[160px] block" title="<?= htmlspecialchars($ord['items']) ?>">
+                                                <?= htmlspecialchars($ord['items']) ?>
+                                            </span>
+                                        </td>
+
+                                        <!-- Tanggal -->
+                                        <td class="py-3 px-4 text-center font-mono cursor-pointer" onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                            <span class="font-semibold text-xs text-[#251A14] block">
+                                                <?= date('d/m/y', strtotime($ord['date'])) ?>
+                                            </span>
+                                            <span class="text-[11px] text-[#8E7E73] flex items-center justify-center gap-1">
+                                                <i class="far fa-clock text-[10px]"></i>
+                                                <?= htmlspecialchars($ord['time']) ?>
+                                            </span>
+                                        </td>
+
+                                        <!-- Status (Stacked 3 Badges) -->
+                                        <td class="py-3 px-4 text-center">
+                                            <div class="flex flex-col gap-1 items-center justify-center">
+                                                <span class="text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase border <?= $serviceTagClass ?>">
+                                                    <?= $serviceTag ?>
+                                                </span>
+                                                <span class="text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase border <?= $statusTagInfo['class'] ?>" id="table-status-badge-<?= htmlspecialchars($ord['id']) ?>">
+                                                    <?= $statusTagInfo['label'] ?>
+                                                </span>
+                                                <span class="text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase border <?= $payTagInfo['class'] ?>">
+                                                    <?= $payTagInfo['label'] ?>
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Aksi -->
+                                        <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                            <div class="flex items-center justify-center gap-1.5">
+                                                <!-- Cetak Struk Thermal (Purple Tag Icon matching Rodeo Laundry) -->
+                                                <button type="button" onclick="handlePrintReceipt('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                                    class="w-8 h-8 rounded-lg bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                                    title="Cetak Struk Thermal Bluetooth">
+                                                    <i class="fas fa-tag text-xs"></i>
+                                                </button>
+
+                                                <!-- Ubah Status Cepat (Orange Check Icon matching Rodeo Laundry) -->
+                                                <button type="button" id="table-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
+                                                    onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                                    class="w-8 h-8 rounded-lg <?= $statusKey === 'selesai' ? 'bg-[#107C41] text-white opacity-80 cursor-default' : 'bg-[#D46E15] hover:bg-[#B85207] text-white active:scale-90' ?> flex items-center justify-center shadow-xs transition-all" 
+                                                    title="<?= $statusKey === 'selesai' ? 'Pesanan Selesai' : 'Lanjutkan Alur Kerja Dapur' ?>"
+                                                    <?= $statusKey === 'selesai' ? 'disabled' : '' ?>>
+                                                    <i class="fas <?= $statusKey === 'selesai' ? 'fa-check-double' : 'fa-check' ?> text-xs"></i>
+                                                </button>
+
+                                                <!-- Buka Detail Modal (Eye Icon) -->
+                                                <button type="button" onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')" 
+                                                    class="w-8 h-8 rounded-lg bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] border border-[#DDD3C5] flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                                    title="Buka Rincian Pesanan">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="tableEmptyState" class="hidden py-12 px-4 text-center">
+                            <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#8E7E73] flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-search text-lg"></i>
+                            </div>
+                            <p class="font-bold text-sm text-[#251A14]">Tidak Ada Pesanan Ditemukan</p>
+                            <p class="text-xs text-[#8E7E73] mt-1">Coba sesuaikan kata kunci pencarian atau ubah filter status.</p>
+                            <button type="button" onclick="resetTableFilters()" class="mt-3 bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] px-4 py-2 rounded-xl text-xs font-semibold">
+                                Reset Filter
+                            </button>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="px-5 py-3 border-t border-[#E2D7C8] bg-[#FDFBF7] flex items-center justify-between text-xs text-[#8E7E73]">
+                            <span id="tableShowingText">Menampilkan <?= count($master_orders) ?> dari <?= count($master_orders) ?> pesanan</span>
+                            <span class="text-[11px] font-mono text-[#A89C92]">Sistem POS Berkat Dinasti</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- TAB CONTENT 3: KALENDER PENGIRIMAN                             -->
+                <!-- ============================================================== -->
+                <div id="calendarView" class="<?= $active_tab === 'kalender' ? '' : 'hidden' ?>">
                     
                     <!-- Controls Row: Month Selector & Filters -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -2376,37 +2672,384 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             user.classList.toggle('hidden');
         }
 
-        // Switch View Tabs (Kanban vs Kalender)
+        // Switch View Tabs (Kanban vs Tabel vs Kalender)
         function switchTab(tab) {
             const kanbanView = document.getElementById('kanbanView');
+            const tableView = document.getElementById('tableView');
             const calendarView = document.getElementById('calendarView');
             const tabBtnKanban = document.getElementById('tabBtnKanban');
+            const tabBtnTabel = document.getElementById('tabBtnTabel');
             const tabBtnKalender = document.getElementById('tabBtnKalender');
             const headerTitle = document.getElementById('headerTitle');
             const headerBreadcrumb = document.getElementById('headerBreadcrumb');
             const pageSubtitle = document.getElementById('pageSubtitle');
 
-            if (tab === 'kalender') {
-                kanbanView.classList.add('hidden');
-                calendarView.classList.remove('hidden');
+            const activeClass = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm font-semibold';
+            const inactiveClass = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
 
-                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm';
-                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
+            if (tab === 'tabel') {
+                if (kanbanView) kanbanView.classList.add('hidden');
+                if (calendarView) calendarView.classList.add('hidden');
+                if (tableView) tableView.classList.remove('hidden');
 
-                headerTitle.textContent = 'Pengiriman';
-                headerBreadcrumb.textContent = 'Kalendar';
-                pageSubtitle.textContent = 'Pantau penjadwalan produksi dapur, rute kurir, dan pengiriman harian.';
+                if (tabBtnTabel) tabBtnTabel.className = activeClass;
+                if (tabBtnKanban) tabBtnKanban.className = inactiveClass;
+                if (tabBtnKalender) tabBtnKalender.className = inactiveClass;
+
+                if (headerTitle) headerTitle.textContent = 'Daftar Pesanan';
+                if (headerBreadcrumb) headerBreadcrumb.textContent = 'Tabel';
+                if (pageSubtitle) pageSubtitle.textContent = 'Tabel data pesanan lengkap dengan pencarian, filter status, ekspor CSV/Excel, dan aksi cepat.';
+
+                try {
+                    window.history.replaceState(null, '', '?tab=tabel');
+                } catch(e) {}
+
+                if (typeof filterTableOrders === 'function') filterTableOrders();
+            } else if (tab === 'kalender') {
+                if (kanbanView) kanbanView.classList.add('hidden');
+                if (tableView) tableView.classList.add('hidden');
+                if (calendarView) calendarView.classList.remove('hidden');
+
+                if (tabBtnKalender) tabBtnKalender.className = activeClass;
+                if (tabBtnKanban) tabBtnKanban.className = inactiveClass;
+                if (tabBtnTabel) tabBtnTabel.className = inactiveClass;
+
+                if (headerTitle) headerTitle.textContent = 'Pengiriman';
+                if (headerBreadcrumb) headerBreadcrumb.textContent = 'Kalendar';
+                if (pageSubtitle) pageSubtitle.textContent = 'Pantau penjadwalan produksi dapur, rute kurir, dan pengiriman harian.';
+
+                try {
+                    window.history.replaceState(null, '', '?tab=kalender');
+                } catch(e) {}
+
                 renderInteractiveCalendar();
             } else {
-                calendarView.classList.add('hidden');
-                kanbanView.classList.remove('hidden');
+                if (calendarView) calendarView.classList.add('hidden');
+                if (tableView) tableView.classList.add('hidden');
+                if (kanbanView) kanbanView.classList.remove('hidden');
 
-                tabBtnKanban.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm';
-                tabBtnKalender.className = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
+                if (tabBtnKanban) tabBtnKanban.className = activeClass;
+                if (tabBtnTabel) tabBtnTabel.className = inactiveClass;
+                if (tabBtnKalender) tabBtnKalender.className = inactiveClass;
 
-                headerTitle.textContent = 'Manage Pesanan';
-                headerBreadcrumb.textContent = 'Manajemen';
-                pageSubtitle.textContent = 'Kelola status dan alur pengiriman pesanan roti secara real-time';
+                if (headerTitle) headerTitle.textContent = 'Manage Pesanan';
+                if (headerBreadcrumb) headerBreadcrumb.textContent = 'Manajemen';
+                if (pageSubtitle) pageSubtitle.textContent = 'Kelola status dan alur pengiriman pesanan roti secara real-time';
+
+                try {
+                    window.history.replaceState(null, '', '?tab=kanban');
+                } catch(e) {}
+            }
+        }
+
+        // =========================================================================
+        // DATA TABLE CONTROLLER (SEARCH, FILTER, BULK ACTIONS & EXPORT)
+        // =========================================================================
+        function filterTableOrders() {
+            const q = (document.getElementById('tableSearchInput')?.value || '').toLowerCase().trim();
+            const statusF = document.getElementById('tableStatusFilter')?.value || '';
+            const payF = document.getElementById('tablePayFilter')?.value || '';
+            const courierF = document.getElementById('tableCourierFilter')?.value || '';
+            const dateF = document.getElementById('tableDateFilter')?.value || '';
+
+            const rows = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row');
+            let visibleCount = 0;
+
+            rows.forEach(tr => {
+                const id = tr.getAttribute('data-id')?.toLowerCase() || '';
+                const customer = tr.getAttribute('data-customer') || '';
+                const phone = tr.getAttribute('data-phone') || '';
+                const items = tr.getAttribute('data-items') || '';
+                const dest = tr.getAttribute('data-destination') || '';
+                const status = tr.getAttribute('data-status') || '';
+                const pay = tr.getAttribute('data-pay') || '';
+                const courier = tr.getAttribute('data-courier') || '';
+                const date = tr.getAttribute('data-date') || '';
+
+                const matchQ = !q || id.includes(q) || customer.includes(q) || phone.includes(q) || items.includes(q) || dest.includes(q);
+                const matchStatus = !statusF || status === statusF;
+                const matchPay = !payF || pay === payF;
+                const matchCourier = !courierF || courier === courierF;
+                const matchDate = !dateF || date === dateF;
+
+                if (matchQ && matchStatus && matchPay && matchCourier && matchDate) {
+                    tr.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    tr.classList.add('hidden');
+                }
+            });
+
+            const countBadge = document.getElementById('tableOrdersCount');
+            if (countBadge) countBadge.textContent = visibleCount;
+
+            const showingText = document.getElementById('tableShowingText');
+            if (showingText) showingText.textContent = `Menampilkan ${visibleCount} dari ${rows.length} pesanan`;
+
+            const emptyState = document.getElementById('tableEmptyState');
+            if (emptyState) {
+                if (visibleCount === 0) emptyState.classList.remove('hidden');
+                else emptyState.classList.add('hidden');
+            }
+
+            updateSelectedCount();
+        }
+
+        function resetTableFilters() {
+            if (document.getElementById('tableSearchInput')) document.getElementById('tableSearchInput').value = '';
+            if (document.getElementById('tableStatusFilter')) document.getElementById('tableStatusFilter').value = '';
+            if (document.getElementById('tablePayFilter')) document.getElementById('tablePayFilter').value = '';
+            if (document.getElementById('tableCourierFilter')) document.getElementById('tableCourierFilter').value = '';
+            if (document.getElementById('tableDateFilter')) document.getElementById('tableDateFilter').value = '';
+            filterTableOrders();
+        }
+
+        function toggleSelectAll(masterCb) {
+            const isChecked = masterCb.checked;
+            const checkboxes = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden) .order-table-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+            });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden) .order-table-checkbox:checked');
+            const bar = document.getElementById('bulkActionBar');
+            const text = document.getElementById('selectedCountText');
+            const master = document.getElementById('selectAllCheckbox');
+
+            if (bar && text) {
+                if (checked.length > 0) {
+                    bar.classList.remove('hidden');
+                    text.textContent = `${checked.length} pesanan dipilih`;
+                } else {
+                    bar.classList.add('hidden');
+                }
+            }
+
+            const allVisible = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden) .order-table-checkbox');
+            if (master) {
+                master.checked = allVisible.length > 0 && checked.length === allVisible.length;
+            }
+        }
+
+        function exportTableToCSV() {
+            let rows = [];
+            rows.push(['No Invoice', 'Nama Pelanggan', 'No WhatsApp', 'Rincian Produk', 'Tujuan', 'Tgl Kirim', 'Waktu Kirim', 'Total (Rp)', 'Status Dapur', 'Status Bayar']);
+            
+            const visibleRows = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden)');
+            visibleRows.forEach(tr => {
+                const id = tr.getAttribute('data-id') || '';
+                const ord = ordersData.find(o => o.id === id);
+                if (ord) {
+                    rows.push([
+                        ord.id,
+                        ord.customer,
+                        ord.phone,
+                        ord.items,
+                        ord.destination,
+                        ord.date,
+                        ord.time,
+                        ord.total,
+                        (ord.current_status || ord.default_status || 'menunggu').toUpperCase(),
+                        ord.status_bayar
+                    ]);
+                }
+            });
+
+            let csvContent = "\uFEFF" + rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Daftar_Pesanan_Berkat_Dinasti_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Ekspor CSV berhasil diunduh!');
+        }
+
+        function exportTableToExcel() {
+            let html = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"><title>Daftar Pesanan Berkat Dinasti</title></head>
+            <body>
+            <table border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:12px;">
+                <tr style="background:#D46E15;color:#ffffff;font-weight:bold;text-align:center;">
+                    <th>No Invoice</th>
+                    <th>Nama Pelanggan</th>
+                    <th>No WhatsApp</th>
+                    <th>Rincian Produk</th>
+                    <th>Tujuan</th>
+                    <th>Tgl Kirim</th>
+                    <th>Waktu Kirim</th>
+                    <th>Total (Rp)</th>
+                    <th>Status Dapur</th>
+                    <th>Status Bayar</th>
+                </tr>`;
+
+            const visibleRows = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden)');
+            visibleRows.forEach(tr => {
+                const id = tr.getAttribute('data-id') || '';
+                const ord = ordersData.find(o => o.id === id);
+                if (ord) {
+                    html += `<tr>
+                        <td style="mso-number-format:'\\@';font-weight:bold;">${ord.id}</td>
+                        <td>${escapeHtml(ord.customer)}</td>
+                        <td style="mso-number-format:'\\@';">${escapeHtml(ord.phone)}</td>
+                        <td>${escapeHtml(ord.items)}</td>
+                        <td>${escapeHtml(ord.destination)}</td>
+                        <td>${ord.date}</td>
+                        <td>${escapeHtml(ord.time)}</td>
+                        <td style="text-align:right;">${ord.total}</td>
+                        <td style="text-align:center;">${(ord.current_status || ord.default_status || 'menunggu').toUpperCase()}</td>
+                        <td style="text-align:center;">${escapeHtml(ord.status_bayar)}</td>
+                    </tr>`;
+                }
+            });
+
+            html += `</table></body></html>`;
+
+            let blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Daftar_Pesanan_Berkat_Dinasti_${new Date().toISOString().slice(0, 10)}.xls`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Ekspor Excel berhasil diunduh!');
+        }
+
+        async function bulkPrintReceipts() {
+            const checked = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden) .order-table-checkbox:checked');
+            if (checked.length === 0) return;
+
+            if (!confirm(`Cetak struk thermal untuk ${checked.length} pesanan terpilih secara bertahap?`)) return;
+
+            showToast(`Memulai pencetakan ${checked.length} struk thermal...`);
+            let countSuccess = 0;
+            for (let i = 0; i < checked.length; i++) {
+                const orderId = checked[i].getAttribute('data-id');
+                try {
+                    await window.printBridge.printOrder(orderId, '58');
+                    countSuccess++;
+                    await new Promise(r => setTimeout(r, 600));
+                } catch(e) {
+                    console.error(`Gagal mencetak #${orderId}:`, e);
+                    alert(`Pencetakan terhenti pada order #${orderId}:\n${e.message}`);
+                    break;
+                }
+            }
+            if (countSuccess > 0) {
+                showToast(`Pencetakan selesai! ${countSuccess} struk berhasil dikirim.`);
+            }
+        }
+
+        function bulkExportSelected() {
+            const checked = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row:not(.hidden) .order-table-checkbox:checked');
+            if (checked.length === 0) {
+                alert('Pilih minimal satu pesanan untuk diekspor.');
+                return;
+            }
+
+            let rows = [];
+            rows.push(['No Invoice', 'Nama Pelanggan', 'No WhatsApp', 'Rincian Produk', 'Tujuan', 'Tgl Kirim', 'Waktu Kirim', 'Total (Rp)', 'Status Dapur', 'Status Bayar']);
+            
+            checked.forEach(cb => {
+                const id = cb.getAttribute('data-id');
+                const ord = ordersData.find(o => o.id === id);
+                if (ord) {
+                    rows.push([
+                        ord.id,
+                        ord.customer,
+                        ord.phone,
+                        ord.items,
+                        ord.destination,
+                        ord.date,
+                        ord.time,
+                        ord.total,
+                        (ord.current_status || ord.default_status || 'menunggu').toUpperCase(),
+                        ord.status_bayar
+                    ]);
+                }
+            });
+
+            let csvContent = "\uFEFF" + rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Pesanan_Terpilih_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`${checked.length} pesanan terpilih berhasil diekspor!`);
+        }
+
+        function quickAdvanceOrder(orderId, btnEl) {
+            const ord = ordersData.find(o => o.id === orderId);
+            if (!ord) return;
+
+            const currentStatus = ord.current_status || ord.default_status || 'menunggu';
+            let nextStatus = 'proses';
+            if (currentStatus === 'menunggu') nextStatus = 'proses';
+            else if (currentStatus === 'proses') nextStatus = 'kirim';
+            else if (currentStatus === 'kirim') nextStatus = 'selesai';
+            else return;
+
+            ord.current_status = nextStatus;
+
+            // Move Kanban card if exists
+            const card = document.getElementById('card-' + orderId);
+            const targetContainer = document.getElementById('container-' + nextStatus);
+            if (card && targetContainer) {
+                targetContainer.appendChild(card);
+                updateKanbanStatusBadge(card, nextStatus);
+                recalculateKanbanCounts();
+            }
+
+            // Update Table row
+            updateTableRowStatus(orderId, nextStatus);
+
+            // Sync with backend
+            saveStatusToServer(orderId, nextStatus);
+
+            showToast(`Status #${orderId} dialihkan ke ${nextStatus.toUpperCase()}!`);
+        }
+
+        function updateTableRowStatus(orderId, status) {
+            const row = document.querySelector(`.order-table-row[data-id="${orderId}"]`);
+            if (row) {
+                row.setAttribute('data-status', status);
+                const badge = document.getElementById(`table-status-badge-${orderId}`);
+                if (badge) {
+                    const statusConfig = {
+                        'menunggu': { label: 'MENUNGGU', class: 'bg-yellow-50 text-yellow-800 border-yellow-200/70' },
+                        'proses': { label: 'PROSES DAPUR', class: 'bg-amber-50 text-amber-800 border-amber-200/70' },
+                        'kirim': { label: 'SIAP KIRIM', class: 'bg-sky-50 text-sky-800 border-sky-200/70' },
+                        'selesai': { label: 'SELESAI', class: 'bg-emerald-50 text-emerald-800 border-emerald-200/70' }
+                    };
+                    const cfg = statusConfig[status] || statusConfig['menunggu'];
+                    badge.textContent = cfg.label;
+                    badge.className = `text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase border ${cfg.class}`;
+                }
+
+                const advanceBtn = document.getElementById(`table-btn-advance-${orderId}`);
+                if (advanceBtn) {
+                    if (status === 'selesai') {
+                        advanceBtn.disabled = true;
+                        advanceBtn.className = 'w-8 h-8 rounded-lg bg-[#107C41] text-white flex items-center justify-center opacity-80 cursor-default shadow-xs';
+                        advanceBtn.title = 'Pesanan Selesai';
+                        advanceBtn.innerHTML = '<i class="fas fa-check-double text-xs"></i>';
+                    } else {
+                        advanceBtn.disabled = false;
+                        advanceBtn.className = 'w-8 h-8 rounded-lg bg-[#D46E15] hover:bg-[#B85207] text-white flex items-center justify-center shadow-xs transition-all active:scale-90';
+                        advanceBtn.title = 'Lanjutkan Alur Kerja Dapur';
+                        advanceBtn.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                    }
+                }
             }
         }
 
@@ -2443,6 +3086,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 targetContainer.appendChild(card);
                 updateKanbanStatusBadge(card, targetStatus);
                 recalculateKanbanCounts();
+                updateTableRowStatus(orderId, targetStatus);
                 saveStatusToServer(orderId, targetStatus);
                 showToast(`Status #${orderId} dipindahkan ke ${targetStatus.toUpperCase()}!`);
             }
@@ -2534,6 +3178,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 updateKanbanStatusBadge(card, status);
                 recalculateKanbanCounts();
             }
+            updateTableRowStatus(selectedDetailOrderId, status);
             saveStatusToServer(selectedDetailOrderId, status);
             showToast(`Status pesanan #${selectedDetailOrderId} diubah ke ${status.toUpperCase()}!`);
             closeOrderDetailModal();
@@ -3482,6 +4127,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
             if (typeof calculateOrderTotal === 'function') calculateOrderTotal();
             if (typeof renderInteractiveCalendar === 'function') renderInteractiveCalendar();
+            if (typeof filterTableOrders === 'function') filterTableOrders();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam === 'tabel' || tabParam === 'table') {
+                switchTab('tabel');
+            } else if (tabParam === 'kalender') {
+                switchTab('kalender');
+            }
         });
     </script>
 </body>

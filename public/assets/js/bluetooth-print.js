@@ -283,3 +283,4 @@ async function handleTestPrintBluetooth(btnElement = null) {
         }
     }
 }
+

@@ -237,9 +237,17 @@ if (!$order) {
 try {
     $escposBytes = buildReceiptESCPOS($store, $order, $items, $logoPath, $colWidth);
 
+    // Encode ke Base64 murni untuk Android Intent / RawBT / Scheme Support
+    $binData = '';
+    foreach (array_chunk($escposBytes, 4096) as $chunk) {
+        $binData .= pack('C*', ...$chunk);
+    }
+    $base64Escpos = base64_encode($binData);
+
     echo json_encode([
         'success'    => true,
         'escpos'     => $escposBytes,
+        'base64'     => $base64Escpos,
         'byte_count' => count($escposBytes),
         'paper_size' => $paperSize . 'mm',
         'col_width'  => $colWidth,

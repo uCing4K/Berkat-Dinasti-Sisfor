@@ -1258,49 +1258,58 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 
                 <!-- TOP BANNER: TITLE, STATS, & OMSET (Dark Chocolate Espresso Cards) -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-                    <div>
-                        <div class="flex items-center gap-2.5">
-                            <h2 class="text-[#251A14] text-2xl font-bold tracking-tight">Manajemen Pesanan</h2>
-                            <span class="bg-[#EFE8DE] text-[#D46E15] text-xs font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C5]" id="totalOrdersBadge">
+                    <!-- Mobile Header Box (Aesthetic Card) / Desktop Clean Header -->
+                    <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-xl p-4 md:p-0 md:bg-transparent md:border-0 shadow-2xs md:shadow-none">
+                        <div class="flex items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center text-[#D46E15] md:hidden shrink-0">
+                                    <i class="fas fa-clipboard-list text-xs"></i>
+                                </div>
+                                <h2 class="text-[#251A14] text-lg md:text-2xl font-bold tracking-tight">Manajemen Pesanan</h2>
+                            </div>
+                            <span class="bg-[#EFE8DE] text-[#D46E15] text-[11px] md:text-xs font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C5] whitespace-nowrap shrink-0" id="totalOrdersBadge">
                                 <?= $totalOrdersCount ?> Total Pesanan
                             </span>
                         </div>
-                        <p class="text-[#8E7E73] text-sm mt-1" id="pageSubtitle">
+                        <p class="text-[#8E7E73] text-xs md:text-sm mt-1" id="pageSubtitle">
                             <?= $active_tab === 'tabel' ? 'Tabel data pesanan lengkap dengan pencarian, filter status, ekspor CSV/Excel, dan aksi cepat.' : ($active_tab === 'kalender' ? 'Pantau penjadwalan produksi dapur, rute kurir, dan pengiriman harian.' : 'Kelola status dan alur pengiriman pesanan roti secara real-time') ?>
                         </p>
                     </div>
 
-                    <!-- Right Stats Indicator Pills (Dark Chocolate Espresso Cluster) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
-                        <!-- Menunggu & Proses: count -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">AKTIF DAPUR</span>
-                                <span class="font-bold text-base text-[#FAF8F5]" id="statMenunggu"><?= $totalMenungguCount ?> Pesanan</span>
+                    <!-- Right Stats Indicator Pills: On mobile 2 cards in 1 row (hide Selesai, rename Aktif Dapur -> Pesanan Aktif) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 md:gap-3 shrink-0">
+                        <!-- Card 1: Pesanan Aktif (Desktop label: AKTIF DAPUR) -->
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[120px] md:min-w-[140px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[9px] md:text-[10px] font-semibold uppercase tracking-wider block truncate">
+                                    <span class="md:hidden">PESANAN AKTIF</span>
+                                    <span class="hidden md:inline">AKTIF DAPUR</span>
+                                </span>
+                                <span class="font-bold text-sm md:text-base text-[#FAF8F5] truncate block" id="statMenunggu"><?= $totalMenungguCount ?> Pesanan</span>
                             </div>
-                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
                                 <i class="fas fa-fire text-xs"></i>
                             </div>
                         </div>
 
-                        <!-- Selesai: count -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">SELESAI</span>
-                                <span class="font-bold text-base text-[#FAF8F5]" id="statSelesai"><?= $totalSelesaiCount ?> Pesanan</span>
+                        <!-- Card 2: Selesai (Hidden on mobile) -->
+                        <div class="hidden sm:flex craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg items-center justify-between min-w-[140px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block truncate">SELESAI</span>
+                                <span class="font-bold text-base text-[#FAF8F5] truncate block" id="statSelesai"><?= $totalSelesaiCount ?> Pesanan</span>
                             </div>
                             <div class="w-8 h-8 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
                                 <i class="fas fa-check-double text-xs"></i>
                             </div>
                         </div>
 
-                        <!-- Omset Card -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[170px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">TOTAL OMSET</span>
-                                <span class="font-bold text-base text-[#FAF8F5]">Rp <?= number_format($totalOmset, 0, ',', '.') ?></span>
+                        <!-- Card 3: Omset Card -->
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[120px] md:min-w-[170px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[9px] md:text-[10px] font-semibold uppercase tracking-wider block truncate">TOTAL OMSET</span>
+                                <span class="font-bold text-xs md:text-base text-[#FAF8F5] truncate block">Rp <?= number_format($totalOmset, 0, ',', '.') ?></span>
                             </div>
-                            <div class="w-8 h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
+                            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
                                 <i class="fas fa-wallet text-xs"></i>
                             </div>
                         </div>
@@ -1308,26 +1317,27 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
 
                 <!-- TAB SWITCHER BAR (KANBAN BOARD VS TABEL PESANAN VS KALENDER PENGIRIMAN) -->
-                <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
-                    <!-- Tab 1: Kanban Board -->
+                <!-- Mobile hides Kanban button to keep a neat 1-row switch between Tabel and Kalender -->
+                <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-1.5 md:gap-2 mb-6 shadow-2xs max-w-fit">
+                    <!-- Tab 1: Kanban Board (Hidden on mobile) -->
                     <button onclick="switchTab('kanban')" id="tabBtnKanban" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        class="hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
                         <i class="fas fa-columns text-xs"></i>
                         <span>Kanban Board</span>
                     </button>
 
                     <!-- Tab 2: Tabel Pesanan -->
                     <button onclick="switchTab('tabel')" id="tabBtnTabel" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'tabel' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'tabel' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
                         <i class="fas fa-table-list text-xs"></i>
-                        <span>Tabel Pesanan</span>
+                        <span class="whitespace-nowrap">Tabel Pesanan</span>
                     </button>
 
                     <!-- Tab 3: Kalender Pengiriman -->
                     <button onclick="switchTab('kalender')" id="tabBtnKalender" 
-                        class="px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
                         <i class="far fa-calendar-alt text-xs"></i>
-                        <span>Kalender Pengiriman</span>
+                        <span class="whitespace-nowrap">Kalender Pengiriman</span>
                     </button>
                 </div>
 
@@ -1607,56 +1617,69 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div id="tableView" class="<?= $active_tab === 'tabel' ? '' : 'hidden' ?>">
                     
                     <!-- Search & Filter Card -->
-                    <div class="bg-white rounded-2xl border border-[#E2D7C8] p-4 mb-5 shadow-xs">
-                        <div class="flex flex-col lg:flex-row lg:items-center gap-3">
-                            <!-- Input Pencarian Cepat -->
+                    <div class="bg-white rounded-2xl border border-[#E2D7C8] p-3.5 md:p-4 mb-5 shadow-xs space-y-2.5 md:space-y-3">
+                        <!-- Baris 1: Live Search Bar + Reset Button -->
+                        <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E7E73] text-xs"></i>
                                 <input type="text" id="tableSearchInput" oninput="filterTableOrders()" 
-                                    placeholder="Cari no. invoice, nama pelanggan, no telepon, atau alamat..." 
-                                    class="w-full bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-[#251A14] placeholder-[#A89C92] focus:outline-none transition-colors">
+                                    placeholder="Cari invoice, nama pelanggan, no telepon, atau alamat..." 
+                                    class="w-full bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl pl-9 pr-3.5 py-2 text-xs text-[#251A14] placeholder-[#A89C92] focus:outline-none transition-colors">
                             </div>
+                            <!-- Tombol Reset di Sebelah Kanan Search Bar -->
+                            <button type="button" onclick="resetTableFilters()" 
+                                class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] hover:text-[#251A14] text-xs font-semibold px-3 py-2 rounded-xl border border-[#DDD3C5] flex items-center gap-1.5 transition-colors shrink-0 shadow-2xs active:scale-95" title="Reset Semua Filter">
+                                <i class="fas fa-undo-alt text-[10px]"></i>
+                                <span class="text-xs">Reset</span>
+                            </button>
+                        </div>
 
-                            <!-- Filter Controls -->
-                            <div class="flex flex-wrap items-center gap-2">
-                                <!-- Filter Status Dapur -->
+                        <!-- Baris 2 & 3 (Desktop 1-Line Flex, Mobile 2 Clean Rows) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <!-- Mobile Baris 1: 3 Dropdowns (Status, Pembayaran, Pengiriman) -->
+                            <div class="grid grid-cols-3 gap-2 flex-1">
+                                <!-- Filter Status -->
                                 <select id="tableStatusFilter" onchange="filterTableOrders()" 
-                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
-                                    <option value="">Semua Status Dapur</option>
-                                    <option value="menunggu">Menunggu Konfirmasi</option>
-                                    <option value="proses">Proses Dapur</option>
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
+                                    <option value="">Status</option>
+                                    <option value="menunggu">Menunggu</option>
+                                    <option value="proses">Proses</option>
                                     <option value="kirim">Siap Kirim</option>
                                     <option value="selesai">Selesai</option>
                                 </select>
 
                                 <!-- Filter Pembayaran -->
                                 <select id="tablePayFilter" onchange="filterTableOrders()" 
-                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
-                                    <option value="">Semua Pembayaran</option>
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
+                                    <option value="">Pembayaran</option>
                                     <option value="lunas">Lunas</option>
-                                    <option value="hutang">Hutang / DP</option>
-                                    <option value="belum">Belum Bayar</option>
+                                    <option value="hutang">Hutang</option>
+                                    <option value="belum">Belum</option>
                                 </select>
 
                                 <!-- Filter Pengiriman -->
                                 <select id="tableCourierFilter" onchange="filterTableOrders()" 
-                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-3 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
-                                    <option value="">Semua Pengiriman</option>
-                                    <option value="kurir">Kurir Toko</option>
-                                    <option value="ambil">Ambil Sendiri</option>
+                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
+                                    <option value="">Pengiriman</option>
+                                    <option value="ambil">Take Away</option>
+                                    <option value="kurir">Delivery</option>
                                 </select>
+                            </div>
 
-                                <!-- Filter Tanggal Kirim -->
-                                <input type="date" id="tableDateFilter" onchange="filterTableOrders()" 
-                                    title="Filter Tanggal Kirim"
-                                    class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2.5 py-2 text-xs text-[#251A14] focus:outline-none cursor-pointer">
-
-                                <!-- Tombol Reset -->
-                                <button type="button" onclick="resetTableFilters()" 
-                                    class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] hover:text-[#251A14] text-xs font-semibold px-3 py-2 rounded-xl border border-[#DDD3C5] flex items-center gap-1.5 transition-colors" title="Reset Semua Filter">
-                                    <i class="fas fa-undo-alt text-[10px]"></i>
-                                    <span>Reset</span>
-                                </button>
+                            <!-- Mobile Baris 2: Pemilihan Tanggal Range (Dari - Sampai) -->
+                            <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:w-auto">
+                                <div class="flex items-center gap-1.5 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl px-2.5 py-1.5">
+                                    <span class="text-[10px] text-[#8E7E73] font-medium">Dari:</span>
+                                    <input type="date" id="tableDateFrom" onchange="filterTableOrders()" 
+                                        title="Dari Tanggal"
+                                        class="bg-transparent text-[11px] md:text-xs text-[#251A14] focus:outline-none cursor-pointer w-full">
+                                </div>
+                                <div class="flex items-center gap-1.5 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl px-2.5 py-1.5">
+                                    <span class="text-[10px] text-[#8E7E73] font-medium">Sampai:</span>
+                                    <input type="date" id="tableDateTo" onchange="filterTableOrders()" 
+                                        title="Sampai Tanggal"
+                                        class="bg-transparent text-[11px] md:text-xs text-[#251A14] focus:outline-none cursor-pointer w-full">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1708,8 +1731,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
                         </div>
 
-                        <!-- Table Responsive -->
-                        <div class="overflow-x-auto">
+                        <!-- Table Responsive (Desktop Only) -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-left border-collapse" id="ordersDataTable">
                                 <thead>
                                     <tr class="border-b border-[#E2D7C8] bg-[#F7F4EE] text-[11px] font-semibold text-[#8E7E73] uppercase tracking-wider">
@@ -1866,6 +1889,104 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Order Cards List (Rodeo POS Pattern) -->
+                        <div class="block md:hidden p-3 space-y-2.5" id="ordersDataMobileList">
+                            <?php foreach ($master_orders as $ord): 
+                                $courierText = $ord['courier_info'] ?? 'Kurir Toko';
+                                $isAmbil = str_contains(strtolower($courierText), 'ambil') || str_contains(strtolower($ord['destination'] ?? ''), 'ambil');
+                                $serviceTag = $isAmbil ? 'AMBIL SENDIRI' : 'KURIR TOKO';
+                                $serviceTagClass = $isAmbil 
+                                    ? 'bg-amber-50 text-amber-800 border-amber-200/70' 
+                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
+
+                                $statusKey = strtolower($ord['current_status'] ?? $ord['default_status'] ?? 'menunggu');
+                                $statusTagInfo = match($statusKey) {
+                                    'proses' => ['label' => 'PROSES', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                    'kirim' => ['label' => 'SIAP KIRIM', 'class' => 'bg-sky-50 text-sky-800 border-sky-200/70'],
+                                    'selesai' => ['label' => 'SELESAI', 'class' => 'bg-emerald-50 text-emerald-800 border-emerald-200/70'],
+                                    default => ['label' => 'MENUNGGU', 'class' => 'bg-yellow-50 text-yellow-800 border-yellow-200/70']
+                                };
+
+                                $payText = strtolower($ord['status_bayar'] ?? 'belum');
+                                $payTagInfo = match(true) {
+                                    str_contains($payText, 'lunas') => ['label' => 'LUNAS', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70'],
+                                    str_contains($payText, 'hutang') || str_contains($payText, 'dp') => ['label' => 'HUTANG', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                    default => ['label' => 'BELUM', 'class' => 'bg-rose-50 text-rose-700 border-rose-200/70']
+                                };
+                                $payFilterKey = str_contains($payText, 'lunas') ? 'lunas' : (str_contains($payText, 'hutang') || str_contains($payText, 'dp') ? 'hutang' : 'belum');
+                                $courierFilterKey = $isAmbil ? 'ambil' : 'kurir';
+                            ?>
+                            <div class="order-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all cursor-pointer"
+                                 data-id="<?= htmlspecialchars($ord['id']) ?>"
+                                 data-customer="<?= htmlspecialchars(strtolower($ord['customer'])) ?>"
+                                 data-phone="<?= htmlspecialchars(strtolower($ord['phone'])) ?>"
+                                 data-items="<?= htmlspecialchars(strtolower($ord['items'])) ?>"
+                                 data-destination="<?= htmlspecialchars(strtolower($ord['destination'])) ?>"
+                                 data-status="<?= $statusKey ?>"
+                                 data-pay="<?= $payFilterKey ?>"
+                                 data-courier="<?= $courierFilterKey ?>"
+                                 data-date="<?= $ord['date'] ?>"
+                                 onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                
+                                <!-- Top Bar: Order ID & Total Amount -->
+                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
+                                    <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($ord['id']) ?></span>
+                                    <span class="font-mono font-bold text-sm text-[#3E2B21]">Rp <?= number_format($ord['total'], 0, ',', '.') ?></span>
+                                </div>
+
+                                <!-- Middle: Customer & Destination -->
+                                <div class="py-2.5 space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-bold text-xs text-[#251A14] flex items-center gap-1.5 truncate">
+                                            <i class="fas fa-user text-[10px] text-[#8E7E73]"></i>
+                                            <?= htmlspecialchars($ord['customer']) ?>
+                                        </h4>
+                                        <span class="text-[11px] text-[#8E7E73] font-mono"><i class="fas fa-phone text-[9px] mr-1"></i><?= htmlspecialchars($ord['phone']) ?></span>
+                                    </div>
+                                    <p class="text-[11px] text-[#5E4D42] truncate font-medium">
+                                        <i class="fas fa-bread-slice text-[10px] text-[#D46E15] mr-1"></i><?= htmlspecialchars($ord['items']) ?>
+                                    </p>
+                                    <?php if (!empty($ord['destination'])): ?>
+                                    <p class="text-[10px] text-[#8E7E73] truncate">
+                                        <i class="fas fa-map-marker-alt text-[9px] text-amber-600 mr-1"></i><?= htmlspecialchars($ord['destination']) ?>
+                                    </p>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Bottom: Date, 3 Badges, and Quick Actions -->
+                                <div class="pt-2 border-t border-[#EAE1D5] flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1 flex-wrap">
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $serviceTagClass ?>">
+                                            <?= $serviceTag ?>
+                                        </span>
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $statusTagInfo['class'] ?>" id="mobile-status-badge-<?= htmlspecialchars($ord['id']) ?>">
+                                            <?= $statusTagInfo['label'] ?>
+                                        </span>
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $payTagInfo['class'] ?>">
+                                            <?= $payTagInfo['label'] ?>
+                                        </span>
+                                    </div>
+
+                                    <!-- Quick Action Buttons -->
+                                    <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                                        <button type="button" onclick="handlePrintReceipt('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                            class="w-7 h-7 rounded-lg bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                            title="Cetak Struk Thermal Bluetooth">
+                                            <i class="fas fa-tag text-[10px]"></i>
+                                        </button>
+                                        <button type="button" id="mobile-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
+                                            onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                            class="w-7 h-7 rounded-lg <?= $statusKey === 'selesai' ? 'bg-[#107C41] text-white opacity-80 cursor-default' : 'bg-[#D46E15] hover:bg-[#B85207] text-white active:scale-90' ?> flex items-center justify-center shadow-xs transition-all" 
+                                            title="<?= $statusKey === 'selesai' ? 'Pesanan Selesai' : 'Lanjutkan Alur Kerja Dapur' ?>"
+                                            <?= $statusKey === 'selesai' ? 'disabled' : '' ?>>
+                                            <i class="fas <?= $statusKey === 'selesai' ? 'fa-check-double' : 'fa-check' ?> text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
 
                         <!-- Empty State -->
@@ -2258,6 +2379,104 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Order Cards List (Rodeo POS Pattern) -->
+                        <div class="block md:hidden p-3 space-y-2.5" id="ordersDataMobileList">
+                            <?php foreach ($master_orders as $ord): 
+                                $courierText = $ord['courier_info'] ?? 'Kurir Toko';
+                                $isAmbil = str_contains(strtolower($courierText), 'ambil') || str_contains(strtolower($ord['destination'] ?? ''), 'ambil');
+                                $serviceTag = $isAmbil ? 'AMBIL SENDIRI' : 'KURIR TOKO';
+                                $serviceTagClass = $isAmbil 
+                                    ? 'bg-amber-50 text-amber-800 border-amber-200/70' 
+                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
+
+                                $statusKey = strtolower($ord['current_status'] ?? $ord['default_status'] ?? 'menunggu');
+                                $statusTagInfo = match($statusKey) {
+                                    'proses' => ['label' => 'PROSES', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                    'kirim' => ['label' => 'SIAP KIRIM', 'class' => 'bg-sky-50 text-sky-800 border-sky-200/70'],
+                                    'selesai' => ['label' => 'SELESAI', 'class' => 'bg-emerald-50 text-emerald-800 border-emerald-200/70'],
+                                    default => ['label' => 'MENUNGGU', 'class' => 'bg-yellow-50 text-yellow-800 border-yellow-200/70']
+                                };
+
+                                $payText = strtolower($ord['status_bayar'] ?? 'belum');
+                                $payTagInfo = match(true) {
+                                    str_contains($payText, 'lunas') => ['label' => 'LUNAS', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70'],
+                                    str_contains($payText, 'hutang') || str_contains($payText, 'dp') => ['label' => 'HUTANG', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
+                                    default => ['label' => 'BELUM', 'class' => 'bg-rose-50 text-rose-700 border-rose-200/70']
+                                };
+                                $payFilterKey = str_contains($payText, 'lunas') ? 'lunas' : (str_contains($payText, 'hutang') || str_contains($payText, 'dp') ? 'hutang' : 'belum');
+                                $courierFilterKey = $isAmbil ? 'ambil' : 'kurir';
+                            ?>
+                            <div class="order-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all cursor-pointer"
+                                 data-id="<?= htmlspecialchars($ord['id']) ?>"
+                                 data-customer="<?= htmlspecialchars(strtolower($ord['customer'])) ?>"
+                                 data-phone="<?= htmlspecialchars(strtolower($ord['phone'])) ?>"
+                                 data-items="<?= htmlspecialchars(strtolower($ord['items'])) ?>"
+                                 data-destination="<?= htmlspecialchars(strtolower($ord['destination'])) ?>"
+                                 data-status="<?= $statusKey ?>"
+                                 data-pay="<?= $payFilterKey ?>"
+                                 data-courier="<?= $courierFilterKey ?>"
+                                 data-date="<?= $ord['date'] ?>"
+                                 onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
+                                
+                                <!-- Top Bar: Order ID & Total Amount -->
+                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
+                                    <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($ord['id']) ?></span>
+                                    <span class="font-mono font-bold text-sm text-[#3E2B21]">Rp <?= number_format($ord['total'], 0, ',', '.') ?></span>
+                                </div>
+
+                                <!-- Middle: Customer & Destination -->
+                                <div class="py-2.5 space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-bold text-xs text-[#251A14] flex items-center gap-1.5 truncate">
+                                            <i class="fas fa-user text-[10px] text-[#8E7E73]"></i>
+                                            <?= htmlspecialchars($ord['customer']) ?>
+                                        </h4>
+                                        <span class="text-[11px] text-[#8E7E73] font-mono"><i class="fas fa-phone text-[9px] mr-1"></i><?= htmlspecialchars($ord['phone']) ?></span>
+                                    </div>
+                                    <p class="text-[11px] text-[#5E4D42] truncate font-medium">
+                                        <i class="fas fa-bread-slice text-[10px] text-[#D46E15] mr-1"></i><?= htmlspecialchars($ord['items']) ?>
+                                    </p>
+                                    <?php if (!empty($ord['destination'])): ?>
+                                    <p class="text-[10px] text-[#8E7E73] truncate">
+                                        <i class="fas fa-map-marker-alt text-[9px] text-amber-600 mr-1"></i><?= htmlspecialchars($ord['destination']) ?>
+                                    </p>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Bottom: Date, 3 Badges, and Quick Actions -->
+                                <div class="pt-2 border-t border-[#EAE1D5] flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1 flex-wrap">
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $serviceTagClass ?>">
+                                            <?= $serviceTag ?>
+                                        </span>
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $statusTagInfo['class'] ?>" id="mobile-status-badge-<?= htmlspecialchars($ord['id']) ?>">
+                                            <?= $statusTagInfo['label'] ?>
+                                        </span>
+                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $payTagInfo['class'] ?>">
+                                            <?= $payTagInfo['label'] ?>
+                                        </span>
+                                    </div>
+
+                                    <!-- Quick Action Buttons -->
+                                    <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                                        <button type="button" onclick="handlePrintReceipt('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                            class="w-7 h-7 rounded-lg bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                            title="Cetak Struk Thermal Bluetooth">
+                                            <i class="fas fa-tag text-[10px]"></i>
+                                        </button>
+                                        <button type="button" id="mobile-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
+                                            onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
+                                            class="w-7 h-7 rounded-lg <?= $statusKey === 'selesai' ? 'bg-[#107C41] text-white opacity-80 cursor-default' : 'bg-[#D46E15] hover:bg-[#B85207] text-white active:scale-90' ?> flex items-center justify-center shadow-xs transition-all" 
+                                            title="<?= $statusKey === 'selesai' ? 'Pesanan Selesai' : 'Lanjutkan Alur Kerja Dapur' ?>"
+                                            <?= $statusKey === 'selesai' ? 'disabled' : '' ?>>
+                                            <i class="fas <?= $statusKey === 'selesai' ? 'fa-check-double' : 'fa-check' ?> text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
 
                         <!-- Button Tambah Produk Baru Dinamis -->

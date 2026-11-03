@@ -682,7 +682,7 @@ if ($db_connected && $pdo) {
                     'kirim' => ['Siap Kirim', 'bg-[#27AE60]/15 text-[#1B7A43]'],
                     'proses' => ['Sedang Dikemas / Oven', 'bg-[#E2B93B]/20 text-[#886C12]'],
                     'selesai' => ['Terkirim', 'bg-[#2F80ED]/15 text-[#2F80ED]'],
-                    default => ['Menunggu Dapur', 'bg-[#828282]/15 text-[#544337]']
+                    default => ['Menunggu', 'bg-[#828282]/15 text-[#544337]']
                 };
                 $formattedD[] = [
                     'time' => !empty($dr['waktu_kirim']) ? substr($dr['waktu_kirim'], 0, 5) : '14:00',
@@ -708,7 +708,7 @@ if (!empty($_SESSION['session_orders'])) {
                     'time' => preg_match('/\d{2}:\d{2}/', $so['deadline'] ?? '', $m) ? $m[0] : '14:00',
                     'customer' => $so['customer'] ?? 'Pelanggan',
                     'items' => $so['product'] ?? 'Pesanan Bakery',
-                    'status' => 'Menunggu Dapur',
+                    'status' => 'Menunggu',
                     'status_class' => 'bg-[#828282]/15 text-[#544337]'
                 ]);
             }
@@ -724,7 +724,7 @@ if (!empty($_SESSION['custom_orders'])) {
                     'time' => preg_match('/\d{2}:\d{2}/', $co['time'] ?? '', $m) ? $m[0] : '14:00',
                     'customer' => $co['customer'] ?? 'Pelanggan',
                     'items' => $co['items'] ?? 'Pesanan Bakery',
-                    'status' => 'Menunggu Dapur',
+                    'status' => 'Menunggu',
                     'status_class' => 'bg-[#828282]/15 text-[#544337]'
                 ]);
             }
@@ -766,9 +766,10 @@ $activities = [
 if ($db_connected && $pdo) {
     try {
         $stmtAct = $pdo->query("
-            SELECT tl.*, p.no_invoice 
+            SELECT tl.*, p.no_invoice, plg.nama as nama_pelanggan
             FROM tracking_log tl 
             LEFT JOIN pesanan p ON tl.id_pesanan = p.id_pesanan 
+            LEFT JOIN pelanggan plg ON p.id_pelanggan = plg.id_pelanggan
             ORDER BY tl.id_log DESC 
             LIMIT 5
         ");
@@ -783,10 +784,11 @@ if ($db_connected && $pdo) {
                     default => 'bg-[#FF9B45]'
                 };
                 $inv = htmlspecialchars($ar['no_invoice'] ?? '');
+                $namaPelanggan = htmlspecialchars($ar['nama_pelanggan'] ?? 'Pelanggan');
                 $ket = htmlspecialchars($ar['keterangan'] ?? 'Aktivitas pesanan');
                 $formattedA[] = [
                     'dot_color' => $dotColor,
-                    'text' => "<span class='text-[#1C1C1C]'>Pesanan <span class='font-semibold text-[#FF9B45]'>#{$inv}</span>: {$ket}</span>",
+                    'text' => "<span class='text-[#1C1C1C]'><span class='font-semibold text-[#3E2B21]'>{$namaPelanggan}</span> (<span class='font-mono text-[#D46E15]'>#{$inv}</span>): {$ket}</span>",
                     'time' => date('H:i', strtotime($ar['created_at'] ?? 'now')) . ' WIB'
                 ];
             }
@@ -1033,12 +1035,17 @@ if ($db_connected && $pdo) {
                     <div class="relative">
                         <button onclick="toggleNotificationDropdown()" class="relative p-2 text-[#544337] hover:bg-[#F5F3F1] rounded-lg transition-colors" title="Notifikasi">
                             <i class="far fa-bell text-[#3E2B21] text-base"></i>
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
+                            <span id="notifDot" class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#D46E15] rounded-full ring-2 ring-white"></span>
                         </button>
                         <div id="notificationDropdown" class="hidden absolute right-0 mt-2.5 w-80 craft-dropdown py-2 z-50">
                             <div class="px-4 py-2 border-b border-[#ECE5DD] flex items-center justify-between">
-                                <h4 class="font-semibold text-xs text-[#251A14]">Notifikasi Operasional</h4>
-                                <span class="text-[10px] craft-badge-warning font-medium px-2 py-0.5 rounded-full">3 Baru</span>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-xs text-[#251A14]">Notifikasi</h4>
+                                    <span id="notifBadge" class="text-[10px] craft-badge-warning font-medium px-2 py-0.5 rounded-full">3 Baru</span>
+                                </div>
+                                <button type="button" onclick="markAllNotificationsRead(event)" class="text-[10px] font-semibold text-[#D46E15] hover:underline cursor-pointer">
+                                    Tandai Dibaca
+                                </button>
                             </div>
                             <div class="divide-y divide-[#F0ECE9]/70 text-xs py-1">
                                 <div class="px-3.5 py-2.5 hover:bg-[#F8F5F1] transition-colors cursor-pointer rounded-lg mx-1">
@@ -1395,8 +1402,82 @@ if ($db_connected && $pdo) {
                     </div>
                 </div>
 
-                <!-- ROW 1: 4 KPI STAT CARDS (ALL UNIFIED DARK CHOCOLATE / ESPRESSO CARDS) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                <!-- MOBILE ONLY: SHORTCUTS & 2-CARD KPI GRID (RODEO POS PATTERN) -->
+                <div class="block md:hidden mb-6 space-y-3.5">
+                    <!-- Quick Page Shortcuts (2 Columns) -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <a href="beranda.php?view=tambah_pesanan" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FFF6ED] border border-[#F7D4B2] text-[#924C00] font-semibold text-xs shadow-2xs hover:bg-[#FFEEDD] active:scale-95 transition-all">
+                            <div class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shrink-0 text-xs shadow-xs">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span class="truncate font-bold">Pesanan Baru</span>
+                        </a>
+                        <a href="pesanan.php?tab=tabel" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                            <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <span class="truncate font-bold">Cari Pesanan</span>
+                        </a>
+                        <a href="produk.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                            <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
+                                <i class="fas fa-bread-slice"></i>
+                            </div>
+                            <span class="truncate font-bold">Produk Bakery</span>
+                        </a>
+                        <a href="pelanggan.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                            <div class="w-8 h-8 rounded-lg bg-[#FAF0E6] text-[#D46E15] flex items-center justify-center shrink-0 text-xs shadow-xs">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span class="truncate font-bold">Pelanggan</span>
+                        </a>
+                        <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                            <div class="w-6 h-6 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <span class="font-bold">Laporan Penjualan</span>
+                        </a>
+                    </div>
+
+                    <!-- 1-Row 2-Card KPI Grid: Total Pemasukan & Pesanan Antrean -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <!-- Card 1: Total Pemasukan -->
+                        <div class="craft-card-espresso rounded-xl p-3.5 relative overflow-hidden flex flex-col justify-between">
+                            <div class="flex items-start justify-between">
+                                <div class="min-w-0 pr-1">
+                                    <p class="text-[#D8C7B8] text-[10px] font-bold uppercase tracking-wider truncate">Pemasukan</p>
+                                    <p class="text-[#FAF8F5] text-base font-bold mt-1 tracking-tight truncate"><?= htmlspecialchars($kpi_data['total_revenue']) ?></p>
+                                </div>
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                                    <i class="fas fa-wallet text-emerald-300 text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 mt-2 pt-1.5 border-t border-white/10">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#4ADE80] shrink-0"></span>
+                                <span class="text-[#86EFAC] text-[10px] font-medium truncate"><?= htmlspecialchars($kpi_data['revenue_target']) ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Pesanan Antrean -->
+                        <div class="craft-card-espresso rounded-xl p-3.5 relative overflow-hidden flex flex-col justify-between">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-[#D8C7B8] text-[10px] font-bold uppercase tracking-wider">Antrean</p>
+                                    <p class="text-[#FAF8F5] text-base font-bold mt-1 tracking-tight"><?= htmlspecialchars($kpi_data['pending_orders']) ?> Pesanan</p>
+                                </div>
+                                <div class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                                    <i class="fas fa-hourglass-half text-amber-300 text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 mt-2 pt-1.5 border-t border-white/10">
+                                <i class="fas fa-exclamation-circle text-amber-400 text-[9px] shrink-0"></i>
+                                <span class="text-amber-200 text-[10px] font-medium truncate"><?= htmlspecialchars($kpi_data['pending_note']) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESKTOP ROW 1: 4 KPI STAT CARDS (ALL UNIFIED DARK CHOCOLATE / ESPRESSO CARDS) -->
+                <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     
                     <!-- Card 1: Total Pesanan Hari Ini -->
                     <div class="craft-card-espresso rounded-xl p-5 relative overflow-hidden flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200">
@@ -1520,8 +1601,8 @@ if ($db_connected && $pdo) {
                         </div>
                     </div>
 
-                    <!-- Table Container -->
-                    <div class="overflow-x-auto rounded-xl border border-[#E2D7C8] shadow-xs">
+                    <!-- Table Container (Desktop Only) -->
+                    <div class="hidden md:block overflow-x-auto rounded-xl border border-[#E2D7C8] shadow-xs">
                         <table class="w-full text-left border-collapse" id="ordersTable">
                             <thead>
                                 <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
@@ -1596,6 +1677,63 @@ if ($db_connected && $pdo) {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Order Cards (Rodeo POS Pattern) -->
+                    <div class="block md:hidden space-y-2.5" id="ordersMobileList">
+                        <?php foreach ($pending_orders as $idx => $order): ?>
+                            <div class="order-mobile-card order-row bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] transition-all cursor-pointer"
+                                 data-search="<?= strtolower($order['customer'] . ' ' . $order['product'] . ' ' . $order['payment_status'] . ' ' . $order['id']) ?>"
+                                 data-status="<?= htmlspecialchars($order['status'] ?? 'pending') ?>"
+                                 onclick="viewOrderDetail('<?= htmlspecialchars($order['id']) ?>', '<?= htmlspecialchars(addslashes($order['customer'])) ?>', '<?= htmlspecialchars(addslashes($order['product'])) ?>', '<?= htmlspecialchars($order['deadline']) ?>', '<?= htmlspecialchars($order['payment_status']) ?>', '<?= htmlspecialchars($order['status'] ?? 'pending') ?>', '<?= htmlspecialchars($order['total'] ?? 'Rp 0') ?>', '<?= htmlspecialchars(addslashes($order['no_wa'] ?? '-')) ?>', '<?= htmlspecialchars(addslashes($order['alamat'] ?? '-')) ?>')">
+                                
+                                <!-- Top Bar: Order ID & Payment Status -->
+                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($order['id']) ?></span>
+                                    </div>
+                                    <span class="<?= $order['payment_class'] ?> px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                                        <?= htmlspecialchars($order['payment_status']) ?>
+                                    </span>
+                                </div>
+
+                                <!-- Middle: Customer Name & Items -->
+                                <div class="py-2 space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-bold text-xs text-[#251A14] truncate"><?= htmlspecialchars($order['customer']) ?></h4>
+                                        <span class="text-[11px] font-bold text-[#3E2B21]"><?= htmlspecialchars($order['total'] ?? '') ?></span>
+                                    </div>
+                                    <p class="text-[11px] text-[#5E4D42] truncate font-medium">
+                                        <i class="fas fa-bread-slice text-[10px] text-[#D46E15] mr-1"></i><?= htmlspecialchars($order['product']) ?>
+                                    </p>
+                                </div>
+
+                                <!-- Bottom: Deadline & Status Badge -->
+                                <div class="pt-2 border-t border-[#EAE1D5] flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-1 text-[11px] text-[#8E7E73]">
+                                        <i class="far fa-clock text-[10px]"></i>
+                                        <span><?= htmlspecialchars($order['deadline']) ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <?php
+                                        $ordStatus = $order['status'] ?? 'pending';
+                                        $statusPill = match($ordStatus) {
+                                            'proses' => ['Diproses', 'bg-[#FFF8F2] text-[#D97706] border border-[#FF9B45]/30'],
+                                            'kirim' => ['Siap Kirim', 'bg-[#F0F7FF] text-[#2F80ED] border border-[#2F80ED]/30'],
+                                            'selesai' => ['Selesai', 'bg-[#F2FBF6] text-[#1B7A43] border border-[#27AE60]/30'],
+                                            default => ['Pending', 'bg-[#EFE8DE] text-[#5E4D42] border border-[#DDD3C5]']
+                                        };
+                                        ?>
+                                        <span class="<?= $statusPill[1] ?> px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                                            <?= $statusPill[0] ?>
+                                        </span>
+                                        <span class="text-[10px] text-[#D46E15] font-semibold flex items-center gap-0.5">
+                                            <i class="fas fa-chevron-right text-[8px]"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Table Footer Summary -->
@@ -1799,12 +1937,15 @@ if ($db_connected && $pdo) {
                     <!-- Header -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center shrink-0">
                                 <i class="fas fa-history text-xs text-[#D46E15]"></i>
                             </div>
-                            <h3 class="text-[#251A14] text-base font-bold">Aktivitas Operasional Terbaru</h3>
+                            <h3 class="text-[#251A14] text-sm md:text-base font-bold">
+                                <span class="md:hidden">Aktivitas Terbaru</span>
+                                <span class="hidden md:inline">Aktivitas Operasional Terbaru</span>
+                            </h3>
                         </div>
-                        <span class="bg-[#EFE8DE] text-[#5E4D42] text-xs font-semibold px-3 py-1 rounded-full border border-[#DDD3C5]">
+                        <span class="bg-[#EFE8DE] text-[#5E4D42] text-[11px] md:text-xs font-semibold px-2.5 py-0.5 md:px-3 md:py-1 rounded-full border border-[#DDD3C5] whitespace-nowrap shrink-0">
                             Hari Ini
                         </span>
                     </div>
@@ -2716,18 +2857,23 @@ if ($db_connected && $pdo) {
                         ${capacityBadge}
                     </div>
                     ${overloadBanner}
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 max-h-[220px] md:max-h-[360px] overflow-y-auto pr-1">
                         ${items.map(it => `
-                            <div class="p-3.5 bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] space-y-2 text-xs">
+                            <div onclick="window.location.href='pesanan.php?tab=tabel&q=' + encodeURIComponent('${escapeHtml(it.id)}')" 
+                                class="p-3 bg-[#EFE8DE] hover:bg-[#E4DCCE] cursor-pointer rounded-xl border border-[#DDD3C5] hover:border-[#D46E15] transition-all space-y-1.5 text-xs shadow-2xs group"
+                                title="Klik untuk buka detail pesanan ini di halaman Pesanan">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-mono font-bold text-[#D46E15]">${escapeHtml(it.id)}</span>
+                                    <span class="font-mono font-bold text-[#D46E15] group-hover:underline">${escapeHtml(it.id)}</span>
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${it.status === 'Selesai' ? 'bg-[#27AE60]/15 text-[#1B7A43]' : (it.status === 'Siap Kirim' ? 'bg-[#2F80ED]/15 text-[#2F80ED]' : 'bg-[#E2B93B]/20 text-[#886C12]')}">${escapeHtml(it.status)}</span>
                                 </div>
                                 <div>
-                                    <p class="font-bold text-[#251A14]">${escapeHtml(it.cust)} <span class="text-[#8E7E73] font-normal text-[11px]">(${escapeHtml(it.phone)})</span></p>
-                                    <p class="text-[#544337] mt-0.5 font-medium">${escapeHtml(it.items)}</p>
+                                    <p class="font-bold text-[#251A14] flex items-center justify-between">
+                                        <span>${escapeHtml(it.cust)} <span class="text-[#8E7E73] font-normal text-[11px]">(${escapeHtml(it.phone)})</span></span>
+                                        <span class="text-[10px] text-[#D46E15] font-semibold flex items-center gap-0.5">Buka <i class="fas fa-chevron-right text-[8px]"></i></span>
+                                    </p>
+                                    <p class="text-[#544337] mt-0.5 font-medium truncate">${escapeHtml(it.items)}</p>
                                 </div>
-                                <div class="pt-2 border-t border-[#DDD3C5] flex items-center justify-between text-[11px] text-[#786E65]">
+                                <div class="pt-1.5 border-t border-[#DDD3C5] flex items-center justify-between text-[11px] text-[#786E65]">
                                     <span><i class="far fa-clock mr-1"></i>${escapeHtml(it.time)}</span>
                                     <span><i class="fas fa-motorcycle mr-1 text-[#D46E15]"></i>${escapeHtml(it.courier)}</span>
                                 </div>
@@ -3018,6 +3164,37 @@ if ($db_connected && $pdo) {
             if (u) u.classList.add('hidden');
             if (d) d.classList.toggle('hidden');
         }
+
+        function markAllNotificationsRead(e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            const dot = document.getElementById('notifDot');
+            const badge = document.getElementById('notifBadge');
+            if (dot) dot.classList.add('hidden');
+            if (badge) {
+                badge.textContent = '0 Baru';
+                badge.className = 'text-[10px] bg-stone-200 text-stone-600 font-medium px-2 py-0.5 rounded-full';
+            }
+            const notifItems = document.querySelectorAll('#notificationDropdown .divide-y > div');
+            notifItems.forEach(el => el.classList.add('opacity-50'));
+            localStorage.setItem('berkat_dinasti_notif_read', 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('berkat_dinasti_notif_read') === 'true') {
+                const dot = document.getElementById('notifDot');
+                const badge = document.getElementById('notifBadge');
+                if (dot) dot.classList.add('hidden');
+                if (badge) {
+                    badge.textContent = '0 Baru';
+                    badge.className = 'text-[10px] bg-stone-200 text-stone-600 font-medium px-2 py-0.5 rounded-full';
+                }
+                const notifItems = document.querySelectorAll('#notificationDropdown .divide-y > div');
+                notifItems.forEach(el => el.classList.add('opacity-50'));
+            }
+        });
 
         function toggleUserDropdown() {
             const u = document.getElementById('userDropdown');

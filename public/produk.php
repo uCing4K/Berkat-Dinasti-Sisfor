@@ -917,30 +917,38 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                 <?php endif; ?>
 
                 <!-- TOP SECTION: GREETING & 3 STAT CARDS -->
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-                    <div>
-                        <h2 class="text-[#251A14] text-2xl font-bold tracking-tight">Daftar Produk Bakery</h2>
-                        <p class="text-[#8E7E73] text-sm mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, roti manis, varian kemasan, dan batas minimal pemesanan produksi.</p>
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6 mb-6">
+                    <!-- Mobile Header Box (Aesthetic Card) / Desktop Clean Header -->
+                    <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-xl p-4 md:p-0 md:bg-transparent md:border-0 shadow-2xs md:shadow-none">
+                        <div class="flex items-center gap-2.5 md:block">
+                            <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center text-[#D46E15] md:hidden shrink-0">
+                                <i class="fas fa-bread-slice text-xs"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-[#251A14] text-lg md:text-2xl font-bold tracking-tight">Daftar Produk Bakery</h2>
+                                <p class="text-[#8E7E73] text-xs md:text-sm mt-0.5 md:mt-1 max-w-xl">Kelola katalog roti hajatan, bolu premium, varian kemasan, dan batas minimal order produksi.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 3 KPI Cards Cluster (Dark Chocolate Espresso - Identical Size with Pesanan) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
+                    <!-- KPI Cards: On Mobile 2 cards in 1 row (hide Produk Aktif), On Desktop 3 cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 md:gap-3 shrink-0">
                         <!-- Card 1: Total Produk -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">TOTAL PRODUK</span>
-                                <span class="font-bold text-base text-[#FAF8F5]"><?= $total_katalog ?> Katalog</span>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[120px] md:min-w-[140px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[9px] md:text-[10px] font-semibold uppercase tracking-wider block truncate">TOTAL PRODUK</span>
+                                <span class="font-bold text-sm md:text-base text-[#FAF8F5] truncate block"><?= $total_katalog ?> Katalog</span>
                             </div>
-                            <div class="w-8 h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
+                            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-[#D46E15]/20 ring-1 ring-[#D46E15]/30 flex items-center justify-center text-[#D46E15] shrink-0">
                                 <i class="fas fa-boxes text-xs"></i>
                             </div>
                         </div>
 
-                        <!-- Card 2: Produk Aktif -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">PRODUK AKTIF</span>
-                                <span class="font-bold text-base text-[#FAF8F5]"><?= $produk_aktif ?> Siap Pesan</span>
+                        <!-- Card 2: Produk Aktif (Hidden on mobile) -->
+                        <div class="hidden sm:flex craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg items-center justify-between min-w-[140px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block truncate">PRODUK AKTIF</span>
+                                <span class="font-bold text-base text-[#FAF8F5] truncate block"><?= $produk_aktif ?> Siap Pesan</span>
                             </div>
                             <div class="w-8 h-8 rounded-lg bg-emerald-500/20 ring-1 ring-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
                                 <i class="fas fa-check-circle text-xs"></i>
@@ -948,12 +956,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         </div>
 
                         <!-- Card 3: Varian Kemasan -->
-                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[140px]">
-                            <div class="pr-2">
-                                <span class="text-[#D8C7B8] text-[10px] font-semibold uppercase tracking-wider block">VARIAN KEMASAN</span>
-                                <span class="font-bold text-base text-[#FAF8F5]"><?= $varian_kemasan ?> Tipe Box/Pcs</span>
+                        <div class="craft-card-espresso rounded-xl p-3 border border-white/10 shadow-lg flex items-center justify-between min-w-[120px] md:min-w-[140px]">
+                            <div class="pr-2 min-w-0">
+                                <span class="text-[#D8C7B8] text-[9px] md:text-[10px] font-semibold uppercase tracking-wider block truncate">VARIAN KEMASAN</span>
+                                <span class="font-bold text-sm md:text-base text-[#FAF8F5] truncate block"><?= $varian_kemasan ?> Kemasan</span>
                             </div>
-                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                            <div class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-amber-500/20 ring-1 ring-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
                                 <i class="fas fa-box text-xs"></i>
                             </div>
                         </div>
@@ -1020,7 +1028,8 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
 
                 <!-- TABLE CARD (FULL WIDTH) -->
                 <div class="bg-[#FDFBF7] rounded-xl shadow-sm border border-[#E2D7C8] overflow-hidden mb-6">
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table View -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse border-b border-[#E2D7C8]" id="productsTable">
                             <thead>
                                 <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
@@ -1137,6 +1146,74 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Products Card List (Rodeo POS Pattern: Click Card to Edit, Dedicated Delete Button) -->
+                    <div class="block md:hidden p-3 space-y-2.5" id="productsMobileList">
+                        <?php foreach ($products as $idx => $prod): ?>
+                            <div class="product-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all cursor-pointer"
+                                 data-name="<?= strtolower(htmlspecialchars($prod['name'])) ?>"
+                                 data-sku="<?= strtolower(htmlspecialchars($prod['sku'])) ?>"
+                                 data-category="<?= htmlspecialchars($prod['category']) ?>"
+                                 data-status="<?= htmlspecialchars($prod['status']) ?>"
+                                 onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)"
+                                 title="Klik untuk edit produk">
+                                
+                                <!-- Top Bar: SKU, Category & Status Badge -->
+                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($prod['sku']) ?></span>
+                                        <span class="text-[10px] text-[#8E7E73]">• <?= htmlspecialchars($prod['category']) ?></span>
+                                    </div>
+                                    <button type="button" onclick="event.stopPropagation(); toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
+                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60]' : 'bg-[#8E7E73]/15 text-[#8E7E73]' ?>">
+                                        <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
+                                        <span><?= htmlspecialchars($prod['status']) ?></span>
+                                    </button>
+                                </div>
+
+                                <!-- Middle: Product Name & Packaging -->
+                                <div class="py-2.5 space-y-1.5">
+                                    <h4 class="font-bold text-sm text-[#251A14] leading-snug"><?= htmlspecialchars($prod['name']) ?></h4>
+                                    <div class="flex items-center gap-2 flex-wrap text-xs">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border <?= $prod['packaging_badge_class'] ?>">
+                                            <?php if ($prod['packaging_icon'] === 'mika'): ?>
+                                                <i class="far fa-window-restore text-[9px]"></i>
+                                            <?php elseif ($prod['packaging_icon'] === 'kardus'): ?>
+                                                <i class="fas fa-box-open text-[9px]"></i>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($prod['packaging_label']) ?>
+                                        </span>
+                                        <span class="text-[10px] text-[#5E4D42] font-medium bg-[#EFE8DE] px-2 py-0.5 rounded-md border border-[#DDD3C5]">
+                                            Min: <?= htmlspecialchars($prod['min_order']) ?>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Bottom: Price & Quick Delete Action -->
+                                <div class="pt-2 border-t border-[#EAE1D5] flex items-center justify-between">
+                                    <div>
+                                        <span class="text-sm font-bold text-[#251A14]">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
+                                        <span class="text-[10px] text-[#8E7E73]">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-[#D46E15] font-semibold flex items-center gap-1">
+                                            <i class="fas fa-edit text-[10px]"></i> Edit
+                                        </span>
+                                        <button type="button" onclick="event.stopPropagation(); confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" 
+                                            class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center justify-center transition-colors active:scale-95" 
+                                            title="Hapus Produk">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <div id="emptyStateMobile" class="hidden py-8 text-center text-xs text-[#8E7E73]">
+                            <i class="fas fa-search text-base text-[#D46E15] mb-2"></i>
+                            <p class="font-bold text-[#251A14]">Tidak Ada Produk Ditemukan</p>
+                        </div>
                     </div>
 
                     <!-- Table Footer: Record count & Pagination -->
@@ -1689,7 +1766,8 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
             const categoryVal = document.getElementById('categoryFilter').value;
             const statusVal = document.getElementById('statusFilter').value;
 
-            const rows = document.querySelectorAll('.product-row');
+            // Desktop Table Rows
+            const rows = document.querySelectorAll('#productsTableBody .product-row');
             const matchingRows = [];
 
             rows.forEach((row) => {
@@ -1706,6 +1784,25 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                     matchingRows.push(row);
                 } else {
                     row.style.display = 'none';
+                }
+            });
+
+            // Mobile Product Cards
+            const mobileCards = document.querySelectorAll('#productsMobileList .product-mobile-card');
+            mobileCards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const sku = (card.getAttribute('data-sku') || '').toLowerCase();
+                const category = card.getAttribute('data-category') || '';
+                const status = card.getAttribute('data-status') || '';
+
+                const matchesSearch = !searchVal || name.includes(searchVal) || sku.includes(searchVal);
+                const matchesCategory = !categoryVal || category === categoryVal;
+                const matchesStatus = !statusVal || status === statusVal;
+
+                if (matchesSearch && matchesCategory && matchesStatus) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
                 }
             });
 
@@ -1730,14 +1827,15 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
             const visibleCountEl = document.getElementById('visibleCount');
             if (visibleCountEl) visibleCountEl.textContent = totalMatches;
 
-            // Show or hide empty state row
+            // Show or hide empty state row and mobile empty state
             const emptyStateRow = document.getElementById('emptyStateRow');
-            if (emptyStateRow) {
-                if (totalMatches === 0) {
-                    emptyStateRow.classList.remove('hidden');
-                } else {
-                    emptyStateRow.classList.add('hidden');
-                }
+            const emptyStateMobile = document.getElementById('emptyStateMobile');
+            if (totalMatches === 0) {
+                if (emptyStateRow) emptyStateRow.classList.remove('hidden');
+                if (emptyStateMobile) emptyStateMobile.classList.remove('hidden');
+            } else {
+                if (emptyStateRow) emptyStateRow.classList.add('hidden');
+                if (emptyStateMobile) emptyStateMobile.classList.add('hidden');
             }
 
             updatePagination(totalMatches);

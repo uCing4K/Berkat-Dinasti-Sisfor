@@ -489,11 +489,11 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <span class="text-[#D8C7B8]">/</span>
                             <a href="pengaturan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pengaturan</a>
                             <span class="text-[#D8C7B8]">/</span>
-                            <span class="text-[#3E2B21] font-semibold" id="headerSubtitle"><?= $active_tab === 'user' ? 'Manajemen User' : 'Profil Toko' ?></span>
+                            <span class="text-[#3E2B21] font-semibold" id="headerSubtitle"><?= $active_tab === 'user' ? 'Pengguna' : 'Profil Toko' ?></span>
                         </div>
                         <!-- Section Heading -->
                         <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight mt-0.5" id="headerTitle">
-                            <?= $active_tab === 'user' ? 'Manajemen Pengguna' : 'Pengaturan Toko' ?>
+                            <?= $active_tab === 'user' ? 'Pengaturan Pengguna' : 'Pengaturan Toko' ?>
                         </h1>
                     </div>
                 </div>
@@ -580,20 +580,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <span id="dynamicToastText">Fitur segera diimplementasi</span>
                 </div>
 
-                <!-- TAB SWITCHER BAR (PROFIL TOKO VS MANAJEMEN USER) -->
+                <!-- TAB SWITCHER BAR (PROFIL TOKO VS PENGGUNA) -->
                 <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-2 mb-6 shadow-2xs max-w-fit">
                     <!-- Tab 1: Profil UMKM -->
                     <button onclick="switchSettingTab('profil')" id="tabBtnProfil" 
-                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab !== 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
+                        class="px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all <?= $active_tab !== 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
                         <i class="fas fa-store text-xs"></i>
-                        <span>Profil Toko & Printer</span>
+                        <span>Profil Toko</span>
                     </button>
 
                     <!-- Tab 2: Manajemen User -->
                     <button onclick="switchSettingTab('user')" id="tabBtnUser" 
-                        class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all <?= $active_tab === 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
+                        class="px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all <?= $active_tab === 'user' ? 'bg-[#D46E15] text-white shadow-xs' : 'text-[#8E7E73] hover:text-[#251A14]' ?>">
                         <i class="fas fa-users-cog text-xs"></i>
-                        <span>Manajemen Pengguna</span>
+                        <span>Pengguna</span>
                     </button>
                 </div>
 
@@ -908,7 +908,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             </button>
                         </div>
 
-                        <div class="overflow-x-auto">
+                        <!-- Desktop Table View -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-left border-collapse" id="usersTable">
                                 <thead>
                                     <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
@@ -970,6 +971,48 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile Users Card List -->
+                        <div class="block md:hidden space-y-2.5 pt-2" id="usersMobileList">
+                            <?php foreach ($users_list as $u): ?>
+                                <div class="user-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs">
+                                    <div class="flex items-center justify-between pb-2.5 border-b border-[#EAE1D5]">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-9 h-9 rounded-full <?= $u['id'] === 1 ? 'bg-[#3E2B21]' : 'bg-[#D46E15]' ?> text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                                                <?= htmlspecialchars($u['avatar']) ?>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold text-xs text-[#251A14] leading-tight"><?= htmlspecialchars($u['nama']) ?></h4>
+                                                <p class="font-mono text-[11px] text-[#8E7E73]">@<?= htmlspecialchars($u['username']) ?></p>
+                                            </div>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <?= $u['id'] === 1 ? 'bg-[#3E2B21] text-white' : 'bg-[#D46E15]/15 text-[#924C00]' ?>">
+                                            <?= htmlspecialchars($u['role']) ?>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-2.5 text-xs">
+                                        <span class="inline-flex items-center gap-1.5 font-semibold text-[11px] <?= $u['status_class'] ?>">
+                                            <span class="w-1.5 h-1.5 rounded-full <?= $u['dot_class'] ?>"></span>
+                                            <span><?= htmlspecialchars($u['status']) ?></span>
+                                        </span>
+                                        <div>
+                                            <?php if ($u['is_locked'] ?? false): ?>
+                                                <span class="text-[11px] text-[#8E7E73] italic">Terkunci (Owner)</span>
+                                            <?php else: ?>
+                                                <div class="flex items-center gap-1.5">
+                                                    <button onclick="openUserModal(<?= $u['id'] ?>)" class="w-7 h-7 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 flex items-center justify-center shadow-xs">
+                                                        <i class="fas fa-edit text-xs"></i>
+                                                    </button>
+                                                    <button onclick="handleDeleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['nama']) ?>')" class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/70 flex items-center justify-center shadow-xs">
+                                                        <i class="fas fa-trash-alt text-xs"></i>
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -1226,15 +1269,15 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             if (tab === 'user') {
                 tabContentProfil.classList.add('hidden');
                 tabContentUser.classList.remove('hidden');
-                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
-                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
-                headerSubtitle.textContent = 'Manajemen User';
-                headerTitle.textContent = 'Manajemen Pengguna';
+                tabBtnUser.className = 'px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
+                tabBtnProfil.className = 'px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
+                headerSubtitle.textContent = 'Pengguna';
+                headerTitle.textContent = 'Pengaturan Pengguna';
             } else {
                 tabContentUser.classList.add('hidden');
                 tabContentProfil.classList.remove('hidden');
-                tabBtnProfil.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
-                tabBtnUser.className = 'px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
+                tabBtnProfil.className = 'px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all bg-[#D46E15] text-white shadow-xs';
+                tabBtnUser.className = 'px-3.5 sm:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 sm:gap-2 transition-all text-[#8E7E73] hover:text-[#251A14]';
                 headerSubtitle.textContent = 'Profil Toko';
                 headerTitle.textContent = 'Pengaturan Toko';
             }

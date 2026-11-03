@@ -423,15 +423,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div id="filterBar" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     
                     <!-- Left: Periode Filter Controls -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2 text-xs md:text-sm font-semibold text-[#251A14]">
+                    <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                        <div class="hidden sm:flex items-center gap-2 text-xs md:text-sm font-semibold text-[#251A14]">
                             <i class="fas fa-filter text-[#D46E15]"></i>
                             <span>Periode:</span>
                         </div>
 
                         <!-- Dropdown Periode -->
-                        <div class="relative">
-                            <select id="periodeSelect" onchange="applyPeriodFilter()" class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs md:text-sm text-[#251A14] font-semibold focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
+                        <div class="relative flex-1 sm:flex-initial">
+                            <select id="periodeSelect" onchange="applyPeriodFilter()" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3 pr-7 py-2 text-xs md:text-sm text-[#251A14] font-semibold focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
                                 <option value="bulan_ini">Bulan Ini (<?= $currentMonthIndo ?>)</option>
                                 <option value="bulan_lalu">Bulan Lalu (<?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?>)</option>
                                 <option value="kuartal">Kuartal Berjalan</option>
@@ -443,49 +443,52 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
 
                         <!-- Date Range Display Box -->
-                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2 text-xs md:text-sm text-[#3E2B21] font-semibold flex items-center gap-2 shadow-2xs">
+                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3 py-2 text-xs md:text-sm text-[#3E2B21] font-semibold flex items-center gap-1.5 shadow-2xs">
                             <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
                             <span id="dateRangeText">01/<?= date('m/Y') ?> — <?= date('d/m/Y') ?></span>
                         </div>
 
                         <!-- Button Terapkan Filter -->
-                        <button onclick="applyPeriodFilter()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
+                        <button onclick="applyPeriodFilter()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-check text-xs"></i>
-                            <span>Terapkan Filter</span>
+                            <span class="hidden sm:inline">Terapkan Filter</span>
+                            <span class="sm:hidden">Terapkan</span>
                         </button>
                     </div>
 
                     <!-- Right: Unduh Excel & Cetak Laporan -->
-                    <div id="reportActions" class="flex items-center gap-3 self-end sm:self-auto">
-                        <button onclick="handleExportExcel()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                    <div id="reportActions" class="flex items-center gap-2 self-end sm:self-auto">
+                        <button onclick="handleExportExcel()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
                             <i class="fas fa-file-excel text-xs text-emerald-700"></i>
-                            <span>Unduh Excel (CSV)</span>
+                            <span class="hidden sm:inline">Unduh Excel</span>
+                            <span class="sm:hidden">Excel</span>
                         </button>
 
-                        <button onclick="window.print()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                        <button onclick="window.print()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
                             <i class="fas fa-print text-xs text-[#5E4D42]"></i>
-                            <span>Cetak Laporan</span>
+                            <span class="hidden sm:inline">Cetak Laporan</span>
+                            <span class="sm:hidden">Cetak</span>
                         </button>
                     </div>
 
                 </div>
 
-                <!-- ROW 1: 4 KPI STATS (Dark Chocolate Espresso Cards) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                <!-- ROW 1: 4 KPI STATS (Dark Chocolate Espresso Cards - 2x2 Mini on Mobile, 4x1 on Desktop) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-5 mb-5 sm:mb-6">
                     
                     <!-- KPI 1: Total Pemasukan -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Total Pemasukan</span>
-                                <div class="w-9 h-9 rounded-lg bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center ring-1 ring-[#27AE60]/30">
-                                    <i class="fas fa-wallet text-sm"></i>
+                            <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                                <span class="text-[10px] sm:text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Total Pemasukan</span>
+                                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center ring-1 ring-[#27AE60]/30">
+                                    <i class="fas fa-wallet text-xs sm:text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPemasukan"><?= 'Rp ' . number_format($kpi_pemasukan_raw, 0, ',', '.') ?></h3>
+                            <h3 class="text-base sm:text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPemasukan"><?= 'Rp ' . number_format($kpi_pemasukan_raw, 0, ',', '.') ?></h3>
                         </div>
-                        <div class="mt-4">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#27AE60]/20 text-[#27AE60] border border-[#27AE60]/30">
+                        <div class="mt-2 sm:mt-4">
+                            <span class="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#27AE60]/20 text-[#27AE60] border border-[#27AE60]/30">
                                 <i class="fas fa-check-circle text-[9px]"></i>
                                 <span>Total Lunas Realtime</span>
                             </span>
@@ -493,50 +496,50 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
 
                     <!-- KPI 2: Total Pesanan -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Total Pesanan</span>
-                                <div class="w-9 h-9 rounded-lg bg-[#D46E15]/20 text-[#D46E15] flex items-center justify-center ring-1 ring-[#D46E15]/30">
-                                    <i class="fas fa-clipboard-check text-sm"></i>
+                            <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                                <span class="text-[10px] sm:text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Total Pesanan</span>
+                                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#D46E15]/20 text-[#D46E15] flex items-center justify-center ring-1 ring-[#D46E15]/30">
+                                    <i class="fas fa-clipboard-check text-xs sm:text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPesanan"><?= $kpi_orders_count ?> Order</h3>
+                            <h3 class="text-base sm:text-2xl font-bold text-[#FAF8F5] tracking-tight mt-1" id="kpiPesanan"><?= $kpi_orders_count ?> Order</h3>
                         </div>
-                        <div class="mt-4">
-                            <span class="text-xs text-[#D8C7B8]">Akumulasi seluruh transaksi</span>
+                        <div class="mt-2 sm:mt-4">
+                            <span class="hidden sm:block text-xs text-[#D8C7B8]">Akumulasi seluruh transaksi</span>
                         </div>
                     </div>
 
                     <!-- KPI 3: Total Piutang (Hutang) -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Sisa Piutang</span>
-                                <div class="w-9 h-9 rounded-lg bg-[#EB5757]/20 text-[#EB5757] flex items-center justify-center ring-1 ring-[#EB5757]/30">
-                                    <i class="fas fa-exclamation-triangle text-sm"></i>
+                            <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                                <span class="text-[10px] sm:text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Sisa Piutang</span>
+                                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#EB5757]/20 text-[#EB5757] flex items-center justify-center ring-1 ring-[#EB5757]/30">
+                                    <i class="fas fa-exclamation-triangle text-xs sm:text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#FF8585] tracking-tight mt-1" id="kpiPiutang"><?= 'Rp ' . number_format($kpi_piutang_raw, 0, ',', '.') ?></h3>
+                            <h3 class="text-base sm:text-2xl font-bold text-[#FF8585] tracking-tight mt-1" id="kpiPiutang"><?= 'Rp ' . number_format($kpi_piutang_raw, 0, ',', '.') ?></h3>
                         </div>
-                        <div class="mt-4">
-                            <span class="text-xs text-[#D8C7B8]">Piutang tertagih pelanggan</span>
+                        <div class="mt-2 sm:mt-4">
+                            <span class="hidden sm:block text-xs text-[#D8C7B8]">Piutang tertagih pelanggan</span>
                         </div>
                     </div>
 
                     <!-- KPI 4: Pesanan Pending -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Pesanan Pending</span>
-                                <div class="w-9 h-9 rounded-lg bg-[#E2B93B]/20 text-[#E2B93B] flex items-center justify-center ring-1 ring-[#E2B93B]/30">
-                                    <i class="fas fa-hourglass-half text-sm"></i>
+                            <div class="flex items-center justify-between mb-1.5 sm:mb-2">
+                                <span class="text-[10px] sm:text-xs text-[#D8C7B8] font-semibold tracking-wider uppercase">Pesanan Pending</span>
+                                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-[#E2B93B]/20 text-[#E2B93B] flex items-center justify-center ring-1 ring-[#E2B93B]/30">
+                                    <i class="fas fa-hourglass-half text-xs sm:text-sm"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-[#E2B93B] tracking-tight mt-1" id="kpiPending"><?= $kpi_pending_count ?> Order</h3>
+                            <h3 class="text-base sm:text-2xl font-bold text-[#E2B93B] tracking-tight mt-1" id="kpiPending"><?= $kpi_pending_count ?> Order</h3>
                         </div>
-                        <div class="mt-4">
-                            <span class="text-xs text-[#D8C7B8]" id="kpiPendingDesc">5 antrean oven, 1 tertunda</span>
+                        <div class="mt-2 sm:mt-4">
+                            <span class="hidden sm:block text-xs text-[#D8C7B8]" id="kpiPendingDesc">5 antrean oven, 1 tertunda</span>
                         </div>
                     </div>
 
@@ -744,8 +747,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
                     </div>
 
-                    <!-- Responsive Orders Table (Lebar Pas & Tidak Terpotong) -->
-                    <div class="overflow-x-auto w-full">
+                    <!-- Responsive Orders Table (Desktop View) -->
+                    <div class="hidden md:block overflow-x-auto w-full">
                         <table class="w-full text-left border-collapse" id="ordersReportTable">
                             <thead>
                                 <tr class="bg-[#3E2B21] text-[#FAF8F5] text-xs font-bold uppercase tracking-wider">
@@ -801,6 +804,43 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Orders Report Cards List -->
+                    <div class="block md:hidden p-3 space-y-2.5" id="ordersReportMobileList">
+                        <?php foreach ($orders_report as $ord): ?>
+                            <div class="report-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] transition-all"
+                                 data-status="<?= htmlspecialchars($ord['status_bayar']) ?>">
+                                
+                                <!-- Top Bar: Date, Invoice ID & Payment Status -->
+                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($ord['order_id']) ?></span>
+                                        <span class="text-[#8E7E73] text-[11px]">• <?= htmlspecialchars($ord['tanggal']) ?></span>
+                                    </div>
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider <?= $ord['status_bayar_class'] ?>">
+                                        <?= htmlspecialchars($ord['status_bayar_label'] ?? $ord['status_bayar']) ?>
+                                    </span>
+                                </div>
+
+                                <!-- Customer & Items -->
+                                <div class="py-2.5 space-y-1">
+                                    <h4 class="font-bold text-xs text-[#251A14]"><?= htmlspecialchars($ord['customer']) ?></h4>
+                                    <p class="text-[11px] text-[#5E4D42] line-clamp-2 leading-relaxed"><?= htmlspecialchars($ord['items']) ?></p>
+                                </div>
+
+                                <!-- Bottom: Total & Jam -->
+                                <div class="flex items-center justify-between pt-2 border-t border-[#EAE1D5] text-xs">
+                                    <span class="text-[11px] text-[#8E7E73] flex items-center gap-1">
+                                        <i class="far fa-clock text-[10px]"></i>
+                                        <?= htmlspecialchars($ord['jam']) ?>
+                                    </span>
+                                    <span class="font-mono font-bold text-xs text-[#3E2B21]">
+                                        <?= htmlspecialchars($ord['total']) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Pagination Footer (Akurat & Dinamis) -->
@@ -1099,7 +1139,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
         }
 
-        // Filter Report Table by Payment Status
+        // Filter Report Table by Payment Status (Desktop & Mobile)
         function filterReportTable(status, activeBtn) {
             const buttons = [
                 document.getElementById('filterBtnAll'),
@@ -1114,7 +1154,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             activeBtn.className = 'px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors';
 
             const rows = document.querySelectorAll('#ordersReportTable tbody tr');
+            const mobileCards = document.querySelectorAll('#ordersReportMobileList .report-mobile-card');
             let count = 0;
+
             rows.forEach(row => {
                 const rowStatus = row.getAttribute('data-status');
                 if (status === 'all' || rowStatus === status) {
@@ -1124,6 +1166,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     row.style.display = 'none';
                 }
             });
+
+            mobileCards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                if (status === 'all' || cardStatus === status) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
             document.getElementById('tableRecordCountBadge').textContent = count + ' Data';
         }
 

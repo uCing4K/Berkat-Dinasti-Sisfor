@@ -2015,41 +2015,41 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div id="calendarView" class="<?= $active_tab === 'kalender' ? '' : 'hidden' ?>">
                     
                     <!-- Controls Row: Month Selector & Filters -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                        <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
                             <!-- Dropdown Bulan Dinamis -->
-                            <div class="relative">
-                                <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#251A14] font-semibold focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
+                            <div class="relative w-full sm:w-auto">
+                                <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs sm:text-sm text-[#251A14] font-semibold focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
                                     <option value="<?= date('Y-m') ?>"><?= $currentMonthIndo ?></option>
                                     <option value="<?= date('Y-m', strtotime('-1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?></option>
                                     <option value="<?= date('Y-m', strtotime('+1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('+1 month'))] ?? '') . ' ' . date('Y', strtotime('+1 month')) ?></option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
-                                    <i class="fas fa-chevron-down text-xs"></i>
+                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-[10px]"></i>
                                 </div>
                             </div>
 
                             <!-- Dropdown Tipe Pengiriman -->
-                            <div class="relative">
-                                <select id="shippingTypeSelect" onchange="filterShippingType(this.value)" class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg pl-3.5 pr-9 py-2 text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
+                            <div class="relative w-full sm:w-auto">
+                                <select id="shippingTypeSelect" onchange="filterShippingType(this.value)" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs sm:text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
                                     <option value="all">Semua Pengiriman</option>
                                     <option value="kurir">Kurir Toko (Obrok)</option>
                                     <option value="toko">Ambil di Toko</option>
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
-                                    <i class="fas fa-chevron-down text-xs"></i>
+                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                    <i class="fas fa-chevron-down text-[10px]"></i>
                                 </div>
                             </div>
 
-                            <!-- Badge 3 Hari Pengiriman Aktif -->
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
+                            <!-- Badge Kapasitas Trip -->
+                            <span class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
                                 <i class="fas fa-motorcycle text-xs"></i>
-                                <span>Kapasitas Trip: Maks. 150 pcs/Motor</span>
+                                <span>Kapasitas: Maks. 150 pcs/Trip</span>
                             </span>
                         </div>
 
                         <!-- Button Tambah Pesanan -->
-                        <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                        <a href="pesanan.php?view=tambah_pesanan" class="hidden sm:inline-flex bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan</span>
                         </a>
@@ -2112,13 +2112,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
 
                     <!-- Bottom Delivery Schedule (Interactive Filtered View) -->
-                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-sm" id="deliveryScheduleSection">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-[#E2D7C8] mb-5">
-                            <div class="flex items-center gap-2.5">
-                                <h3 class="text-[#251A14] font-bold text-base" id="deliveryScheduleTitle">Jadwal Pengiriman: <?= $todayFormatted ?></h3>
-                                <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full" id="deliveryBatchBadge">
-                                    2 Batch Siap
-                                </span>
+                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-6 shadow-sm" id="deliveryScheduleSection">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-4 border-b border-[#E2D7C8] mb-5">
+                            <div class="space-y-0.5">
+                                <span class="text-[11px] sm:text-xs text-[#8E7E73] font-semibold uppercase tracking-wider block">Jadwal Pengiriman:</span>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-[#251A14] font-bold text-base sm:text-lg" id="deliveryScheduleTitle"><?= $todayFormatted ?></h3>
+                                    <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0" id="deliveryBatchBadge">
+                                        2 Batch Aktif
+                                    </span>
+                                </div>
                             </div>
                             <span class="text-xs text-[#8E7E73]" id="deliveryCountLabel">2 Pengiriman Terjadwal</span>
                         </div>
@@ -2381,104 +2384,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </table>
                         </div>
 
-                        <!-- Mobile Order Cards List (Rodeo POS Pattern) -->
-                        <div class="block md:hidden p-3 space-y-2.5" id="ordersDataMobileList">
-                            <?php foreach ($master_orders as $ord): 
-                                $courierText = $ord['courier_info'] ?? 'Kurir Toko';
-                                $isAmbil = str_contains(strtolower($courierText), 'ambil') || str_contains(strtolower($ord['destination'] ?? ''), 'ambil');
-                                $serviceTag = $isAmbil ? 'AMBIL SENDIRI' : 'KURIR TOKO';
-                                $serviceTagClass = $isAmbil 
-                                    ? 'bg-amber-50 text-amber-800 border-amber-200/70' 
-                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200/70';
-
-                                $statusKey = strtolower($ord['current_status'] ?? $ord['default_status'] ?? 'menunggu');
-                                $statusTagInfo = match($statusKey) {
-                                    'proses' => ['label' => 'PROSES', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
-                                    'kirim' => ['label' => 'SIAP KIRIM', 'class' => 'bg-sky-50 text-sky-800 border-sky-200/70'],
-                                    'selesai' => ['label' => 'SELESAI', 'class' => 'bg-emerald-50 text-emerald-800 border-emerald-200/70'],
-                                    default => ['label' => 'MENUNGGU', 'class' => 'bg-yellow-50 text-yellow-800 border-yellow-200/70']
-                                };
-
-                                $payText = strtolower($ord['status_bayar'] ?? 'belum');
-                                $payTagInfo = match(true) {
-                                    str_contains($payText, 'lunas') => ['label' => 'LUNAS', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200/70'],
-                                    str_contains($payText, 'hutang') || str_contains($payText, 'dp') => ['label' => 'HUTANG', 'class' => 'bg-amber-50 text-amber-800 border-amber-200/70'],
-                                    default => ['label' => 'BELUM', 'class' => 'bg-rose-50 text-rose-700 border-rose-200/70']
-                                };
-                                $payFilterKey = str_contains($payText, 'lunas') ? 'lunas' : (str_contains($payText, 'hutang') || str_contains($payText, 'dp') ? 'hutang' : 'belum');
-                                $courierFilterKey = $isAmbil ? 'ambil' : 'kurir';
-                            ?>
-                            <div class="order-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all cursor-pointer"
-                                 data-id="<?= htmlspecialchars($ord['id']) ?>"
-                                 data-customer="<?= htmlspecialchars(strtolower($ord['customer'])) ?>"
-                                 data-phone="<?= htmlspecialchars(strtolower($ord['phone'])) ?>"
-                                 data-items="<?= htmlspecialchars(strtolower($ord['items'])) ?>"
-                                 data-destination="<?= htmlspecialchars(strtolower($ord['destination'])) ?>"
-                                 data-status="<?= $statusKey ?>"
-                                 data-pay="<?= $payFilterKey ?>"
-                                 data-courier="<?= $courierFilterKey ?>"
-                                 data-date="<?= $ord['date'] ?>"
-                                 onclick="openOrderDetailById('<?= htmlspecialchars($ord['id']) ?>')">
-                                
-                                <!-- Top Bar: Order ID & Total Amount -->
-                                <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
-                                    <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($ord['id']) ?></span>
-                                    <span class="font-mono font-bold text-sm text-[#3E2B21]">Rp <?= number_format($ord['total'], 0, ',', '.') ?></span>
-                                </div>
-
-                                <!-- Middle: Customer & Destination -->
-                                <div class="py-2.5 space-y-1.5">
-                                    <div class="flex items-center justify-between">
-                                        <h4 class="font-bold text-xs text-[#251A14] flex items-center gap-1.5 truncate">
-                                            <i class="fas fa-user text-[10px] text-[#8E7E73]"></i>
-                                            <?= htmlspecialchars($ord['customer']) ?>
-                                        </h4>
-                                        <span class="text-[11px] text-[#8E7E73] font-mono"><i class="fas fa-phone text-[9px] mr-1"></i><?= htmlspecialchars($ord['phone']) ?></span>
-                                    </div>
-                                    <p class="text-[11px] text-[#5E4D42] truncate font-medium">
-                                        <i class="fas fa-bread-slice text-[10px] text-[#D46E15] mr-1"></i><?= htmlspecialchars($ord['items']) ?>
-                                    </p>
-                                    <?php if (!empty($ord['destination'])): ?>
-                                    <p class="text-[10px] text-[#8E7E73] truncate">
-                                        <i class="fas fa-map-marker-alt text-[9px] text-amber-600 mr-1"></i><?= htmlspecialchars($ord['destination']) ?>
-                                    </p>
-                                    <?php endif; ?>
-                                </div>
-
-                                <!-- Bottom: Date, 3 Badges, and Quick Actions -->
-                                <div class="pt-2 border-t border-[#EAE1D5] flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-1 flex-wrap">
-                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $serviceTagClass ?>">
-                                            <?= $serviceTag ?>
-                                        </span>
-                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $statusTagInfo['class'] ?>" id="mobile-status-badge-<?= htmlspecialchars($ord['id']) ?>">
-                                            <?= $statusTagInfo['label'] ?>
-                                        </span>
-                                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border <?= $payTagInfo['class'] ?>">
-                                            <?= $payTagInfo['label'] ?>
-                                        </span>
-                                    </div>
-
-                                    <!-- Quick Action Buttons -->
-                                    <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
-                                        <button type="button" onclick="handlePrintReceipt('<?= htmlspecialchars($ord['id']) ?>', this)" 
-                                            class="w-7 h-7 rounded-lg bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
-                                            title="Cetak Struk Thermal Bluetooth">
-                                            <i class="fas fa-tag text-[10px]"></i>
-                                        </button>
-                                        <button type="button" id="mobile-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
-                                            onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
-                                            class="w-7 h-7 rounded-lg <?= $statusKey === 'selesai' ? 'bg-[#107C41] text-white opacity-80 cursor-default' : 'bg-[#D46E15] hover:bg-[#B85207] text-white active:scale-90' ?> flex items-center justify-center shadow-xs transition-all" 
-                                            title="<?= $statusKey === 'selesai' ? 'Pesanan Selesai' : 'Lanjutkan Alur Kerja Dapur' ?>"
-                                            <?= $statusKey === 'selesai' ? 'disabled' : '' ?>>
-                                            <i class="fas <?= $statusKey === 'selesai' ? 'fa-check-double' : 'fa-check' ?> text-[10px]"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-
                         <!-- Button Tambah Produk Baru Dinamis -->
                         <div class="flex items-center justify-between mb-4">
                             <button type="button" onclick="addOrderProductRow()" 
@@ -2610,7 +2515,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="font-mono text-[#D46E15] font-bold text-base" id="modalDetailOrderId">#ORD-000</span>
-                        <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold" id="modalDetailStatusBadge">Menunggu</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-[#D46E15] text-white shadow-xs" id="modalDetailStatusBadge">Menunggu</span>
                     </div>
                     <h3 class="text-lg font-bold text-[#251A14] mt-1" id="modalDetailCustomer">Nama Pelanggan</h3>
                 </div>
@@ -2643,16 +2548,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <div>
                     <label class="block font-semibold text-[#3E2B21] mb-2">Ubah Status Alur Kerja:</label>
                     <div class="grid grid-cols-4 gap-2">
-                        <button type="button" onclick="changeModalOrderStatus('menunggu')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#E2B93B] text-[#886C12] bg-[#E2B93B]/10 hover:bg-[#E2B93B]/20 text-[11px]">
+                        <button type="button" id="modalStatusBtn-menunggu" onclick="changeModalOrderStatus('menunggu')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#D46E15] text-white bg-[#D46E15] text-[11px] transition-all">
                             Menunggu
                         </button>
-                        <button type="button" onclick="changeModalOrderStatus('proses')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#D46E15] text-[#B85207] bg-[#D46E15]/10 hover:bg-[#D46E15]/20 text-[11px]">
-                            Oven/Dapur
+                        <button type="button" id="modalStatusBtn-proses" onclick="changeModalOrderStatus('proses')" class="py-2 px-1 text-center font-semibold rounded-lg border border-[#DDD3C5] text-[#544337] bg-white hover:bg-[#FAF7F2] text-[11px] transition-all">
+                            Oven
                         </button>
-                        <button type="button" onclick="changeModalOrderStatus('kirim')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#2F80ED] text-[#1B57A6] bg-[#2F80ED]/10 hover:bg-[#2F80ED]/20 text-[11px]">
+                        <button type="button" id="modalStatusBtn-kirim" onclick="changeModalOrderStatus('kirim')" class="py-2 px-1 text-center font-semibold rounded-lg border border-[#DDD3C5] text-[#544337] bg-white hover:bg-[#FAF7F2] text-[11px] transition-all">
                             Siap Kirim
                         </button>
-                        <button type="button" onclick="changeModalOrderStatus('selesai')" class="py-2 px-1 text-center font-bold rounded-lg border border-[#27AE60] text-[#1B7A43] bg-[#27AE60]/10 hover:bg-[#27AE60]/20 text-[11px]">
+                        <button type="button" id="modalStatusBtn-selesai" onclick="changeModalOrderStatus('selesai')" class="py-2 px-1 text-center font-semibold rounded-lg border border-[#DDD3C5] text-[#544337] bg-white hover:bg-[#FAF7F2] text-[11px] transition-all">
                             Selesai
                         </button>
                     </div>
@@ -2903,8 +2808,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const headerBreadcrumb = document.getElementById('headerBreadcrumb');
             const pageSubtitle = document.getElementById('pageSubtitle');
 
-            const activeClass = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-[#D46E15] text-white shadow-sm font-semibold';
-            const inactiveClass = 'px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
+            const activeClass = 'px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all bg-[#D46E15] text-white shadow-sm font-semibold';
+            const inactiveClass = 'px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
 
             if (tab === 'tabel') {
                 if (kanbanView) kanbanView.classList.add('hidden');
@@ -2912,7 +2817,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (tableView) tableView.classList.remove('hidden');
 
                 if (tabBtnTabel) tabBtnTabel.className = activeClass;
-                if (tabBtnKanban) tabBtnKanban.className = inactiveClass;
+                if (tabBtnKanban) tabBtnKanban.className = inactiveClass + ' hidden md:flex';
                 if (tabBtnKalender) tabBtnKalender.className = inactiveClass;
 
                 if (headerTitle) headerTitle.textContent = 'Daftar Pesanan';
@@ -2930,7 +2835,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (calendarView) calendarView.classList.remove('hidden');
 
                 if (tabBtnKalender) tabBtnKalender.className = activeClass;
-                if (tabBtnKanban) tabBtnKanban.className = inactiveClass;
+                if (tabBtnKanban) tabBtnKanban.className = inactiveClass + ' hidden md:flex';
                 if (tabBtnTabel) tabBtnTabel.className = inactiveClass;
 
                 if (headerTitle) headerTitle.textContent = 'Pengiriman';
@@ -2947,7 +2852,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (tableView) tableView.classList.add('hidden');
                 if (kanbanView) kanbanView.classList.remove('hidden');
 
-                if (tabBtnKanban) tabBtnKanban.className = activeClass;
+                if (tabBtnKanban) tabBtnKanban.className = activeClass + ' hidden md:flex';
                 if (tabBtnTabel) tabBtnTabel.className = inactiveClass;
                 if (tabBtnKalender) tabBtnKalender.className = inactiveClass;
 
@@ -2969,7 +2874,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const statusF = document.getElementById('tableStatusFilter')?.value || '';
             const payF = document.getElementById('tablePayFilter')?.value || '';
             const courierF = document.getElementById('tableCourierFilter')?.value || '';
-            const dateF = document.getElementById('tableDateFilter')?.value || '';
+            const dateFrom = document.getElementById('tableDateFrom')?.value || '';
+            const dateTo = document.getElementById('tableDateTo')?.value || '';
 
             const rows = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row');
             let visibleCount = 0;
@@ -2989,13 +2895,43 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 const matchStatus = !statusF || status === statusF;
                 const matchPay = !payF || pay === payF;
                 const matchCourier = !courierF || courier === courierF;
-                const matchDate = !dateF || date === dateF;
+                let matchDate = true;
+                if (dateFrom && date < dateFrom) matchDate = false;
+                if (dateTo && date > dateTo) matchDate = false;
 
                 if (matchQ && matchStatus && matchPay && matchCourier && matchDate) {
                     tr.classList.remove('hidden');
                     visibleCount++;
                 } else {
                     tr.classList.add('hidden');
+                }
+            });
+
+            // Filter Mobile Cards
+            const mobileCards = document.querySelectorAll('#ordersDataMobileList .order-mobile-card');
+            mobileCards.forEach(card => {
+                const id = card.getAttribute('data-id')?.toLowerCase() || '';
+                const customer = card.getAttribute('data-customer') || '';
+                const phone = card.getAttribute('data-phone') || '';
+                const items = card.getAttribute('data-items') || '';
+                const dest = card.getAttribute('data-destination') || '';
+                const status = card.getAttribute('data-status') || '';
+                const pay = card.getAttribute('data-pay') || '';
+                const courier = card.getAttribute('data-courier') || '';
+                const date = card.getAttribute('data-date') || '';
+
+                const matchQ = !q || id.includes(q) || customer.includes(q) || phone.includes(q) || items.includes(q) || dest.includes(q);
+                const matchStatus = !statusF || status === statusF;
+                const matchPay = !payF || pay === payF;
+                const matchCourier = !courierF || courier === courierF;
+                let matchDate = true;
+                if (dateFrom && date < dateFrom) matchDate = false;
+                if (dateTo && date > dateTo) matchDate = false;
+
+                if (matchQ && matchStatus && matchPay && matchCourier && matchDate) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
                 }
             });
 
@@ -3019,7 +2955,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (document.getElementById('tableStatusFilter')) document.getElementById('tableStatusFilter').value = '';
             if (document.getElementById('tablePayFilter')) document.getElementById('tablePayFilter').value = '';
             if (document.getElementById('tableCourierFilter')) document.getElementById('tableCourierFilter').value = '';
-            if (document.getElementById('tableDateFilter')) document.getElementById('tableDateFilter').value = '';
+            if (document.getElementById('tableDateFrom')) document.getElementById('tableDateFrom').value = '';
+            if (document.getElementById('tableDateTo')) document.getElementById('tableDateTo').value = '';
             filterTableOrders();
         }
 
@@ -3239,18 +3176,19 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         }
 
         function updateTableRowStatus(orderId, status) {
+            const statusConfig = {
+                'menunggu': { label: 'MENUNGGU', class: 'bg-yellow-50 text-yellow-800 border-yellow-200/70' },
+                'proses': { label: 'PROSES DAPUR', class: 'bg-amber-50 text-amber-800 border-amber-200/70' },
+                'kirim': { label: 'SIAP KIRIM', class: 'bg-sky-50 text-sky-800 border-sky-200/70' },
+                'selesai': { label: 'SELESAI', class: 'bg-emerald-50 text-emerald-800 border-emerald-200/70' }
+            };
+            const cfg = statusConfig[status] || statusConfig['menunggu'];
+
             const row = document.querySelector(`.order-table-row[data-id="${orderId}"]`);
             if (row) {
                 row.setAttribute('data-status', status);
                 const badge = document.getElementById(`table-status-badge-${orderId}`);
                 if (badge) {
-                    const statusConfig = {
-                        'menunggu': { label: 'MENUNGGU', class: 'bg-yellow-50 text-yellow-800 border-yellow-200/70' },
-                        'proses': { label: 'PROSES DAPUR', class: 'bg-amber-50 text-amber-800 border-amber-200/70' },
-                        'kirim': { label: 'SIAP KIRIM', class: 'bg-sky-50 text-sky-800 border-sky-200/70' },
-                        'selesai': { label: 'SELESAI', class: 'bg-emerald-50 text-emerald-800 border-emerald-200/70' }
-                    };
-                    const cfg = statusConfig[status] || statusConfig['menunggu'];
                     badge.textContent = cfg.label;
                     badge.className = `text-[9px] font-bold px-2 py-0.5 rounded tracking-wider uppercase border ${cfg.class}`;
                 }
@@ -3269,6 +3207,35 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         advanceBtn.innerHTML = '<i class="fas fa-check text-xs"></i>';
                     }
                 }
+            }
+
+            // Sync Mobile Card
+            const mobileCard = document.querySelector(`.order-mobile-card[data-id="${orderId}"]`);
+            if (mobileCard) {
+                mobileCard.setAttribute('data-status', status);
+                const mobBadge = document.getElementById(`mobile-status-badge-${orderId}`);
+                if (mobBadge) {
+                    mobBadge.textContent = cfg.label;
+                    mobBadge.className = `text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase border ${cfg.class}`;
+                }
+                const mobAdvanceBtn = document.getElementById(`mobile-btn-advance-${orderId}`);
+                if (mobAdvanceBtn) {
+                    if (status === 'selesai') {
+                        mobAdvanceBtn.disabled = true;
+                        mobAdvanceBtn.className = 'w-7 h-7 rounded-lg bg-[#107C41] text-white opacity-80 cursor-default flex items-center justify-center shadow-xs transition-all';
+                        mobAdvanceBtn.innerHTML = '<i class="fas fa-check-double text-[10px]"></i>';
+                    } else {
+                        mobAdvanceBtn.disabled = false;
+                        mobAdvanceBtn.className = 'w-7 h-7 rounded-lg bg-[#D46E15] hover:bg-[#B85207] text-white flex items-center justify-center shadow-xs transition-all active:scale-90';
+                        mobAdvanceBtn.innerHTML = '<i class="fas fa-check text-[10px]"></i>';
+                    }
+                }
+            }
+
+            const memOrd = ordersData.find(o => o.id === orderId);
+            if (memOrd) {
+                memOrd.current_status = status;
+                memOrd.status = status;
             }
         }
 
@@ -3427,7 +3394,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             // Blanks
             for (let i = 0; i < startCol; i++) {
-                grid.insertAdjacentHTML('beforeend', '<div class="p-2.5 text-sm text-[#D8D2CB] pointer-events-none"></div>');
+                grid.insertAdjacentHTML('beforeend', '<div class="p-1 md:p-2.5 text-sm text-[#D8D2CB] pointer-events-none min-h-[46px] md:min-h-[64px]"></div>');
             }
 
             // Days
@@ -3455,9 +3422,14 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (isToday) {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#D46E15] flex flex-col items-center justify-between min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
-                            <span class="font-bold text-sm text-[#924C00]">${d}</span>
-                            <span class="text-[10px] font-bold ${isOverload ? 'text-amber-950 bg-amber-300' : 'text-white bg-[#D46E15]'} px-1.5 py-0.5 rounded shadow-2xs">${isOverload ? '⚠️ ' + dayTotalPcs + ' pcs' : (count > 0 ? count + ' Pesanan' : 'Hari Ini')}</span>
+                             class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#D46E15] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
+                            <span class="font-bold text-xs md:text-sm text-[#924C00]">${d}</span>
+                            ${count > 0 ? `
+                                <span class="md:hidden w-5 h-5 rounded-full bg-[#D46E15] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-bold ${isOverload ? 'text-amber-950 bg-amber-300' : 'text-white bg-[#D46E15]'} px-1.5 py-0.5 rounded shadow-2xs">${isOverload ? '⚠️ ' + dayTotalPcs + ' pcs' : count + ' Pesanan'}</span>
+                            ` : `
+                                <span class="text-[9px] md:text-[10px] font-bold text-[#D46E15] md:text-white md:bg-[#D46E15] md:px-1.5 md:py-0.5 rounded">Hari Ini</span>
+                            `}
                         </div>
                     `;
                 } else if (count > 0) {
@@ -3465,32 +3437,35 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     if (allSelesai) {
                         dayHtml = `
                             <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-sm text-[#1C1C1C]">${d}</span>
-                                <span class="text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ ${count} Selesai</span>
+                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-xs md:text-sm text-[#1C1C1C]">${d}</span>
+                                <span class="md:hidden w-5 h-5 rounded-full bg-[#27AE60] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ ${count} Selesai</span>
                             </div>
                         `;
                     } else if (isOverload) {
                         dayHtml = `
                             <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-2.5 rounded-xl bg-amber-50 border border-amber-300 flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-sm text-amber-900">${d}</span>
-                                <span class="text-[10px] font-bold text-amber-900 bg-amber-200 px-1.5 py-0.5 rounded shadow-2xs">⚠️ ${dayTotalPcs} pcs</span>
+                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-amber-50 border border-amber-300 flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-xs md:text-sm text-amber-900">${d}</span>
+                                <span class="md:hidden w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-bold text-amber-900 bg-amber-200 px-1.5 py-0.5 rounded shadow-2xs">⚠️ ${dayTotalPcs} pcs</span>
                             </div>
                         `;
                     } else {
                         dayHtml = `
                             <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-2.5 rounded-xl bg-[#FEF6EE] border border-[#FDE6D2] flex flex-col items-center justify-between min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-sm text-[#D97706]">${d}</span>
-                                <span class="text-[10px] font-semibold text-[#D97706] bg-white px-1.5 py-0.5 rounded shadow-2xs">${count} Pesanan</span>
+                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#FEF6EE] border border-[#FDE6D2] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
+                                <span class="font-bold text-xs md:text-sm text-[#D97706]">${d}</span>
+                                <span class="md:hidden w-5 h-5 rounded-full bg-[#D46E15] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-semibold text-[#D97706] bg-white px-1.5 py-0.5 rounded shadow-2xs">${count} Pesanan</span>
                             </div>
                         `;
                     }
                 } else {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-3 text-sm font-medium text-[#1C1C1C] rounded-xl hover:bg-[#FFF8F2] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-[64px]">
+                             class="cal-day-cell p-1.5 md:p-2 text-xs md:text-sm font-medium text-[#1C1C1C] rounded-xl hover:bg-[#FFF8F2] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-[46px] md:min-h-[64px]">
                             <span>${d}</span>
                         </div>
                     `;
@@ -3516,7 +3491,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
 
             const monthTitle = document.getElementById('calendarGridTitle').textContent;
-            document.getElementById('deliveryScheduleTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${monthTitle}`;
+            document.getElementById('deliveryScheduleTitle').textContent = `${dayNum} ${monthTitle}`;
             
             // Filter matching orders from ordersData
             const matchingOrders = ordersData.filter(o => {
@@ -3541,10 +3516,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (matchingOrders.length > 0) {
                 if (isDayOverload) {
                     badge.textContent = `⚠️ Overload (${totalPcs}/150 pcs)`;
-                    badge.className = 'bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-full';
+                    badge.className = 'bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0';
                 } else {
-                    badge.textContent = `${matchingOrders.length} Batch Aktif (${totalPcs} pcs)`;
-                    badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full';
+                    badge.textContent = `${matchingOrders.length} Batch Aktif`;
+                    badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0';
                 }
                 countLabel.textContent = `${matchingOrders.length} Pengiriman Terjadwal (${totalPcs} pcs)`;
 

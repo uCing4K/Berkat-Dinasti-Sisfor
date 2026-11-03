@@ -641,98 +641,107 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                     </div>
                 <?php endif; ?>
 
-                <!-- TOP 4 KPI STATS (Dark Chocolate Espresso Cards) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- TOP 4 KPI STATS (Dark Chocolate Espresso Cards - 2x2 Mini on Mobile, 4x1 on Desktop) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-5 sm:mb-6">
                     <!-- Stat 1: Total Pelanggan -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
                         <div class="flex items-center justify-between">
-                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Total Pelanggan</span>
-                            <div class="w-10 h-10 rounded-lg bg-[#D46E15]/20 text-[#D46E15] flex items-center justify-center ring-1 ring-[#D46E15]/30">
-                                <i class="fas fa-users text-base"></i>
+                            <span class="text-[#D8C7B8] text-[10px] sm:text-xs font-semibold tracking-wider uppercase">Total Pelanggan</span>
+                            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg bg-[#D46E15]/20 text-[#D46E15] flex items-center justify-center ring-1 ring-[#D46E15]/30">
+                                <i class="fas fa-users text-xs sm:text-base"></i>
                             </div>
                         </div>
-                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalCust ?> <span class="text-xs font-normal text-[#D8C7B8]">Kontak</span></p>
-                        <p class="text-xs text-[#D8C7B8] mt-1">Pelanggan terdaftar aktif</p>
+                        <p class="text-lg sm:text-2xl font-bold text-[#FAF8F5] mt-2 sm:mt-3"><?= $totalCust ?> <span class="text-[10px] sm:text-xs font-normal text-[#D8C7B8]">Kontak</span></p>
+                        <p class="hidden sm:block text-xs text-[#D8C7B8] mt-1">Pelanggan terdaftar aktif</p>
                     </div>
 
                     <!-- Stat 2: Mitra Reseller -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
                         <div class="flex items-center justify-between">
-                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Mitra Reseller</span>
-                            <div class="w-10 h-10 rounded-lg bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center ring-1 ring-[#27AE60]/30">
-                                <i class="fas fa-store text-base"></i>
+                            <span class="text-[#D8C7B8] text-[10px] sm:text-xs font-semibold tracking-wider uppercase">Mitra Reseller</span>
+                            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center ring-1 ring-[#27AE60]/30">
+                                <i class="fas fa-store text-xs sm:text-base"></i>
                             </div>
                         </div>
-                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalReseller ?> <span class="text-xs font-normal text-[#D8C7B8]">Mitra</span></p>
-                        <p class="text-xs text-[#D8C7B8] mt-1">Distributor & toko reseller</p>
+                        <p class="text-lg sm:text-2xl font-bold text-[#FAF8F5] mt-2 sm:mt-3"><?= $totalReseller ?> <span class="text-[10px] sm:text-xs font-normal text-[#D8C7B8]">Mitra</span></p>
+                        <p class="hidden sm:block text-xs text-[#D8C7B8] mt-1">Distributor & toko reseller</p>
                     </div>
 
                     <!-- Stat 3: Total Transaksi / Repeat Orders -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
                         <div class="flex items-center justify-between">
-                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Total Pesanan</span>
-                            <div class="w-10 h-10 rounded-lg bg-[#2F80ED]/20 text-[#2F80ED] flex items-center justify-center ring-1 ring-[#2F80ED]/30">
-                                <i class="fas fa-shopping-bag text-base"></i>
+                            <span class="text-[#D8C7B8] text-[10px] sm:text-xs font-semibold tracking-wider uppercase">Total Pesanan</span>
+                            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg bg-[#2F80ED]/20 text-[#2F80ED] flex items-center justify-center ring-1 ring-[#2F80ED]/30">
+                                <i class="fas fa-shopping-bag text-xs sm:text-base"></i>
                             </div>
                         </div>
-                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalOrders ?> <span class="text-xs font-normal text-[#D8C7B8]">Pesanan</span></p>
-                        <p class="text-xs text-[#D8C7B8] mt-1">Akumulasi transaksi bakery</p>
+                        <p class="text-lg sm:text-2xl font-bold text-[#FAF8F5] mt-2 sm:mt-3"><?= $totalOrders ?> <span class="text-[10px] sm:text-xs font-normal text-[#D8C7B8]">Pesanan</span></p>
+                        <p class="hidden sm:block text-xs text-[#D8C7B8] mt-1">Akumulasi transaksi bakery</p>
                     </div>
 
                     <!-- Stat 4: Tagihan Piutang -->
-                    <div class="craft-card-espresso rounded-xl p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
+                    <div class="craft-card-espresso rounded-xl p-3.5 sm:p-5 border border-white/10 shadow-lg text-[#FAF8F5] relative overflow-hidden">
                         <div class="flex items-center justify-between">
-                            <span class="text-[#D8C7B8] text-xs font-semibold tracking-wider uppercase">Status Piutang</span>
-                            <div class="w-10 h-10 rounded-lg bg-[#EB5757]/20 text-[#EB5757] flex items-center justify-center ring-1 ring-[#EB5757]/30">
-                                <i class="fas fa-file-invoice-dollar text-base"></i>
+                            <span class="text-[#D8C7B8] text-[10px] sm:text-xs font-semibold tracking-wider uppercase">Status Piutang</span>
+                            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg bg-[#EB5757]/20 text-[#EB5757] flex items-center justify-center ring-1 ring-[#EB5757]/30">
+                                <i class="fas fa-file-invoice-dollar text-xs sm:text-base"></i>
                             </div>
                         </div>
-                        <p class="text-2xl font-bold text-[#FAF8F5] mt-3"><?= $totalHutang ?> <span class="text-xs font-normal text-[#D8C7B8]">Tertagih</span></p>
-                        <p class="text-xs text-[#D8C7B8] mt-1">Perlu pelunasan saat kirim</p>
+                        <p class="text-lg sm:text-2xl font-bold text-[#FAF8F5] mt-2 sm:mt-3"><?= $totalHutang ?> <span class="text-[10px] sm:text-xs font-normal text-[#D8C7B8]">Tertagih</span></p>
+                        <p class="hidden sm:block text-xs text-[#D8C7B8] mt-1">Perlu pelunasan saat kirim</p>
                     </div>
                 </div>
 
                 <!-- TOP FILTER & ACTION BAR -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-6">
                     
                     <!-- Left: Search & Filter Dropdown -->
-                    <div class="flex flex-wrap items-center gap-3 flex-1 max-w-2xl">
+                    <div class="flex flex-wrap items-center gap-2.5 flex-1 max-w-2xl">
                         <!-- Search Box -->
-                        <div class="relative flex-1 min-w-[240px]">
+                        <div class="relative flex-1 min-w-[160px] sm:min-w-[240px]">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
                                 <i class="fas fa-search text-xs"></i>
                             </div>
-                            <input type="text" id="customerSearchInput" onkeyup="filterCustomers()" placeholder="Cari nama pelanggan, no. telp..." 
-                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none shadow-2xs transition-colors">
+                            <input type="text" id="customerSearchInput" onkeyup="filterCustomers()" placeholder="Cari nama, no. telp..." 
+                                class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-3.5 py-2 sm:py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none shadow-2xs transition-colors">
                         </div>
 
                         <!-- Dropdown Filter Tagihan -->
                         <div class="relative">
                             <select id="statusFilter" onchange="filterCustomers()" 
-                                class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2.5 text-xs md:text-sm text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
-                                <option value="all">Status: Semua Tagihan</option>
-                                <option value="Lunas">Status: Lunas</option>
-                                <option value="Hutang">Status: Hutang</option>
-                                <option value="Belum Bayar">Status: Belum Bayar</option>
+                                class="appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3 pr-7 py-2 sm:py-2.5 text-xs md:text-sm text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
+                                <option value="all">Semua</option>
+                                <option value="Lunas">Lunas</option>
+                                <option value="Hutang">Hutang</option>
+                                <option value="Belum Bayar">Belum Bayar</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#8E7E73]">
+                            <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
                                 <i class="fas fa-chevron-down text-[10px]"></i>
                             </div>
                         </div>
 
                         <!-- Badge Pelanggan Count -->
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#EFE8DE] text-[#924C00] border border-[#DDD3C5] shrink-0">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#924C00] border border-[#DDD3C5] shrink-0">
                             <span class="w-2 h-2 rounded-full bg-[#D46E15]"></span>
                             <span id="customerCountBadge"><?= count($pelanggan_list) ?> Pelanggan</span>
                         </span>
                     </div>
 
                     <!-- Right: Button Ekspor & Tambah Pelanggan -->
-                    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+                    <div class="flex items-center gap-2 self-end sm:self-auto">
                         <button onclick="exportCustomersCSV()" 
-                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs sm:text-sm font-semibold px-3 py-2 sm:py-2.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
                             <i class="fas fa-file-export text-xs"></i>
-                            <span>Ekspor Data</span>
+                            <span class="hidden sm:inline">Ekspor Data</span>
+                        </button>
+
+                        <button onclick="openCustomerModal()" 
+                            class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0">
+                            <i class="fas fa-user-plus text-xs"></i>
+                            <span>Tambah Pelanggan</span>
+                        </button>
+                    </div>
+                </div>
                         </button>
 
                         <button onclick="openCustomerModal()" 
@@ -757,8 +766,8 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         <span class="text-xs text-[#8E7E73]">Total Kontak: <?= count($pelanggan_list) ?> terdaftar</span>
                     </div>
 
-                    <!-- Responsive Table -->
-                    <div class="overflow-x-auto">
+                    <!-- Responsive Table (Desktop View) -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse" id="customersTable">
                             <!-- Table Header with Dark Chocolate Theme -->
                             <thead>
@@ -850,6 +859,81 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         </table>
                     </div>
 
+                    <!-- Mobile Customer Cards List (Rodeo POS Pattern) -->
+                    <div class="block md:hidden p-3 space-y-2.5" id="customersMobileList">
+                        <?php foreach ($pelanggan_list as $cust): ?>
+                            <div class="customer-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] transition-all cursor-pointer"
+                                 data-id="<?= $cust['id'] ?>"
+                                 data-name="<?= htmlspecialchars(strtolower($cust['nama'])) ?>"
+                                 data-phone="<?= htmlspecialchars(strtolower($cust['no_wa'])) ?>"
+                                 data-status="<?= htmlspecialchars($cust['tagihan']) ?>"
+                                 onclick="openCustomerDetailModal(<?= $cust['id'] ?>)">
+                                
+                                <!-- Top Row: Avatar, Name, Type & Debt Badge -->
+                                <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-[#EAE1D5]">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-9 h-9 rounded-full bg-[#D46E15]/20 text-[#924C00] font-bold text-xs flex items-center justify-center shrink-0">
+                                            <?= htmlspecialchars($cust['avatar']) ?>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h4 class="font-bold text-xs text-[#251A14] truncate"><?= htmlspecialchars($cust['nama']) ?></h4>
+                                            <span class="text-[10px] text-[#8E7E73] font-medium block truncate"><?= htmlspecialchars($cust['tipe']) ?></span>
+                                        </div>
+                                    </div>
+                                    <span class="font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider <?= $cust['tagihan_class'] ?> shrink-0">
+                                        <?= htmlspecialchars($cust['tagihan']) ?>
+                                    </span>
+                                </div>
+
+                                <!-- Middle Info: Phone & Address -->
+                                <div class="py-2.5 space-y-1.5 text-xs">
+                                    <div class="flex items-center justify-between text-[#5E4D42]">
+                                        <div class="flex items-center gap-1.5">
+                                            <i class="fas fa-phone-alt text-[10px] text-[#8E7E73]"></i>
+                                            <span class="font-mono text-[11px]"><?= htmlspecialchars($cust['no_wa']) ?></span>
+                                        </div>
+                                        <a href="https://wa.me/<?= htmlspecialchars($cust['wa_clean']) ?>" target="_blank" onclick="event.stopPropagation()" 
+                                           class="text-[#27AE60] hover:text-[#219653] font-semibold text-[11px] flex items-center gap-1">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span>WA</span>
+                                        </a>
+                                    </div>
+                                    <p class="text-[11px] text-[#8E7E73] truncate flex items-center gap-1">
+                                        <i class="fas fa-map-marker-alt text-[10px] shrink-0 text-[#8E7E73]"></i>
+                                        <span class="truncate"><?= htmlspecialchars($cust['alamat_short']) ?></span>
+                                    </p>
+                                </div>
+
+                                <!-- Bottom Row: Order Stats & Quick Actions -->
+                                <div class="flex items-center justify-between pt-2.5 border-t border-[#EAE1D5] text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#EFE8DE] text-[#3E2B21] font-semibold text-[10px] px-2 py-0.5 rounded-full border border-[#DDD3C5]">
+                                            <?= $cust['pesanan_count'] ?> order
+                                        </span>
+                                        <span class="font-bold text-[11px] text-[#251A14] font-mono">
+                                            <?= htmlspecialchars($cust['total_transaksi']) ?>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                                        <button onclick="openCustomerDetailModal(<?= $cust['id'] ?>)" 
+                                                class="px-2 py-1 rounded-lg bg-[#EFE8DE] hover:bg-[#DDD3C5] text-[#3E2B21] text-[10px] font-semibold flex items-center gap-1 transition-colors">
+                                            <i class="fas fa-eye text-[10px]"></i>
+                                            <span>Detail</span>
+                                        </button>
+                                        <button onclick="openCustomerModal(<?= $cust['id'] ?>)" 
+                                                class="w-6 h-6 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/70 flex items-center justify-center transition-colors">
+                                            <i class="fas fa-edit text-[10px]"></i>
+                                        </button>
+                                        <button onclick="handleDeleteCustomer(<?= $cust['id'] ?>, '<?= htmlspecialchars($cust['nama']) ?>')" 
+                                                class="w-6 h-6 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/70 flex items-center justify-center transition-colors">
+                                            <i class="fas fa-trash-alt text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
                     <!-- Pagination Footer (Akurat & Dinamis) -->
                     <div class="px-5 py-4 border-t border-[#E2D7C8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#8E7E73] bg-[#FDFBF7]">
                         <span>Menampilkan 1-<?= count($pelanggan_list) ?> dari <?= count($pelanggan_list) ?> pelanggan</span>
@@ -863,8 +947,8 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
 
                 </div>
 
-                <!-- SECTION 2: BOTTOM DETAILS (2 COLUMNS: DETAIL PELANGGAN & RIWAYAT PESANAN) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- SECTION 2: BOTTOM DETAILS (Desktop Only - Mobile Uses Popout Modal) -->
+                <div class="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-6">
                     
                     <!-- LEFT CARD: DETAIL PELANGGAN TERPILIH -->
                     <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-card flex flex-col justify-between">
@@ -1249,13 +1333,15 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
             user.classList.toggle('hidden');
         }
 
-        // Live Filter Customers by Search Input and Status Dropdown
+        // Live Filter Customers by Search Input and Status Dropdown (Sync Desktop & Mobile)
         function filterCustomers() {
             const query = document.getElementById('customerSearchInput').value.toLowerCase().trim();
             const statusFilter = document.getElementById('statusFilter').value;
             const rows = document.querySelectorAll('#customersTable tbody tr');
+            const mobileCards = document.querySelectorAll('#customersMobileList .customer-mobile-card');
             let visibleCount = 0;
 
+            // Desktop Rows
             rows.forEach(row => {
                 const nameEl = row.querySelector('.customer-name');
                 const phoneEl = row.querySelector('.customer-phone');
@@ -1276,7 +1362,24 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 }
             });
 
-            document.getElementById('customerCountBadge').textContent = visibleCount + ' Pelanggan';
+            // Mobile Cards
+            mobileCards.forEach(card => {
+                const name = card.getAttribute('data-name') || '';
+                const phone = card.getAttribute('data-phone') || '';
+                const status = card.getAttribute('data-status') || '';
+
+                const matchesQuery = name.includes(query) || phone.includes(query);
+                const matchesStatus = (statusFilter === 'all') || (status === statusFilter);
+
+                if (matchesQuery && matchesStatus) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            const countBadge = document.getElementById('customerCountBadge');
+            if (countBadge) countBadge.textContent = visibleCount + ' Pelanggan';
         }
 
         let selectedDetailCustId = 1;

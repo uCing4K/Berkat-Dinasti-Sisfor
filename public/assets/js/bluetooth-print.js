@@ -266,6 +266,31 @@ class BluetoothPrintBridge {
             '3. Website ini dibuka dari perangkat HP yang sama dengan aplikasi Print Bridge'
         );
     }
+
+    /**
+     * Cek status koneksi aplikasi Rodeo Print Bridge (port 8080)
+     */
+    async checkBridgeStatus() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1200);
+            const resp = await fetch('http://localhost:8080/status', {
+                method: 'GET',
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (resp.ok) {
+                const data = await resp.json().catch(() => ({}));
+                return {
+                    online: true,
+                    deviceName: data.printer || data.device || 'Rodeo Print Bridge'
+                };
+            }
+        } catch (e) {
+            // Standby / Mixed content fallback
+        }
+        return { online: false, deviceName: null };
+    }
     
     /**
      * Mengambil data ESC/POS dari PHP Server lalu mengirimkannya ke printer
@@ -342,12 +367,19 @@ window.printOrderReceipt = function(orderId, paperSize = '58') {
 /**
  * Trigger Cetak untuk Tombol di UI Pesanan / Detail / Beranda
  */
-async function handlePrintReceipt(orderId, btnElement = null, paperSize = '58') {
+async function handlePrintReceipt(orderId, btnElement = null, paperSize = null) {
     let originalHtml = '';
     if (btnElement) {
         originalHtml = btnElement.innerHTML;
         btnElement.disabled = true;
         btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Mencetak...</span>';
+    }
+
+    // Ambil default ukuran kertas dari setting toko jika tidak dispesifikasikan
+    if (!paperSize) {
+        const is58 = (document.getElementById('storePaperSize58') && document.getElementById('storePaperSize58').checked) ||
+                     (window.STORE_PAPER_SIZE === '58');
+        paperSize = is58 ? '58' : (window.STORE_PAPER_SIZE || '58');
     }
 
     try {
@@ -398,7 +430,9 @@ async function handleTestPrintBluetooth(btnElement = null) {
     }
 
     const printerStatus = document.getElementById('modalPrinterStatus');
-    const is58 = document.getElementById('paper58') && document.getElementById('paper58').checked;
+    const is58 = (document.getElementById('storePaperSize58') && document.getElementById('storePaperSize58').checked) ||
+                 (document.getElementById('paper58') && document.getElementById('paper58').checked) ||
+                 (window.STORE_PAPER_SIZE === '58');
     const paperSize = is58 ? '58' : '80';
 
     if (printerStatus) {

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berkat Dinasti - Bridge Proxy</title>
+</head>
+<body>
+    <script>
+        // Proxy iframe to communicate with local Rodeo Print Bridge on port 8080
+        window.addEventListener('message', async (event) => {
+            // Verify origin for security
+            const allowedOrigins = [
+                'https://ex5.ucing4k.my.id',
+                'https://rodeolaundry.online',
+                'https://rodeolaundry.my.id',
+                'http://localhost',
+                'http://127.0.0.1'
+            ];
+            
+            const isAllowed = allowedOrigins.some(origin => event.origin.startsWith(origin)) || 
+                              event.origin === window.location.origin;
+            
+            if (!isAllowed) {
+                console.error('Invalid origin:', event.origin);
+                return;
+            }
+            
+            const { action, data, requestId } = event.data;
+            if (!requestId) return;
+            
+            const candidateUrls = [
+                'http://localhost:8080',
+                'http://127.0.0.1:8080'
+            ];
+            
+            try {
+                let result = null;
+                let lastError = null;
+                
+                if (action === 'checkStatus') {
+                    for (const baseUrl of candidateUrls) {
+                        try {
+                            const response = await fetch(`${baseUrl}/status`, {
+                                method: 'GET',
+                                headers: { 'Content-Type': 'application/json' }
+                            });
+                            if (response.ok) {
+                                result = { ok: true, data: await response.json() };
+                                break;
+                            }
+                        } catch (e) {
+                            lastError = e;
+                        }
+                    }
+                    if (!result) throw lastError || new Error('Print bridge status check failed');
+                    
+                } else if (action === 'print') {
+                    for (const baseUrl of candidateUrls) {
+                        try {
+                            const response = await fetch(`${baseUrl}/print`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(data)
+                            });
+                            if (response.ok) {
+                                result = { ok: true, data: await response.json() };
+                                break;
+                            }
+                        } catch (e) {
+                            lastError = e;
+                        }
+                    }
+                    if (!result) throw lastError || new Error('Print request to bridge failed');
+                }
+                
+                // Send result back to parent
+                event.source.postMessage({
+                    requestId,
+                    success: true,
+                    result
+                }, event.origin);
+                
+            } catch (error) {
+                event.source.postMessage({
+                    requestId,
+                    success: false,
+                    error: error.message
+                }, event.origin);
+            }
+        });
+        
+        // Signal ready to parent window
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'proxyReady' }, '*');
+        }
+    </script>
+</body>
+</html>

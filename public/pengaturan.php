@@ -1163,9 +1163,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <div class="bg-[#FFF0E6] border border-[#FFD8BF] rounded-xl p-3 flex items-start gap-2.5 text-xs text-[#924C00]">
                     <i class="fas fa-info-circle text-[#D46E15] mt-0.5 shrink-0"></i>
                     <div class="leading-relaxed text-[11px] space-y-1">
-                        <p><strong>Dukungan Cetak Multi-Channel:</strong></p>
-                        <p>• <strong>📱 RawBT / Intent App:</strong> Rekomendasi utama di HP Android. Langsung cetak via aplikasi driver printer Bluetooth tanpa hambatan browser.</p>
-                        • <strong>Kirim ke Bridge:</strong> Menghubungi service bridge lokal di port 8080 (127.0.0.1 / PC daemon). Di HP, gunakan mode <em>Split Screen</em> agar service tidak tertidur di background.</p>
+                        <p><strong>Integrasi Thermal Printer:</strong></p>
+                        <p>• <strong>Cetak via Print Bridge:</strong> Mengirim raw ESC/POS langsung ke aplikasi <em>Rodeo Print Bridge</em> di HP via port 8080. Pastikan aplikasi Print Bridge sudah terhubung ke printer Bluetooth.</p>
+                        <p>• <strong>Cetak via Browser:</strong> Menggunakan dialog cetak bawaan browser untuk simulasi di PC atau printer kabel/WiFi.</p>
                     </div>
                 </div>
             </div>
@@ -1177,15 +1177,11 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <span>Unduh Raw .bin</span>
                 </button>
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-end">
-                    <button type="button" onclick="handlePrintViaRawBT('test', this)" class="w-full sm:w-auto bg-[#E8F3FF] hover:bg-[#D9EAFE] text-[#1E56A0] text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#BFDBFE] flex items-center justify-center gap-1.5 transition-colors shadow-sm" title="Kirim data struk langsung ke aplikasi printer Bluetooth Android (RawBT / Mobile Intent)">
-                        <i class="fas fa-bolt text-[#2563EB]"></i>
-                        <span>📱 RawBT / Mobile Intent</span>
+                    <button type="button" onclick="handleTestPrintBluetooth(this)" class="w-full sm:w-auto bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-button-orange active:scale-95 flex items-center justify-center gap-1.5 transition-all" title="Kirim data struk ke Rodeo Print Bridge via Bluetooth">
+                        <i class="fab fa-bluetooth-b"></i>
+                        <span>Cetak via Print Bridge</span>
                     </button>
-                    <button type="button" onclick="handleTestPrintBluetooth(this)" class="w-full sm:w-auto bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors" title="Kirim via Local Bridge Daemon HTTP Port 8080">
-                        <i class="fab fa-bluetooth-b text-[#0082FC]"></i>
-                        <span>Kirim ke Bridge (8080)</span>
-                    </button>
-                    <button type="button" onclick="executeDirectPrint()" class="w-full sm:w-auto bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-button-orange active:scale-95 flex items-center justify-center gap-1.5 transition-all">
+                    <button type="button" onclick="executeDirectPrint()" class="w-full sm:w-auto bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
                         <i class="fas fa-print"></i>
                         <span>Cetak via Browser</span>
                     </button>

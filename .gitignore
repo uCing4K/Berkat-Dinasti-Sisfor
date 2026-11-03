@@ -9,3 +9,5 @@ node_modules/
 !package.json
 /data/
 scripts/__pycache__/
+*.apk
+android-print-bridge/

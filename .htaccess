@@ -1,0 +1,16 @@
+# =========================================================================
+# SISTEM INFORMASI BERKAT DINASTI - SERVER CONFIGURATION (.htaccess)
+# =========================================================================
+
+# Pastikan index.php diprioritaskan sebagai file index utama
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect otomatis dari root domain ke halaman login public
+    RewriteRule ^$ public/login.php [L,R=302]
+</IfModule>
+
+# Keamanan: Sembunyikan direktori listing jika index.php tidak ada
+Options -Indexes

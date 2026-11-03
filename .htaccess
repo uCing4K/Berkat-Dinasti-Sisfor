@@ -14,3 +14,4 @@ DirectoryIndex index.php index.html
 
 # Keamanan: Sembunyikan direktori listing jika index.php tidak ada
 Options -Indexes
+

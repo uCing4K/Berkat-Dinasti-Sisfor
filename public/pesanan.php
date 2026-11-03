@@ -1326,9 +1326,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <span>Kanban Board</span>
                     </button>
 
-                    <!-- Tab 2: Tabel Pesanan -->
+                    <!-- Tab 2: Tabel Pesanan (Highlighted as default on mobile) -->
                     <button onclick="switchTab('tabel')" id="tabBtnTabel" 
-                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'tabel' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= ($active_tab === 'tabel') ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : (($active_tab === 'kanban') ? 'bg-[#D46E15] text-white shadow-sm font-semibold md:bg-transparent md:text-[#544337] md:shadow-none hover:text-[#251A14] hover:bg-[#E5DDD0]' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]') ?>">
                         <i class="fas fa-table-list text-xs"></i>
                         <span class="whitespace-nowrap">Tabel Pesanan</span>
                     </button>
@@ -1342,9 +1342,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- TAB CONTENT 1: KANBAN BOARD (4 SWIMLANES + CATATAN DAPUR)       -->
+                <!-- TAB CONTENT 1: KANBAN BOARD (Hidden on mobile by default)      -->
                 <!-- ============================================================== -->
-                <div id="kanbanView" class="<?= $active_tab === 'kanban' ? '' : 'hidden' ?>">
+                <div id="kanbanView" class="<?= $active_tab === 'kanban' ? 'hidden md:block' : 'hidden' ?>">
                     
                     <!-- Action Bar: Unduh Rekap & Tambah Pesanan -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -1614,7 +1614,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- ============================================================== -->
                 <!-- TAB CONTENT 2: TABEL PESANAN (DATA TABLE MODEL RODEO POS)       -->
                 <!-- ============================================================== -->
-                <div id="tableView" class="<?= $active_tab === 'tabel' ? '' : 'hidden' ?>">
+                <div id="tableView" class="<?= $active_tab === 'tabel' ? '' : ($active_tab === 'kanban' ? 'block md:hidden' : 'hidden') ?>">
                     
                     <!-- Search & Filter Card -->
                     <div class="bg-white rounded-2xl border border-[#E2D7C8] p-3.5 md:p-4 mb-5 shadow-xs space-y-2.5 md:space-y-3">
@@ -2812,9 +2812,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const inactiveClass = 'px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]';
 
             if (tab === 'tabel') {
-                if (kanbanView) kanbanView.classList.add('hidden');
+                if (kanbanView) {
+                    kanbanView.classList.remove('md:block');
+                    kanbanView.classList.add('hidden');
+                }
                 if (calendarView) calendarView.classList.add('hidden');
-                if (tableView) tableView.classList.remove('hidden');
+                if (tableView) {
+                    tableView.classList.remove('hidden', 'md:hidden');
+                    tableView.classList.add('block');
+                }
 
                 if (tabBtnTabel) tabBtnTabel.className = activeClass;
                 if (tabBtnKanban) tabBtnKanban.className = inactiveClass + ' hidden md:flex';
@@ -2830,9 +2836,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                 if (typeof filterTableOrders === 'function') filterTableOrders();
             } else if (tab === 'kalender') {
-                if (kanbanView) kanbanView.classList.add('hidden');
-                if (tableView) tableView.classList.add('hidden');
-                if (calendarView) calendarView.classList.remove('hidden');
+                if (kanbanView) {
+                    kanbanView.classList.remove('md:block');
+                    kanbanView.classList.add('hidden');
+                }
+                if (tableView) {
+                    tableView.classList.remove('block');
+                    tableView.classList.add('hidden');
+                }
+                if (calendarView) {
+                    calendarView.classList.remove('hidden');
+                    calendarView.classList.add('block');
+                }
 
                 if (tabBtnKalender) tabBtnKalender.className = activeClass;
                 if (tabBtnKanban) tabBtnKanban.className = inactiveClass + ' hidden md:flex';
@@ -2848,9 +2863,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                 renderInteractiveCalendar();
             } else {
-                if (calendarView) calendarView.classList.add('hidden');
-                if (tableView) tableView.classList.add('hidden');
-                if (kanbanView) kanbanView.classList.remove('hidden');
+                if (calendarView) {
+                    calendarView.classList.remove('block');
+                    calendarView.classList.add('hidden');
+                }
+                if (tableView) {
+                    tableView.classList.remove('block');
+                    tableView.classList.add('hidden');
+                }
+                if (kanbanView) {
+                    kanbanView.classList.remove('hidden');
+                    kanbanView.classList.add('block');
+                }
 
                 if (tabBtnKanban) tabBtnKanban.className = activeClass + ' hidden md:flex';
                 if (tabBtnTabel) tabBtnTabel.className = inactiveClass;
@@ -4325,10 +4349,23 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
+            const isMobile = window.innerWidth < 768;
+
             if (tabParam === 'tabel' || tabParam === 'table') {
                 switchTab('tabel');
             } else if (tabParam === 'kalender') {
                 switchTab('kalender');
+            } else if (tabParam === 'kanban') {
+                if (isMobile) {
+                    switchTab('tabel');
+                } else {
+                    switchTab('kanban');
+                }
+            } else {
+                // Default tanpa parameter ?tab=: di layar mobile langsung buka tabel pesanan (cards), di desktop buka kanban
+                if (isMobile) {
+                    switchTab('tabel');
+                }
             }
         });
     </script>

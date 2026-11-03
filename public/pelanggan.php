@@ -721,31 +721,22 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         </div>
 
                         <!-- Badge Pelanggan Count -->
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#924C00] border border-[#DDD3C5] shrink-0">
+                        <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EFE8DE] text-[#924C00] border border-[#DDD3C5] shrink-0">
                             <span class="w-2 h-2 rounded-full bg-[#D46E15]"></span>
                             <span id="customerCountBadge"><?= count($pelanggan_list) ?> Pelanggan</span>
                         </span>
                     </div>
 
                     <!-- Right: Button Ekspor & Tambah Pelanggan -->
-                    <div class="flex items-center gap-2 self-end sm:self-auto">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
                         <button onclick="exportCustomersCSV()" 
-                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs sm:text-sm font-semibold px-3 py-2 sm:py-2.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
+                            class="flex-1 sm:flex-initial justify-center bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs sm:text-sm font-semibold px-3 py-2 sm:py-2.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
                             <i class="fas fa-file-export text-xs"></i>
-                            <span class="hidden sm:inline">Ekspor Data</span>
+                            <span>Ekspor Data</span>
                         </button>
 
                         <button onclick="openCustomerModal()" 
-                            class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0">
-                            <i class="fas fa-user-plus text-xs"></i>
-                            <span>Tambah Pelanggan</span>
-                        </button>
-                    </div>
-                </div>
-                        </button>
-
-                        <button onclick="openCustomerModal()" 
-                            class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                            class="flex-1 sm:flex-initial justify-center bg-[#D46E15] hover:bg-[#B85207] text-white text-xs sm:text-sm font-semibold px-4 py-2 sm:py-2.5 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-user-plus text-xs"></i>
                             <span>Tambah Pelanggan</span>
                         </button>

@@ -3,3 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/ucie5797/public_html/ex5.ucing4k.my.id
     - /bin/cp -a * $DEPLOYPATH
+

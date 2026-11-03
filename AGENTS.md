@@ -13,9 +13,24 @@ Dokumen ini berisi sekumpulan aturan baku, alur kerja, standar kualitas, arsitek
 
 ## 🌿 2. Protokol Git, Percabangan & CI/CD Deployment
 * **Branch Utama & Target Kerja**: Branch kerja utama repositori ini adalah `main`.
-* **CI/CD Auto-Deploy via GitHub Actions**:
-  * Repositori ini terintegrasi dengan **GitHub Actions** (`.github/workflows/main.yml`).
-  * Setiap kode yang di-`push` ke branch `main` akan **secara otomatis langsung ter-deploy (*upload*) ke server cPanel hosting melalui FTP** ke domain live preview: **[ex5.ucing4k.my.id](https://ex5.ucing4k.my.id)**.
+* **CI/CD Auto-Deploy via GitHub Actions (SSH Protocol)**:
+  * Repositori ini terintegrasi penuh dengan **GitHub Actions** (`.github/workflows/main.yml`) menggunakan protokol **SSH Remote Execution** (`appleboy/ssh-action`).
+  * Setiap kode yang di-`push` ke branch `main` akan **secara otomatis langsung menjalankan sinkronisasi Git di server hosting cPanel** tanpa perlu membuka cPanel secara manual:
+    ```bash
+    cd /home/ucie5797/public_html/ex5.ucing4k.my.id
+    git fetch origin main
+    git reset --hard origin/main
+    ```
+  * **Spesifikasi Server & Remote Environment**:
+    * **Target Path**: `/home/ucie5797/public_html/ex5.ucing4k.my.id`
+    * **Host / Server IP**: `202.10.43.133` (atau `ucing4k.my.id`)
+    * **Port SSH**: `2223` (port resmi SSH Rumahweb)
+    * **SSH Username**: `ucie5797`
+  * **Daftar GitHub Secrets Wajib (Repository Settings ➔ Secrets and variables ➔ Actions)**:
+    * `SSH_HOST`: `202.10.43.133` (atau `ucing4k.my.id`)
+    * `SSH_PORT`: `2223`
+    * `SSH_USER`: `ucie5797`
+    * `SSH_PASSWORD`: *(Password akun cPanel ucie5797)* atau `SSH_KEY` *(Private SSH Key)*
   * **Kredensial Testing Web (Live)**:
     * **URL**: [https://ex5.ucing4k.my.id/](https://ex5.ucing4k.my.id/)
     * **Username**: `admin`
@@ -23,8 +38,8 @@ Dokumen ini berisi sekumpulan aturan baku, alur kerja, standar kualitas, arsitek
 * **Kewajiban Verifikasi Sebelum Push**:
   * Karena push ke `main` langsung berdampak ke server live preview, AI **WAJIB memverifikasi keabsahan sintaks dan fungsionalitas kode** secara lokal sebelum melakukan commit/push.
   * Untuk penambahan fitur berskala besar atau eksperimental, buat branch terpisah (misal `feat/nama-fitur`) sebelum di-merge ke `main`.
-* **Proteksi File & Direktori (FTP Exclude)**:
-  * GitHub Actions mengecualikan folder `database/**`, `docs/**`, `prototypes/**`, dan `.git*` dari proses upload FTP.
+* **Proteksi File & Keamanan Direktori**:
+  * Root `.htaccess` mengaktifkan proteksi `Options -Indexes`, `DirectoryIndex index.php index.html`, dan pengalihan otomatis root `/` ke `public/login.php`.
   * Pastikan seluruh fungsionalitas aplikasi produksi berjalan mandiri di folder `app/`, `config/`, `public/`, `views/`, dan `index.php`.
 * **Standar Pesan Commit (Conventional Commits with Scope)**:
   Gunakan format `type(scope): deskripsi jelas dan ringkas`.

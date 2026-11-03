@@ -1,32 +1,26 @@
-name: Deploy to cPanel via FTP
+name: Deploy to cPanel via SSH
 
 on:
   push:
     branches:
-      - main # Akan otomatis berjalan setiap kali ada push ke branch main
+      - main # Otomatis berjalan setiap kali ada push ke branch main
 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  deploy:
+    name: 🚀 Deploy to Production via SSH
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
-    
-    - name: 📂 Sync files ke cPanel FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./ # Jika file website ada di dalam folder spesifik (misal public_html/ex5/), ubah bagian ini
-        protocol: ftp
-        
-        # Mengecualikan folder yang tidak perlu diupload ke server agar proses cepat dan aman
-        exclude: |
-          **/.git*
-          **/.git*/**
-          .github/**
-          database/**
-          prototypes/**
-          docs/**
+      - name: 🔄 Execute Remote Git Pull via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            echo "=== Memulai Deployment ke ex5.ucing4k.my.id ==="
+            cd /home/ucie5797/public_html/ex5.ucing4k.my.id
+            git fetch origin main
+            git reset --hard origin/main
+            echo "=== Deployment Berhasil! Versi terbaru aktif di https://ex5.ucing4k.my.id ==="

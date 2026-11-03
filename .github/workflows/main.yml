@@ -20,6 +20,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ./ # Jika file website ada di dalam folder spesifik (misal public_html/ex5/), ubah bagian ini
+        protocol: ftp
         
         # Mengecualikan folder yang tidak perlu diupload ke server agar proses cepat dan aman
         exclude: |

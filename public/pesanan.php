@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'add_order' || $action === 'tambah_pesanan') {
         $id_pelanggan = intval($_POST['id_pelanggan'] ?? 0);
         $nama_pelanggan_baru = trim($_POST['nama_pelanggan_baru'] ?? '');
-        $no_wa_baru = trim($_POST['no_wa_baru'] ?? '');
+        $no_wa_baru = preg_replace('/[^0-9+]/', '', trim($_POST['no_wa_baru'] ?? ''));
         $alamat_baru = trim($_POST['alamat_baru'] ?? '');
 
         $custName = !empty($nama_pelanggan_baru) ? $nama_pelanggan_baru : trim($_POST['customer_name'] ?? '');
@@ -1153,7 +1153,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
-                                                <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
+                                                <input type="tel" inputmode="numeric" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 081234567890" 
+                                                    oninput="this.value = this.value.replace(/[^0-9+]/g, '');"
                                                     class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                             </div>
                                             <div>
@@ -2282,7 +2283,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <input type="text" id="inputNamaBaru" name="nama_pelanggan_baru" placeholder="Nama Lengkap Pelanggan *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
-                                <input type="text" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                                <input type="tel" inputmode="numeric" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="this.value = this.value.replace(/[^0-9+]/g, ''); syncNewCustomerPreview();">
                             </div>
                             <input type="text" id="inputAlamatBaru" name="alamat_baru" placeholder="Alamat Pengiriman Lengkap *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
                         </div>
@@ -2494,6 +2495,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                         <button type="submit" id="submitOrderBtn" 
                             class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-5 py-2.5 rounded-lg flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95">
+                            <span id="submitLockIcon" class="text-xs"></span>
                             <i class="fas fa-check text-xs"></i>
                             <span>Simpan Pesanan</span>
                         </button>
@@ -3369,7 +3371,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         }
 
         function openOrderDetailById(orderId) {
-            const ord = ordersData.find(o => o.id === orderId);
+            const ord = ordersData.find(o => o.id === orderId || o.invoice === orderId);
             if (ord) openOrderDetail(ord);
         }
 
@@ -4349,6 +4351,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
+            const qParam = urlParams.get('q');
             const isMobile = window.innerWidth < 768;
 
             if (tabParam === 'tabel' || tabParam === 'table') {
@@ -4365,6 +4368,17 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 // Default tanpa parameter ?tab=: di layar mobile langsung buka tabel pesanan (cards), di desktop buka kanban
                 if (isMobile) {
                     switchTab('tabel');
+                }
+            }
+
+            if (qParam) {
+                const sInput = document.getElementById('tableSearchInput') || document.getElementById('orderSearchInput');
+                if (sInput) {
+                    sInput.value = qParam;
+                    if (typeof filterTableOrders === 'function') filterTableOrders();
+                }
+                if (typeof openOrderDetailById === 'function') {
+                    openOrderDetailById(qParam);
                 }
             }
         });

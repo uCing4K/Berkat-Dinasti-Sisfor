@@ -99,7 +99,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_rekap') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'tambah_pesanan') {
     $id_pelanggan = intval($_POST['id_pelanggan'] ?? 0);
     $nama_pelanggan_baru = trim($_POST['nama_pelanggan_baru'] ?? '');
-    $no_wa_baru = trim($_POST['no_wa_baru'] ?? '');
+    $no_wa_baru = preg_replace('/[^0-9+]/', '', trim($_POST['no_wa_baru'] ?? ''));
     $alamat_baru = trim($_POST['alamat_baru'] ?? '');
     
     $tgl_kirim = !empty($_POST['tgl_kirim']) ? $_POST['tgl_kirim'] : date('Y-m-d', strtotime('+4 days'));
@@ -1267,7 +1267,8 @@ if ($db_connected && $pdo) {
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
-                                                <input type="text" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 0812-3456-7890" 
+                                                <input type="tel" inputmode="numeric" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 081234567890" 
+                                                    oninput="this.value = this.value.replace(/[^0-9+]/g, '');"
                                                     class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                             </div>
                                             <div>
@@ -1571,7 +1572,7 @@ if ($db_connected && $pdo) {
                         <!-- Right Controls: Status Filter Pills + Live Search -->
                         <div class="flex flex-wrap items-center gap-2.5">
                             <!-- Filter Pills -->
-                            <div class="flex items-center bg-[#EFE8DE] p-1 rounded-lg text-xs font-medium border border-[#E2D7C8]">
+                            <div class="flex items-center bg-[#EFE8DE] p-1 rounded-lg text-xs font-medium border border-[#E2D7C8] max-w-full overflow-x-auto whitespace-nowrap scrollbar-none">
                                 <button type="button" onclick="filterOrdersByStatus('all', this)" id="tabFilterAll" 
                                     class="px-3 py-1.5 rounded-md bg-[#3E2B21] text-[#FAF8F5] font-semibold shadow-xs transition-all status-filter-btn">
                                     Semua
@@ -2154,7 +2155,7 @@ if ($db_connected && $pdo) {
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <input type="text" id="inputNamaBaru" name="nama_pelanggan_baru" placeholder="Nama Lengkap Pelanggan *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
-                                <input type="text" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
+                                <input type="tel" inputmode="numeric" id="inputWaBaru" name="no_wa_baru" placeholder="Nomor WhatsApp (08xxx) *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="this.value = this.value.replace(/[^0-9+]/g, ''); syncNewCustomerPreview();">
                             </div>
                             <input type="text" id="inputAlamatBaru" name="alamat_baru" placeholder="Alamat Pengiriman Lengkap *" class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-2 text-xs outline-none focus:border-[#D46E15]" oninput="syncNewCustomerPreview()">
                         </div>

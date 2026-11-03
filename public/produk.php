@@ -319,11 +319,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_product') {
     $nama = trim($_POST['nama_produk'] ?? '');
     $kategori = trim($_POST['kategori'] ?? 'Roti');
-    $harga_raw = str_replace(['.', ',', ' '], '', $_POST['harga'] ?? '0');
+    $harga_raw = preg_replace('/[^0-9]/', '', $_POST['harga'] ?? '0');
     $harga = (float)$harga_raw;
     $kemasan = trim($_POST['kemasan'] ?? 'Mika');
-    $isi = (int)($_POST['isi'] ?? 1);
-    $moq = (int)($_POST['moq'] ?? 1);
+    $isi = max(1, intval(preg_replace('/[^0-9]/', '', $_POST['isi'] ?? '1')));
+    $moq = max(1, intval(preg_replace('/[^0-9]/', '', $_POST['moq'] ?? '1')));
     $status = isset($_POST['status']) && $_POST['status'] === 'on' ? 'Aktif' : 'Nonaktif';
     $deskripsi = trim($_POST['deskripsi'] ?? '');
 
@@ -393,11 +393,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $prod_id = intval($_POST['product_id'] ?? 0);
     $nama = trim($_POST['nama_produk'] ?? '');
     $kategori = trim($_POST['kategori'] ?? 'Roti');
-    $harga_raw = str_replace(['.', ',', ' '], '', $_POST['harga'] ?? '0');
+    $harga_raw = preg_replace('/[^0-9]/', '', $_POST['harga'] ?? '0');
     $harga = (float)$harga_raw;
     $kemasan = trim($_POST['kemasan'] ?? 'Mika');
-    $isi = (int)($_POST['isi'] ?? 1);
-    $moq = (int)($_POST['moq'] ?? 1);
+    $isi = max(1, intval(preg_replace('/[^0-9]/', '', $_POST['isi'] ?? '1')));
+    $moq = max(1, intval(preg_replace('/[^0-9]/', '', $_POST['moq'] ?? '1')));
     $status = isset($_POST['status']) && $_POST['status'] === 'on' ? 'Aktif' : 'Nonaktif';
     $deskripsi = trim($_POST['deskripsi'] ?? '');
 
@@ -1197,9 +1197,6 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                         <span class="text-[10px] text-[#8E7E73]">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-[11px] text-[#D46E15] font-semibold flex items-center gap-1">
-                                            <i class="fas fa-edit text-[10px]"></i> Edit
-                                        </span>
                                         <button type="button" onclick="event.stopPropagation(); confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" 
                                             class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center justify-center transition-colors active:scale-95" 
                                             title="Hapus Produk">
@@ -1309,7 +1306,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                             <label for="prod_harga" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
                             <div class="relative flex rounded-lg shadow-2xs">
                                 <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold">Rp</span>
-                                <input type="text" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" 
+                                <input type="text" inputmode="numeric" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" 
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-r-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                             </div>
                         </div>

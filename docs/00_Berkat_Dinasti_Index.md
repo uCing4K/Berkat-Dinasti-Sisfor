@@ -19,6 +19,7 @@ Selamat datang di pusat dokumentasi **Sistem Informasi Berkat Dinasti**. File in
   - Design System, Typography (Font Inter), Hasil Usability Testing, Link Figma Prototype.
 - [[04-Changelogs/README|04. Catatan Perubahan & Changelog]]
   - Riwayat versi perancangan dan log pembaruan proyek.
+  - [[04-Changelogs/QA_AUDIT_BUG_REPORT|🐞 Laporan QA Audit & Catatan Bug Aplikasi (November 2026)]]
 
 ---
 

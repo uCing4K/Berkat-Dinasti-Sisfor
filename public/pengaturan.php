@@ -122,8 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'save_store_settings') {
         $sName = trim($_POST['store_name'] ?? 'Berkat Dinasti Bakery');
-        $sPhone = trim($_POST['store_phone'] ?? '');
-        $sWa = trim($_POST['store_wa'] ?? '');
+        $sPhone = preg_replace('/[^0-9+]/', '', trim($_POST['store_phone'] ?? ''));
+        $sWa = preg_replace('/[^0-9+]/', '', trim($_POST['store_wa'] ?? ''));
         $sAddr = trim($_POST['store_address'] ?? '');
         $sProv = trim($_POST['store_province'] ?? 'Jawa Timur');
         $sCity = trim($_POST['store_city'] ?? 'Kota Batu');
@@ -685,14 +685,15 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label for="storePhoneInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. Telepon Toko</label>
-                                            <input type="text" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" 
+                                            <input type="tel" inputmode="numeric" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" 
+                                                oninput="this.value = this.value.replace(/[^0-9+]/g, ''); updateReceiptPreview()"
                                                 class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
                                             <label for="storeWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">WhatsApp Bisnis</label>
-                                            <input type="text" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" 
-                                                onkeyup="updateReceiptPreview()"
+                                            <input type="tel" inputmode="numeric" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" 
+                                                oninput="this.value = this.value.replace(/[^0-9+]/g, ''); updateReceiptPreview()"
                                                 class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
                                     </div>
@@ -1301,7 +1302,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             const paper80 = document.getElementById('storePaperSize80');
             const card58 = document.getElementById('cardPaper58');
             const card80 = document.getElementById('cardPaper80');
-            const receiptBox = document.getElementById('thermalPaperBox');
+            const receiptBox = document.getElementById('actualReceiptSlip') || document.getElementById('thermalPaperBox');
             const headerTitle = document.getElementById('lblSimulasiHeader');
             const formBtnLabel = document.getElementById('lblTestPrintForm');
             const footerPaperLabel = document.getElementById('lblUkuranKertasFooter');

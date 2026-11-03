@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save_customer') {
         $edit_id = intval($_POST['customer_id'] ?? 0);
         $nama = trim($_POST['nama'] ?? '');
-        $no_wa = trim($_POST['no_wa'] ?? '');
+        $no_wa = preg_replace('/[^0-9+]/', '', trim($_POST['no_wa'] ?? ''));
         $tipe = trim($_POST['tipe'] ?? 'Pelanggan Reguler');
         $alamat = trim($_POST['alamat'] ?? '');
         $catatan = trim($_POST['catatan'] ?? '');
@@ -1103,7 +1103,8 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label for="custWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. WhatsApp <span class="text-[#EB5757]">*</span></label>
-                        <input type="text" id="custWaInput" name="no_wa" required placeholder="Contoh: 0812-3456-7890" 
+                        <input type="tel" inputmode="numeric" id="custWaInput" name="no_wa" required placeholder="Contoh: 081234567890" 
+                            oninput="this.value = this.value.replace(/[^0-9+]/g, '');"
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 

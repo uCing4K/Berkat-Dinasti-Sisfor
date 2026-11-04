@@ -110,7 +110,7 @@ if ($db_connected && $pdo) {
         $stmtRep = $pdo->query("
             SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.waktu_kirim, p.grand_total, p.status_bayar, p.status,
                    pel.nama as nama_pelanggan,
-                   (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
+                   (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, IF(dp.topping IS NOT NULL AND dp.topping != '', CONCAT(' [Top: ', dp.topping, ']'), ''), ' (', dp.qty, ' pcs)') SEPARATOR ', ')
                     FROM detail_pesanan dp 
                     JOIN varian_produk v ON dp.id_varian = v.id_varian 
                     WHERE dp.id_pesanan = p.id_pesanan) as item_summary

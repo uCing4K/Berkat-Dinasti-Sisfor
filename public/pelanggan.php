@@ -306,7 +306,7 @@ if ($db_connected && $pdo) {
                     $stmtH = $pdo->prepare("
                         SELECT no_invoice as order_no, status_bayar, grand_total as amount, status as delivery_status, 
                                tgl_pesan, tgl_kirim, waktu_kirim, catatan,
-                               (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
+                               (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, IF(dp.topping IS NOT NULL AND dp.topping != '', CONCAT(' [Top: ', dp.topping, ']'), ''), ' (', dp.qty, ' pcs)') SEPARATOR ', ')
                                 FROM detail_pesanan dp 
                                 JOIN varian_produk v ON dp.id_varian = v.id_varian 
                                 WHERE dp.id_pesanan = pesanan.id_pesanan) as item_summary

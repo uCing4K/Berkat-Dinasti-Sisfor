@@ -47,6 +47,21 @@ $$\text{INV-} \mathbf{YYYYMMDD} \text{-} \mathbf{XXXX}$$
 - **Bebas Ongkir:** Seluruh area pengiriman Kota Malang & Kota Batu disetel Rp 0 (tanpa zonasi).
 - **Kapasitas Armada:** Sepeda motor obrok dibatasi **maksimal 150 pcs roti besar per perjalanan (trip)**.
 
+### C. Pilihan 9 Topping Resmi Roti Hajatan
+Pada pesanan produk Roti Hajatan (isi 7 kelopak), admin/staf kasir dapat memilih varian topping resmi:
+1. `Coco Chip + Keju`
+2. `Coco Chip + Wijen`
+3. `Meses + Keju`
+4. `Meses + Wijen`
+5. `Wijen + Keju`
+6. `Meses + Sprinkle`
+7. `Coco Chip + Sprinkle`
+8. `Wijen`
+9. `Wijen + Sprinkle`
+*(Serta opsi `Campur / Mix (Aneka Topping)` dan `Tanpa Topping (Polos / Original)`).*
+
+Topping tersimpan pada kolom `detail_pesanan.topping`, tampil interaktif pada keranjang POS, tabel pesanan, kartu Kanban, modal detail pesanan, serta tercetak otomatis pada struk kasir Bluetooth printer thermal ESC/POS (`* Top: <nama_topping>`).
+
 ---
 
 ## 3. Alur Kerja Pengguna (User Flows)

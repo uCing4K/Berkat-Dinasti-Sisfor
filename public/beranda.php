@@ -31,6 +31,10 @@ if (file_exists($configFile)) {
                 PDO::ATTR_TIMEOUT => 2
             ]);
             $db_connected = true;
+            // Self-healing migration: Pastikan kolom topping tersedia di detail_pesanan
+            try {
+                $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN IF NOT EXISTS topping VARCHAR(150) NULL AFTER id_varian");
+            } catch (Exception $e) {}
         }
     } catch (Exception $e) {
         $db_connected = false;
@@ -128,6 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $p_kemasan = trim($it['kemasan'] ?? 'Kardus Putih');
             $p_qty = max(1, intval($it['qty'] ?? 1));
             $p_harga = max(0, floatval($it['harga'] ?? 10000));
+            $p_top = trim($it['topping'] ?? '');
+            $p_top_note = trim($it['topping_note'] ?? '');
+            if (!empty($p_top_note)) {
+                $p_top = $p_top ? ($p_top . " (" . $p_top_note . ")") : $p_top_note;
+            }
             $sub = $p_qty * $p_harga;
             $grand_total += $sub;
             $processed_items[] = [
@@ -136,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'kemasan' => $p_kemasan,
                 'qty' => $p_qty,
                 'harga' => $p_harga,
+                'topping' => $p_top,
                 'subtotal' => $sub
             ];
         }
@@ -227,19 +237,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             ]);
             $new_order_id = $pdo->lastInsertId();
             
-            // Insert Detail Pesanan
-            $stmtDetail = $pdo->prepare("
-                INSERT INTO detail_pesanan (id_pesanan, id_varian, qty, harga_satuan, subtotal)
-                VALUES (?, ?, ?, ?, ?)
-            ");
-            foreach ($processed_items as $pi) {
-                $stmtDetail->execute([
-                    $new_order_id,
-                    $pi['id_varian'] > 0 ? $pi['id_varian'] : 1,
-                    $pi['qty'],
-                    $pi['harga'],
-                    $pi['subtotal']
-                ]);
+            // Insert Detail Pesanan (dengan kolom topping dan fallback graceful)
+            try {
+                $stmtDetail = $pdo->prepare("
+                    INSERT INTO detail_pesanan (id_pesanan, id_varian, topping, qty, harga_satuan, subtotal)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ");
+                foreach ($processed_items as $pi) {
+                    $stmtDetail->execute([
+                        $new_order_id,
+                        $pi['id_varian'] > 0 ? $pi['id_varian'] : 1,
+                        !empty($pi['topping']) ? $pi['topping'] : null,
+                        $pi['qty'],
+                        $pi['harga'],
+                        $pi['subtotal']
+                    ]);
+                }
+            } catch (Exception $e) {
+                $stmtDetailFallback = $pdo->prepare("
+                    INSERT INTO detail_pesanan (id_pesanan, id_varian, qty, harga_satuan, subtotal)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                foreach ($processed_items as $pi) {
+                    $stmtDetailFallback->execute([
+                        $new_order_id,
+                        $pi['id_varian'] > 0 ? $pi['id_varian'] : 1,
+                        $pi['qty'],
+                        $pi['harga'],
+                        $pi['subtotal']
+                    ]);
+                }
             }
             
             // Triggers automatically handle tracking_log & pengiriman
@@ -258,7 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!isset($_SESSION['session_orders'])) {
         $_SESSION['session_orders'] = [];
     }
-    $itemSummaryStr = implode(', ', array_map(fn($p) => "{$p['nama']} ({$p['qty']} pcs)", $processed_items));
+    $itemSummaryStr = implode(', ', array_map(fn($p) => $p['nama'] . (!empty($p['topping']) ? " [Top: {$p['topping']}]" : '') . " ({$p['qty']} pcs)", $processed_items));
     $p_class = match($status_bayar) {
         'lunas' => 'bg-[#27AE60]/15 text-[#1B7A43]',
         'hutang', 'dp' => 'bg-[#E2B93B]/20 text-[#886C12]',
@@ -559,7 +586,7 @@ if ($db_connected && $pdo) {
         $stmtOrders = $pdo->query("
             SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.tgl_kirim, p.waktu_kirim, p.grand_total, p.status, p.status_bayar, p.catatan,
                    pel.nama as nama_pelanggan, pel.no_wa, pel.alamat,
-                   (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
+                   (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, IF(dp.topping IS NOT NULL AND dp.topping != '', CONCAT(' [Top: ', dp.topping, ']'), ''), ' (', dp.qty, ' pcs)') SEPARATOR ', ')
                     FROM detail_pesanan dp 
                     JOIN varian_produk v ON dp.id_varian = v.id_varian 
                     WHERE dp.id_pesanan = p.id_pesanan) as item_summary
@@ -663,7 +690,7 @@ if ($db_connected && $pdo) {
     try {
         $stmtD = $pdo->query("
             SELECT p.waktu_kirim, pel.nama as nama_pelanggan, 
-                   COALESCE((SELECT GROUP_CONCAT(CONCAT(dp.qty, ' pcs ', v.nama_varian) SEPARATOR ', ')
+                   COALESCE((SELECT GROUP_CONCAT(CONCAT(dp.qty, ' pcs ', v.nama_varian, IF(dp.topping IS NOT NULL AND dp.topping != '', CONCAT(' [Top: ', dp.topping, ']'), '')) SEPARATOR ', ')
                     FROM detail_pesanan dp 
                     JOIN varian_produk v ON dp.id_varian = v.id_varian 
                     WHERE dp.id_pesanan = p.id_pesanan), 'Roti Pesanan') as items,
@@ -2191,6 +2218,7 @@ if ($db_connected && $pdo) {
                                 <tr>
                                     <th class="px-3.5 py-2.5">Produk</th>
                                     <th class="px-3.5 py-2.5">Kemasan</th>
+                                    <th class="px-3.5 py-2.5">Pilihan Topping</th>
                                     <th class="px-3.5 py-2.5 w-24">Jumlah</th>
                                     <th class="px-3.5 py-2.5">Harga Satuan</th>
                                     <th class="px-3.5 py-2.5">Subtotal</th>
@@ -2209,6 +2237,21 @@ if ($db_connected && $pdo) {
                                     <td class="px-3.5 py-3 text-[#544337]">
                                         <span class="item-kemasan-text">Kardus Putih</span>
                                         <input type="hidden" name="items[0][kemasan]" value="Kardus Putih" class="item-kemasan-input">
+                                    </td>
+                                    <td class="px-3.5 py-3 item-topping-td">
+                                        <select name="items[0][topping]" class="item-topping-select w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
+                                            <option value="Coco Chip + Keju">1. Coco Chip + Keju</option>
+                                            <option value="Coco Chip + Wijen">2. Coco Chip + Wijen</option>
+                                            <option value="Meses + Keju" selected>3. Meses + Keju</option>
+                                            <option value="Meses + Wijen">4. Meses + Wijen</option>
+                                            <option value="Wijen + Keju">5. Wijen + Keju</option>
+                                            <option value="Meses + Sprinkle">6. Meses + Sprinkle</option>
+                                            <option value="Coco Chip + Sprinkle">7. Coco Chip + Sprinkle</option>
+                                            <option value="Wijen">8. Wijen</option>
+                                            <option value="Wijen + Sprinkle">9. Wijen + Sprinkle</option>
+                                            <option value="Campur / Mix (Aneka Topping)">Campur / Mix (Aneka Topping)</option>
+                                            <option value="Tanpa Topping (Polos / Original)">Tanpa Topping (Polos / Original)</option>
+                                        </select>
                                     </td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" name="items[0][qty]" value="10" min="1" oninput="calculateOrderTotal()" 
@@ -2237,6 +2280,10 @@ if ($db_connected && $pdo) {
                                     <td class="px-3.5 py-3 text-[#544337]">
                                         <span class="item-kemasan-text">Mika</span>
                                         <input type="hidden" name="items[1][kemasan]" value="Mika" class="item-kemasan-input">
+                                    </td>
+                                    <td class="px-3.5 py-3 item-topping-td">
+                                        <span class="text-xs text-[#8E7E73]">-</span>
+                                        <input type="hidden" name="items[1][topping]" value="">
                                     </td>
                                     <td class="px-3.5 py-3">
                                         <input type="number" name="items[1][qty]" value="2" min="1" oninput="calculateOrderTotal()" 
@@ -2462,6 +2509,167 @@ if ($db_connected && $pdo) {
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: KATALOG FOTO 9 PILIHAN TOPPING ROTI HAJATAN      -->
+    <!-- ============================================================== -->
+    <div id="toppingCatalogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center">
+                        <i class="fas fa-cookie-bite text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-[#251A14]">9 Pilihan Topping Roti Hajatan</h3>
+                        <p class="text-[11px] text-[#8E7E73]">Katalog Visual Topping Resmi UMKM Berkat Dinasti</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeToppingCatalogModal()" class="w-7 h-7 rounded-lg text-[#8E7E73] hover:text-[#251A14] hover:bg-[#EAE2D5] flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="p-5 overflow-y-auto craft-scrollbar space-y-4">
+                <!-- Catalog Image -->
+                <div class="rounded-xl overflow-hidden border border-[#E2D7C8] shadow-sm bg-white p-1.5">
+                    <img src="assets/images/9_pilihan_topping_roti_hajatan.jpg" alt="9 Pilihan Topping Roti Hajatan" class="w-full max-h-[360px] object-contain rounded-lg mx-auto">
+                </div>
+
+                <!-- Topping Grid List 1-9 -->
+                <div>
+                    <h4 class="text-xs font-bold text-[#544337] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <i class="fas fa-list-ol text-[#D46E15]"></i>
+                        <span>Daftar Varian Topping Sesuai Nomor:</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">4</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">5</span>
+                            <span class="font-semibold text-[#251A14]">Wijen + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">6</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Sprinkle</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">7</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Sprinkle</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">8</span>
+                            <span class="font-semibold text-[#251A14]">Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">9</span>
+                            <span class="font-semibold text-[#251A14]">Wijen + Sprinkle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-[#FFF8F0] border border-[#F7D4B2] rounded-xl p-3 text-[11px] text-[#924C00] flex items-start gap-2">
+                    <i class="fas fa-info-circle text-[#D46E15] mt-0.5 shrink-0"></i>
+                    <p>Pelanggan dapat memilih varian topping di atas sesuai selera atau opsi <strong>Campur / Mix (Aneka Topping)</strong> dalam satu pesanan hajatan.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-[#F3EDE2] border-t border-[#E2D7C8] flex justify-end">
+                <button type="button" onclick="closeToppingCatalogModal()" class="px-4 py-2 bg-[#D46E15] hover:bg-[#B85207] text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: PEMILIH TOPPING INTERAKTIF KASIR / POS           -->
+    <!-- ============================================================== -->
+    <div id="toppingPickerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="px-5 py-3.5 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-[#251A14]" id="toppingPickerTitle">Pilih Topping Roti Hajatan</h3>
+                    <p class="text-[11px] text-[#8E7E73]" id="toppingPickerSubtitle">Kemasan: Kardus Putih • Rp 10.000</p>
+                </div>
+                <button type="button" onclick="closeToppingPickerModal()" class="w-7 h-7 rounded-lg text-[#8E7E73] hover:text-[#251A14] hover:bg-[#EAE2D5] flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="p-4 sm:p-5 overflow-y-auto craft-scrollbar space-y-4">
+                <input type="hidden" id="toppingPickerVarianId" value="1">
+
+                <!-- Banner info + photo button -->
+                <div class="flex items-center justify-between bg-[#FFF8F0] border border-[#F7D4B2] rounded-xl p-2.5">
+                    <span class="text-xs font-semibold text-[#924C00] flex items-center gap-1.5">
+                        <i class="fas fa-cookie-bite text-[#D46E15]"></i>
+                        <span>9 Pilihan Topping Spesial:</span>
+                    </span>
+                    <button type="button" onclick="openToppingCatalogModal()" class="text-xs font-bold text-[#D46E15] hover:text-[#B85207] underline flex items-center gap-1 cursor-pointer">
+                        <i class="fas fa-image text-[11px]"></i>
+                        <span>Lihat Foto Katalog</span>
+                    </button>
+                </div>
+
+                <!-- Topping Grid 3x3 -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="toppingOptionsGrid">
+                    <!-- Javascript will populate this with 9 options + Mix + Polos -->
+                </div>
+
+                <!-- Custom / Notes Option -->
+                <div class="pt-2 border-t border-[#EAE1D5]">
+                    <label class="block text-[11px] font-bold text-[#544337] mb-1">Catatan Tambahan Topping (Opsional):</label>
+                    <input type="text" id="toppingCustomNote" placeholder="Cth: Topping keju dipisah / agak banyak" 
+                        class="w-full bg-white border border-[#DDD3C5] rounded-lg px-3 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                </div>
+
+                <!-- Quantity Stepper -->
+                <div class="flex items-center justify-between pt-3 border-t border-[#EAE1D5]">
+                    <div>
+                        <label class="block text-xs font-bold text-[#251A14]">Jumlah Pesanan (pcs)</label>
+                        <span class="text-[10px] text-[#8E7E73]" id="toppingPickerMoqLabel">Min. 1 pcs</span>
+                    </div>
+                    <div class="flex items-center rounded-xl border border-[#DDD3C5] bg-white overflow-hidden shadow-2xs">
+                        <button type="button" onclick="stepToppingPickerQty(-1)" class="w-8 h-8 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all font-bold text-sm">−</button>
+                        <input type="number" id="toppingPickerQty" min="1" value="10" class="w-14 h-8 text-center text-xs font-bold bg-transparent text-[#251A14] border-x border-[#DDD3C5] focus:outline-none">
+                        <button type="button" onclick="stepToppingPickerQty(1)" class="w-8 h-8 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all font-bold text-sm">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3.5 bg-[#F3EDE2] border-t border-[#E2D7C8] flex items-center justify-between">
+                <button type="button" onclick="closeToppingPickerModal()" class="px-3.5 py-2 text-xs font-semibold text-[#8E7E73] hover:text-[#251A14] transition-colors cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" onclick="confirmToppingPicker()" class="px-5 py-2 bg-[#D46E15] hover:bg-[#B85207] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shadow-button-orange active:scale-95 transition-all cursor-pointer">
+                    <i class="fas fa-cart-plus text-xs"></i>
+                    <span id="btnConfirmToppingText">Tambahkan ke Pesanan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- BLUETOOTH PRINT BRIDGE & ESC/POS ENGINE -->
     <script src="assets/js/bluetooth-print.js"></script>
 
@@ -2470,6 +2678,193 @@ if ($db_connected && $pdo) {
         // Master Data injected from PHP
         const CUSTOMERS_DATA = <?= json_encode($customers_for_select, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
         const PRODUCTS_DATA = <?= json_encode($products_for_select, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+
+        // 9 Pilihan Topping Resmi Roti Hajatan (Katalog Berkat Dinasti)
+        const TOPPING_OPTIONS = [
+            'Coco Chip + Keju',
+            'Coco Chip + Wijen',
+            'Meses + Keju',
+            'Meses + Wijen',
+            'Wijen + Keju',
+            'Meses + Sprinkle',
+            'Coco Chip + Sprinkle',
+            'Wijen',
+            'Wijen + Sprinkle',
+            'Campur / Mix (Aneka Topping)',
+            'Tanpa Topping (Polos / Original)'
+        ];
+
+        function isToppingProduct(prod) {
+            if (!prod) return false;
+            const name = (typeof prod === 'string' ? prod : (prod.nama || '')).toLowerCase();
+            return name.includes('topping') || name.includes('hajatan') || name.includes('roti hajatan');
+        }
+
+        function openToppingCatalogModal() {
+            const modal = document.getElementById('toppingCatalogModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeToppingCatalogModal() {
+            const modal = document.getElementById('toppingCatalogModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                const picker = document.getElementById('toppingPickerModal');
+                if (!picker || picker.classList.contains('hidden')) {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+
+        let currentPickerVarianId = null;
+        let currentPickerCartKey = null;
+        let currentPickerSelectedTopping = 'Coco Chip + Keju';
+
+        function openToppingPickerModal(id_varian, editingCartKey = null) {
+            const prod = PRODUCTS_DATA.find(p => p.id_varian === id_varian);
+            if (!prod) return;
+
+            currentPickerVarianId = id_varian;
+            currentPickerCartKey = editingCartKey;
+
+            const modal = document.getElementById('toppingPickerModal');
+            const titleEl = document.getElementById('toppingPickerTitle');
+            const subtitleEl = document.getElementById('toppingPickerSubtitle');
+            const moqEl = document.getElementById('toppingPickerMoqLabel');
+            const qtyInput = document.getElementById('toppingPickerQty');
+            const gridEl = document.getElementById('toppingOptionsGrid');
+            const noteInput = document.getElementById('toppingCustomNote');
+            const submitBtnText = document.getElementById('btnConfirmToppingText');
+
+            if (titleEl) titleEl.textContent = `Pilih Topping: ${prod.nama}`;
+            if (subtitleEl) subtitleEl.textContent = `Kemasan: ${prod.kemasan} • Rp ${formatRupiahNumber(prod.harga)}`;
+            
+            const minOrder = parseInt(prod.min_order, 10) || 1;
+            if (moqEl) moqEl.textContent = minOrder > 1 ? `Min. ${minOrder} pcs` : 'Ready Stock';
+
+            if (editingCartKey) {
+                const item = posCart.find(c => c.cartKey === editingCartKey);
+                if (item) {
+                    currentPickerSelectedTopping = item.topping || TOPPING_OPTIONS[0];
+                    if (qtyInput) qtyInput.value = item.qty;
+                    if (noteInput) noteInput.value = item.toppingNote || '';
+                    if (submitBtnText) submitBtnText.textContent = 'Simpan Perubahan Topping';
+                }
+            } else {
+                currentPickerSelectedTopping = TOPPING_OPTIONS[0];
+                if (qtyInput) qtyInput.value = minOrder > 1 ? minOrder : 10;
+                if (noteInput) noteInput.value = '';
+                if (submitBtnText) submitBtnText.textContent = 'Tambahkan ke Pesanan';
+            }
+
+            renderToppingOptionsGrid();
+
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeToppingPickerModal() {
+            const modal = document.getElementById('toppingPickerModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            currentPickerVarianId = null;
+            currentPickerCartKey = null;
+        }
+
+        function selectToppingOption(toppingName) {
+            currentPickerSelectedTopping = toppingName;
+            renderToppingOptionsGrid();
+        }
+
+        function renderToppingOptionsGrid() {
+            const gridEl = document.getElementById('toppingOptionsGrid');
+            if (!gridEl) return;
+
+            gridEl.innerHTML = TOPPING_OPTIONS.map((top, idx) => {
+                const isSelected = (top === currentPickerSelectedTopping);
+                const numBadge = (idx < 9) ? `<span class="w-5 h-5 rounded-full ${isSelected ? 'bg-white text-[#D46E15]' : 'bg-[#EFE8DE] text-[#544337]'} text-[10px] font-black flex items-center justify-center shrink-0">${idx + 1}</span>` : `<span class="w-5 h-5 rounded-full ${isSelected ? 'bg-white text-[#D46E15]' : 'bg-[#EAE2D5] text-[#8E7E73]'} text-[9px] font-bold flex items-center justify-center shrink-0"><i class="fas fa-star text-[8px]"></i></span>`;
+
+                return `
+                    <div onclick="selectToppingOption('${escapeHtml(top)}')" 
+                        class="p-2.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-2 ${
+                            isSelected 
+                                ? 'bg-[#D46E15] text-white border-[#D46E15] shadow-xs ring-2 ring-[#D46E15]/30 scale-[1.01]' 
+                                : 'bg-white text-[#251A14] border-[#E2D7C8] hover:border-[#D46E15] hover:bg-[#FDFBF7]'
+                        }">
+                        <div class="flex items-center gap-2 min-w-0">
+                            ${numBadge}
+                            <span class="text-xs font-bold leading-tight truncate ${isSelected ? 'text-white' : 'text-[#251A14]'}">
+                                ${escapeHtml(top)}
+                            </span>
+                        </div>
+                        ${isSelected ? '<i class="fas fa-check-circle text-xs text-white shrink-0"></i>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function stepToppingPickerQty(delta) {
+            const input = document.getElementById('toppingPickerQty');
+            if (!input) return;
+            let val = parseInt(input.value, 10) || 1;
+            val += delta;
+            if (val < 1) val = 1;
+            input.value = val;
+        }
+
+        function confirmToppingPicker() {
+            if (!currentPickerVarianId) return;
+            const prod = PRODUCTS_DATA.find(p => p.id_varian === currentPickerVarianId);
+            if (!prod) return;
+
+            const qtyInput = document.getElementById('toppingPickerQty');
+            const noteInput = document.getElementById('toppingCustomNote');
+            const qty = Math.max(1, parseInt(qtyInput ? qtyInput.value : 1, 10) || 1);
+            const note = noteInput ? noteInput.value.trim() : '';
+            const topping = currentPickerSelectedTopping || TOPPING_OPTIONS[0];
+
+            if (currentPickerCartKey) {
+                const item = posCart.find(c => c.cartKey === currentPickerCartKey);
+                if (item) {
+                    item.topping = topping;
+                    item.toppingNote = note;
+                    item.qty = qty;
+                    item.cartKey = `${item.id_varian}_${topping}`;
+                }
+            } else {
+                const targetKey = `${prod.id_varian}_${topping}`;
+                const existing = posCart.find(c => c.cartKey === targetKey);
+                if (existing) {
+                    existing.qty += qty;
+                    if (note) existing.toppingNote = note;
+                } else {
+                    const minOrder = parseInt(prod.min_order, 10) || 1;
+                    posCart.push({
+                        cartKey: targetKey,
+                        id_varian: prod.id_varian,
+                        nama: prod.nama,
+                        kemasan: prod.kemasan,
+                        harga: parseFloat(prod.harga) || 10000,
+                        min_order: minOrder,
+                        qty: qty,
+                        topping: topping,
+                        toppingNote: note
+                    });
+                }
+            }
+
+            closeToppingPickerModal();
+            renderPosProducts();
+            renderPosCart();
+            showToast(`Topping "${topping}" (${qty} pcs) dimasukkan ke pesanan`);
+        }
 
         let currentStatusFilter = 'all';
 
@@ -2951,6 +3346,16 @@ if ($db_connected && $pdo) {
                 optionsHtml += `<option value="${p.id_varian}" data-price="${p.harga}" data-kemasan="${p.kemasan}" data-name="${p.nama}" data-min-order="${p.min_order || 1}" ${isSelected}>${p.nama} (${p.kemasan})</option>`;
             });
 
+            const isTopping = isToppingProduct(defaultProd);
+            const toppingCellHtml = isTopping ? `
+                <select name="items[${rowIndex}][topping]" class="item-topping-select w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
+                    ${TOPPING_OPTIONS.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}
+                </select>
+            ` : `
+                <span class="text-xs text-[#8E7E73]">-</span>
+                <input type="hidden" name="items[${rowIndex}][topping]" value="">
+            `;
+
             tr.innerHTML = `
                 <td class="px-3.5 py-3">
                     <input type="hidden" name="items[${rowIndex}][nama]" value="${defaultProd.nama}" class="item-name-input">
@@ -2964,6 +3369,9 @@ if ($db_connected && $pdo) {
                 <td class="px-3.5 py-3 text-[#544337]">
                     <span class="item-kemasan-text">${defaultProd.kemasan}</span>
                     <input type="hidden" name="items[${rowIndex}][kemasan]" value="${defaultProd.kemasan}" class="item-kemasan-input">
+                </td>
+                <td class="px-3.5 py-3 item-topping-td">
+                    ${toppingCellHtml}
                 </td>
                 <td class="px-3.5 py-3">
                     <input type="number" name="items[${rowIndex}][qty]" value="1" min="1" oninput="calculateOrderTotal()" 
@@ -3005,6 +3413,23 @@ if ($db_connected && $pdo) {
             tr.querySelector('.item-price-input').value = price;
             tr.querySelector('.item-price-text').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(price);
             
+            const toppingTd = tr.querySelector('.item-topping-td');
+            const hasTop = isToppingProduct({ nama: name, id_varian: idVarian });
+            if (toppingTd) {
+                if (hasTop) {
+                    toppingTd.innerHTML = `
+                        <select name="items[${rowIndex}][topping]" onchange="calculateOrderTotal()" class="item-topping-select w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded px-2 py-1 text-xs font-semibold text-[#1C1C1C] focus:border-[#D46E15] focus:outline-none">
+                            ${TOPPING_OPTIONS.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('')}
+                        </select>
+                    `;
+                } else {
+                    toppingTd.innerHTML = `
+                        <span class="text-xs text-[#8E7E73]">-</span>
+                        <input type="hidden" name="items[${rowIndex}][topping]" value="">
+                    `;
+                }
+            }
+
             const moqLabel = tr.querySelector('.item-moq-label');
             if (minOrder > 1) {
                 moqLabel.textContent = `Min. ${minOrder} pcs`;
@@ -3373,8 +3798,9 @@ if ($db_connected && $pdo) {
             if (empty) empty.classList.add('hidden');
 
             grid.innerHTML = filtered.map(p => {
-                const inCart = posCart.find(c => c.id_varian === p.id_varian);
-                const inCartQty = inCart ? inCart.qty : 0;
+                const hasTopping = isToppingProduct(p);
+                const matchingCartItems = posCart.filter(c => c.id_varian === p.id_varian);
+                const inCartQty = matchingCartItems.reduce((acc, it) => acc + it.qty, 0);
                 const minOrder = parseInt(p.min_order, 10) || 1;
                 const moqText = minOrder > 1 ? `Min. ${minOrder} pcs` : 'Ready Stock';
 
@@ -3384,8 +3810,10 @@ if ($db_connected && $pdo) {
                 else if (kemLower.includes('batik')) badgeStyle = 'bg-[#FFF0E6] text-[#924C00] border-[#FFD8BF]';
                 else if (kemLower.includes('coklat')) badgeStyle = 'bg-[#FEF6EE] text-[#D97706] border-[#FDE6D2]';
 
+                const onClickAction = hasTopping ? `openToppingPickerModal(${p.id_varian})` : `addPosItem(${p.id_varian})`;
+
                 return `
-                    <div onclick="addPosItem(${p.id_varian})" 
+                    <div onclick="${onClickAction}" 
                         class="group bg-white rounded-xl border ${inCartQty > 0 ? 'border-[#D46E15] ring-2 ring-[#D46E15]/20 shadow-xs' : 'border-[#E2D7C8]'} p-3.5 hover:border-[#D46E15] hover:shadow-card active:scale-[0.98] transition-all cursor-pointer flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between gap-1.5 mb-1.5">
@@ -3397,7 +3825,21 @@ if ($db_connected && $pdo) {
                             <h4 class="font-bold text-xs sm:text-sm text-[#251A14] group-hover:text-[#D46E15] transition-colors leading-snug line-clamp-2">
                                 ${escapeHtml(p.nama)}
                             </h4>
-                            <p class="text-[10px] text-[#8E7E73] mt-1 flex items-center gap-1">
+                            
+                            ${hasTopping ? `
+                                <div class="mt-2 flex items-center justify-between bg-[#FFF8F0] border border-[#F7D4B2] rounded-lg px-2 py-1 text-[10px] text-[#924C00]">
+                                    <span class="font-bold flex items-center gap-1">
+                                        <i class="fas fa-cookie-bite text-[#D46E15]"></i>
+                                        <span>9 Varian Topping</span>
+                                    </span>
+                                    <button type="button" onclick="event.stopPropagation(); openToppingCatalogModal();" class="text-[#D46E15] hover:text-[#B85207] underline font-bold flex items-center gap-0.5">
+                                        <i class="fas fa-image text-[9px]"></i>
+                                        <span>Foto</span>
+                                    </button>
+                                </div>
+                            ` : ''}
+
+                            <p class="text-[10px] text-[#8E7E73] mt-1.5 flex items-center gap-1">
                                 <i class="fas fa-box text-[9px] text-[#D46E15]"></i>
                                 <span>${moqText}</span>
                             </p>
@@ -3416,8 +3858,8 @@ if ($db_connected && $pdo) {
                                 </span>
                             ` : `
                                 <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#D46E15]/10 text-[#D46E15] group-hover:bg-[#D46E15] group-hover:text-white transition-all shadow-2xs">
-                                    <i class="fas fa-plus text-[10px]"></i>
-                                    <span>Pilih</span>
+                                    <i class="fas ${hasTopping ? 'fa-cookie-bite' : 'fa-plus'} text-[10px]"></i>
+                                    <span>${hasTopping ? 'Pilih Topping' : 'Pilih'}</span>
                                 </button>
                             `}
                         </div>
@@ -3430,18 +3872,27 @@ if ($db_connected && $pdo) {
             const prod = PRODUCTS_DATA.find(p => p.id_varian === id_varian);
             if (!prod) return;
 
-            const existing = posCart.find(c => c.id_varian === id_varian);
+            if (isToppingProduct(prod)) {
+                openToppingPickerModal(id_varian);
+                return;
+            }
+
+            const cartKey = `${prod.id_varian}_std`;
+            const existing = posCart.find(c => c.cartKey === cartKey);
             if (existing) {
                 existing.qty += 1;
             } else {
                 const minOrder = parseInt(prod.min_order, 10) || 1;
                 posCart.push({
+                    cartKey: cartKey,
                     id_varian: prod.id_varian,
                     nama: prod.nama,
                     kemasan: prod.kemasan,
                     harga: parseFloat(prod.harga) || 10000,
                     min_order: minOrder,
-                    qty: minOrder > 1 ? minOrder : 1
+                    qty: minOrder > 1 ? minOrder : 1,
+                    topping: '',
+                    toppingNote: ''
                 });
             }
 
@@ -3449,23 +3900,40 @@ if ($db_connected && $pdo) {
             renderPosCart();
         }
 
-        function removePosItem(id_varian) {
-            posCart = posCart.filter(c => c.id_varian !== id_varian);
+        function removePosItem(cartKey) {
+            posCart = posCart.filter(c => (c.cartKey || c.id_varian) !== cartKey);
             renderPosProducts();
             renderPosCart();
         }
 
-        function updatePosQty(id_varian, newQty) {
-            const item = posCart.find(c => c.id_varian === id_varian);
+        function updatePosQty(cartKey, newQty) {
+            const item = posCart.find(c => (c.cartKey || c.id_varian) === cartKey);
             if (!item) return;
             const qty = parseInt(newQty, 10);
             if (isNaN(qty) || qty <= 0) {
-                removePosItem(id_varian);
+                removePosItem(cartKey);
                 return;
             }
             item.qty = qty;
             renderPosProducts();
             renderPosCart();
+        }
+
+        function updatePosItemTopping(cartKey, newTopping) {
+            const item = posCart.find(c => (c.cartKey || c.id_varian) === cartKey);
+            if (!item) return;
+            const targetKey = `${item.id_varian}_${newTopping}`;
+            const existing = posCart.find(c => c.cartKey === targetKey && c !== item);
+            if (existing) {
+                existing.qty += item.qty;
+                posCart = posCart.filter(c => c !== item);
+            } else {
+                item.topping = newTopping;
+                item.cartKey = targetKey;
+            }
+            renderPosProducts();
+            renderPosCart();
+            showToast(`Topping diubah ke: ${newTopping}`);
         }
 
         function clearPosCart() {
@@ -3492,16 +3960,25 @@ if ($db_connected && $pdo) {
             let subtotal = 0;
             let moqViolations = [];
 
+            const totalQtyPerVarian = {};
             posCart.forEach(item => {
                 subtotal += (item.qty * item.harga);
-                if (item.qty < item.min_order) {
-                    moqViolations.push(`${item.nama} (${item.kemasan}) min. ${item.min_order} pcs`);
+                totalQtyPerVarian[item.id_varian] = (totalQtyPerVarian[item.id_varian] || 0) + item.qty;
+            });
+
+            posCart.forEach(item => {
+                const totalVarianQty = totalQtyPerVarian[item.id_varian] || 0;
+                if (totalVarianQty < item.min_order) {
+                    const label = `${item.nama} (${item.kemasan}) min. ${item.min_order} pcs`;
+                    if (!moqViolations.includes(label)) {
+                        moqViolations.push(label);
+                    }
                 }
             });
 
             const totalQty = posCart.reduce((acc, it) => acc + it.qty, 0);
 
-            if (badgeEl) badgeEl.textContent = `${posCart.length} Produk (${totalQty} pcs)`;
+            if (badgeEl) badgeEl.textContent = `${posCart.length} Item (${totalQty} pcs)`;
             if (clearBtn) {
                 if (posCart.length > 0) clearBtn.classList.remove('hidden');
                 else clearBtn.classList.add('hidden');
@@ -3510,7 +3987,6 @@ if ($db_connected && $pdo) {
             if (subtotalEl) subtotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
             if (grandTotalEl) grandTotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
 
-            // If empty:
             if (posCart.length === 0) {
                 listEl.innerHTML = `
                     <div id="posCartEmpty" class="py-8 px-4 text-center">
@@ -3533,36 +4009,55 @@ if ($db_connected && $pdo) {
                 return;
             }
 
-            // Render items list
             listEl.innerHTML = posCart.map(item => {
                 const itemSubtotal = item.qty * item.harga;
-                const isMoqErr = item.qty < item.min_order;
+                const totalVarianQty = totalQtyPerVarian[item.id_varian] || 0;
+                const isMoqErr = totalVarianQty < item.min_order;
+                const hasTopping = isToppingProduct(item);
 
                 return `
                     <div class="bg-white rounded-xl border ${isMoqErr ? 'border-rose-300 bg-rose-50/20' : 'border-[#E2D7C8]'} p-3 space-y-2">
                         <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <h5 class="text-xs font-bold text-[#251A14] truncate">${escapeHtml(item.nama)}</h5>
                                     <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-[#EFE8DE] text-[#544337]">${escapeHtml(item.kemasan)}</span>
                                 </div>
+                                
+                                ${item.topping ? `
+                                    <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#FFF0E6] text-[#924C00] border border-[#FFD8BF]">
+                                            <i class="fas fa-cookie-bite text-[9px] text-[#D46E15]"></i>
+                                            <span>${escapeHtml(item.topping)}</span>
+                                        </span>
+                                        <button type="button" onclick="openToppingPickerModal(${item.id_varian}, '${escapeHtml(item.cartKey)}')" class="text-[10px] text-[#D46E15] hover:text-[#B85207] underline font-semibold cursor-pointer">
+                                            Ganti
+                                        </button>
+                                    </div>
+                                    ${item.toppingNote ? `<p class="text-[9px] text-[#8E7E73] italic mt-0.5">Catatan: ${escapeHtml(item.toppingNote)}</p>` : ''}
+                                ` : (hasTopping ? `
+                                    <button type="button" onclick="openToppingPickerModal(${item.id_varian}, '${escapeHtml(item.cartKey)}')" class="mt-1 inline-flex items-center gap-1 text-[10px] text-[#D46E15] font-bold bg-[#FFF8F0] border border-[#F7D4B2] px-2 py-0.5 rounded cursor-pointer">
+                                        <i class="fas fa-plus text-[9px]"></i>
+                                        <span>Pilih Topping (Wajib)</span>
+                                    </button>
+                                ` : '')}
+
                                 <p class="text-[10px] text-[#8E7E73] mt-0.5">Rp ${formatRupiahNumber(item.harga)} / item</p>
                             </div>
-                            <button type="button" onclick="removePosItem(${item.id_varian})" title="Hapus produk ini" class="text-[#8E7E73] hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors">
+                            <button type="button" onclick="removePosItem('${escapeHtml(item.cartKey)}')" title="Hapus produk ini" class="text-[#8E7E73] hover:text-rose-600 p-1 rounded-lg hover:bg-rose-50 transition-colors">
                                 <i class="fas fa-trash-alt text-xs"></i>
                             </button>
                         </div>
 
                         <div class="flex items-center justify-between pt-1.5 border-t border-[#F5F1EB]">
-                            <!-- Stepper -->
                             <div class="flex items-center rounded-lg border border-[#DDD3C5] bg-[#FAF7F2] overflow-hidden">
-                                <button type="button" onclick="updatePosQty(${item.id_varian}, ${item.qty - 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">−</button>
-                                <input type="number" min="1" value="${item.qty}" onchange="updatePosQty(${item.id_varian}, this.value)" class="w-10 h-6 text-center text-xs font-bold bg-transparent text-[#251A14] border-x border-[#DDD3C5] focus:outline-none">
-                                <button type="button" onclick="updatePosQty(${item.id_varian}, ${item.qty + 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">+</button>
+                                <button type="button" onclick="updatePosQty('${escapeHtml(item.cartKey)}', ${item.qty - 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">−</button>
+                                <input type="number" min="1" value="${item.qty}" onchange="updatePosQty('${escapeHtml(item.cartKey)}', this.value)" class="w-10 h-6 text-center text-xs font-bold bg-transparent text-[#251A14] border-x border-[#DDD3C5] focus:outline-none">
+                                <button type="button" onclick="updatePosQty('${escapeHtml(item.cartKey)}', ${item.qty + 1})" class="w-6 h-6 flex items-center justify-center text-[#544337] hover:bg-[#EFE8DE] active:scale-95 transition-all text-xs font-bold">+</button>
                             </div>
 
                             <div class="text-right">
-                                ${isMoqErr ? `<p class="text-[9px] font-bold text-rose-600">Min. ${item.min_order} pcs</p>` : ''}
+                                ${isMoqErr ? `<p class="text-[9px] font-bold text-rose-600">Total min. ${item.min_order} pcs</p>` : ''}
                                 <span class="font-mono font-bold text-xs text-[#251A14]">Rp ${formatRupiahNumber(itemSubtotal)}</span>
                             </div>
                         </div>
@@ -3570,7 +4065,6 @@ if ($db_connected && $pdo) {
                 `;
             }).join('');
 
-            // MOQ check & button state
             if (moqViolations.length > 0) {
                 if (moqWarning) {
                     moqWarning.classList.remove('hidden');
@@ -3590,7 +4084,6 @@ if ($db_connected && $pdo) {
                 if (submitText) submitText.textContent = `Simpan Pesanan • Rp ${formatRupiahNumber(subtotal)}`;
             }
 
-            // Hidden inputs for PHP $_POST['items']
             if (hiddenInputs) {
                 hiddenInputs.innerHTML = posCart.map((item, idx) => `
                     <input type="hidden" name="items[${idx}][id_varian]" value="${item.id_varian}">
@@ -3599,10 +4092,11 @@ if ($db_connected && $pdo) {
                     <input type="hidden" name="items[${idx}][harga]" value="${item.harga}">
                     <input type="hidden" name="items[${idx}][qty]" value="${item.qty}">
                     <input type="hidden" name="items[${idx}][subtotal]" value="${item.qty * item.harga}">
+                    <input type="hidden" name="items[${idx}][topping]" value="${escapeHtml(item.topping || '')}">
+                    <input type="hidden" name="items[${idx}][topping_note]" value="${escapeHtml(item.toppingNote || '')}">
                 `).join('');
             }
         }
-
         function togglePosNewCustomer() {
             const box = document.getElementById('posNewCustBox');
             const selectWrap = document.getElementById('posCustSelectWrapper');

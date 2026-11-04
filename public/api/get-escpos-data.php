@@ -116,6 +116,7 @@ if ($isTest) {
         [
             'product_name' => 'Roti Hajatan (9 Topping)',
             'packaging' => 'Kardus Putih',
+            'topping' => 'Meses + Keju',
             'qty' => 10,
             'price' => 10000,
             'subtotal' => 100000
@@ -123,6 +124,7 @@ if ($isTest) {
         [
             'product_name' => 'Bolu Pisang Premium',
             'packaging' => 'Mika',
+            'topping' => '',
             'qty' => 2,
             'price' => 22000,
             'subtotal' => 44000
@@ -155,6 +157,7 @@ if ($isTest) {
                         $items[] = [
                             'product_name' => $di['nama_produk'],
                             'packaging' => $di['nama_varian'] ?? 'Satuan',
+                            'topping' => $di['topping'] ?? '',
                             'qty' => intval($di['qty']),
                             'price' => floatval($di['harga_satuan']),
                             'subtotal' => floatval($di['subtotal'])
@@ -180,6 +183,7 @@ if ($isTest) {
                             $items[] = [
                                 'product_name' => $di['product_name'],
                                 'packaging' => $di['packaging'],
+                                'topping' => $di['topping'] ?? '',
                                 'qty' => intval($di['qty']),
                                 'price' => floatval($di['harga_satuan']),
                                 'subtotal' => floatval($di['subtotal'])
@@ -484,6 +488,7 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
     foreach ($items as $it) {
         $pName = $it['product_name'] ?? 'Roti Pesanan';
         $pPkg = !empty($it['packaging']) ? " (" . $it['packaging'] . ")" : "";
+        $pTop = !empty($it['topping']) ? $it['topping'] : "";
         $pQty = intval($it['qty'] ?? 1);
         $pHrg = floatval($it['price'] ?? 0);
         $pSub = floatval($it['subtotal'] ?? ($pQty * $pHrg));
@@ -492,14 +497,17 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
         $fullName = $pQty . "x " . $pName . $pPkg;
         $priceStr = "Rp " . number_format($pSub, 0, ',', '.');
 
-        // Jika muat dalam 1 baris
+        // Jika muat dalam 1 baris dan tidak ada topping khusus
         $maxNameLen = $colWidth - strlen($priceStr) - 1;
-        if (strlen($fullName) <= $maxNameLen) {
+        if (strlen($fullName) <= $maxNameLen && empty($pTop)) {
             appendRow2Col($c, $fullName, $priceStr, $colWidth);
         } else {
             // Tulis nama produk di baris 1
             appendWrappedLine($c, $fullName, $colWidth);
-            // Tulis rincian harga satuan di baris 2
+            if (!empty($pTop)) {
+                appendWrappedLine($c, "  * Top: " . $pTop, $colWidth);
+            }
+            // Tulis rincian harga satuan di baris berikutnya
             $detailQtyPrice = "  " . $pQty . "x @" . number_format($pHrg, 0, ',', '.');
             appendRow2Col($c, $detailQtyPrice, $priceStr, $colWidth);
         }

@@ -227,6 +227,7 @@ CREATE TABLE `detail_pesanan` (
   `id_detail` int(11) NOT NULL,
   `id_pesanan` int(11) NOT NULL,
   `id_varian` int(11) NOT NULL,
+  `topping` varchar(150) DEFAULT NULL,
   `qty` int(11) NOT NULL,
   `harga_satuan` decimal(10,2) NOT NULL,
   `subtotal` decimal(15,2) NOT NULL,
@@ -1035,6 +1036,7 @@ CREATE TABLE `v_detail_pesanan_produk` (
 ,`no_invoice` varchar(50)
 ,`nama_produk` varchar(150)
 ,`nama_varian` varchar(100)
+,`topping` varchar(150)
 ,`qty` int(11)
 ,`harga_satuan` decimal(10,2)
 ,`subtotal` decimal(15,2)
@@ -1363,7 +1365,7 @@ ALTER TABLE `varian_produk`
 DROP TABLE IF EXISTS `v_detail_pesanan_produk`;
 
 DROP VIEW IF EXISTS `v_detail_pesanan_produk`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_detail_pesanan_produk`  AS SELECT `dp`.`id_detail` AS `id_detail`, `dp`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `pr`.`nama_produk` AS `nama_produk`, `vp`.`nama_varian` AS `nama_varian`, `dp`.`qty` AS `qty`, `dp`.`harga_satuan` AS `harga_satuan`, `dp`.`subtotal` AS `subtotal` FROM (((`detail_pesanan` `dp` join `pesanan` `p` on(`dp`.`id_pesanan` = `p`.`id_pesanan`)) join `varian_produk` `vp` on(`dp`.`id_varian` = `vp`.`id_varian`)) join `produk` `pr` on(`vp`.`id_produk` = `pr`.`id_produk`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`rodd1157`@`localhost` SQL SECURITY DEFINER VIEW `v_detail_pesanan_produk`  AS SELECT `dp`.`id_detail` AS `id_detail`, `dp`.`id_pesanan` AS `id_pesanan`, `p`.`no_invoice` AS `no_invoice`, `pr`.`nama_produk` AS `nama_produk`, `vp`.`nama_varian` AS `nama_varian`, `dp`.`topping` AS `topping`, `dp`.`qty` AS `qty`, `dp`.`harga_satuan` AS `harga_satuan`, `dp`.`subtotal` AS `subtotal` FROM (((`detail_pesanan` `dp` join `pesanan` `p` on(`dp`.`id_pesanan` = `p`.`id_pesanan`)) join `varian_produk` `vp` on(`dp`.`id_varian` = `vp`.`id_varian`)) join `produk` `pr` on(`vp`.`id_produk` = `pr`.`id_produk`)) ;
 
 -- --------------------------------------------------------
 

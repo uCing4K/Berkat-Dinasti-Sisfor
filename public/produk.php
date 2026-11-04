@@ -1059,7 +1059,15 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                         <!-- Nama Produk -->
                                         <td class="px-3.5 py-3 text-[#251A14] font-semibold max-w-[200px] border-r border-[#E2D7C8]/60">
                                             <div class="truncate font-semibold text-[#251A14]" title="<?= htmlspecialchars($prod['name']) ?>"><?= htmlspecialchars($prod['name']) ?></div>
-                                            <span class="text-[11px] text-[#8E7E73] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span class="text-[11px] text-[#8E7E73] font-mono"><?= htmlspecialchars($prod['sku']) ?></span>
+                                                <?php if ($prod['category'] === 'Roti Hajatan' || stripos($prod['name'], 'Topping') !== false): ?>
+                                                    <button type="button" onclick="event.stopPropagation(); openToppingCatalogModal();" class="inline-flex items-center gap-1 text-[10px] font-bold text-[#D46E15] bg-[#FFF8F0] border border-[#F7D4B2] px-2 py-0.5 rounded hover:bg-[#FFEEDD] transition-colors cursor-pointer" title="Lihat Foto 9 Pilihan Topping Resmi">
+                                                        <i class="fas fa-cookie-bite text-[9px]"></i>
+                                                        <span>9 Topping (Foto)</span>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
 
                                         <!-- Kategori -->
@@ -1175,6 +1183,14 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                 <!-- Middle: Product Name & Packaging -->
                                 <div class="py-2.5 space-y-1.5">
                                     <h4 class="font-bold text-sm text-[#251A14] leading-snug"><?= htmlspecialchars($prod['name']) ?></h4>
+                                    <?php if ($prod['category'] === 'Roti Hajatan' || stripos($prod['name'], 'Topping') !== false): ?>
+                                        <div>
+                                            <button type="button" onclick="event.stopPropagation(); openToppingCatalogModal();" class="inline-flex items-center gap-1 text-[10px] font-bold text-[#D46E15] bg-[#FFF8F0] border border-[#F7D4B2] px-2 py-0.5 rounded hover:bg-[#FFEEDD] transition-colors cursor-pointer">
+                                                <i class="fas fa-cookie-bite text-[9px]"></i>
+                                                <span>9 Pilihan Topping (Lihat Foto)</span>
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="flex items-center gap-2 flex-wrap text-xs">
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border <?= $prod['packaging_badge_class'] ?>">
                                             <?php if ($prod['packaging_icon'] === 'mika'): ?>
@@ -1540,6 +1556,96 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL POPOUT: KATALOG FOTO 9 PILIHAN TOPPING ROTI HAJATAN      -->
+    <!-- ============================================================== -->
+    <div id="toppingCatalogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center">
+                        <i class="fas fa-cookie-bite text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-[#251A14]">9 Pilihan Topping Roti Hajatan</h3>
+                        <p class="text-[11px] text-[#8E7E73]">Katalog Visual Topping Resmi UMKM Berkat Dinasti</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeToppingCatalogModal()" class="w-7 h-7 rounded-lg text-[#8E7E73] hover:text-[#251A14] hover:bg-[#EAE2D5] flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="p-5 overflow-y-auto craft-scrollbar space-y-4">
+                <!-- Catalog Image -->
+                <div class="rounded-xl overflow-hidden border border-[#E2D7C8] shadow-sm bg-white p-1.5">
+                    <img src="assets/images/9_pilihan_topping_roti_hajatan.jpg" alt="9 Pilihan Topping Roti Hajatan" class="w-full max-h-[360px] object-contain rounded-lg mx-auto">
+                </div>
+
+                <!-- Topping Grid List 1-9 -->
+                <div>
+                    <h4 class="text-xs font-bold text-[#544337] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <i class="fas fa-list-ol text-[#D46E15]"></i>
+                        <span>Daftar Varian Topping Sesuai Nomor:</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">4</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">5</span>
+                            <span class="font-semibold text-[#251A14]">Wijen + Keju</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">6</span>
+                            <span class="font-semibold text-[#251A14]">Meses + Sprinkle</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">7</span>
+                            <span class="font-semibold text-[#251A14]">Coco Chip + Sprinkle</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">8</span>
+                            <span class="font-semibold text-[#251A14]">Wijen</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-white border border-[#E2D7C8] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-md bg-[#D46E15] text-white font-bold text-[10px] flex items-center justify-center shrink-0">9</span>
+                            <span class="font-semibold text-[#251A14]">Wijen + Sprinkle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-[#FFF8F0] border border-[#F7D4B2] rounded-xl p-3 text-[11px] text-[#924C00] flex items-start gap-2">
+                    <i class="fas fa-info-circle text-[#D46E15] mt-0.5 shrink-0"></i>
+                    <p>Pelanggan dapat memilih varian topping di atas sesuai selera atau opsi <strong>Campur / Mix (Aneka Topping)</strong> dalam satu pesanan hajatan.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-[#F3EDE2] border-t border-[#E2D7C8] flex justify-end">
+                <button type="button" onclick="closeToppingCatalogModal()" class="px-4 py-2 bg-[#D46E15] hover:bg-[#B85207] text-white rounded-lg text-xs font-semibold transition-colors shadow-2xs">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Hidden Form untuk Quick Toggle Status -->
     <form id="quickToggleStatusForm" action="produk.php" method="POST" class="hidden">
         <input type="hidden" name="action" value="toggle_status">
@@ -1558,6 +1664,22 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
             } else {
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
+            }
+        }
+
+        function openToppingCatalogModal() {
+            const modal = document.getElementById('toppingCatalogModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeToppingCatalogModal() {
+            const modal = document.getElementById('toppingCatalogModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
             }
         }
 

@@ -4,6 +4,42 @@ Seluruh perubahan rancangan, pembaruan fitur, serta revisi dokumentasi proyek **
 
 ---
 
+## [v1.2.0] - 2026-11-04
+
+### 🧁 Fitur Pemilihan 9 Topping Roti Hajatan & Integrasi Cetak Struk Thermal ESC/POS
+- **Integrasi 9 Varian Topping Resmi (Sesuai Foto Katalog Fisik Mitra):**
+  1. `Coco Chip + Keju`
+  2. `Coco Chip + Wijen`
+  3. `Meses + Keju`
+  4. `Meses + Wijen`
+  5. `Wijen + Keju`
+  6. `Meses + Sprinkle`
+  7. `Coco Chip + Sprinkle`
+  8. `Wijen`
+  9. `Wijen + Sprinkle`
+  *(Disertai opsi fleksibel: `Campur / Mix (Aneka Topping)` dan `Tanpa Topping (Polos / Original)`).*
+- **Perubahan Skema Database & Migrasi Idempoten:**
+  - Penambahan kolom `topping VARCHAR(150) NULL AFTER id_varian` pada tabel `detail_pesanan`.
+  - Pembaruan view `v_detail_pesanan_produk` dengan menyertakan field `dp.topping`.
+  - Pembuatan file migrasi SQL `database/migration_add_topping.sql`.
+  - Pembaruan file baseline `database/berkat_dinasti_final.sql` dan `database/rodd1157_berkat_dinasti_db.sql`.
+  - Mekanisme **self-healing migration** otomatis pada backend PHP (`pesanan.php` & `beranda.php`) untuk kompatibilitas server live hosting cPanel.
+- **Frontend & Antarmuka POS Interaktif:**
+  - **Modal Pop-up Visual Foto Katalog Topping** (`toppingCatalogModal`) yang menampilkan foto katalog fisik (`public/assets/images/9_pilihan_topping_roti_hajatan.jpg`) dan daftar 9 nomor topping.
+  - **Modal Pemilih Topping Interaktif POS** (`toppingPickerModal`) dengan tombol nomor varian, catatan topping khusus, dan kontrol kuantitas.
+  - **Papan POS & Keranjang Belanja (`public/pesanan.php` & `public/beranda.php`)**:
+    - Kartu produk Roti Hajatan dilengkapi penanda varian topping dan tombol cepat foto katalog.
+    - Keranjang belanja menampilkan badge topping, tombol ubah topping langsung, dan validasi MOQ per varian.
+    - Mendukung pesanan hajatan dengan berbagai kombinasi topping berbeda dalam satu invoice.
+  - **Modal Form Pesanan Tradisional**: Menambahkan kolom `Pilihan Topping` dengan select dropdown dinamis.
+  - **Master Produk (`public/produk.php`)**: Menampilkan badge dan tombol pop-up foto katalog 9 topping pada tabel master dan kartu mobile.
+- **Pencetakan Struk Kasir Thermal Bluetooth ESC/POS (`public/api/get-escpos-data.php`):**
+  - Mesin ESC/POS secara otomatis menyertakan baris topping (`  * Top: <nama_topping>`) di bawah nama produk saat dicetak ke printer Bluetooth thermal 58mm / 80mm agar bagian produksi dapur dan packing tidak salah varian.
+- **Agregasi Data Laporan & Pelanggan:**
+  - Pembaruan query subquery agregasi di `pesanan.php`, `beranda.php`, `laporan.php`, dan `pelanggan.php` agar ringkasan item menyertakan label `[Top: ...]`.
+
+---
+
 ## [v1.1.0] - 2026-10-26
 
 ### 🍞 Sinkronisasi Katalog Master Produk & Pricelist Resmi Berkat Dinasti

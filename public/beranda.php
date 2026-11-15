@@ -593,7 +593,7 @@ if ($db_connected && $pdo) {
             FROM pesanan p
             LEFT JOIN pelanggan pel ON p.id_pelanggan = pel.id_pelanggan
             ORDER BY p.id_pesanan DESC
-            LIMIT 15
+            LIMIT 10
         ");
         $dbOrders = $stmtOrders->fetchAll();
         if (!empty($dbOrders)) {
@@ -665,6 +665,9 @@ if (!empty($_SESSION['order_status_overrides'])) {
     }
     unset($po);
 }
+
+// Batasi tampilan pesanan di beranda maksimal 10 pesanan (Item 24)
+$pending_orders = array_slice($pending_orders, 0, 10);
 
 // -------------------------------------------------------------
 // 7. JADWAL PENGIRIMAN HARI INI
@@ -1226,13 +1229,13 @@ if ($db_connected && $pdo) {
                         </div>
                     </div>
 
-                    <!-- RIGHT: KERANJANG PESANAN (FIXED IN PLACE / ZERO WINDOW SCROLL) -->
-                    <div class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0">
-                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-sm overflow-hidden">
+                    <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
+                    <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
+                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-visible lg:overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
-                            <!-- 1. ARTISANAL BAKERY HEADER: Soft Oat Cream with Signature Caramel Accent Bar -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between shrink-0 shadow-2xs">
+                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream without brown stripe -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center shrink-0 shadow-2xs">
                                         <i class="fas fa-shopping-basket text-xs"></i>
@@ -1432,33 +1435,33 @@ if ($db_connected && $pdo) {
 
                 <!-- MOBILE ONLY: SHORTCUTS & 2-CARD KPI GRID (RODEO POS PATTERN) -->
                 <div class="block md:hidden mb-6 space-y-3.5">
-                    <!-- Quick Page Shortcuts (2 Columns) -->
+                    <!-- Quick Page Shortcuts (2 Columns) - Dark Brown Borders Khas Berkat Dinasti (Item 23) -->
                     <div class="grid grid-cols-2 gap-2.5">
-                        <a href="beranda.php?view=tambah_pesanan" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FFF6ED] border border-[#F7D4B2] text-[#924C00] font-semibold text-xs shadow-2xs hover:bg-[#FFEEDD] active:scale-95 transition-all">
+                        <a href="pesanan.php?tab=kalender" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FFF6ED] border-2 border-[#544337] text-[#924C00] font-semibold text-xs shadow-2xs hover:bg-[#FFEEDD] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shrink-0 text-xs shadow-xs">
-                                <i class="fas fa-plus"></i>
+                                <i class="far fa-calendar-alt"></i>
                             </div>
-                            <span class="truncate font-bold">Pesanan Baru</span>
+                            <span class="truncate font-bold">Jadwal Kirim</span>
                         </a>
-                        <a href="pesanan.php?tab=tabel" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="pesanan.php?tab=tabel" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-search"></i>
                             </div>
                             <span class="truncate font-bold">Cari Pesanan</span>
                         </a>
-                        <a href="produk.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="produk.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-bread-slice"></i>
                             </div>
                             <span class="truncate font-bold">Produk Bakery</span>
                         </a>
-                        <a href="pelanggan.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="pelanggan.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#FAF0E6] text-[#D46E15] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-users"></i>
                             </div>
                             <span class="truncate font-bold">Pelanggan</span>
                         </a>
-                        <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-6 h-6 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-chart-pie"></i>
                             </div>
@@ -2579,9 +2582,9 @@ if ($db_connected && $pdo) {
     <!-- MODAL POPOUT: KATALOG FOTO 9 PILIHAN TOPPING ROTI HAJATAN      -->
     <!-- ============================================================== -->
     <div id="toppingCatalogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
-        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <!-- Header -->
-            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center">
                         <i class="fas fa-cookie-bite text-sm"></i>
@@ -2669,9 +2672,9 @@ if ($db_connected && $pdo) {
     <!-- MODAL POPOUT: PEMILIH TOPPING INTERAKTIF KASIR / POS           -->
     <!-- ============================================================== -->
     <div id="toppingPickerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
-        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <!-- Header -->
-            <div class="px-5 py-3.5 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+            <div class="px-5 py-3.5 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-sm sm:text-base text-[#251A14]" id="toppingPickerTitle">Pilih Topping Roti Hajatan</h3>
                     <p class="text-[11px] text-[#8E7E73]" id="toppingPickerSubtitle">Kemasan: Kardus Putih • Rp 10.000</p>
@@ -3244,11 +3247,29 @@ if ($db_connected && $pdo) {
         });
 
         // =========================================================================
-        // DELIVERY SCHEDULE CALENDAR MODAL
+        // DELIVERY SCHEDULE CALENDAR MODAL (Singkron Penuh Tanggal & Pesanan - Item 14)
         // =========================================================================
         const SCHEDULE_BY_DATE = {
+            2: [
+                { id: 'INV-20261002-001', cust: 'Ibu Rahmawati (Arisan Sawojajar)', phone: '0812-4567-8910', items: 'Roti Hajatan Putih (25 box), Roti Manis Coklat (30 pcs)', time: '09:30 WIB', address: 'Jl. Danau Toba No. 45, Sawojajar', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            5: [
+                { id: 'INV-20261005-001', cust: 'Keluarga Bpk. Hendra', phone: '0813-8899-2233', items: 'Roti Hajatan Batik (35 box)', time: '10:00 WIB', address: 'Perumahan Griya Shanta Blok E-12', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            9: [
+                { id: 'INV-20261009-001', cust: 'Kantor BPN Malang', phone: '0851-2233-4455', items: 'Bolu Pisang Mika (20 mika), Roti Kopi (40 pcs)', time: '08:30 WIB', address: 'Jl. Terusan Kawi No. 10', courier: 'Kurir Obrok 2', status: 'Selesai' }
+            ],
+            14: [
+                { id: 'INV-20261014-001', cust: 'Ibu Hj. Aminah (Pengajian)', phone: '0812-7788-9900', items: 'Roti Hajatan Kardus Coklat (50 box)', time: '13:00 WIB', address: 'Jl. Bandung No. 8', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            18: [
+                { id: 'INV-20261018-001', cust: 'Catering Berkah Barokah', phone: '0822-3344-5566', items: 'Roti Bijian Kecil (120 pcs), Bolu Tanpa Pisang (15 box)', time: '11:30 WIB', address: 'Jl. Soekarno Hatta No. 88', courier: 'Kurir Obrok 2', status: 'Selesai' }
+            ],
             20: [
                 { id: 'INV-20261020-001', cust: 'Toko Berkah Snack', phone: '0812-9988-1122', items: 'Roti Hajatan Putih (40 box)', time: '09:00 WIB', address: 'Jl. Ahmad Yani No. 12', courier: 'Kurir Obrok 1', status: 'Selesai' }
+            ],
+            22: [
+                { id: 'INV-20261022-001', cust: 'Sekolah Brawijaya Smart School', phone: '0819-4455-6677', items: 'Roti Manis Abon (60 pcs), Roti Coklat (60 pcs)', time: '09:00 WIB', address: 'Jl. Veteran No. 2, Malang', courier: 'Kurir Obrok 1', status: 'Selesai' }
             ],
             24: [
                 { id: 'INV-20261024-002', cust: 'Ibu Ratna Sari', phone: '0813-7766-5544', items: 'Bolu Pisang Mika (10 mika), Roti Manis (30 pcs)', time: '13:30 WIB', address: 'Komplek Permata Hijau C-2', courier: 'Kurir Obrok 1', status: 'Selesai' }
@@ -3741,7 +3762,7 @@ if ($db_connected && $pdo) {
             }
             for (let day = 1; day <= totalDays; day++) {
                 const isToday = isThisMonth && today.getDate() === day;
-                const hasDelivery = Boolean(SCHEDULE_BY_DATE[day] && SCHEDULE_BY_DATE[day].length > 0) || [2, 5, 9, 14, 18, 22, 26, 28, 30].includes(day);
+                const hasDelivery = Boolean(SCHEDULE_BY_DATE[day] && SCHEDULE_BY_DATE[day].length > 0);
 
                 if (isToday) {
                     html += `<div onclick="openDeliveryScheduleModal(${day})" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg bg-[#3E2B21] text-[#FAF8F5] font-bold shadow-xs hover:bg-[#4E372B] transition-colors relative" title="Jadwal Hari Ini: Tgl ${day}">

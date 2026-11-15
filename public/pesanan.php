@@ -388,7 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'is_urgent' => $isToday,
             'status_bayar' => ucfirst(str_replace('_', ' ', $dbStatusBayar)),
             'bayar_class' => $bayarClass,
-            'courier_info' => 'Kurir Toko (Siap Antar ' . substr($waktuKirim, 0, 5) . ')',
+            'courier_info' => 'Kurir Siap Antar ' . substr($waktuKirim, 0, 5),
             'total' => $grand_total
         ]);
 
@@ -496,7 +496,7 @@ $master_orders = [
         'is_urgent' => true,
         'status_bayar' => 'Belum Bayar',
         'bayar_class' => 'bg-[#828282]/15 text-[#544337]',
-        'courier_info' => 'Kurir Toko (Siap Antar 14:00)',
+        'courier_info' => 'Kurir Siap Antar 14:00',
         'total' => 144000
     ],
     [
@@ -565,7 +565,7 @@ $master_orders = [
         'phone' => '0821-9988-7766',
         'items' => 'Roti Hajatan Mika (10 mika), Bolu Pisang Kardus Coklat (2 box)',
         'destination' => 'Kirim ke Jl. Ijen No. 15',
-        'courier_info' => 'Kurir Toko',
+        'courier_info' => 'Kurir Siap Antar 17:00',
         'time' => 'Hari Ini, 17:00',
         'date' => date('Y-m-d'),
         'default_status' => 'menunggu',
@@ -629,7 +629,7 @@ if ($db_connected && $pdo) {
                 'is_urgent' => $is_urgent,
                 'status_bayar' => ucfirst(str_replace('_', ' ', $payStat)),
                 'bayar_class' => $bayarCls,
-                'courier_info' => 'Kurir Toko (Siap Antar ' . $wTime . ')',
+                'courier_info' => 'Kurir Siap Antar ' . $wTime,
                 'total' => floatval($r['grand_total'])
             ];
         }
@@ -667,7 +667,7 @@ if (!empty($_SESSION['session_orders'])) {
                 'is_urgent' => !empty($so['is_urgent']),
                 'status_bayar' => $so['payment_status'] ?? 'Belum Bayar',
                 'bayar_class' => $so['payment_class'] ?? 'bg-[#828282]/15 text-[#544337]',
-                'courier_info' => 'Kurir Toko',
+                'courier_info' => 'Kurir Siap Antar 17:00',
                 'total' => intval(preg_replace('/[^0-9]/', '', $so['total'] ?? '0'))
             ];
         }
@@ -1146,7 +1146,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                     <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
                     <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
-                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden">
+                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-visible lg:overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
                             <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream without brown stripe -->
@@ -1167,7 +1167,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
 
                             <!-- 2. SCROLLABLE MIDDLE BODY (Form Pelanggan First, then Cart Items) -->
-                            <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF6F0]">
+                            <div class="flex-1 lg:overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF6F0]">
                                 
                                 <!-- FORM DATA PELANGGAN (PROMINENT AT TOP, ALWAYS VISIBLE FIRST) -->
                                 <div class="p-3 sm:p-3.5 space-y-3 bg-[#F5F0E6] text-xs" id="posCustomerSection">
@@ -1177,7 +1177,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                                 <i class="fas fa-user-circle text-[#D46E15] text-xs"></i>
                                                 <label class="font-bold text-[#544337] uppercase tracking-wider text-[10px]">Data Pelanggan (Wajib Diisi Awal)</label>
                                             </div>
-                                            <span id="posCustTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                            <span id="posCustTypeBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                 Pelanggan Lama
                                             </span>
                                         </div>
@@ -1187,7 +1187,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                             <div class="relative">
                                                 <input type="text" id="posCustNameInput" name="customer_name" autocomplete="off"
                                                     placeholder="Ketik nama pelanggan..."
-                                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?>"
+                                                    value=""
                                                     oninput="handlePosCustSearch(this.value)"
                                                     onfocus="handlePosCustSearchFocus()"
                                                     maxlength="70"
@@ -1203,22 +1203,22 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                             </div>
                                         </div>
 
-                                        <input type="hidden" name="id_pelanggan" id="pos_id_pelanggan" value="<?= $customers_for_select[0]['id_pelanggan'] ?? $customers_for_select[0]['id'] ?? 1 ?>">
+                                        <input type="hidden" name="id_pelanggan" id="pos_id_pelanggan" value="">
                                         <input type="hidden" name="is_pelanggan_baru" id="pos_is_pelanggan_baru" value="0">
 
-                                        <!-- Phone & Address Inputs (Always visible and filled) -->
+                                        <!-- Phone & Address Inputs (Starts empty, required to fill) -->
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-0.5">No WhatsApp *</label>
                                                 <input type="tel" inputmode="numeric" id="pos_customer_wa" name="customer_wa" placeholder="08xxxxxxxxxx"
-                                                    value="<?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?>"
+                                                    value=""
                                                     oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" required
                                                     class="w-full bg-white border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none shadow-2xs">
                                             </div>
                                             <div>
                                                 <label class="block text-[10px] font-bold text-[#544337] mb-0.5">Alamat Pengiriman *</label>
                                                 <input type="text" id="pos_customer_address" name="customer_address" placeholder="Jl. Alamat lengkap..."
-                                                    value="<?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?>"
+                                                    value=""
                                                     maxlength="255" required
                                                     class="w-full bg-white border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none shadow-2xs">
                                             </div>
@@ -1356,7 +1356,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 <div class="w-8 h-8 rounded-lg bg-[#FFF6EC] border border-[#F7D4B2] flex items-center justify-center text-[#D46E15] md:hidden shrink-0">
                                     <i class="fas fa-clipboard-list text-xs"></i>
                                 </div>
-                                <h2 class="text-[#251A14] text-lg md:text-2xl font-bold tracking-tight">Manajemen Pesanan</h2>
+                                <h2 class="text-[#251A14] text-base sm:text-xl md:text-2xl font-bold tracking-tight whitespace-nowrap">Manajemen Pesanan</h2>
                             </div>
                             <span class="bg-[#EFE8DE] text-[#D46E15] text-[11px] md:text-xs font-semibold px-2.5 py-1 rounded-full border border-[#DDD3C5] whitespace-nowrap shrink-0" id="totalOrdersBadge">
                                 <?= $totalOrdersCount ?> Total Pesanan
@@ -1407,29 +1407,46 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
                 </div>
 
-                <!-- TAB SWITCHER BAR (KANBAN BOARD VS TABEL PESANAN VS KALENDER PENGIRIMAN) -->
-                <!-- Mobile hides Kanban button to keep a neat 1-row switch between Tabel and Kalender -->
-                <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-1.5 md:gap-2 mb-6 shadow-2xs max-w-fit">
-                    <!-- Tab 1: Kanban Board (Hidden on mobile) -->
-                    <button onclick="switchTab('kanban')" id="tabBtnKanban" 
-                        class="hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
-                        <i class="fas fa-columns text-xs"></i>
-                        <span>Kanban Board</span>
-                    </button>
+                <!-- TAB SWITCHER & ACTION TOOLBAR (SEJAJAR & RAPI - Item 18) -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                    <!-- Left: View Tabs (Kanban, Tabel, Kalender) -->
+                    <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-1.5 md:gap-2 shadow-2xs max-w-fit">
+                        <!-- Tab 1: Kanban Board (Hidden on mobile) -->
+                        <button onclick="switchTab('kanban')" id="tabBtnKanban" 
+                            class="hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                            <i class="fas fa-columns text-xs"></i>
+                            <span>Kanban Board</span>
+                        </button>
 
-                    <!-- Tab 2: Tabel Pesanan (Highlighted as default on mobile) -->
-                    <button onclick="switchTab('tabel')" id="tabBtnTabel" 
-                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= ($active_tab === 'tabel') ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : (($active_tab === 'kanban') ? 'bg-[#D46E15] text-white shadow-sm font-semibold md:bg-transparent md:text-[#544337] md:shadow-none hover:text-[#251A14] hover:bg-[#E5DDD0]' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]') ?>">
-                        <i class="fas fa-table-list text-xs"></i>
-                        <span class="whitespace-nowrap">Tabel Pesanan</span>
-                    </button>
+                        <!-- Tab 2: Tabel Pesanan (Highlighted as default on mobile) -->
+                        <button onclick="switchTab('tabel')" id="tabBtnTabel" 
+                            class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= ($active_tab === 'tabel') ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : (($active_tab === 'kanban') ? 'bg-[#D46E15] text-white shadow-sm font-semibold md:bg-transparent md:text-[#544337] md:shadow-none hover:text-[#251A14] hover:bg-[#E5DDD0]' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]') ?>">
+                            <i class="fas fa-table-list text-xs"></i>
+                            <span class="whitespace-nowrap">Tabel Pesanan</span>
+                        </button>
 
-                    <!-- Tab 3: Kalender Pengiriman -->
-                    <button onclick="switchTab('kalender')" id="tabBtnKalender" 
-                        class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
-                        <i class="far fa-calendar-alt text-xs"></i>
-                        <span class="whitespace-nowrap">Kalender Pengiriman</span>
-                    </button>
+                        <!-- Tab 3: Kalender Pengiriman -->
+                        <button onclick="switchTab('kalender')" id="tabBtnKalender" 
+                            class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                            <i class="far fa-calendar-alt text-xs"></i>
+                            <span class="whitespace-nowrap">Kalender Pengiriman</span>
+                        </button>
+                    </div>
+
+                    <!-- Right: Action Buttons (Sejajar dengan Tab Switcher) -->
+                    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+                        <!-- Tombol Unduh Rekap (Ekspor CSV Riil) -->
+                        <button onclick="handleDownloadRecap()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2 md:py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                            <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
+                            <span>Unduh Rekap</span>
+                        </button>
+
+                        <!-- Tombol Tambah Pesanan (Desktop & Tablet) -->
+                        <a href="pesanan.php?view=tambah_pesanan" class="hidden sm:inline-flex bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2 md:py-2.5 rounded-xl items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Tambah Pesanan</span>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- ============================================================== -->
@@ -1437,26 +1454,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- ============================================================== -->
                 <div id="kanbanView" class="<?= $active_tab === 'kanban' ? 'hidden md:block' : 'hidden' ?>">
                     
-                    <!-- Action Bar: Unduh Rekap & Tambah Pesanan -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                        <div class="flex items-center gap-2 text-xs text-[#8E7E73]">
-                            <span class="inline-block w-2 h-2 rounded-full bg-[#27AE60]"></span>
-                            <span>Tarik kartu untuk memindahkan status alur kerja produksi & pengiriman secara langsung.</span>
-                        </div>
-
-                        <div class="flex items-center gap-3 self-end sm:self-auto">
-                            <!-- Tombol Unduh Rekap (Ekspor CSV Riil) -->
-                            <button onclick="handleDownloadRecap()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
-                                <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
-                                <span>Unduh Rekap</span>
-                            </button>
-
-                            <!-- Tombol Tambah Pesanan -->
-                            <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
-                                <i class="fas fa-plus text-xs"></i>
-                                <span>Tambah Pesanan</span>
-                            </a>
-                        </div>
+                    <!-- Caption Bar -->
+                    <div class="flex items-center gap-2 text-xs text-[#8E7E73] mb-4">
+                        <span class="inline-block w-2 h-2 rounded-full bg-[#27AE60]"></span>
+                        <span>Tarik kartu untuk memindahkan status alur kerja produksi & pengiriman secara langsung.</span>
                     </div>
 
                     <!-- 4 Swimlanes Kanban Board Grid (Menunggu -> Oven -> Siap Kirim -> Selesai) -->
@@ -1777,31 +1778,31 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                     <!-- Table Main Card -->
                     <div class="bg-white rounded-2xl border border-[#E2D7C8] shadow-xs overflow-hidden mb-8">
-                        <!-- Card Header (Hasil Pencarian & Export Buttons) -->
-                        <div class="px-5 py-3.5 border-b border-[#E2D7C8] bg-[#FDFBF7] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-[#D46E15]/10 text-[#D46E15] flex items-center justify-center">
+                        <!-- Card Header (Hasil Pencarian & Export Buttons - Compact on Mobile Item 22) -->
+                        <div class="px-4 sm:px-5 py-3.5 border-b border-[#E2D7C8] bg-[#FDFBF7] flex items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                                <div class="w-8 h-8 rounded-lg bg-[#D46E15]/10 text-[#D46E15] flex items-center justify-center shrink-0">
                                     <i class="fas fa-clipboard-list text-sm"></i>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-sm font-bold text-[#251A14]">Hasil Pencarian</h3>
-                                    <span id="tableOrdersCount" class="bg-[#D46E15] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                                <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                                    <h3 class="text-xs sm:text-sm font-bold text-[#251A14] truncate">Hasil Pencarian</h3>
+                                    <span id="tableOrdersCount" class="bg-[#D46E15] text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0">
                                         <?= count($master_orders) ?>
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- Export Action Buttons -->
-                            <div class="flex items-center gap-2 self-end sm:self-auto">
+                            <!-- Export Action Buttons: Icons only on mobile, text on desktop (Item 22) -->
+                            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                                 <button type="button" onclick="exportTableToCSV()" 
-                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format CSV">
-                                    <i class="fas fa-file-csv text-base"></i>
-                                    <span>Export CSV</span>
+                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format CSV">
+                                    <i class="fas fa-file-csv text-sm sm:text-base"></i>
+                                    <span class="hidden sm:inline">Export CSV</span>
                                 </button>
                                 <button type="button" onclick="exportTableToExcel()" 
-                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format Excel (.xls)">
-                                    <i class="fas fa-file-excel text-base"></i>
-                                    <span>Export Excel</span>
+                                    class="bg-[#107C41] hover:bg-[#0C6133] active:scale-95 text-white text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all" title="Ekspor data tabel ke format Excel (.xls)">
+                                    <i class="fas fa-file-excel text-sm sm:text-base"></i>
+                                    <span class="hidden sm:inline">Export Excel</span>
                                 </button>
                             </div>
                         </div>
@@ -2105,59 +2106,38 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- ============================================================== -->
                 <div id="calendarView" class="<?= $active_tab === 'kalender' ? '' : 'hidden' ?>">
                     
-                    <!-- Controls Row: Month Selector & Filters -->
+                    <!-- Controls Row: Month Manual Fixed Navigation & Capacity (Item 15) -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-                            <!-- Dropdown Bulan Dinamis (12 Bulan Penuh Tahun Ini & Tahun Depan) -->
-                            <div class="relative w-full sm:w-auto">
-                                <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs sm:text-sm text-[#251A14] font-semibold focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
-                                    <?php 
-                                    $currY = (int)date('Y');
-                                    $allMonthsList = [
-                                        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
-                                        '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
-                                        '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-                                    ];
-                                    foreach ([$currY, $currY + 1] as $yr):
-                                        foreach ($allMonthsList as $mCode => $mName):
-                                            $valYM = "$yr-$mCode";
-                                            $isSel = ($valYM === date('Y-m')) ? 'selected' : '';
-                                    ?>
-                                        <option value="<?= $valYM ?>" <?= $isSel ?>><?= "$mName $yr" ?></option>
-                                    <?php 
-                                        endforeach;
-                                    endforeach; 
-                                    ?>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
-                                    <i class="fas fa-chevron-down text-[10px]"></i>
+                        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                            <!-- Navigasi Manual Bulan: < Sebelumnya (Bulan Tahun Fixed) Berikutnya > -->
+                            <div class="flex items-center gap-1 bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-1 shadow-2xs">
+                                <button type="button" onclick="navigateCalendarMonth(-1)" 
+                                    class="px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-[#E2D7C8] text-[#544337] hover:text-[#251A14] text-xs font-bold transition-all flex items-center gap-1 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                    <span class="hidden sm:inline">Sebelumnya</span>
+                                </button>
+                                <div id="calendarMonthDisplay" class="w-36 sm:w-44 text-center font-bold text-xs sm:text-sm text-[#251A14] select-none truncate">
+                                    <!-- Dynamic month text rendered here (e.g. Oktober 2026) -->
                                 </div>
+                                <button type="button" onclick="navigateCalendarMonth(1)" 
+                                    class="px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-[#E2D7C8] text-[#544337] hover:text-[#251A14] text-xs font-bold transition-all flex items-center gap-1 active:scale-95 cursor-pointer">
+                                    <span class="hidden sm:inline">Berikutnya</span>
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
                             </div>
 
-                            <!-- Dropdown Tipe Pengiriman -->
-                            <div class="relative w-full sm:w-auto">
-                                <select id="shippingTypeSelect" onchange="filterShippingType(this.value)" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs sm:text-sm text-[#251A14] font-medium focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
-                                    <option value="all">Semua Pengiriman</option>
-                                    <option value="kurir">Kurir Toko (Obrok)</option>
-                                    <option value="toko">Ambil di Toko</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
-                                    <i class="fas fa-chevron-down text-[10px]"></i>
-                                </div>
-                            </div>
-
-                            <!-- Badge Kapasitas Trip -->
-                            <span class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
+                            <!-- Badge Kapasitas Trip Obrok -->
+                            <span class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
                                 <i class="fas fa-motorcycle text-xs"></i>
                                 <span>Kapasitas: Maks. 150 pcs/Trip</span>
                             </span>
                         </div>
 
-                        <!-- Button Tambah Pesanan -->
-                        <a href="pesanan.php?view=tambah_pesanan" class="hidden sm:inline-flex bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
-                            <i class="fas fa-plus text-xs"></i>
-                            <span>Tambah Pesanan</span>
-                        </a>
+                        <!-- Info Semua Pengiriman Dimasukkan -->
+                        <div class="text-xs text-[#8E7E73] flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-[#27AE60]"></span>
+                            <span>Semua data pengiriman harian toko & kurir ditampilkan.</span>
+                        </div>
                     </div>
 
                     <!-- Main Big Calendar Card (With signature border-[#544337]) -->
@@ -2265,7 +2245,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <p class="text-xs text-[#544337] mt-1">Roti Hajatan Putih 10 box, Bolu Pisang 2 mika</p>
                                 </div>
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#DDD3C5] text-xs">
-                                    <span class="bg-[#D46E15]/15 text-[#B85207] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-motorcycle text-xs mr-1"></i> Kurir Toko (Siap Antar)</span>
+                                    <span class="bg-[#D46E15]/15 text-[#B85207] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-motorcycle text-xs mr-1"></i> Kurir Siap Antar</span>
                                     <button type="button" onclick="openOrderDetailById('ORD-089')" class="text-[#D46E15] hover:text-[#B85207] font-semibold flex items-center gap-1">
                                         <span>Detail</span>
                                         <i class="fas fa-arrow-right text-xs"></i>
@@ -2301,6 +2281,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 </div>
 
                 <?php endif; ?>
+
+                <!-- Floating Action Button (FAB) for Mobile (Item 22) -->
+                <button type="button" 
+                    id="mobileFabAddOrder"
+                    onclick="openOrderModal()" 
+                    class="fixed bottom-6 right-6 z-40 flex md:hidden items-center justify-center w-14 h-14 bg-[#D46E15] text-white rounded-full shadow-2xl hover:bg-[#B85207] active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-[#D46E15]/30 cursor-pointer"
+                    title="Tambah Pesanan Baru"
+                    aria-label="Tambah Pesanan Baru">
+                    <i class="fas fa-plus text-xl"></i>
+                </button>
 
             </main>
         </div>
@@ -3689,11 +3679,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             ord.current_status = nextStatus;
 
-            // Move Kanban card if exists
+            // Move Kanban card if exists (prepend to top, Item 19)
             const card = document.getElementById('card-' + orderId);
             const targetContainer = document.getElementById('container-' + nextStatus);
             if (card && targetContainer) {
-                targetContainer.appendChild(card);
+                targetContainer.prepend(card);
                 updateKanbanStatusBadge(card, nextStatus);
                 recalculateKanbanCounts();
             }
@@ -3801,7 +3791,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const targetContainer = document.getElementById('container-' + targetStatus);
 
             if (card && targetContainer) {
-                targetContainer.appendChild(card);
+                targetContainer.prepend(card);
                 updateKanbanStatusBadge(card, targetStatus);
                 recalculateKanbanCounts();
                 updateTableRowStatus(orderId, targetStatus);
@@ -3892,7 +3882,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const targetContainer = document.getElementById('container-' + status);
 
             if (card && targetContainer) {
-                targetContainer.appendChild(card);
+                targetContainer.prepend(card);
                 updateKanbanStatusBadge(card, status);
                 recalculateKanbanCounts();
             }
@@ -3906,6 +3896,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         // INTERACTIVE CALENDAR
         // =========================================================================
         let currentCalDate = new Date();
+
+        function navigateCalendarMonth(direction) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + direction);
+            renderInteractiveCalendar();
+        }
 
         function filterCalendarByMonth(val) {
             if (!val) return;
@@ -3930,6 +3925,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const monthTitle = monthNames[month] + ' ' + year;
             const gridTitle = document.getElementById('calendarGridTitle');
             if (gridTitle) gridTitle.textContent = monthTitle;
+
+            // Update fixed navigation month display (Item 15)
+            const monthDisplay = document.getElementById('calendarMonthDisplay');
+            if (monthDisplay) monthDisplay.textContent = monthTitle;
 
             const monthSelect = document.getElementById('calendarMonthSelect');
             if (monthSelect) {
@@ -4598,7 +4597,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             updatePosCategoryCounts();
             renderPosProducts();
             renderPosCart();
-            syncPosCustomerInfo();
         }
 
         function updatePosCategoryCounts() {

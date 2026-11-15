@@ -168,6 +168,22 @@ if ($db_connected && $pdo) {
     } catch (Exception $e) {}
 }
 
+// Hitung metrik awal pill status bayar
+$count_all = count($orders_report);
+$count_lunas = 0;
+$count_hutang = 0;
+$count_belum_bayar = 0;
+foreach ($orders_report as $r) {
+    $sb = strtolower($r['status_bayar'] ?? '');
+    if ($sb === 'lunas') {
+        $count_lunas++;
+    } elseif ($sb === 'hutang' || $sb === 'dp') {
+        $count_hutang++;
+    } else {
+        $count_belum_bayar++;
+    }
+}
+
 // Helper Tanggal Dinamis Bahasa Indonesia
 $daysIndo = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
 $monthsIndo = ['01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu', '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'];
@@ -472,16 +488,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </button>
                     </div>
 
-                    <!-- Right: Unduh Excel & Cetak Laporan -->
-                    <div id="reportActions" class="flex items-center gap-2 self-end sm:self-auto">
-                        <button onclick="handleExportExcel()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
-                            <i class="fas fa-file-excel text-xs text-emerald-700"></i>
+                    <!-- Right: Unduh Excel & Cetak Laporan (Item 16: Compact, Dark Brown, Inline) -->
+                    <div id="reportActions" class="flex items-center gap-2 shrink-0">
+                        <button onclick="handleExportExcel()" class="bg-[#3E2B21] hover:bg-[#251A14] text-white text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer">
+                            <i class="fas fa-file-excel text-xs text-emerald-400"></i>
                             <span class="hidden sm:inline">Unduh Excel</span>
                             <span class="sm:hidden">Excel</span>
                         </button>
 
-                        <button onclick="window.print()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
-                            <i class="fas fa-print text-xs text-[#5E4D42]"></i>
+                        <button onclick="window.print()" class="bg-[#3E2B21] hover:bg-[#251A14] text-white text-xs md:text-sm font-semibold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer">
+                            <i class="fas fa-print text-xs text-[#D8C7B8]"></i>
                             <span class="hidden sm:inline">Cetak Laporan</span>
                             <span class="sm:hidden">Cetak</span>
                         </button>
@@ -742,23 +758,23 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </span>
                         </div>
 
-                        <!-- Segmented Filter Pills -->
+                        <!-- Segmented Filter Pills (Item 17: Dynamic Real Counters) -->
                         <div class="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
                             <button onclick="filterReportTable('all', this)" id="filterBtnAll" 
                                 class="px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors">
-                                Semua (<?= count($orders_report) ?>)
+                                Semua (<span id="pillCountAll"><?= $count_all ?></span>)
                             </button>
                             <button onclick="filterReportTable('Lunas', this)" id="filterBtnLunas" 
                                 class="px-3 py-1.5 rounded-lg bg-[#EFE8DE] border border-[#DDD3C5] text-[#5E4D42] hover:bg-[#E5DDD0] transition-colors">
-                                Lunas (3)
+                                Lunas (<span id="pillCountLunas"><?= $count_lunas ?></span>)
                             </button>
                             <button onclick="filterReportTable('Hutang', this)" id="filterBtnHutang" 
                                 class="px-3 py-1.5 rounded-lg bg-[#EFE8DE] border border-[#DDD3C5] text-[#5E4D42] hover:bg-[#E5DDD0] transition-colors">
-                                Hutang (1)
+                                Hutang (<span id="pillCountHutang"><?= $count_hutang ?></span>)
                             </button>
                             <button onclick="filterReportTable('Belum Bayar', this)" id="filterBtnBelumBayar" 
                                 class="px-3 py-1.5 rounded-lg bg-[#EFE8DE] border border-[#DDD3C5] text-[#5E4D42] hover:bg-[#E5DDD0] transition-colors">
-                                Belum Bayar (1)
+                                Belum Bayar (<span id="pillCountBelumBayar"><?= $count_belum_bayar ?></span>)
                             </button>
                         </div>
                     </div>
@@ -864,14 +880,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <?php endforeach; ?>
                     </div>
 
-                    <!-- Pagination Footer (Akurat & Dinamis) -->
+                    <!-- Pagination Footer (Akurat & Dinamis - Item 17) -->
                     <div class="px-6 py-4 border-t border-[#E2D7C8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#8E7E73] bg-[#FDFBF7]">
-                        <span>Menampilkan 1-<?= count($orders_report) ?> dari <?= count($orders_report) ?> pesanan</span>
+                        <span id="reportPaginationInfo">Menampilkan 1-<?= min(20, count($orders_report)) ?> dari <?= count($orders_report) ?> pesanan</span>
                         
-                        <div class="flex items-center gap-1.5">
-                            <button class="w-7 h-7 rounded-md text-[#8E7E73] opacity-50 cursor-default flex items-center justify-center font-bold">‹</button>
+                        <div class="flex items-center gap-1.5" id="reportPaginationControls">
+                            <!-- Rendered dynamically by renderPaginationControls() in JS -->
+                            <button class="w-7 h-7 rounded-md text-[#8E7E73] opacity-40 cursor-not-allowed flex items-center justify-center font-bold">‹</button>
                             <button class="w-7 h-7 rounded-md bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shadow-xs">1</button>
-                            <button class="w-7 h-7 rounded-md text-[#8E7E73] opacity-50 cursor-default flex items-center justify-center font-bold">›</button>
+                            <button class="w-7 h-7 rounded-md text-[#8E7E73] opacity-40 cursor-not-allowed flex items-center justify-center font-bold">›</button>
                         </div>
                     </div>
 
@@ -963,6 +980,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
         }
 
+        const PAGE_SIZE = 20;
+        let currentPage = 1;
         let currentStatusFilter = 'all';
         let currentFilteredOrders = [...reportData];
 
@@ -1091,51 +1110,150 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const startDate = startInput ? startInput.value : '';
             const endDate = endInput ? endInput.value : '';
 
+            // 1. Calculate dynamic counts for pills based on current date range (Item 17)
+            let dateMatchAll = 0;
+            let dateMatchLunas = 0;
+            let dateMatchHutang = 0;
+            let dateMatchBelumBayar = 0;
+
+            reportData.forEach(r => {
+                const rDate = r.date_raw || '';
+                const matchDate = (!startDate || rDate >= startDate) && (!endDate || rDate <= endDate);
+                if (matchDate) {
+                    dateMatchAll++;
+                    const sb = (r.status_bayar || '').toLowerCase();
+                    if (sb === 'lunas') {
+                        dateMatchLunas++;
+                    } else if (sb === 'hutang' || sb === 'dp') {
+                        dateMatchHutang++;
+                    } else {
+                        dateMatchBelumBayar++;
+                    }
+                }
+            });
+
+            const pillAll = document.getElementById('pillCountAll');
+            const pillLunas = document.getElementById('pillCountLunas');
+            const pillHutang = document.getElementById('pillCountHutang');
+            const pillBelum = document.getElementById('pillCountBelumBayar');
+            if (pillAll) pillAll.textContent = dateMatchAll;
+            if (pillLunas) pillLunas.textContent = dateMatchLunas;
+            if (pillHutang) pillHutang.textContent = dateMatchHutang;
+            if (pillBelum) pillBelum.textContent = dateMatchBelumBayar;
+
+            // 2. Filter matching table rows and mobile cards
             const rows = document.querySelectorAll('#ordersReportTable tbody tr.order-row');
             const mobileCards = document.querySelectorAll('#ordersReportMobileList .report-mobile-card');
-            let count = 0;
+            
+            const matchingRows = [];
+            const matchingCards = [];
             currentFilteredOrders = [];
 
-            rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
+            rows.forEach((row, idx) => {
+                const rowStatus = row.getAttribute('data-status') || '';
                 const rowDate = row.getAttribute('data-date') || '';
                 
-                const matchStatus = (currentStatusFilter === 'all' || rowStatus === currentStatusFilter);
+                const sLower = rowStatus.toLowerCase();
+                const fLower = currentStatusFilter.toLowerCase();
+                const matchStatus = (
+                    currentStatusFilter === 'all' || 
+                    sLower === fLower ||
+                    (fLower === 'hutang' && (sLower === 'hutang' || sLower === 'dp'))
+                );
                 const matchDate = (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate);
 
                 if (matchStatus && matchDate) {
-                    row.style.display = '';
-                    count++;
-                } else {
-                    row.style.display = 'none';
+                    matchingRows.push(row);
+                    if (mobileCards[idx]) {
+                        matchingCards.push(mobileCards[idx]);
+                    }
+                    if (reportData[idx]) {
+                        currentFilteredOrders.push(reportData[idx]);
+                    }
                 }
             });
 
-            mobileCards.forEach(card => {
-                const cardStatus = card.getAttribute('data-status');
-                const cardDate = card.getAttribute('data-date') || '';
-                const matchStatus = (currentStatusFilter === 'all' || cardStatus === currentStatusFilter);
-                const matchDate = (!startDate || cardDate >= startDate) && (!endDate || cardDate <= endDate);
-
-                if (matchStatus && matchDate) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-
-            // Update filtered export data
-            reportData.forEach(r => {
-                const rDate = r.date_raw || '';
-                const matchStatus = (currentStatusFilter === 'all' || r.status_bayar === currentStatusFilter);
-                const matchDate = (!startDate || rDate >= startDate) && (!endDate || rDate <= endDate);
-                if (matchStatus && matchDate) {
-                    currentFilteredOrders.push(r);
-                }
-            });
-
+            // 3. Update table records count badge
             const badge = document.getElementById('tableRecordCountBadge');
-            if (badge) badge.textContent = count + ' Data';
+            if (badge) badge.textContent = matchingRows.length + ' Data';
+
+            // 4. Functional Pagination (PAGE_SIZE = 20) (Item 17)
+            const totalRows = matchingRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIdx = (currentPage - 1) * PAGE_SIZE;
+            const endIdx = Math.min(startIdx + PAGE_SIZE, totalRows);
+
+            // Hide all rows & cards initially
+            rows.forEach(r => r.style.display = 'none');
+            mobileCards.forEach(c => c.classList.add('hidden'));
+
+            // Show current page slice
+            for (let i = startIdx; i < endIdx; i++) {
+                if (matchingRows[i]) matchingRows[i].style.display = '';
+                if (matchingCards[i]) matchingCards[i].classList.remove('hidden');
+            }
+
+            // Update Pagination Info
+            const infoEl = document.getElementById('reportPaginationInfo');
+            if (infoEl) {
+                if (totalRows === 0) {
+                    infoEl.textContent = 'Menampilkan 0 dari 0 pesanan';
+                } else {
+                    infoEl.textContent = `Menampilkan ${startIdx + 1}-${endIdx} dari ${totalRows} pesanan`;
+                }
+            }
+
+            // Render Pagination Controls
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            const controls = document.getElementById('reportPaginationControls');
+            if (!controls) return;
+            controls.innerHTML = '';
+
+            // Previous Button (‹)
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs transition-colors ${currentPage > 1 ? 'hover:bg-[#E5DDD0] text-[#544337] cursor-pointer' : 'text-[#8E7E73] opacity-40 cursor-not-allowed'}`;
+            prevBtn.innerHTML = '‹';
+            if (currentPage > 1) {
+                prevBtn.onclick = () => {
+                    currentPage--;
+                    applyCombinedTableFilters();
+                };
+            }
+            controls.appendChild(prevBtn);
+
+            // Numbered Page Buttons
+            for (let p = 1; p <= totalPages; p++) {
+                const pageBtn = document.createElement('button');
+                if (p === currentPage) {
+                    pageBtn.className = 'w-7 h-7 rounded-md bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shadow-xs cursor-pointer';
+                } else {
+                    pageBtn.className = 'w-7 h-7 rounded-md bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] font-bold text-xs flex items-center justify-center border border-[#DDD3C5] cursor-pointer transition-colors';
+                }
+                pageBtn.textContent = p;
+                pageBtn.onclick = () => {
+                    currentPage = p;
+                    applyCombinedTableFilters();
+                };
+                controls.appendChild(pageBtn);
+            }
+
+            // Next Button (›)
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs transition-colors ${currentPage < totalPages ? 'hover:bg-[#E5DDD0] text-[#544337] cursor-pointer' : 'text-[#8E7E73] opacity-40 cursor-not-allowed'}`;
+            nextBtn.innerHTML = '›';
+            if (currentPage < totalPages) {
+                nextBtn.onclick = () => {
+                    currentPage++;
+                    applyCombinedTableFilters();
+                };
+            }
+            controls.appendChild(nextBtn);
         }
 
         // Real CSV / Excel Export Action
@@ -1305,6 +1423,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (activeBtn) activeBtn.className = 'px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors';
 
             currentStatusFilter = status;
+            currentPage = 1; // Reset to page 1 on filter change
             applyCombinedTableFilters();
         }
 
@@ -1319,6 +1438,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (startInput) startInput.value = `${curYear}-${curMonth}-01`;
             if (endInput) endInput.value = `${curYear}-${curMonth}-${curDay}`;
             currentFilteredOrders = [...reportData];
+            applyCombinedTableFilters();
         });
 
         // Logout Modal Open / Close

@@ -11,3 +11,5 @@ node_modules/
 scripts/__pycache__/
 *.apk
 android-print-bridge/
+scratch/
+.venv/

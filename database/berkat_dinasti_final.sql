@@ -998,6 +998,7 @@ INSERT INTO `transaksi_kas` (`id_transaksi`, `tanggal`, `jenis`, `sumber_tipe`, 
 
 CREATE TABLE `varian_produk` (
   `id_varian` int(11) NOT NULL,
+  `topping` varchar(150) DEFAULT NULL,
   `id_produk` int(11) NOT NULL,
   `nama_varian` varchar(100) NOT NULL COMMENT 'Contoh: Kardus, Mika, Satuan',
   `harga` decimal(10,2) NOT NULL,

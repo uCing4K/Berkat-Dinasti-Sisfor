@@ -447,34 +447,71 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
     // 2. Set Print Density (GS ( K - Level 5: Pekat & Tajam)
     $c[] = 0x1D; $c[] = 0x28; $c[] = 0x4B; $c[] = 0x02; $c[] = 0x00; $c[] = 0x31; $c[] = 0x05;
 
-    // CATATAN: Sesuai preferensi kasir & UMKM, tanpa logo gambar agar cetak instan (0.2s), ringan, dan rapi
-
     // 3. Header Toko (Center)
     appendAlign($c, 1); // Center
     appendBold($c, true);
-    appendDoubleSize($c, true);
-    appendText($c, strtoupper($store['name'] ?? 'BERKAT DINASTI') . "\n");
-    appendDoubleSize($c, false);
+
+    $storeName = strtoupper(trim($store['name'] ?? 'BERKAT DINASTI'));
+    // Penanganan font header agar tidak terpotong acak di kertas 58mm (32 col)
+    if ($colWidth <= 32) {
+        if (strlen($storeName) <= 16) {
+            appendDoubleSize($c, true);
+            appendText($c, $storeName . "\n");
+            appendDoubleSize($c, false);
+        } else {
+            // Jika nama panjang seperti 'BERKAT DINASTI BAKERY', split per kata dengan batas 16 char
+            $words = explode(' ', $storeName);
+            $l1 = [];
+            $l2 = [];
+            $curLen = 0;
+            foreach ($words as $w) {
+                if ($curLen + strlen($w) <= 16) {
+                    $l1[] = $w;
+                    $curLen += strlen($w) + 1;
+                } else {
+                    $l2[] = $w;
+                }
+            }
+            appendDoubleSize($c, true);
+            appendText($c, implode(' ', $l1) . "\n");
+            if (!empty($l2)) {
+                appendText($c, implode(' ', $l2) . "\n");
+            }
+            appendDoubleSize($c, false);
+        }
+    } else {
+        appendDoubleSize($c, true);
+        appendWrappedLine($c, $storeName, 24);
+        appendDoubleSize($c, false);
+    }
     appendBold($c, false);
 
+    // Alamat Toko (Wrapped per kata agar tidak terpotong di tengah kata seperti 'Ng' & 'aglik')
     if (!empty($store['address'])) {
-        appendText($c, $store['address'] . "\n");
+        appendWrappedLine($c, $store['address'], $colWidth);
     }
     $waVal = !empty($store['wa']) ? $store['wa'] : '0812-3456-7890';
-    appendText($c, "Kota Batu - WA: " . $waVal . "\n");
+    appendWrappedLine($c, "Kota Batu - WA: " . $waVal, $colWidth);
 
+    // Garis Separator Tepat 32 Karakter (atau 48 untuk 80mm)
     appendSeparator($c, '-', $colWidth);
 
-    // 4. Meta Order (2 Kolom Bersih)
+    // 4. Meta Order (Struktur Bersih, Anti-Wrap Angka & Tanggal)
     appendAlign($c, 0); // Left
     $invVal = $order['no_invoice'] ?? ('INV-' . ($order['id'] ?? '0001'));
     $tglVal = !empty($order['tgl_pesan']) ? date('d/m/y H:i', strtotime($order['tgl_pesan'])) : date('d/m/y H:i');
-    appendRow2Col($c, "Nota: " . $invVal, $tglVal, $colWidth);
 
+    // Baris 1: Nomor Nota
+    appendWrappedLine($c, "Nota: " . $invVal, $colWidth);
+
+    // Baris 2: Kasir di kiri, Tanggal Transaksi di kanan (Dynamic Spacing)
+    appendRow2Col($c, "Kasir: Admin", $tglVal, $colWidth);
+
+    // Baris 3: Pelanggan
     $custVal = !empty($order['customer_name']) ? $order['customer_name'] : ($order['customer'] ?? 'Ibu Sari Dewi');
-    appendRow2Col($c, "Kasir: Admin", "Plg: " . $custVal, $colWidth);
+    appendWrappedLine($c, "Plg  : " . $custVal, $colWidth);
 
-    // Tampilkan tanggal & waktu kirim PO jika ada
+    // Baris 4: Jadwal Pengiriman (Jika Pesanan Khusus / PO)
     if (!empty($order['tgl_kirim'])) {
         $tglKirimStr = date('d/m/y', strtotime($order['tgl_kirim']));
         $wktKirimStr = !empty($order['waktu_kirim']) ? substr($order['waktu_kirim'], 0, 5) : '09:00';
@@ -483,7 +520,9 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
 
     appendSeparator($c, '-', $colWidth);
 
-    // 5. Items Ordered (Daftar Produk & Subtotal)
+    // 5. Items Ordered (Pola 2 Baris Standar Thermal POS)
+    // Baris 1 = Nama Item & Varian Kemasan
+    // Baris 2 = Qty x Harga di kiri & Subtotal di kanan (Dynamic Spacing)
     $totalCalculated = 0;
     foreach ($items as $it) {
         $pName = $it['product_name'] ?? 'Roti Pesanan';
@@ -494,23 +533,19 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
         $pSub = floatval($it['subtotal'] ?? ($pQty * $pHrg));
         $totalCalculated += $pSub;
 
+        // Baris 1: Nama Produk & Kemasan (Full width wrapped)
         $fullName = $pQty . "x " . $pName . $pPkg;
-        $priceStr = "Rp " . number_format($pSub, 0, ',', '.');
+        appendWrappedLine($c, $fullName, $colWidth);
 
-        // Jika muat dalam 1 baris dan tidak ada topping khusus
-        $maxNameLen = $colWidth - strlen($priceStr) - 1;
-        if (strlen($fullName) <= $maxNameLen && empty($pTop)) {
-            appendRow2Col($c, $fullName, $priceStr, $colWidth);
-        } else {
-            // Tulis nama produk di baris 1
-            appendWrappedLine($c, $fullName, $colWidth);
-            if (!empty($pTop)) {
-                appendWrappedLine($c, "  * Top: " . $pTop, $colWidth);
-            }
-            // Tulis rincian harga satuan di baris berikutnya
-            $detailQtyPrice = "  " . $pQty . "x @" . number_format($pHrg, 0, ',', '.');
-            appendRow2Col($c, $detailQtyPrice, $priceStr, $colWidth);
+        // Baris 1b (Opsional): Topping
+        if (!empty($pTop)) {
+            appendWrappedLine($c, "  * Top: " . $pTop, $colWidth);
         }
+
+        // Baris 2: Qty x Harga di kiri & Subtotal di kanan (Dynamic Spacing)
+        $leftQtyHrg = "  " . $pQty . "x @" . number_format($pHrg, 0, ',', '.');
+        $rightSub = "Rp " . number_format($pSub, 0, ',', '.');
+        appendRow2Col($c, $leftQtyHrg, $rightSub, $colWidth);
     }
 
     appendSeparator($c, '-', $colWidth);
@@ -523,7 +558,7 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
         appendRow2Col($c, "Ongkir:", "Rp " . number_format(floatval($order['ongkir']), 0, ',', '.'), $colWidth);
     }
 
-    // TOTAL AKHIR (Bold)
+    // TOTAL AKHIR (Bold + Double Height)
     appendBold($c, true);
     appendDoubleHeight($c, true);
     appendRow2Col($c, "TOTAL AKHIR:", "Rp " . number_format($grandTotal, 0, ',', '.'), $colWidth);
@@ -548,7 +583,7 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
 
     appendSeparator($c, '-', $colWidth);
 
-    // 7. Footer Message (Center, Persis Tampilan Pengaturan Toko)
+    // 7. Footer Message (Center)
     appendAlign($c, 1); // Center
     $footerText = !empty($store['footer']) ? $store['footer'] : 'Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah.';
     appendWrappedLine($c, '"' . $footerText . '"', $colWidth);
@@ -689,25 +724,84 @@ function appendSeparator(&$c, $char = '-', $width = 32) {
 function appendRow2Col(&$c, $left, $right, $width = 32) {
     $leftLen = strlen($left);
     $rightLen = strlen($right);
+    
+    // Proteksi: Jika left + right melebihi batas kolom (32 atau 48), potong left secara elegan agar tidak wrap
+    if ($leftLen + $rightLen >= $width) {
+        $maxLeft = $width - $rightLen - 1;
+        if ($maxLeft >= 4) {
+            $left = substr($left, 0, $maxLeft);
+            $leftLen = strlen($left);
+        } else {
+            // Split baris jika kolom kanan terlalu panjang
+            appendText($c, $left . "\n");
+            $left = '';
+            $leftLen = 0;
+        }
+    }
+    
+    // Dynamic Spacing: (colWidth - len(left) - len(right))
     $spaces = $width - ($leftLen + $rightLen);
     if ($spaces < 1) $spaces = 1;
     appendText($c, $left . str_repeat(' ', $spaces) . $right . "\n");
 }
 
 function appendWrappedLine(&$c, $text, $width = 32) {
-    $words = explode(' ', $text);
-    $currentLine = '';
-    foreach ($words as $w) {
-        if (strlen($currentLine) + strlen($w) + 1 <= $width) {
-            $currentLine .= ($currentLine === '' ? '' : ' ') . $w;
-        } else {
-            if (!empty($currentLine)) {
-                appendText($c, $currentLine . "\n");
+    // Normalisasi baris baru (CRLF -> LF)
+    $paragraphs = explode("\n", str_replace(["\r\n", "\r"], "\n", $text));
+    foreach ($paragraphs as $para) {
+        $words = explode(' ', $para);
+        $currentLine = '';
+        foreach ($words as $w) {
+            if ($w === '') continue;
+
+            // Jika satu kata melebihi lebar kertas, potong per $width agar tidak crash chip printer
+            while (strlen($w) > $width) {
+                if (!empty($currentLine)) {
+                    appendText($c, $currentLine . "\n");
+                    $currentLine = '';
+                }
+                appendText($c, substr($w, 0, $width) . "\n");
+                $w = substr($w, $width);
             }
-            $currentLine = $w;
+
+            if ($currentLine === '') {
+                $currentLine = $w;
+            } elseif (strlen($currentLine) + 1 + strlen($w) <= $width) {
+                $currentLine .= ' ' . $w;
+            } else {
+                appendText($c, $currentLine . "\n");
+                $currentLine = $w;
+            }
+        }
+        if ($currentLine !== '') {
+            appendText($c, $currentLine . "\n");
         }
     }
-    if (!empty($currentLine)) {
-        appendText($c, $currentLine . "\n");
+}
+
+/**
+ * Helper Barcode / QR Code ESC/POS
+ * Menggunakan module width narrow (n=2 untuk Code 128 / size 4 untuk QR) agar tidak terpotong tepi kertas
+ */
+function appendQRCode(&$c, $data, $moduleSize = 4) {
+    if (empty($data)) return;
+    $len = strlen($data) + 3;
+    $pL = $len & 0xFF;
+    $pH = ($len >> 8) & 0xFF;
+
+    appendAlign($c, 1); // Center
+    // 1. Set Model 2
+    $c = array_merge($c, [0x1D, 0x28, 0x6B, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00]);
+    // 2. Set Module Size (Narrow 4 dots agar pas di 58mm)
+    $c = array_merge($c, [0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x43, $moduleSize]);
+    // 3. Set Error Correction Level L
+    $c = array_merge($c, [0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x45, 0x30]);
+    // 4. Store Data
+    $c = array_merge($c, [0x1D, 0x28, 0x6B, $pL, $pH, 0x31, 0x50, 0x30]);
+    for ($i = 0; $i < strlen($data); $i++) {
+        $c[] = ord($data[$i]);
     }
+    // 5. Print QR Code
+    $c = array_merge($c, [0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x51, 0x30]);
+    $c[] = 0x0A;
 }

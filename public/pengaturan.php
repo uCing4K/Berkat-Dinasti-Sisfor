@@ -367,35 +367,101 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             color: #251A14;
         }
 
-        /* Thermal Struk Print Style */
+        /* Authentic 1:1 Thermal Receipt Simulation Styling */
+        .thermal-paper-wrapper {
+            position: relative;
+            background: transparent;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.08));
+        }
+
+        .thermal-paper-cut-top {
+            height: 6px;
+            width: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,6 6,0 12,6' fill='%23FFFFFF'/%3E%3C/svg%3E");
+            background-size: 10px 6px;
+            background-repeat: repeat-x;
+        }
+
+        .thermal-paper-cut-bottom {
+            height: 6px;
+            width: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,0 6,6 12,0' fill='%23FFFFFF'/%3E%3C/svg%3E");
+            background-size: 10px 6px;
+            background-repeat: repeat-x;
+        }
+
+        .thermal-paper {
+            font-family: 'Courier New', Courier, 'Lucida Console', Monaco, monospace !important;
+            background-color: #FFFFFF !important;
+            color: #111111 !important;
+            letter-spacing: 0px !important;
+            line-height: 1.25 !important;
+            padding: 12px 14px;
+            box-sizing: content-box;
+            transition: width 0.2s ease;
+        }
+
+        /* 58mm: Lebar efektif tepat 32 karakter (Font A 58mm / 384 dots) */
+        .thermal-paper-58 {
+            width: 32ch !important;
+            font-size: 11.5px !important;
+        }
+
+        /* 80mm: Lebar efektif tepat 48 karakter (Font A 80mm / 576 dots) */
+        .thermal-paper-80 {
+            width: 48ch !important;
+            font-size: 11px !important;
+        }
+
+        .thermal-sep {
+            font-family: 'Courier New', Courier, 'Lucida Console', Monaco, monospace;
+            user-select: none;
+            letter-spacing: 0px;
+            overflow: hidden;
+            white-space: pre;
+            color: #555555;
+            margin: 4px 0;
+            line-height: 1;
+        }
+
+        /* Thermal Struk Print Style (@media print) */
         @media print {
             @page {
+                size: 58mm auto;
                 margin: 0;
-                size: auto;
             }
-            body {
-                background: white !important;
+            html, body {
+                width: 58mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             body * {
-                visibility: hidden;
+                visibility: hidden !important;
             }
             #actualReceiptSlip, #actualReceiptSlip * {
-                visibility: visible;
+                visibility: visible !important;
             }
             #actualReceiptSlip {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 80mm;
-                max-width: 100%;
-                margin: 0;
-                padding: 8px 12px;
-                background: white !important;
-                color: black !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 48mm !important; /* Lebar cetak efektif 48mm */
+                max-width: 48mm !important;
+                margin: 0 auto !important;
+                padding: 2mm 0 !important;
+                font-family: 'Courier New', Courier, monospace !important;
+                font-size: 11px !important;
+                line-height: 1.25 !important;
+                color: #000000 !important;
+                background: #ffffff !important;
                 border: none !important;
                 box-shadow: none !important;
+            }
+            .thermal-paper-cut-top, .thermal-paper-cut-bottom {
+                display: none !important;
             }
         }
     </style>
@@ -829,70 +895,143 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     </span>
                                 </div>
 
-                                <!-- Receipt Paper Preview (Dinamis 58mm vs 80mm) -->
-                                <div id="actualReceiptSlip" class="thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 <?= ($store['paper_size'] === '58') ? 'text-[10px] max-w-[250px]' : 'text-[11px] max-w-[340px]' ?> leading-relaxed shadow-xs text-[#251A14] transition-all mx-auto">
+                                <!-- Receipt Paper Preview (1:1 Sama Persis Kertas Cetak Fisik 58mm / 80mm) -->
+                                <?php
+                                    $isPaper58 = ($store['paper_size'] === '58');
+                                    $paperClass = $isPaper58 ? 'thermal-paper-58' : 'thermal-paper-80';
+                                    $cutWidth = $isPaper58 ? 'calc(32ch + 28px)' : 'calc(48ch + 28px)';
+                                    $dashSep = $isPaper58 ? '--------------------------------' : '------------------------------------------------';
                                     
-                                    <!-- Store Header -->
-                                    <div class="text-center pb-2 border-b border-dashed border-[#8E7E73]">
-                                        <p class="font-bold text-xs uppercase tracking-wider" id="previewReceiptName"><?= htmlspecialchars($store['name']) ?></p>
-                                        <p class="text-[10px] text-[#5E4D42]" id="previewReceiptAddress"><?= htmlspecialchars($store['address']) ?></p>
-                                        <p class="text-[10px] text-[#5E4D42]">Kota Batu • WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span></p>
+                                    // Format nama toko agar 2 baris jika ada Bakery
+                                    $dispStoreName = htmlspecialchars($store['name']);
+                                    if (stripos($dispStoreName, 'BAKERY') !== false && !str_contains($dispStoreName, '<br>')) {
+                                        $dispStoreName = preg_replace('/BAKERY/i', '<br>BAKERY', $dispStoreName);
+                                    }
+
+                                    // Format alamat agar membungkus kata dengan rapi
+                                    $dispStoreAddress = htmlspecialchars($store['address']);
+                                    if (strlen($dispStoreAddress) > 28 && str_contains($dispStoreAddress, ',')) {
+                                        $addrParts = explode(',', $dispStoreAddress);
+                                        $dispStoreAddress = $addrParts[0] . ',<br>' . trim(implode(',', array_slice($addrParts, 1)));
+                                    }
+                                ?>
+                                <div class="thermal-paper-wrapper mx-auto flex flex-col items-center">
+                                    <!-- Sawtooth Jagged Tear (Atas) -->
+                                    <div class="thermal-paper-cut-top" id="topPaperCut" style="width: <?= $cutWidth ?>;"></div>
+
+                                    <div id="actualReceiptSlip" class="thermal-paper <?= $paperClass ?> text-[#111111] bg-white border-x border-[#E5E0D8]">
+                                        
+                                        <!-- Store Header (Center) -->
+                                        <div class="text-center font-bold text-xs uppercase tracking-tight" id="previewReceiptName">
+                                            <?= $dispStoreName ?>
+                                        </div>
+                                        <div class="text-center text-[10px] text-neutral-800 leading-tight mt-0.5" id="previewReceiptAddress">
+                                            <?= $dispStoreAddress ?>
+                                        </div>
+                                        <div class="text-center text-[10px] text-neutral-800 leading-tight">
+                                            Kota Batu - WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span>
+                                        </div>
+
+                                        <!-- Separator 1 (Tepat 32 Karakter) -->
+                                        <div class="thermal-sep text-center" id="previewSep1"><?= $dashSep ?></div>
+
+                                        <!-- Meta Order (Clean 2-Kolom, Anti-Wrap) -->
+                                        <div class="text-[11px] leading-tight space-y-0.5">
+                                            <div class="font-bold" id="previewReceiptInv">Nota: INV-TEST-<?= date('md') ?>-0001</div>
+                                            <div class="flex justify-between">
+                                                <span>Kasir: Admin</span>
+                                                <span id="previewReceiptDate"><?= date('d/m/y H:i') ?></span>
+                                            </div>
+                                            <div class="truncate" id="previewReceiptCust">Plg  : Ibu Sari Dewi</div>
+                                            <div class="flex justify-between" id="previewReceiptKirim">
+                                                <span>Kirim: <?= date('d/m/y', strtotime('+4 days')) ?></span>
+                                                <span>Jam: 09:00</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Separator 2 (Tepat 32 Karakter) -->
+                                        <div class="thermal-sep text-center" id="previewSep2"><?= $dashSep ?></div>
+
+                                        <!-- Items Ordered (Strict Pola 2 Baris Sesuai Standar Thermal POS) -->
+                                        <div class="text-[11px] leading-tight space-y-1.5" id="previewReceiptItems">
+                                            <!-- Item 1 -->
+                                            <div>
+                                                <div class="font-bold">10x Roti Hajatan (9 Topping)</div>
+                                                <div class="text-neutral-700 pl-1.5">(Kardus Putih)</div>
+                                                <div class="text-neutral-600 pl-1.5 text-[10px]">* Top: Meses + Keju</div>
+                                                <div class="flex justify-between font-semibold mt-0.5">
+                                                    <span>  10x @10.000</span>
+                                                    <span>Rp 100.000</span>
+                                                </div>
+                                            </div>
+                                            <!-- Item 2 -->
+                                            <div>
+                                                <div class="font-bold">2x Bolu Pisang Premium</div>
+                                                <div class="text-neutral-700 pl-1.5">(Mika)</div>
+                                                <div class="flex justify-between font-semibold mt-0.5">
+                                                    <span>  2x @22.000</span>
+                                                    <span>Rp 44.000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Separator 3 (Tepat 32 Karakter) -->
+                                        <div class="thermal-sep text-center" id="previewSep3"><?= $dashSep ?></div>
+
+                                        <!-- Totals Calculation -->
+                                        <div class="text-[11px] leading-tight space-y-0.5">
+                                            <div class="flex justify-between text-neutral-800">
+                                                <span>Subtotal:</span>
+                                                <span>Rp 144.000</span>
+                                            </div>
+                                            <div class="flex justify-between font-bold text-xs pt-0.5">
+                                                <span>TOTAL AKHIR:</span>
+                                                <span class="text-[#000000]">Rp 144.000</span>
+                                            </div>
+                                            <div class="flex justify-between font-bold">
+                                                <span>Status:</span>
+                                                <span>LUNAS (CASH)</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Catatan Section (Persis Hasil Cetak Fisik) -->
+                                        <div id="previewReceiptNotesSection">
+                                            <div class="thermal-sep text-center" id="previewSepNotes"><?= $dashSep ?></div>
+                                            <div class="text-[11px] leading-tight">
+                                                <div class="font-bold">Catatan:</div>
+                                                <div class="text-neutral-800 break-words" id="previewReceiptCatatan">
+                                                    Uji coba cetak thermal printer Bluetooth & tuning teks jernih.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Separator 4 (Tepat 32 Karakter) -->
+                                        <div class="thermal-sep text-center" id="previewSep4"><?= $dashSep ?></div>
+
+                                        <!-- Footer Message (Center) -->
+                                        <div class="text-center text-[10px] leading-tight space-y-1">
+                                            <div class="italic text-neutral-800 leading-tight" id="previewReceiptFooter">
+                                                "<?= htmlspecialchars($store['footer']) ?>"
+                                            </div>
+                                            <div class="text-neutral-700 text-[9px] font-semibold tracking-wide">
+                                                Berkat Dinasti - Kota Batu
+                                            </div>
+                                        </div>
+
                                     </div>
 
-                                    <!-- Meta Order -->
-                                    <div class="py-2 border-b border-dashed border-[#8E7E73] text-[10px] space-y-0.5">
-                                        <div class="flex justify-between">
-                                            <span>Nota: INV-<?= date('Ymd') ?>-0001</span>
-                                            <span><?= date('d/m/y H:i') ?></span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span>Kasir: Admin</span>
-                                            <span>Plg: Ibu Sari Dewi</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Items Ordered -->
-                                    <div class="py-2 border-b border-dashed border-[#8E7E73] space-y-1.5 text-[10px]">
-                                        <div class="flex justify-between">
-                                            <span>10x Roti Hajatan (Kardus Putih)</span>
-                                            <span class="font-bold">Rp 100.000</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span>2x Bolu Pisang (Mika)</span>
-                                            <span class="font-bold">Rp 44.000</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Totals Calculation -->
-                                    <div class="py-2 border-b border-dashed border-[#8E7E73] text-[10px] space-y-1">
-                                        <div class="flex justify-between text-[#8E7E73]">
-                                            <span>Subtotal:</span>
-                                            <span>Rp 144.000</span>
-                                        </div>
-                                        <div class="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-[#8E7E73]/50">
-                                            <span>TOTAL AKHIR:</span>
-                                            <span class="text-[#924C00]">Rp 144.000</span>
-                                        </div>
-                                        <div class="flex justify-between font-bold text-[#27AE60]">
-                                            <span>Status:</span>
-                                            <span>LUNAS</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Footer Message -->
-                                    <div class="pt-3 text-center text-[10px]">
-                                        <p class="italic text-[#5E4D42] mb-1.5 leading-tight" id="previewReceiptFooter">
-                                            "<?= htmlspecialchars($store['footer']) ?>"
-                                        </p>
-                                        <p class="text-[9px] text-[#8E7E73] font-medium tracking-wide">Berkat Dinasti — Kota Batu</p>
-                                    </div>
-
+                                    <!-- Sawtooth Jagged Tear (Bawah) -->
+                                    <div class="thermal-paper-cut-bottom" id="bottomPaperCut" style="width: <?= $cutWidth ?>;"></div>
                                 </div>
 
                                 <div class="flex items-center justify-between pt-3 mt-3 border-t border-[#E2D7C8] text-xs">
-                                    <span class="text-[#8E7E73]">Ukuran kertas: <strong class="text-[#251A14]" id="lblUkuranKertasFooter"><?= ($store['paper_size'] === '58') ? '58 mm' : '80 mm' ?></strong></span>
-                                    <button type="button" onclick="testPrintThermal()" class="text-[#D46E15] hover:text-[#B85207] font-bold">
-                                        Cetak Uji Coba &rarr;
+                                    <div class="flex flex-col">
+                                        <span class="text-[#8E7E73] text-[11px]">Format Kertas Fisik:</span>
+                                        <strong class="text-[#251A14]" id="lblUkuranKertasFooter"><?= ($store['paper_size'] === '58') ? '58 mm (32 Karakter / 384 Dots)' : '80 mm (48 Karakter / 576 Dots)' ?></strong>
+                                    </div>
+                                    <button type="button" onclick="testPrintThermal()" class="text-[#D46E15] hover:text-[#B85207] font-bold flex items-center gap-1.5 transition-colors">
+                                        <span>Cetak Uji Coba</span>
+                                        <i class="fas fa-arrow-right text-xs"></i>
                                     </button>
                                 </div>
                             </div>
@@ -1150,29 +1289,105 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     </span>
                 </div>
 
-                <!-- Live Receipt Preview inside Modal -->
-                <div class="bg-neutral-100 rounded-xl p-3 border border-[#E2D7C8] flex justify-center">
-                    <div id="modalReceiptPreview" class="bg-white p-3.5 rounded border border-[#DDD3C5] font-mono text-[11px] text-[#251A14] w-full max-w-[280px] shadow-sm leading-tight space-y-2">
-                        <div class="text-center pb-2 border-b border-dashed border-neutral-300">
-                            <p class="font-bold text-xs uppercase" id="mPreName"><?= htmlspecialchars($store['name']) ?></p>
-                            <p class="text-[10px] text-neutral-600" id="mPreAddr"><?= htmlspecialchars($store['address']) ?></p>
-                            <p class="text-[10px] text-neutral-600">Kota Batu • WA: <span id="mPreWa"><?= htmlspecialchars($store['wa']) ?></span></p>
+                <!-- Live Receipt Preview inside Modal (1:1 Standar Thermal POS) -->
+                <div class="bg-neutral-100 rounded-xl p-3 border border-[#E2D7C8] flex justify-center overflow-x-auto">
+                    <div class="thermal-paper-wrapper flex flex-col items-center">
+                        <div class="thermal-paper-cut-top" id="modalTopCut" style="width: <?= $cutWidth ?>;"></div>
+                        <div id="modalReceiptPreview" class="thermal-paper <?= $paperClass ?> text-[#111111] bg-white border-x border-[#E5E0D8]">
+                            <!-- Store Header -->
+                            <div class="text-center font-bold text-xs uppercase tracking-tight" id="mPreName">
+                                <?= $dispStoreName ?>
+                            </div>
+                            <div class="text-center text-[10px] text-neutral-800 leading-tight mt-0.5" id="mPreAddr">
+                                <?= $dispStoreAddress ?>
+                            </div>
+                            <div class="text-center text-[10px] text-neutral-800 leading-tight">
+                                Kota Batu - WA: <span id="mPreWa"><?= htmlspecialchars($store['wa']) ?></span>
+                            </div>
+
+                            <!-- Separator 1 -->
+                            <div class="thermal-sep text-center" id="mSep1"><?= $dashSep ?></div>
+
+                            <!-- Meta Order -->
+                            <div class="text-[11px] leading-tight space-y-0.5">
+                                <div class="font-bold">Nota: INV-TEST-<?= date('md') ?>-0001</div>
+                                <div class="flex justify-between">
+                                    <span>Kasir: Admin</span>
+                                    <span><?= date('d/m/y H:i') ?></span>
+                                </div>
+                                <div>Plg  : Ibu Sari Dewi</div>
+                                <div class="flex justify-between">
+                                    <span>Kirim: <?= date('d/m/y', strtotime('+4 days')) ?></span>
+                                    <span>Jam: 09:00</span>
+                                </div>
+                            </div>
+
+                            <!-- Separator 2 -->
+                            <div class="thermal-sep text-center" id="mSep2"><?= $dashSep ?></div>
+
+                            <!-- Items -->
+                            <div class="text-[11px] leading-tight space-y-1.5">
+                                <div>
+                                    <div class="font-bold">10x Roti Hajatan (9 Topping)</div>
+                                    <div class="text-neutral-700 pl-1.5">(Kardus Putih)</div>
+                                    <div class="text-neutral-600 pl-1.5 text-[10px]">* Top: Meses + Keju</div>
+                                    <div class="flex justify-between font-semibold mt-0.5">
+                                        <span>  10x @10.000</span>
+                                        <span>Rp 100.000</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-bold">2x Bolu Pisang Premium</div>
+                                    <div class="text-neutral-700 pl-1.5">(Mika)</div>
+                                    <div class="flex justify-between font-semibold mt-0.5">
+                                        <span>  2x @22.000</span>
+                                        <span>Rp 44.000</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Separator 3 -->
+                            <div class="thermal-sep text-center" id="mSep3"><?= $dashSep ?></div>
+
+                            <!-- Totals -->
+                            <div class="text-[11px] leading-tight space-y-0.5">
+                                <div class="flex justify-between text-neutral-800">
+                                    <span>Subtotal:</span>
+                                    <span>Rp 144.000</span>
+                                </div>
+                                <div class="flex justify-between font-bold text-xs pt-0.5">
+                                    <span>TOTAL AKHIR:</span>
+                                    <span class="text-[#000000]">Rp 144.000</span>
+                                </div>
+                                <div class="flex justify-between font-bold">
+                                    <span>Status:</span>
+                                    <span>LUNAS (CASH)</span>
+                                </div>
+                            </div>
+
+                            <!-- Catatan Section -->
+                            <div class="thermal-sep text-center" id="mSepNotes"><?= $dashSep ?></div>
+                            <div class="text-[11px] leading-tight">
+                                <div class="font-bold">Catatan:</div>
+                                <div class="text-neutral-800 break-words">
+                                    Uji coba cetak thermal printer Bluetooth & tuning teks jernih.
+                                </div>
+                            </div>
+
+                            <!-- Separator 4 -->
+                            <div class="thermal-sep text-center" id="mSep4"><?= $dashSep ?></div>
+
+                            <!-- Footer -->
+                            <div class="text-center text-[10px] leading-tight space-y-1">
+                                <div class="italic text-neutral-800 leading-tight" id="mPreFooter">
+                                    "<?= htmlspecialchars($store['footer']) ?>"
+                                </div>
+                                <div class="text-neutral-700 text-[9px] font-semibold tracking-wide">
+                                    Berkat Dinasti - Kota Batu
+                                </div>
+                            </div>
                         </div>
-                        <div class="py-1 border-b border-dashed border-neutral-300 text-[10px] space-y-0.5">
-                            <div class="flex justify-between"><span>Nota: INV-TEST-<?= date('md') ?></span><span><?= date('d/m/y H:i') ?></span></div>
-                            <div class="flex justify-between"><span>Kasir: Admin</span><span>Plg: Ibu Sari Dewi</span></div>
-                        </div>
-                        <div class="py-1 border-b border-dashed border-neutral-300 space-y-1 text-[10px]">
-                            <div class="flex justify-between"><span>10x Roti Hajatan (Kardus)</span><span class="font-bold">Rp 100.000</span></div>
-                            <div class="flex justify-between"><span>2x Bolu Pisang (Mika)</span><span class="font-bold">Rp 44.000</span></div>
-                        </div>
-                        <div class="py-1 border-b border-dashed border-neutral-300 text-[10px] space-y-0.5">
-                            <div class="flex justify-between font-bold text-xs"><span>TOTAL:</span><span class="text-[#D46E15]">Rp 144.000</span></div>
-                            <div class="flex justify-between text-emerald-600 font-bold"><span>Status:</span><span>LUNAS (CASH)</span></div>
-                        </div>
-                        <div class="text-center text-[9px] text-neutral-500 pt-1 italic" id="mPreFooter">
-                            "<?= htmlspecialchars($store['footer']) ?>"
-                        </div>
+                        <div class="thermal-paper-cut-bottom" id="modalBottomCut" style="width: <?= $cutWidth ?>;"></div>
                     </div>
                 </div>
 
@@ -1296,45 +1511,92 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
         }
 
-        // Ukuran Kertas Thermal Dinamis (58mm vs 80mm)
+        // Ukuran Kertas Thermal Dinamis (58mm vs 80mm) - Tepat 32 Karakter vs 48 Karakter
         function setPaperSize(size) {
             const paper58 = document.getElementById('storePaperSize58');
             const paper80 = document.getElementById('storePaperSize80');
             const card58 = document.getElementById('cardPaper58');
             const card80 = document.getElementById('cardPaper80');
-            const receiptBox = document.getElementById('actualReceiptSlip') || document.getElementById('thermalPaperBox');
+            const receiptBox = document.getElementById('actualReceiptSlip');
+            const modalReceiptBox = document.getElementById('modalReceiptPreview');
+            const topCut = document.getElementById('topPaperCut');
+            const bottomCut = document.getElementById('bottomPaperCut');
+            const modalTopCut = document.getElementById('modalTopCut');
+            const modalBottomCut = document.getElementById('modalBottomCut');
             const headerTitle = document.getElementById('lblSimulasiHeader');
             const formBtnLabel = document.getElementById('lblTestPrintForm');
             const footerPaperLabel = document.getElementById('lblUkuranKertasFooter');
+            const modalPaperBadge = document.getElementById('modalPaperBadge');
+
+            const sepIds = ['previewSep1', 'previewSep2', 'previewSep3', 'previewSepNotes', 'previewSep4', 'mSep1', 'mSep2', 'mSep3', 'mSepNotes', 'mSep4'];
 
             if (size === '58') {
                 if (paper58) paper58.checked = true;
-                if (card58) {
-                    card58.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
-                }
-                if (card80) {
-                    card80.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
-                }
+                if (card58) card58.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
+                if (card80) card80.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
+                
                 if (receiptBox) {
-                    receiptBox.className = 'thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-3 text-[10px] leading-relaxed shadow-xs text-[#251A14] transition-all max-w-[250px] mx-auto';
+                    receiptBox.className = 'thermal-paper thermal-paper-58 text-[#111111] bg-white border-x border-[#E5E0D8]';
                 }
+                if (modalReceiptBox) {
+                    modalReceiptBox.className = 'thermal-paper thermal-paper-58 text-[#111111] bg-white border-x border-[#E5E0D8]';
+                }
+                if (topCut) topCut.style.width = 'calc(32ch + 28px)';
+                if (bottomCut) bottomCut.style.width = 'calc(32ch + 28px)';
+                if (modalTopCut) modalTopCut.style.width = 'calc(32ch + 28px)';
+                if (modalBottomCut) modalBottomCut.style.width = 'calc(32ch + 28px)';
+
+                sepIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '--------------------------------';
+                });
+
                 if (headerTitle) headerTitle.textContent = 'Simulasi Cetak Nota 58mm';
                 if (formBtnLabel) formBtnLabel.textContent = 'Test Print Nota Struk (58mm)';
-                if (footerPaperLabel) footerPaperLabel.textContent = '58 mm';
+                if (footerPaperLabel) footerPaperLabel.textContent = '58 mm (32 Karakter / 384 Dots)';
+                if (modalPaperBadge) modalPaperBadge.textContent = '58 mm ESC/POS (32 Col)';
+                updatePrintPageSize('58');
             } else {
                 if (paper80) paper80.checked = true;
-                if (card80) {
-                    card80.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
-                }
-                if (card58) {
-                    card58.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
-                }
+                if (card80) card80.className = 'border-2 border-[#D46E15] bg-[#EFE8DE] rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer transition-all shadow-xs';
+                if (card58) card58.className = 'border border-[#DDD3C5] bg-[#EFE8DE]/50 rounded-xl p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-[#D46E15] transition-all';
+                
                 if (receiptBox) {
-                    receiptBox.className = 'thermal-paper bg-[#FFFDF9] border border-[#DDD3C5] rounded-lg p-4 text-[11px] leading-relaxed shadow-xs text-[#251A14] transition-all max-w-[340px] mx-auto';
+                    receiptBox.className = 'thermal-paper thermal-paper-80 text-[#111111] bg-white border-x border-[#E5E0D8]';
                 }
+                if (modalReceiptBox) {
+                    modalReceiptBox.className = 'thermal-paper thermal-paper-80 text-[#111111] bg-white border-x border-[#E5E0D8]';
+                }
+                if (topCut) topCut.style.width = 'calc(48ch + 28px)';
+                if (bottomCut) bottomCut.style.width = 'calc(48ch + 28px)';
+                if (modalTopCut) modalTopCut.style.width = 'calc(48ch + 28px)';
+                if (modalBottomCut) modalBottomCut.style.width = 'calc(48ch + 28px)';
+
+                sepIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '------------------------------------------------';
+                });
+
                 if (headerTitle) headerTitle.textContent = 'Simulasi Cetak Nota 80mm';
                 if (formBtnLabel) formBtnLabel.textContent = 'Test Print Nota Struk (80mm)';
-                if (footerPaperLabel) footerPaperLabel.textContent = '80 mm';
+                if (footerPaperLabel) footerPaperLabel.textContent = '80 mm (48 Karakter / 576 Dots)';
+                if (modalPaperBadge) modalPaperBadge.textContent = '80 mm ESC/POS (48 Col)';
+                updatePrintPageSize('80');
+            }
+            updateReceiptPreview();
+        }
+
+        function updatePrintPageSize(size) {
+            let printStyle = document.getElementById('dynamicPrintPageStyle');
+            if (!printStyle) {
+                printStyle = document.createElement('style');
+                printStyle.id = 'dynamicPrintPageStyle';
+                document.head.appendChild(printStyle);
+            }
+            if (size === '80') {
+                printStyle.innerHTML = '@media print { @page { size: 80mm auto !important; margin: 0 !important; } html, body { width: 80mm !important; } #actualReceiptSlip { width: 72mm !important; max-width: 72mm !important; } }';
+            } else {
+                printStyle.innerHTML = '@media print { @page { size: 58mm auto !important; margin: 0 !important; } html, body { width: 58mm !important; } #actualReceiptSlip { width: 48mm !important; max-width: 48mm !important; } }';
             }
         }
 
@@ -1343,23 +1605,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             const modal = document.getElementById('testThermalModal');
             if (modal) {
                 // Sync latest settings to modal preview
-                const name = document.getElementById('storeNameInput') ? document.getElementById('storeNameInput').value : 'BERKAT DINASTI';
-                const addr = document.getElementById('storeAddressInput') ? document.getElementById('storeAddressInput').value : 'Jl. Diponegoro No. 45, Batu';
-                const wa = document.getElementById('storeWaInput') ? document.getElementById('storeWaInput').value : '0812-3456-7890';
-                const foot = document.getElementById('storeFooterInput') ? document.getElementById('storeFooterInput').value : 'Terima kasih atas pesanan Anda';
+                updateReceiptPreview();
+
                 const is58 = document.getElementById('storePaperSize58') && document.getElementById('storePaperSize58').checked;
-
-                const mPreName = document.getElementById('mPreName');
-                const mPreAddr = document.getElementById('mPreAddr');
-                const mPreWa = document.getElementById('mPreWa');
-                const mPreFooter = document.getElementById('mPreFooter');
                 const mPaperBadge = document.getElementById('modalPaperBadge');
-
-                if (mPreName) mPreName.textContent = name;
-                if (mPreAddr) mPreAddr.textContent = addr;
-                if (mPreWa) mPreWa.textContent = wa;
-                if (mPreFooter) mPreFooter.textContent = `"${foot}"`;
-                if (mPaperBadge) mPaperBadge.textContent = is58 ? '58 mm ESC/POS' : '80 mm ESC/POS';
+                if (mPaperBadge) {
+                    mPaperBadge.textContent = is58 ? '58 mm ESC/POS (32 Col)' : '80 mm ESC/POS (48 Col)';
+                }
 
                 // BUKA MODAL TERLEBIH DAHULU agar UI langsung responsif
                 modal.classList.remove('hidden');
@@ -1427,17 +1679,50 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
         }
 
-        // Live Receipt Preview
+        // Live Receipt Preview (1:1 Thermal Grid)
         function updateReceiptPreview() {
-            const name = document.getElementById('storeNameInput').value;
-            const address = document.getElementById('storeAddressInput').value;
-            const wa = document.getElementById('storeWaInput').value;
-            const footer = document.getElementById('storeFooterInput').value;
+            const nameInput = document.getElementById('storeNameInput');
+            const addressInput = document.getElementById('storeAddressInput');
+            const waInput = document.getElementById('storeWaInput');
+            const footerInput = document.getElementById('storeFooterInput');
 
-            document.getElementById('previewReceiptName').textContent = name;
-            document.getElementById('previewReceiptAddress').textContent = address;
-            document.getElementById('previewReceiptWa').textContent = wa;
-            document.getElementById('previewReceiptFooter').textContent = `"${footer}"`;
+            const name = nameInput ? nameInput.value.trim() : 'BERKAT DINASTI';
+            const address = addressInput ? addressInput.value.trim() : '';
+            const wa = waInput ? waInput.value.trim() : '';
+            const footer = footerInput ? footerInput.value.trim() : '';
+
+            // Format Nama Toko: jika ada kata BAKERY atau panjang > 16 karakter, pisahkan dengan baris baru agar estetik
+            let formattedName = name;
+            if (formattedName.toUpperCase().includes('BAKERY') && !formattedName.includes('<br>')) {
+                formattedName = formattedName.replace(/BAKERY/i, '<br>BAKERY');
+            }
+            const nameEl = document.getElementById('previewReceiptName');
+            const mPreName = document.getElementById('mPreName');
+            if (nameEl) nameEl.innerHTML = formattedName;
+            if (mPreName) mPreName.innerHTML = formattedName;
+
+            // Format Alamat: potong per koma jika panjang > 28 karakter agar membungkus dengan rapi
+            let formattedAddr = address;
+            if (formattedAddr.length > 28 && formattedAddr.includes(',')) {
+                const parts = formattedAddr.split(',');
+                formattedAddr = parts[0] + ',<br>' + parts.slice(1).join(',').trim();
+            }
+            const addrEl = document.getElementById('previewReceiptAddress');
+            const mPreAddr = document.getElementById('mPreAddr');
+            if (addrEl) addrEl.innerHTML = formattedAddr;
+            if (mPreAddr) mPreAddr.innerHTML = formattedAddr;
+
+            // Nomor WhatsApp
+            const waEl = document.getElementById('previewReceiptWa');
+            const mPreWa = document.getElementById('mPreWa');
+            if (waEl) waEl.textContent = wa;
+            if (mPreWa) mPreWa.textContent = wa;
+
+            // Footer Pesan
+            const footEl = document.getElementById('previewReceiptFooter');
+            const mPreFooter = document.getElementById('mPreFooter');
+            if (footEl) footEl.textContent = `"${footer}"`;
+            if (mPreFooter) mPreFooter.textContent = `"${footer}"`;
         }
 
         // Logo Upload Preview

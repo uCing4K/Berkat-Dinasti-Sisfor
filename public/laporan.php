@@ -38,6 +38,7 @@ $orders_report = [
     [
         'no' => 1,
         'tanggal' => date('d M Y'),
+        'date_raw' => date('Y-m-d'),
         'jam' => '14:00 WIB',
         'order_id' => '#ORD-089',
         'customer' => 'Ibu Sari Dewi',
@@ -50,6 +51,7 @@ $orders_report = [
     [
         'no' => 2,
         'tanggal' => date('d M Y'),
+        'date_raw' => date('Y-m-d'),
         'jam' => '10:15 WIB',
         'order_id' => '#ORD-088',
         'customer' => 'Pak Budi Santoso',
@@ -63,6 +65,7 @@ $orders_report = [
     [
         'no' => 3,
         'tanggal' => date('d M Y', strtotime('-1 day')),
+        'date_raw' => date('Y-m-d', strtotime('-1 day')),
         'jam' => '16:30 WIB',
         'order_id' => '#ORD-084',
         'customer' => 'Bu Rina',
@@ -75,6 +78,7 @@ $orders_report = [
     [
         'no' => 4,
         'tanggal' => date('d M Y', strtotime('-2 days')),
+        'date_raw' => date('Y-m-d', strtotime('-2 days')),
         'jam' => '11:00 WIB',
         'order_id' => '#ORD-081',
         'customer' => 'Warung Pak Haji',
@@ -87,6 +91,7 @@ $orders_report = [
     [
         'no' => 5,
         'tanggal' => date('d M Y', strtotime('-3 days')),
+        'date_raw' => date('Y-m-d', strtotime('-3 days')),
         'jam' => '08:20 WIB',
         'order_id' => '#ORD-079',
         'customer' => 'Toko Maju Jaya',
@@ -134,6 +139,7 @@ if ($db_connected && $pdo) {
                 $dynReport[] = [
                     'no' => $noIdx++,
                     'tanggal' => date('d M Y', strtotime($rr['tgl_pesan'])),
+                    'date_raw' => date('Y-m-d', strtotime($rr['tgl_pesan'])),
                     'jam' => $waktu,
                     'order_id' => '#' . $rr['no_invoice'],
                     'customer' => $rr['nama_pelanggan'] ?? 'Pelanggan Walk-in',
@@ -431,20 +437,30 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                         <!-- Dropdown Periode -->
                         <div class="relative flex-1 sm:flex-initial">
-                            <select id="periodeSelect" onchange="applyPeriodFilter()" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3 pr-7 py-2 text-xs md:text-sm text-[#251A14] font-semibold focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
+                            <select id="periodeSelect" onchange="onPeriodPresetChange()" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3 pr-7 py-2 text-xs md:text-sm text-[#251A14] font-semibold focus:border-[#D46E15] focus:outline-none cursor-pointer shadow-2xs">
                                 <option value="bulan_ini">Bulan Ini (<?= $currentMonthIndo ?>)</option>
                                 <option value="bulan_lalu">Bulan Lalu (<?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?>)</option>
                                 <option value="kuartal">Kuartal Berjalan</option>
                                 <option value="ytd">Tahun <?= date('Y') ?> (YTD)</option>
+                                <option value="kustom">Rentang Tanggal Khusus</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
                                 <i class="fas fa-chevron-down text-[10px]"></i>
                             </div>
                         </div>
 
-                        <!-- Date Range Display Box -->
-                        <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3 py-2 text-xs md:text-sm text-[#3E2B21] font-semibold flex items-center gap-1.5 shadow-2xs">
+                        <!-- Specific Date Range Picker (Dari - S/D) -->
+                        <div class="flex items-center gap-1.5 bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs md:text-sm text-[#251A14] font-semibold shadow-2xs">
                             <i class="far fa-calendar-alt text-[#D46E15] text-xs"></i>
+                            <span class="text-[#8E7E73] text-[11px] font-bold uppercase tracking-wider">Dari</span>
+                            <input type="date" id="filterStartDate" onchange="onCustomDateChanged()" class="bg-transparent border border-[#DDD3C5] rounded-md px-1.5 py-0.5 text-xs text-[#251A14] font-bold focus:outline-none focus:border-[#D46E15] cursor-pointer">
+                            <span class="text-[#8E7E73] text-[11px] font-bold uppercase tracking-wider">S/D</span>
+                            <input type="date" id="filterEndDate" onchange="onCustomDateChanged()" class="bg-transparent border border-[#DDD3C5] rounded-md px-1.5 py-0.5 text-xs text-[#251A14] font-bold focus:outline-none focus:border-[#D46E15] cursor-pointer">
+                        </div>
+
+                        <!-- Date Range Display Box -->
+                        <div class="hidden xl:flex bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3 py-2 text-xs md:text-sm text-[#3E2B21] font-semibold items-center gap-1.5 shadow-2xs">
+                            <i class="fas fa-check-circle text-[#D46E15] text-xs"></i>
                             <span id="dateRangeText">01/<?= date('m/Y') ?> — <?= date('d/m/Y') ?></span>
                         </div>
 
@@ -762,7 +778,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </thead>
                             <tbody class="divide-y divide-[#E2D7C8] text-xs md:text-sm">
                                 <?php foreach ($orders_report as $idx => $ord): ?>
-                                    <tr class="transition-colors <?= $idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]' ?> hover:bg-[#F0E9DF] order-row" data-status="<?= htmlspecialchars($ord['status_bayar']) ?>">
+                                    <tr class="transition-colors <?= $idx % 2 === 0 ? 'bg-[#FDFBF7]' : 'bg-[#F8F5F0]' ?> hover:bg-[#F0E9DF] order-row" 
+                                        data-status="<?= htmlspecialchars($ord['status_bayar']) ?>"
+                                        data-date="<?= htmlspecialchars($ord['date_raw']) ?>"
+                                        data-total="<?= (int)$ord['total_raw'] ?>">
                                         
                                         <!-- No -->
                                         <td class="py-3 px-3.5 text-center text-[#8E7E73] font-semibold">
@@ -810,7 +829,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <div class="block md:hidden p-3 space-y-2.5" id="ordersReportMobileList">
                         <?php foreach ($orders_report as $ord): ?>
                             <div class="report-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] transition-all"
-                                 data-status="<?= htmlspecialchars($ord['status_bayar']) ?>">
+                                 data-status="<?= htmlspecialchars($ord['status_bayar']) ?>"
+                                 data-date="<?= htmlspecialchars($ord['date_raw']) ?>"
+                                 data-total="<?= (int)$ord['total_raw'] ?>">
                                 
                                 <!-- Top Bar: Date, Invoice ID & Payment Status -->
                                 <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
@@ -942,13 +963,66 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
         }
 
+        let currentStatusFilter = 'all';
+        let currentFilteredOrders = [...reportData];
+
+        function onPeriodPresetChange() {
+            const select = document.getElementById('periodeSelect');
+            const val = select.value;
+            const startInput = document.getElementById('filterStartDate');
+            const endInput = document.getElementById('filterEndDate');
+
+            const now = new Date();
+            const curYear = now.getFullYear();
+            const curMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const curDay = String(now.getDate()).padStart(2, '0');
+
+            if (val === 'bulan_ini') {
+                if (startInput) startInput.value = `${curYear}-${curMonth}-01`;
+                if (endInput) endInput.value = `${curYear}-${curMonth}-${curDay}`;
+            } else if (val === 'bulan_lalu') {
+                const prevDate = new Date(curYear, now.getMonth() - 1, 1);
+                const prevYear = prevDate.getFullYear();
+                const prevMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
+                const lastDayPrev = new Date(prevYear, prevDate.getMonth() + 1, 0).getDate();
+                if (startInput) startInput.value = `${prevYear}-${prevMonth}-01`;
+                if (endInput) endInput.value = `${prevYear}-${prevMonth}-${String(lastDayPrev).padStart(2, '0')}`;
+            } else if (val === 'kuartal') {
+                const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3 + 1;
+                if (startInput) startInput.value = `${curYear}-${String(quarterStartMonth).padStart(2, '0')}-01`;
+                if (endInput) endInput.value = `${curYear}-${curMonth}-${curDay}`;
+            } else if (val === 'ytd') {
+                if (startInput) startInput.value = `${curYear}-01-01`;
+                if (endInput) endInput.value = `${curYear}-${curMonth}-${curDay}`;
+            }
+            applyPeriodFilter();
+        }
+
+        function onCustomDateChanged() {
+            const select = document.getElementById('periodeSelect');
+            if (select) select.value = 'kustom';
+            applyPeriodFilter();
+        }
+
         // Apply Period Filter (Dynamic recalculation of KPIs, Date Range, and Table rows)
         function applyPeriodFilter() {
             const select = document.getElementById('periodeSelect');
-            const val = select.value;
-            const periodText = select.options[select.selectedIndex].text;
+            const val = select ? select.value : 'bulan_ini';
+            const periodText = select ? select.options[select.selectedIndex].text : '';
 
+            const startInput = document.getElementById('filterStartDate');
+            const endInput = document.getElementById('filterEndDate');
             const dateRange = document.getElementById('dateRangeText');
+
+            const startDate = startInput ? startInput.value : '';
+            const endDate = endInput ? endInput.value : '';
+
+            if (startDate && endDate && dateRange) {
+                const [sy, sm, sd] = startDate.split('-');
+                const [ey, em, ed] = endDate.split('-');
+                dateRange.textContent = `${sd}/${sm}/${sy} — ${ed}/${em}/${ey}`;
+            }
+
             const kpiPemasukan = document.getElementById('kpiPemasukan');
             const kpiPesanan = document.getElementById('kpiPesanan');
             const kpiPiutang = document.getElementById('kpiPiutang');
@@ -956,43 +1030,120 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const kpiPendingDesc = document.getElementById('kpiPendingDesc');
 
             if (val === 'bulan_ini') {
-                if (dateRange) dateRange.textContent = '01/10/2026 — 27/10/2026';
                 if (kpiPemasukan) kpiPemasukan.textContent = 'Rp 4.250.000';
                 if (kpiPesanan) kpiPesanan.textContent = '48 Order';
                 if (kpiPiutang) kpiPiutang.textContent = 'Rp 850.000';
                 if (kpiPending) kpiPending.textContent = '6 Order';
                 if (kpiPendingDesc) kpiPendingDesc.textContent = '5 antrean oven, 1 tertunda';
             } else if (val === 'bulan_lalu') {
-                if (dateRange) dateRange.textContent = '01/09/2026 — 30/09/2026';
                 if (kpiPemasukan) kpiPemasukan.textContent = 'Rp 3.820.000';
                 if (kpiPesanan) kpiPesanan.textContent = '42 Order';
                 if (kpiPiutang) kpiPiutang.textContent = 'Rp 320.000';
                 if (kpiPending) kpiPending.textContent = '0 Order';
                 if (kpiPendingDesc) kpiPendingDesc.textContent = 'Semua pesanan selesai & lunas';
             } else if (val === 'kuartal') {
-                if (dateRange) dateRange.textContent = '01/07/2026 — 27/10/2026';
                 if (kpiPemasukan) kpiPemasukan.textContent = 'Rp 11.950.000';
                 if (kpiPesanan) kpiPesanan.textContent = '134 Order';
                 if (kpiPiutang) kpiPiutang.textContent = 'Rp 1.150.000';
                 if (kpiPending) kpiPending.textContent = '6 Order';
                 if (kpiPendingDesc) kpiPendingDesc.textContent = '5 antrean oven, 1 tertunda';
             } else if (val === 'ytd') {
-                if (dateRange) dateRange.textContent = '01/01/2026 — 27/10/2026';
                 if (kpiPemasukan) kpiPemasukan.textContent = 'Rp 41.200.000';
                 if (kpiPesanan) kpiPesanan.textContent = '480 Order';
                 if (kpiPiutang) kpiPiutang.textContent = 'Rp 1.850.000';
                 if (kpiPending) kpiPending.textContent = '6 Order';
                 if (kpiPendingDesc) kpiPendingDesc.textContent = 'Total akumulasi berjalan 2026';
+            } else if (val === 'kustom') {
+                let totalOmset = 0;
+                let totalOrders = 0;
+                let totalHutang = 0;
+                let pendingOrders = 0;
+
+                reportData.forEach(r => {
+                    const rDate = r.date_raw || '';
+                    const inRange = (!startDate || rDate >= startDate) && (!endDate || rDate <= endDate);
+                    if (inRange) {
+                        totalOrders++;
+                        const tot = Number(r.total_raw) || 0;
+                        if (r.status_bayar === 'Lunas') {
+                            totalOmset += tot;
+                        } else {
+                            totalHutang += tot;
+                            pendingOrders++;
+                        }
+                    }
+                });
+
+                if (kpiPemasukan) kpiPemasukan.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalOmset);
+                if (kpiPesanan) kpiPesanan.textContent = totalOrders + ' Order';
+                if (kpiPiutang) kpiPiutang.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalHutang);
+                if (kpiPending) kpiPending.textContent = pendingOrders + ' Order';
+                if (kpiPendingDesc) kpiPendingDesc.textContent = `Rentang kustom: ${startDate} s/d ${endDate}`;
             }
 
-            showToast(`Laporan diperbarui untuk: ${periodText}`);
+            applyCombinedTableFilters();
+            showToast(`Laporan diperbarui: ${val === 'kustom' ? (startDate + ' s/d ' + endDate) : periodText}`);
+        }
+
+        function applyCombinedTableFilters() {
+            const startInput = document.getElementById('filterStartDate');
+            const endInput = document.getElementById('filterEndDate');
+            const startDate = startInput ? startInput.value : '';
+            const endDate = endInput ? endInput.value : '';
+
+            const rows = document.querySelectorAll('#ordersReportTable tbody tr.order-row');
+            const mobileCards = document.querySelectorAll('#ordersReportMobileList .report-mobile-card');
+            let count = 0;
+            currentFilteredOrders = [];
+
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                const rowDate = row.getAttribute('data-date') || '';
+                
+                const matchStatus = (currentStatusFilter === 'all' || rowStatus === currentStatusFilter);
+                const matchDate = (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate);
+
+                if (matchStatus && matchDate) {
+                    row.style.display = '';
+                    count++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            mobileCards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const cardDate = card.getAttribute('data-date') || '';
+                const matchStatus = (currentStatusFilter === 'all' || cardStatus === currentStatusFilter);
+                const matchDate = (!startDate || cardDate >= startDate) && (!endDate || cardDate <= endDate);
+
+                if (matchStatus && matchDate) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Update filtered export data
+            reportData.forEach(r => {
+                const rDate = r.date_raw || '';
+                const matchStatus = (currentStatusFilter === 'all' || r.status_bayar === currentStatusFilter);
+                const matchDate = (!startDate || rDate >= startDate) && (!endDate || rDate <= endDate);
+                if (matchStatus && matchDate) {
+                    currentFilteredOrders.push(r);
+                }
+            });
+
+            const badge = document.getElementById('tableRecordCountBadge');
+            if (badge) badge.textContent = count + ' Data';
         }
 
         // Real CSV / Excel Export Action
         function handleExportExcel() {
             let csv = "No,Tanggal,Jam,ID Pesanan,Pelanggan,Rincian Produk,Total Tagihan,Status Bayar\n";
-            reportData.forEach(r => {
-                csv += `"${r.no}","${r.tanggal}","${r.jam}","${r.order_id}","${r.customer}","${r.items}","${r.total}","${r.status_bayar}"\n`;
+            const dataToExport = currentFilteredOrders.length > 0 ? currentFilteredOrders : reportData;
+            dataToExport.forEach((r, i) => {
+                csv += `"${i + 1}","${r.tanggal}","${r.jam}","${r.order_id}","${r.customer}","${r.items}","${r.total}","${r.status_bayar}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -1002,7 +1153,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Berkas Excel/CSV laporan berhasil diunduh!');
+            showToast(`Berkas Excel/CSV berhasil diunduh (${dataToExport.length} data)!`);
         }
 
         // 12 Months Interactive Dataset
@@ -1151,33 +1302,24 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             buttons.forEach(btn => {
                 if (btn) btn.className = 'px-3 py-1.5 rounded-lg bg-[#EFE8DE] border border-[#DDD3C5] text-[#5E4D42] hover:bg-[#E5DDD0] transition-colors';
             });
-            activeBtn.className = 'px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors';
+            if (activeBtn) activeBtn.className = 'px-3 py-1.5 rounded-lg bg-[#3E2B21] text-white shadow-2xs transition-colors';
 
-            const rows = document.querySelectorAll('#ordersReportTable tbody tr');
-            const mobileCards = document.querySelectorAll('#ordersReportMobileList .report-mobile-card');
-            let count = 0;
-
-            rows.forEach(row => {
-                const rowStatus = row.getAttribute('data-status');
-                if (status === 'all' || rowStatus === status) {
-                    row.style.display = '';
-                    count++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            mobileCards.forEach(card => {
-                const cardStatus = card.getAttribute('data-status');
-                if (status === 'all' || cardStatus === status) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-
-            document.getElementById('tableRecordCountBadge').textContent = count + ' Data';
+            currentStatusFilter = status;
+            applyCombinedTableFilters();
         }
+
+        // Initialize default dates on DOM Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const startInput = document.getElementById('filterStartDate');
+            const endInput = document.getElementById('filterEndDate');
+            const now = new Date();
+            const curYear = now.getFullYear();
+            const curMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const curDay = String(now.getDate()).padStart(2, '0');
+            if (startInput) startInput.value = `${curYear}-${curMonth}-01`;
+            if (endInput) endInput.value = `${curYear}-${curMonth}-${curDay}`;
+            currentFilteredOrders = [...reportData];
+        });
 
         // Logout Modal Open / Close
         function openLogoutModal() {

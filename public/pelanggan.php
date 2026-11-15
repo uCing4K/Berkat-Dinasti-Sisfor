@@ -1095,7 +1095,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <!-- Nama Pelanggan -->
                 <div>
                     <label for="custNameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Nama Lengkap Pelanggan <span class="text-[#EB5757]">*</span></label>
-                    <input type="text" id="custNameInput" name="nama" required placeholder="Contoh: Ibu Sari Dewi" 
+                    <input type="text" id="custNameInput" name="nama" required maxlength="70" placeholder="Contoh: Ibu Sari Dewi" 
                         class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                 </div>
 
@@ -1103,8 +1103,8 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label for="custWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. WhatsApp <span class="text-[#EB5757]">*</span></label>
-                        <input type="tel" inputmode="numeric" id="custWaInput" name="no_wa" required placeholder="Contoh: 081234567890" 
-                            oninput="this.value = this.value.replace(/[^0-9+]/g, '');"
+                        <input type="tel" inputmode="numeric" id="custWaInput" name="no_wa" required minlength="9" maxlength="15" placeholder="Contoh: 081234567890" 
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 
@@ -1122,14 +1122,14 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <!-- Alamat Pengiriman -->
                 <div>
                     <label for="custAddressInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Alamat Pengiriman Lengkap <span class="text-[#EB5757]">*</span></label>
-                    <textarea id="custAddressInput" name="alamat" rows="2" required placeholder="Contoh: Jl. Mawar No. 5, RT 02/04, Sukajadi, Malang" 
+                    <textarea id="custAddressInput" name="alamat" rows="2" required maxlength="255" placeholder="Contoh: Jl. Mawar No. 5, RT 02/04, Sukajadi, Malang" 
                         class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                 </div>
 
                 <!-- Catatan Khusus Pengiriman / Preferensi -->
                 <div>
                     <label for="custNotesInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Catatan Khusus Pengiriman / Preferensi</label>
-                    <textarea id="custNotesInput" name="catatan" rows="2" placeholder="Contoh: Pengiriman pagi sebelum jam 10:00 WIB, roti minta diiris tipis..." 
+                    <textarea id="custNotesInput" name="catatan" rows="2" maxlength="255" placeholder="Contoh: Pengiriman pagi sebelum jam 10:00 WIB, roti minta diiris tipis..." 
                         class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                 </div>
 

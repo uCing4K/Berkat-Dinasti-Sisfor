@@ -248,7 +248,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
 
-                if ($id_pelanggan <= 0 && !empty($nama_pelanggan_baru)) {
+                $isNewCustMode = (int)($_POST['is_pelanggan_baru'] ?? 0);
+                $custNamePost = trim($_POST['customer_name'] ?? '');
+                $custWaPost = trim($_POST['customer_wa'] ?? '');
+                $custAddrPost = trim($_POST['customer_address'] ?? '');
+
+                if (($id_pelanggan <= 0 || $isNewCustMode === 1) && !empty($custNamePost)) {
+                    $stmtC = $pdo->prepare("INSERT INTO pelanggan (nama, no_wa, alamat, tipe) VALUES (?, ?, ?, 'retail')");
+                    $stmtC->execute([$custNamePost, $custWaPost, $custAddrPost]);
+                    $id_pelanggan = $pdo->lastInsertId();
+                    $custName = $custNamePost;
+                    $custWa = $custWaPost;
+                    $custAddress = $custAddrPost;
+                } elseif ($id_pelanggan <= 0 && !empty($nama_pelanggan_baru)) {
                     $stmtC = $pdo->prepare("INSERT INTO pelanggan (nama, no_wa, alamat, tipe) VALUES (?, ?, ?, 'retail')");
                     $stmtC->execute([$nama_pelanggan_baru, $no_wa_baru, $alamat_baru]);
                     $id_pelanggan = $pdo->lastInsertId();
@@ -1071,8 +1083,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- FULL PAGE: TAMBAH PESANAN BARU (POS KASIR BAKERY)             -->
                 <!-- ============================================================== -->
                 <div class="flex-1 flex flex-col lg:flex-row gap-5 lg:min-h-0 lg:overflow-hidden">
-                    <!-- LEFT: KATALOG PRODUK (SCROLLS INDEPENDENTLY ON LEFT) -->
-                    <div class="flex-1 lg:h-full lg:overflow-y-auto craft-scrollbar space-y-4 lg:pr-1">
+                    <!-- LEFT: KATALOG PRODUK (SCROLLS INDEPENDENTLY ON LEFT, ON MOBILE SHOWN AFTER CART) -->
+                    <div class="flex-1 lg:h-full lg:overflow-y-auto craft-scrollbar space-y-4 lg:pr-1 order-last lg:order-first">
                         
                         <!-- Category Filter Boxes & Search -->
                         <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-5 shadow-card space-y-3.5">
@@ -1132,13 +1144,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
                     </div>
 
-                    <!-- RIGHT: KERANJANG PESANAN (FIXED IN PLACE / ZERO WINDOW SCROLL) -->
-                    <div class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0">
-                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] shadow-sm overflow-hidden">
+                    <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
+                    <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
+                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
-                            <!-- 1. ARTISANAL BAKERY HEADER: Soft Oat Cream with Signature Caramel Accent Bar -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between shrink-0 shadow-2xs">
+                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream without brown stripe -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center shrink-0 shadow-2xs">
                                         <i class="fas fa-shopping-basket text-xs"></i>
@@ -1154,66 +1166,67 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </button>
                             </div>
 
-                            <!-- 2. SCROLLABLE MIDDLE BODY (Daftar Produk & Form Pemesan) -->
+                            <!-- 2. SCROLLABLE MIDDLE BODY (Form Pelanggan First, then Cart Items) -->
                             <div class="flex-1 overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF6F0]">
-                                <!-- Cart Items List (Starts with 0 items) -->
-                                <div class="p-3 sm:p-3.5 space-y-2 bg-[#FAF6F0]" id="posCartList">
-                                    <!-- Populated dynamically by JavaScript -->
-                                </div>
-
-                                <!-- Hidden Input Container for POST items -->
-                                <div id="posHiddenItemsInputs"></div>
-
-                                <!-- Order Details & Customer Form (Compact, Soft Sandstone Tone) -->
-                                <div class="p-3 sm:p-3.5 space-y-3 bg-[#F5F0E6] text-xs">
-                                    <!-- Customer Section -->
+                                
+                                <!-- FORM DATA PELANGGAN (PROMINENT AT TOP, ALWAYS VISIBLE FIRST) -->
+                                <div class="p-3 sm:p-3.5 space-y-3 bg-[#F5F0E6] text-xs" id="posCustomerSection">
                                     <div>
                                         <div class="flex items-center justify-between mb-1.5">
-                                            <label class="font-bold text-[#544337] uppercase tracking-wider text-[10px]">Data Pelanggan</label>
-                                            <button type="button" onclick="togglePosNewCustomer()" id="btnTogglePosNewCust" class="text-[#D46E15] hover:text-[#B85207] font-semibold text-[11px] flex items-center gap-1 transition-colors">
-                                                <i class="fas fa-user-plus text-[10px]"></i>
-                                                <span id="lblPosToggleCust">Tambah Pelanggan Baru</span>
-                                            </button>
+                                            <div class="flex items-center gap-1.5">
+                                                <i class="fas fa-user-circle text-[#D46E15] text-xs"></i>
+                                                <label class="font-bold text-[#544337] uppercase tracking-wider text-[10px]">Data Pelanggan (Wajib Diisi Awal)</label>
+                                            </div>
+                                            <span id="posCustTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                Pelanggan Lama
+                                            </span>
                                         </div>
 
-                                        <!-- Existing Customer Select -->
-                                        <div id="posCustSelectWrapper">
-                                            <select id="pos_id_pelanggan" name="id_pelanggan" onchange="syncPosCustomerInfo()" 
-                                                class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                                <?php foreach ($customers_for_select as $c): ?>
-                                                    <option value="<?= $c['id_pelanggan'] ?? $c['id'] ?>" data-wa="<?= htmlspecialchars($c['no_wa']) ?>" data-address="<?= htmlspecialchars($c['alamat']) ?>">
-                                                        <?= htmlspecialchars($c['nama']) ?> (<?= htmlspecialchars($c['no_wa']) ?>)
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" name="customer_name" id="pos_hidden_customer_name" value="">
-                                        <input type="hidden" name="customer_wa" id="pos_hidden_customer_wa" value="">
-                                        <input type="hidden" name="customer_address" id="pos_hidden_customer_address" value="">
+                                        <!-- Auto-search Customer Name Input with Live Dropdown -->
+                                        <div class="relative" id="posCustSearchWrapper">
+                                            <div class="relative">
+                                                <input type="text" id="posCustNameInput" name="customer_name" autocomplete="off"
+                                                    placeholder="Ketik nama pelanggan..."
+                                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?>"
+                                                    oninput="handlePosCustSearch(this.value)"
+                                                    onfocus="handlePosCustSearchFocus()"
+                                                    maxlength="70"
+                                                    class="w-full bg-white border border-[#DDD3C5] rounded-xl pl-3 pr-8 py-2 text-xs text-[#251A14] font-bold focus:border-[#D46E15] focus:outline-none transition-colors shadow-2xs">
+                                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
+                                                    <i class="fas fa-search text-[10px]"></i>
+                                                </div>
+                                            </div>
 
-                                        <!-- New Customer Form (Hidden by default) -->
-                                        <div id="posNewCustBox" class="hidden space-y-2 p-2.5 bg-white border border-[#DDD3C5] rounded-xl mt-1.5">
+                                            <!-- Auto-search dropdown matches (max 5) -->
+                                            <div id="posCustDropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#FDFBF7] border-2 border-[#544337] rounded-xl shadow-xl max-h-52 overflow-y-auto z-50 divide-y divide-[#EFE8DE]">
+                                                <!-- Filled dynamically by JS -->
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" name="id_pelanggan" id="pos_id_pelanggan" value="<?= $customers_for_select[0]['id_pelanggan'] ?? $customers_for_select[0]['id'] ?? 1 ?>">
+                                        <input type="hidden" name="is_pelanggan_baru" id="pos_is_pelanggan_baru" value="0">
+
+                                        <!-- Phone & Address Inputs (Always visible and filled) -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                                             <div>
-                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Nama Lengkap</label>
-                                                <input type="text" id="pos_nama_baru" name="nama_pelanggan_baru" placeholder="Cth: Ibu Dewi Lestari" 
-                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-0.5">No WhatsApp *</label>
+                                                <input type="tel" inputmode="numeric" id="pos_customer_wa" name="customer_wa" placeholder="08xxxxxxxxxx"
+                                                    value="<?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?>"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" required
+                                                    class="w-full bg-white border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none shadow-2xs">
                                             </div>
                                             <div>
-                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">No WhatsApp</label>
-                                                <input type="tel" inputmode="numeric" id="pos_wa_baru" name="no_wa_baru" placeholder="Cth: 081234567890" 
-                                                    oninput="this.value = this.value.replace(/[^0-9+]/g, '');"
-                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-[10px] font-bold text-[#544337] mb-1">Alamat Pengiriman</label>
-                                                <textarea id="pos_alamat_baru" name="alamat_baru" rows="2" placeholder="Cth: Jl. Panglima Sudirman No. 12, Kota Batu" 
-                                                    class="w-full bg-[#FAF6F0] border border-[#DDD3C5] rounded-lg px-2.5 py-1 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none"></textarea>
+                                                <label class="block text-[10px] font-bold text-[#544337] mb-0.5">Alamat Pengiriman *</label>
+                                                <input type="text" id="pos_customer_address" name="customer_address" placeholder="Jl. Alamat lengkap..."
+                                                    value="<?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?>"
+                                                    maxlength="255" required
+                                                    class="w-full bg-white border border-[#DDD3C5] rounded-lg px-2.5 py-1.5 text-xs text-[#251A14] font-medium focus:border-[#D46E15] focus:outline-none shadow-2xs">
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Delivery Date & Time (PO Rule: Min H+4 Lead Time) -->
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#EAE1D5]">
                                         <div>
                                             <div class="flex items-center justify-between mb-1">
                                                 <label class="block font-bold text-[#544337] text-[10px]">Tgl Kirim / PO</label>
@@ -1254,10 +1267,18 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <!-- Notes -->
                                     <div>
                                         <label class="block font-bold text-[#544337] text-[10px] mb-1">Catatan Khusus (Opsional)</label>
-                                        <input type="text" id="pos_catatan" name="catatan" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
+                                        <input type="text" id="pos_catatan" name="catatan" maxlength="255" placeholder="Cth: Topping keju lebih tebal, packing rapi..." 
                                             class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                     </div>
                                 </div>
+
+                                <!-- Cart Items List (Dynamic) -->
+                                <div class="p-3 sm:p-3.5 space-y-2 bg-[#FAF6F0]" id="posCartList">
+                                    <!-- Populated dynamically by JavaScript -->
+                                </div>
+
+                                <!-- Hidden Input Container for POST items -->
+                                <div id="posHiddenItemsInputs"></div>
                             </div>
 
                             <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Elevated Total Ticket Card -->
@@ -1301,6 +1322,28 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
                         </form>
                     </div>
+                </div>
+
+                <!-- GoFood-Style Floating Cart Bar (Mobile Only) -->
+                <div id="posMobileFloatingCart" class="lg:hidden fixed bottom-4 left-4 right-4 z-40 hidden animate-in slide-in-from-bottom-4 duration-200">
+                    <button type="button" onclick="scrollToPosCart()" class="w-full bg-[#3E2B21] hover:bg-[#251A14] text-white px-4 py-3 rounded-2xl shadow-2xl border-2 border-[#544337] flex items-center justify-between transition-transform active:scale-[0.98]">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-[#D46E15] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                                <span id="posMobileCartBadge">0</span>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold leading-tight">Keranjang Pesanan</p>
+                                <p class="text-[10px] text-[#DDD3C5]" id="posMobileCartItemsDesc">0 produk terpilih</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-sm text-[#FAF8F5]" id="posMobileCartTotal">Rp 0</span>
+                            <span class="text-xs text-[#D46E15] font-bold flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg">
+                                <span>Lihat</span>
+                                <i class="fas fa-chevron-up text-[10px]"></i>
+                            </span>
+                        </div>
+                    </button>
                 </div>
                 <?php else: ?>
                 
@@ -2065,12 +2108,26 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     <!-- Controls Row: Month Selector & Filters -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                         <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-                            <!-- Dropdown Bulan Dinamis -->
+                            <!-- Dropdown Bulan Dinamis (12 Bulan Penuh Tahun Ini & Tahun Depan) -->
                             <div class="relative w-full sm:w-auto">
                                 <select id="calendarMonthSelect" onchange="filterCalendarByMonth(this.value)" class="w-full sm:w-auto appearance-none bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-3.5 pr-8 py-2 text-xs sm:text-sm text-[#251A14] font-semibold focus:outline-none focus:border-[#D46E15] cursor-pointer shadow-2xs">
-                                    <option value="<?= date('Y-m') ?>"><?= $currentMonthIndo ?></option>
-                                    <option value="<?= date('Y-m', strtotime('-1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('-1 month'))] ?? '') . ' ' . date('Y', strtotime('-1 month')) ?></option>
-                                    <option value="<?= date('Y-m', strtotime('+1 month')) ?>"><?= ($monthsIndoFull[date('m', strtotime('+1 month'))] ?? '') . ' ' . date('Y', strtotime('+1 month')) ?></option>
+                                    <?php 
+                                    $currY = (int)date('Y');
+                                    $allMonthsList = [
+                                        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+                                        '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+                                        '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+                                    ];
+                                    foreach ([$currY, $currY + 1] as $yr):
+                                        foreach ($allMonthsList as $mCode => $mName):
+                                            $valYM = "$yr-$mCode";
+                                            $isSel = ($valYM === date('Y-m')) ? 'selected' : '';
+                                    ?>
+                                        <option value="<?= $valYM ?>" <?= $isSel ?>><?= "$mName $yr" ?></option>
+                                    <?php 
+                                        endforeach;
+                                    endforeach; 
+                                    ?>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-[#8E7E73]">
                                     <i class="fas fa-chevron-down text-[10px]"></i>
@@ -2103,8 +2160,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </a>
                     </div>
 
-                    <!-- Main Big Calendar Card -->
-                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-6 shadow-sm mb-6">
+                    <!-- Main Big Calendar Card (With signature border-[#544337]) -->
+                    <div class="bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] p-6 shadow-sm mb-6">
                         <!-- Calendar Header: Month Title & Legend -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E2D7C8] mb-4">
                             <div class="flex items-center gap-3">
@@ -2122,16 +2179,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <!-- Legend Pills -->
                             <div class="flex items-center gap-4 text-xs">
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#D46E15]"></span>
-                                    <span class="text-[#544337] font-medium">Aktif</span>
+                                    <span class="w-3 h-3 rounded-md bg-[#3E2B21] border border-[#251A14]"></span>
+                                    <span class="text-[#544337] font-medium">Ada Pesanan</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full border-2 border-[#D46E15] bg-[#FDFBF7]"></span>
+                                    <span class="w-3 h-3 rounded-md bg-[#27AE60] border border-[#1E8449]"></span>
+                                    <span class="text-[#544337] font-medium">Semua Selesai</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-md border-2 border-[#D46E15] bg-[#FFF8F0]"></span>
                                     <span class="text-[#544337] font-medium">Hari Ini</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#27AE60]"></span>
-                                    <span class="text-[#544337] font-medium">Selesai</span>
                                 </div>
                             </div>
                         </div>
@@ -2155,30 +2212,47 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <!-- Calendar Footer Note -->
                         <div class="pt-4 mt-4 border-t border-[#E2D7C8] flex items-center gap-2 text-xs text-[#8E7E73]">
                             <i class="fas fa-info-circle text-[#D46E15] text-xs"></i>
-                            <span>Klik tanggal mana saja pada kalender untuk melihat daftar pengiriman roti dan status kurir.</span>
+                            <span>Klik tanggal mana saja pada kalender untuk membuka popout modal rincian pengiriman roti dan status kurir.</span>
                         </div>
                     </div>
 
-                    <!-- Bottom Delivery Schedule (Interactive Filtered View) -->
-                    <div class="bg-[#FDFBF7] rounded-2xl border border-[#E2D7C8] p-4 sm:p-6 shadow-sm" id="deliveryScheduleSection">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-4 border-b border-[#E2D7C8] mb-5">
+                    <!-- Bottom Delivery Schedule (With signature border-[#544337]) -->
+                    <div class="bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] p-4 sm:p-6 shadow-sm" id="deliveryScheduleSection">
+                        <!-- Header with small quick action buttons aligned to the right -->
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-4 border-b border-[#E2D7C8] mb-5">
                             <div class="space-y-0.5">
                                 <span class="text-[11px] sm:text-xs text-[#8E7E73] font-semibold uppercase tracking-wider block">Jadwal Pengiriman:</span>
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="text-[#251A14] font-bold text-base sm:text-lg" id="deliveryScheduleTitle"><?= $todayFormatted ?></h3>
                                     <span class="bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0" id="deliveryBatchBadge">
                                         2 Batch Aktif
                                     </span>
+                                    <span class="text-xs text-[#8E7E73]" id="deliveryCountLabel">• 2 Pengiriman Terjadwal</span>
                                 </div>
                             </div>
-                            <span class="text-xs text-[#8E7E73]" id="deliveryCountLabel">2 Pengiriman Terjadwal</span>
+                            
+                            <!-- Aksi Cepat Pengiriman (Small buttons aligned to the right next to title) -->
+                            <div class="flex items-center gap-2 self-start lg:self-auto flex-wrap">
+                                <form method="POST" action="pesanan.php" class="inline">
+                                    <input type="hidden" name="action" value="batch_siap_kirim">
+                                    <button type="submit" class="bg-[#D46E15] hover:bg-[#B85207] text-white font-semibold text-xs py-1.5 px-3 rounded-lg flex items-center gap-1.5 shadow-2xs transition-colors">
+                                        <i class="fas fa-check-double text-[11px]"></i>
+                                        <span>Konfirmasi Semua Siap Kirim</span>
+                                    </button>
+                                </form>
+                                <button type="button" onclick="printDeliverySlip()" 
+                                    class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] font-semibold text-xs py-1.5 px-3 rounded-lg border border-[#DDD3C5] flex items-center gap-1.5 transition-colors shadow-2xs">
+                                    <i class="fas fa-print text-[11px] text-[#D46E15]"></i>
+                                    <span>Cetak Rekap Surat Jalan</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- 3 Cards Grid -->
+                        <!-- Delivery Cards Grid (Only Order Cards with border-[#544337]) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="deliveryCardsGrid">
                             
                             <!-- Card 1: Ibu Sari -->
-                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="kurir">
+                            <div class="bg-[#EFE8DE] rounded-xl p-4 border-2 border-[#544337] flex flex-col justify-between delivery-card" data-type="kurir">
                                 <div>
                                     <div class="flex items-center justify-between text-xs mb-2">
                                         <span class="font-mono text-[#D46E15] font-semibold">#ORD-089</span>
@@ -2200,7 +2274,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
 
                             <!-- Card 2: Bu Rina -->
-                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="toko">
+                            <div class="bg-[#EFE8DE] rounded-xl p-4 border-2 border-[#544337] flex flex-col justify-between delivery-card" data-type="toko">
                                 <div>
                                     <div class="flex items-center justify-between text-xs mb-2">
                                         <span class="font-mono text-[#27AE60] font-semibold">#ORD-084</span>
@@ -2217,31 +2291,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                     <button type="button" onclick="openOrderDetailById('ORD-084')" class="text-[#D46E15] hover:text-[#B85207] font-semibold flex items-center gap-1">
                                         <span>Detail</span>
                                         <i class="fas fa-arrow-right text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Card 3: Action Panel -->
-                            <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between">
-                                <div>
-                                    <h4 class="text-[#251A14] font-bold text-sm mb-1">Aksi Cepat Pengiriman</h4>
-                                    <p class="text-xs text-[#8E7E73] leading-relaxed">Perbarui status semua pesanan hari ini atau cetak dokumen surat jalan untuk kurir.</p>
-                                </div>
-                                <div class="space-y-2 mt-4">
-                                    <!-- Konfirmasi Semua Siap Kirim Riil -->
-                                    <form method="POST" action="pesanan.php">
-                                        <input type="hidden" name="action" value="batch_siap_kirim">
-                                        <button type="submit" class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-semibold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-button-orange transition-colors">
-                                            <i class="fas fa-check-double text-xs"></i>
-                                            <span>Konfirmasi Semua Siap Kirim</span>
-                                        </button>
-                                    </form>
-                                    
-                                    <!-- Cetak Rekap Surat Jalan (Hari Ini) -->
-                                    <button type="button" onclick="printDeliverySlip()" 
-                                        class="w-full bg-[#FDFBF7] hover:bg-[#E5DDD0] text-[#3E2B21] font-medium text-xs py-2.5 rounded-lg border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
-                                        <i class="fas fa-print text-xs text-[#D46E15]"></i>
-                                        <span>Cetak Rekap Surat Jalan (Hari Ini)</span>
                                     </button>
                                 </div>
                             </div>
@@ -2646,6 +2695,41 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     </div>
 
     <!-- ============================================================== -->
+    <!-- MODAL POPOUT: DETAIL JADWAL PENGIRIMAN KALENDER (MATCH BERANDA)-->
+    <!-- ============================================================== -->
+    <div id="deliveryScheduleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div onclick="closeDeliveryScheduleModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
+        <div class="max-w-lg w-full relative z-10 bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center">
+                        <i class="far fa-calendar-alt text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-[#251A14]" id="delivModalTitle">Jadwal Pengiriman Roti</h3>
+                        <p class="text-xs text-[#8E7E73]" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
+                    </div>
+                </div>
+                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup Modal">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-6 space-y-3.5 max-h-[65vh] overflow-y-auto" id="delivModalBody">
+                <!-- Delivery Content Dynamic -->
+            </div>
+            <!-- Footer -->
+            <div class="px-6 py-3.5 border-t border-[#E2D7C8] bg-[#F5F1EB] flex items-center justify-between">
+                <span class="text-xs text-[#8E7E73] font-medium">Sistem Pengiriman Berkat Dinasti</span>
+                <button type="button" onclick="closeDeliveryScheduleModal()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#3E2B21] border border-[#DDD3C5] font-semibold text-xs px-4 py-2 rounded-lg transition-colors">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
     <!-- MODAL POPOUT: TAMBAH CATATAN DAPUR                             -->
     <!-- ============================================================== -->
     <div id="kitchenNoteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -2725,9 +2809,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <!-- MODAL POPOUT: KATALOG FOTO 9 PILIHAN TOPPING ROTI HAJATAN      -->
     <!-- ============================================================== -->
     <div id="toppingCatalogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
-        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <!-- Header -->
-            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center">
                         <i class="fas fa-cookie-bite text-sm"></i>
@@ -2815,9 +2899,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <!-- MODAL POPOUT: PEMILIH TOPPING INTERAKTIF KASIR / POS           -->
     <!-- ============================================================== -->
     <div id="toppingPickerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
-        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <!-- Header -->
-            <div class="px-5 py-3.5 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+            <div class="px-5 py-3.5 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-sm sm:text-base text-[#251A14]" id="toppingPickerTitle">Pilih Topping Roti Hajatan</h3>
                     <p class="text-[11px] text-[#8E7E73]" id="toppingPickerSubtitle">Kemasan: Kardus Putih • Rp 10.000</p>
@@ -2939,6 +3023,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         let currentPickerSelectedTopping = 'Coco Chip + Keju';
 
         function openToppingPickerModal(id_varian, editingCartKey = null) {
+            if (!editingCartKey && typeof validatePosCustomerFilled === 'function') {
+                if (!validatePosCustomerFilled()) return;
+            }
             const prod = PRODUCTS_DATA.find(p => p.id_varian === id_varian);
             if (!prod) return;
 
@@ -3820,6 +3907,16 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         // =========================================================================
         let currentCalDate = new Date();
 
+        function filterCalendarByMonth(val) {
+            if (!val) return;
+            const parts = val.split('-');
+            const y = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10) - 1;
+            currentCalDate = new Date(y, m, 1);
+            renderInteractiveCalendar();
+            showToast(`Kalender beralih ke: ${document.getElementById('calendarGridTitle')?.textContent || val}`);
+        }
+
         function renderInteractiveCalendar() {
             const grid = document.getElementById('calendarDaysGrid');
             if (!grid) return;
@@ -3830,7 +3927,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const today = new Date();
 
             const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            document.getElementById('calendarGridTitle').textContent = monthNames[month] + ' ' + year;
+            const monthTitle = monthNames[month] + ' ' + year;
+            const gridTitle = document.getElementById('calendarGridTitle');
+            if (gridTitle) gridTitle.textContent = monthTitle;
+
+            const monthSelect = document.getElementById('calendarMonthSelect');
+            if (monthSelect) {
+                const valYM = `${year}-${String(month + 1).padStart(2, '0')}`;
+                monthSelect.value = valYM;
+            }
 
             const firstDay = new Date(year, month, 1).getDay();
             // Senin as first column (0 = Senin, 6 = Minggu)
@@ -3841,6 +3946,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             for (let i = 0; i < startCol; i++) {
                 grid.insertAdjacentHTML('beforeend', '<div class="p-1 md:p-2.5 text-sm text-[#D8D2CB] pointer-events-none min-h-[46px] md:min-h-[64px]"></div>');
             }
+
+            let monthTotalOrders = 0;
 
             // Days
             for (let d = 1; d <= totalDays; d++) {
@@ -3853,6 +3960,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     return o.date === dateStr || (o.date.endsWith(`-${String(d).padStart(2, '0')}`) && o.date.includes(`-${String(month+1).padStart(2,'0')}-`));
                 });
                 const count = ordersOnDate.length;
+                monthTotalOrders += count;
+
                 let dayTotalPcs = 0;
                 ordersOnDate.forEach(ord => {
                     const matches = (ord.items || '').matchAll(/(\d+)\s*(pcs|box|mika|biji)/gi);
@@ -3864,58 +3973,73 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 const isOverload = (dayTotalPcs > 150);
 
                 let dayHtml = '';
-                if (isToday) {
+                if (count > 0) {
+                    const allSelesai = ordersOnDate.every(o => o.current_status === 'selesai' || o.status === 'selesai');
+                    if (allSelesai) {
+                        // High-opacity green bg-[#27AE60] text-white border-2 border-[#1E8449]
+                        dayHtml = `
+                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
+                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#27AE60] text-white border-2 border-[#1E8449] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:opacity-90 shadow-xs transition-all">
+                                <span class="font-bold text-xs md:text-sm text-white">${d}</span>
+                                <span class="md:hidden w-5 h-5 rounded-full bg-white text-[#27AE60] text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-bold text-white bg-black/20 px-1.5 py-0.5 rounded">✓ ${count} Selesai</span>
+                            </div>
+                        `;
+                    } else {
+                        // Dark brown bg-[#3E2B21] with white font text-white
+                        dayHtml = `
+                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
+                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#3E2B21] text-white border-2 border-[#251A14] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#251A14] shadow-xs transition-all ${isToday ? 'ring-2 ring-[#D46E15]' : ''}">
+                                <span class="font-bold text-xs md:text-sm text-white">${d}</span>
+                                <span class="md:hidden w-5 h-5 rounded-full bg-[#D46E15] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
+                                <span class="hidden md:inline text-[10px] font-semibold text-white bg-[#D46E15] px-1.5 py-0.5 rounded shadow-2xs">${isOverload ? '⚠️ ' + dayTotalPcs + ' pcs' : count + ' Pesanan'}</span>
+                            </div>
+                        `;
+                    }
+                } else if (isToday) {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
                              class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#FFF8F2] border-2 border-[#D46E15] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] shadow-sm cursor-pointer hover:scale-105 transition-transform">
                             <span class="font-bold text-xs md:text-sm text-[#924C00]">${d}</span>
-                            ${count > 0 ? `
-                                <span class="md:hidden w-5 h-5 rounded-full bg-[#D46E15] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
-                                <span class="hidden md:inline text-[10px] font-bold ${isOverload ? 'text-amber-950 bg-amber-300' : 'text-white bg-[#D46E15]'} px-1.5 py-0.5 rounded shadow-2xs">${isOverload ? '⚠️ ' + dayTotalPcs + ' pcs' : count + ' Pesanan'}</span>
-                            ` : `
-                                <span class="text-[9px] md:text-[10px] font-bold text-[#D46E15] md:text-white md:bg-[#D46E15] md:px-1.5 md:py-0.5 rounded">Hari Ini</span>
-                            `}
+                            <span class="text-[9px] md:text-[10px] font-bold text-white bg-[#D46E15] px-1.5 py-0.5 rounded">Hari Ini</span>
                         </div>
                     `;
-                } else if (count > 0) {
-                    const allSelesai = ordersOnDate.every(o => o.current_status === 'selesai' || o.status === 'selesai');
-                    if (allSelesai) {
-                        dayHtml = `
-                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#F5F3F1] border border-[#EBE8E5] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-xs md:text-sm text-[#1C1C1C]">${d}</span>
-                                <span class="md:hidden w-5 h-5 rounded-full bg-[#27AE60] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
-                                <span class="hidden md:inline text-[10px] font-semibold text-[#1B7A43] bg-[#27AE60]/15 px-1 py-0.5 rounded">✓ ${count} Selesai</span>
-                            </div>
-                        `;
-                    } else if (isOverload) {
-                        dayHtml = `
-                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-amber-50 border border-amber-300 flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-xs md:text-sm text-amber-900">${d}</span>
-                                <span class="md:hidden w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
-                                <span class="hidden md:inline text-[10px] font-bold text-amber-900 bg-amber-200 px-1.5 py-0.5 rounded shadow-2xs">⚠️ ${dayTotalPcs} pcs</span>
-                            </div>
-                        `;
-                    } else {
-                        dayHtml = `
-                            <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                                 class="cal-day-cell p-1.5 md:p-2.5 rounded-xl bg-[#FEF6EE] border border-[#FDE6D2] flex flex-col items-center justify-between min-h-[46px] md:min-h-[64px] cursor-pointer hover:bg-[#FFF8F2] transition-colors">
-                                <span class="font-bold text-xs md:text-sm text-[#D97706]">${d}</span>
-                                <span class="md:hidden w-5 h-5 rounded-full bg-[#D46E15] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">${count}</span>
-                                <span class="hidden md:inline text-[10px] font-semibold text-[#D97706] bg-white px-1.5 py-0.5 rounded shadow-2xs">${count} Pesanan</span>
-                            </div>
-                        `;
-                    }
                 } else {
                     dayHtml = `
                         <div onclick="selectDeliveryDate(this, '${dateStr}', ${d})" 
-                             class="cal-day-cell p-1.5 md:p-2 text-xs md:text-sm font-medium text-[#1C1C1C] rounded-xl hover:bg-[#FFF8F2] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-[46px] md:min-h-[64px]">
+                             class="cal-day-cell p-1.5 md:p-2 text-xs md:text-sm font-medium text-[#251A14] rounded-xl hover:bg-[#EFE8DE] border border-transparent hover:border-[#DDD3C5] transition-colors cursor-pointer flex flex-col items-center justify-center min-h-[46px] md:min-h-[64px]">
                             <span>${d}</span>
                         </div>
                     `;
                 }
                 grid.insertAdjacentHTML('beforeend', dayHtml);
+            }
+
+            // Sync empty state if entire month has no orders
+            const gridCards = document.getElementById('deliveryCardsGrid');
+            if (monthTotalOrders === 0 && gridCards) {
+                const badge = document.getElementById('deliveryBatchBadge');
+                const countLabel = document.getElementById('deliveryCountLabel');
+                const title = document.getElementById('deliveryScheduleTitle');
+                if (title) title.textContent = monthTitle;
+                if (badge) {
+                    badge.textContent = 'Belum Ada Pesanan';
+                    badge.className = 'bg-[#8E7E73]/15 text-[#544337] text-xs font-semibold px-2.5 py-0.5 rounded-full';
+                }
+                if (countLabel) countLabel.textContent = `0 Pengiriman Terjadwal di Bulan ${monthTitle}`;
+                gridCards.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-[#EFE8DE]/60 border-2 border-dashed border-[#DDD3C5] rounded-2xl p-8 text-center flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 rounded-full bg-[#DDD3C5]/50 flex items-center justify-center text-[#8E7E73] mb-3 text-lg">
+                            <i class="far fa-calendar-times"></i>
+                        </div>
+                        <h4 class="text-[#251A14] font-bold text-sm">Belum Ada Pengiriman di Bulan ${monthTitle}</h4>
+                        <p class="text-xs text-[#8E7E73] mt-1 max-w-md">Tidak ada pesanan bakery yang dijadwalkan pada bulan ini. Kalender tetap aktif untuk menerima booking pesanan baru.</p>
+                        <a href="pesanan.php?view=tambah_pesanan" class="mt-4 bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 shadow-button-orange transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Buat Pesanan Baru Bulan Ini</span>
+                        </a>
+                    </div>
+                `;
             }
         }
 
@@ -3966,7 +4090,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     badge.textContent = `${matchingOrders.length} Batch Aktif`;
                     badge.className = 'bg-[#27AE60]/15 text-[#1B7A43] text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0';
                 }
-                countLabel.textContent = `${matchingOrders.length} Pengiriman Terjadwal (${totalPcs} pcs)`;
+                countLabel.textContent = `• ${matchingOrders.length} Pengiriman Terjadwal (${totalPcs} pcs)`;
 
                 let cardsHtml = matchingOrders.map(ord => {
                     const isLunas = (ord.status_bayar === 'Lunas');
@@ -3979,7 +4103,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         : `<span class="bg-[#E5DDD0] text-[#544337] font-semibold px-2.5 py-1 rounded-md text-[11px]"><i class="fas fa-store text-xs mr-1"></i> Ambil di Toko</span>`;
 
                     return `
-                        <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between delivery-card" data-type="${ord.courier_info && ord.courier_info.toLowerCase().includes('ambil') ? 'toko' : 'kurir'}">
+                        <div class="bg-[#EFE8DE] rounded-xl p-4 border-2 border-[#544337] flex flex-col justify-between delivery-card" data-type="${ord.courier_info && ord.courier_info.toLowerCase().includes('ambil') ? 'toko' : 'kurir'}">
                             <div>
                                 <div class="flex items-center justify-between text-xs mb-2">
                                     <span class="font-mono text-[#D46E15] font-semibold">#${escapeHtml(ord.id)}</span>
@@ -4001,29 +4125,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </div>
                     `;
                 }).join('');
-
-                // Action panel card
-                cardsHtml += `
-                    <div class="bg-[#EFE8DE] rounded-xl p-4 border border-[#DDD3C5] flex flex-col justify-between">
-                        <div>
-                            <h4 class="text-[#251A14] font-bold text-sm mb-1">Aksi Cepat Pengiriman</h4>
-                            <p class="text-xs text-[#8E7E73] leading-relaxed">Perbarui status semua pesanan tanggal ini atau cetak dokumen surat jalan untuk kurir obrok motor.</p>
-                        </div>
-                        <div class="space-y-2 mt-4">
-                            <form method="POST" action="pesanan.php">
-                                <input type="hidden" name="action" value="batch_siap_kirim">
-                                <button type="submit" class="w-full bg-[#D46E15] hover:bg-[#B85207] text-white font-semibold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-button-orange transition-colors">
-                                    <i class="fas fa-check-double text-xs"></i>
-                                    <span>Konfirmasi Semua Siap Kirim</span>
-                                </button>
-                            </form>
-                            <button type="button" onclick="printDeliverySlip()" class="w-full bg-[#FDFBF7] hover:bg-[#E5DDD0] text-[#3E2B21] font-medium text-xs py-2.5 rounded-lg border border-[#DDD3C5] flex items-center justify-center gap-1.5 transition-colors">
-                                <i class="fas fa-print text-xs text-[#D46E15]"></i>
-                                <span>Cetak Surat Jalan (${dayNum} ${monthTitle})</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
 
                 let overloadBanner = '';
                 if (isDayOverload) {
@@ -4048,10 +4149,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             } else {
                 badge.textContent = 'Tidak Ada Pengiriman';
                 badge.className = 'bg-[#8E7E73]/15 text-[#544337] text-xs font-semibold px-2.5 py-0.5 rounded-full';
-                countLabel.textContent = '0 Pengiriman Terjadwal';
+                countLabel.textContent = '• 0 Pengiriman Terjadwal';
 
                 grid.innerHTML = `
-                    <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-[#EFE8DE]/60 border border-dashed border-[#DDD3C5] rounded-2xl p-8 text-center flex flex-col items-center justify-center">
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-[#EFE8DE]/60 border-2 border-dashed border-[#DDD3C5] rounded-2xl p-8 text-center flex flex-col items-center justify-center">
                         <div class="w-12 h-12 rounded-full bg-[#DDD3C5]/50 flex items-center justify-center text-[#8E7E73] mb-3 text-lg">
                             <i class="far fa-calendar-times"></i>
                         </div>
@@ -4065,7 +4166,109 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 `;
             }
 
-            showToast(`Jadwal pengiriman tanggal ${dayNum} ditampilkan`);
+            // Open Popout Modal matching Beranda (Item 4)
+            openDeliveryScheduleModal(dayNum, dateStr);
+        }
+
+        // Popout Modal for Calendar Date Click (Item 4)
+        function openDeliveryScheduleModal(dayNum, dateStr) {
+            const modal = document.getElementById('deliveryScheduleModal');
+            if (!modal) return;
+
+            const monthTitle = document.getElementById('calendarGridTitle')?.textContent || '';
+            const modalTitleEl = document.getElementById('delivModalTitle');
+            if (modalTitleEl) modalTitleEl.textContent = `Jadwal Pengiriman: ${dayNum} ${monthTitle}`;
+            
+            const body = document.getElementById('delivModalBody');
+            if (!body) return;
+
+            const matchingOrders = ordersData.filter(o => {
+                if (!o.date) return false;
+                return o.date === dateStr || (o.date.endsWith(`-${String(dayNum).padStart(2, '0')}`) && o.date.includes(`-${String(currentCalDate.getMonth()+1).padStart(2,'0')}-`));
+            });
+
+            let totalPcs = 0;
+            matchingOrders.forEach(ord => {
+                const matches = (ord.items || '').matchAll(/(\d+)\s*(pcs|box|mika|biji)/gi);
+                let pcs = 0;
+                for (const m of matches) pcs += parseInt(m[1], 10);
+                if (pcs === 0 && ord.total_qty) pcs = parseInt(ord.total_qty, 10);
+                totalPcs += (pcs > 0 ? pcs : 10);
+            });
+
+            const isOverload = (totalPcs > 150);
+            const extraTrips = Math.ceil(totalPcs / 150);
+            const capacityBadge = isOverload
+                ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-200 text-amber-900 border border-amber-300">⚠️ Overload: ${totalPcs}/150 pcs (Butuh ${extraTrips} Trip)</span>`
+                : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">✓ Kapasitas Aman (${totalPcs}/150 pcs)</span>`;
+
+            const overloadBanner = isOverload ? `
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 text-xs text-amber-900 flex items-center gap-2.5 shadow-2xs">
+                    <i class="fas fa-motorcycle text-amber-700 text-base shrink-0"></i>
+                    <div>
+                        <p class="font-bold">Perhatian Kapasitas Motor Obrok:</p>
+                        <p class="mt-0.5 text-amber-800">Muatan tanggal ini (<strong>${totalPcs} pcs</strong>) melebihi batas aman 150 pcs per trip motor. Diperlukan <strong>${extraTrips} trip pengiriman</strong>.</p>
+                    </div>
+                </div>
+            ` : '';
+
+            if (matchingOrders.length === 0) {
+                body.innerHTML = `
+                    <div class="p-6 text-center text-xs text-[#8E7E73]">
+                        <div class="w-12 h-12 rounded-full bg-[#EFE8DE] text-[#D46E15] flex items-center justify-center mx-auto mb-3">
+                            <i class="far fa-calendar-times text-xl"></i>
+                        </div>
+                        <p class="font-bold text-sm text-[#251A14]">Belum Ada Pengiriman Terjadwal</p>
+                        <p class="mt-1 max-w-xs mx-auto">Tidak ada jadwal pengiriman roti untuk tanggal ${dayNum} ${monthTitle}. Semua armada kurir stand-by.</p>
+                        <a href="pesanan.php?view=tambah_pesanan&date=${dateStr}" class="mt-4 inline-flex items-center gap-2 bg-[#D46E15] hover:bg-[#B85207] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-button-orange transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Tambah Pesanan Tanggal ${dayNum}</span>
+                        </a>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div class="flex items-center justify-between pb-2 border-b border-[#E2D7C8] text-xs">
+                        <span class="font-semibold text-[#544337]"><i class="fas fa-boxes mr-1 text-[#D46E15]"></i> Total: ${matchingOrders.length} Pesanan Terjadwal</span>
+                        ${capacityBadge}
+                    </div>
+                    ${overloadBanner}
+                    <div class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1 craft-scrollbar">
+                        ${matchingOrders.map(it => `
+                            <div onclick="closeDeliveryScheduleModal(); openOrderDetailById('${escapeHtml(it.id)}')" 
+                                class="p-3 bg-[#EFE8DE] hover:bg-[#E4DCCE] cursor-pointer rounded-xl border border-[#DDD3C5] hover:border-[#D46E15] transition-all space-y-1.5 text-xs shadow-2xs group"
+                                title="Klik untuk buka detail pesanan ini">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-mono font-bold text-[#D46E15] group-hover:underline">#${escapeHtml(it.id)}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${it.status_bayar === 'Lunas' ? 'bg-[#27AE60]/15 text-[#1B7A43]' : 'bg-[#8E7E73]/15 text-[#544337]'}">${escapeHtml(it.status_bayar || 'Belum Bayar')}</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-[#251A14] flex items-center justify-between">
+                                        <span>${escapeHtml(it.customer)} <span class="text-[#8E7E73] font-normal text-[11px]">(${escapeHtml(it.phone || '')})</span></span>
+                                        <span class="text-[10px] text-[#D46E15] font-semibold flex items-center gap-0.5">Detail <i class="fas fa-chevron-right text-[8px]"></i></span>
+                                    </p>
+                                    <p class="text-[#544337] mt-0.5 font-medium truncate">${escapeHtml(it.items)}</p>
+                                </div>
+                                <div class="pt-1.5 border-t border-[#DDD3C5] flex items-center justify-between text-[11px] text-[#786E65]">
+                                    <span><i class="far fa-clock mr-1"></i>${escapeHtml(it.time || '14:00')}</span>
+                                    <span><i class="fas fa-motorcycle mr-1 text-[#D46E15]"></i>${escapeHtml(it.courier_info || 'Kurir Toko')}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeliveryScheduleModal() {
+            const modal = document.getElementById('deliveryScheduleModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
         }
 
         function filterShippingType(type) {
@@ -4544,7 +4747,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }).join('');
         }
 
+        function validatePosCustomerFilled() {
+            const nameInput = document.getElementById('posCustNameInput');
+            const waInput = document.getElementById('pos_customer_wa');
+            const nameVal = (nameInput ? nameInput.value : '').trim();
+            const waVal = (waInput ? waInput.value : '').trim();
+
+            if (!nameVal || !waVal) {
+                if (!nameVal && nameInput) {
+                    nameInput.classList.add('ring-2', 'ring-rose-500', 'border-rose-500');
+                    nameInput.focus();
+                    setTimeout(() => nameInput.classList.remove('ring-2', 'ring-rose-500', 'border-rose-500'), 2500);
+                } else if (!waVal && waInput) {
+                    waInput.classList.add('ring-2', 'ring-rose-500', 'border-rose-500');
+                    waInput.focus();
+                    setTimeout(() => waInput.classList.remove('ring-2', 'ring-rose-500', 'border-rose-500'), 2500);
+                }
+                showToast('Wajib isi Nama dan No. WhatsApp Pelanggan terlebih dahulu sebelum menambahkan produk!', '⚠️');
+                const custSec = document.getElementById('posCustomerSection');
+                if (custSec) custSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+            return true;
+        }
+
         function addPosItem(id_varian) {
+            if (!validatePosCustomerFilled()) return;
+
             const prod = PRODUCTS_DATA.find(p => p.id_varian === id_varian);
             if (!prod) return;
 
@@ -4620,6 +4849,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             renderPosCart();
         }
 
+        function scrollToPosCart() {
+            const el = document.getElementById('posCartContainer');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.classList.add('ring-4', 'ring-[#D46E15]/30');
+                setTimeout(() => el.classList.remove('ring-4', 'ring-[#D46E15]/30'), 1500);
+            }
+        }
+
         function renderPosCart() {
             const listEl = document.getElementById('posCartList');
             const badgeEl = document.getElementById('posCartItemBadge');
@@ -4665,16 +4903,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (subtotalEl) subtotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
             if (grandTotalEl) grandTotalEl.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
 
+            // Update GoFood-Style Floating Cart Bar (Mobile Only)
+            const mobileFloatingCart = document.getElementById('posMobileFloatingCart');
+            const mobileCartBadge = document.getElementById('posMobileCartBadge');
+            const mobileCartTotal = document.getElementById('posMobileCartTotal');
+            const mobileCartDesc = document.getElementById('posMobileCartItemsDesc');
+
+            if (mobileFloatingCart) {
+                if (posCart.length > 0) {
+                    mobileFloatingCart.classList.remove('hidden');
+                    if (mobileCartBadge) mobileCartBadge.textContent = totalQty;
+                    if (mobileCartTotal) mobileCartTotal.textContent = `Rp ${formatRupiahNumber(subtotal)}`;
+                    if (mobileCartDesc) mobileCartDesc.textContent = `${posCart.length} jenis item (${totalQty} pcs)`;
+                } else {
+                    mobileFloatingCart.classList.add('hidden');
+                }
+            }
+
             // If empty:
             if (posCart.length === 0) {
                 listEl.innerHTML = `
-                    <div id="posCartEmpty" class="py-8 px-4 text-center">
-                        <div class="w-12 h-12 rounded-full bg-[#EAE2D5] text-[#8E7E73] flex items-center justify-center mx-auto mb-2.5">
-                            <i class="fas fa-shopping-basket text-lg"></i>
-                        </div>
-                        <p class="text-xs font-bold text-[#251A14]">Keranjang Masih Kosong</p>
-                        <p class="text-[11px] text-[#8E7E73] mt-1 max-w-[220px] mx-auto">
-                            Klik produk pada katalog di sebelah kiri untuk memasukkannya ke dalam pesanan.
+                    <div id="posCartEmpty" class="py-4 px-3 text-center bg-[#FAF6F0] rounded-xl border border-dashed border-[#DDD3C5]">
+                        <p class="text-xs font-bold text-[#544337] flex items-center justify-center gap-1.5">
+                            <i class="fas fa-shopping-basket text-[#D46E15]"></i>
+                            <span>Keranjang Belum Berisi Produk</span>
+                        </p>
+                        <p class="text-[11px] text-[#8E7E73] mt-0.5">
+                            Pilih produk dari katalog di samping setelah mengisi data pelanggan di atas.
                         </p>
                     </div>
                 `;
@@ -4781,48 +5036,158 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             }
         }
 
-        function togglePosNewCustomer() {
-            const box = document.getElementById('posNewCustBox');
-            const selectWrap = document.getElementById('posCustSelectWrapper');
-            const lbl = document.getElementById('lblPosToggleCust');
-            if (!box || !selectWrap) return;
+        // =========================================================================
+        // CUSTOMER AUTO-SEARCH, AUTO-DETECT & SUFFIX LOGIC (ITEM 11)
+        // =========================================================================
+        function handlePosCustSearchFocus() {
+            handlePosCustSearch(document.getElementById('posCustNameInput')?.value || '');
+        }
 
-            const isHidden = box.classList.contains('hidden');
-            if (isHidden) {
-                box.classList.remove('hidden');
-                selectWrap.classList.add('opacity-40', 'pointer-events-none');
-                if (lbl) lbl.textContent = 'Pilih Pelanggan Terdaftar';
-                const idPelangganSelect = document.getElementById('pos_id_pelanggan');
-                if (idPelangganSelect) idPelangganSelect.value = '0';
+        function handlePosCustSearch(query) {
+            const dropdown = document.getElementById('posCustDropdown');
+            if (!dropdown) return;
+
+            const q = (query || '').trim().toLowerCase();
+            let matches = [];
+
+            if (q === '') {
+                matches = CUSTOMERS_DATA.slice(0, 5);
             } else {
-                box.classList.add('hidden');
-                selectWrap.classList.remove('opacity-40', 'pointer-events-none');
-                if (lbl) lbl.textContent = 'Tambah Pelanggan Baru';
-                const idPelangganSelect = document.getElementById('pos_id_pelanggan');
-                if (idPelangganSelect && CUSTOMERS_DATA.length > 0) {
-                    idPelangganSelect.value = CUSTOMERS_DATA[0].id_pelanggan || CUSTOMERS_DATA[0].id;
-                }
-                syncPosCustomerInfo();
+                matches = CUSTOMERS_DATA.filter(c => {
+                    const nameMatch = (c.nama || '').toLowerCase().includes(q);
+                    const waMatch = (c.no_wa || '').includes(q);
+                    return nameMatch || waMatch;
+                }).slice(0, 5);
             }
+
+            // Check if exact name match exists
+            const exactMatch = CUSTOMERS_DATA.find(c => (c.nama || '').toLowerCase() === q);
+            
+            // Calculate duplicate suffix e.g. "Agus" -> "Agus 2"
+            let suggestedNewName = (query || '').trim() || 'Pelanggan Baru';
+            if (exactMatch) {
+                const baseName = exactMatch.nama.replace(/\s+\d+$/, '').trim();
+                let highestSuffix = 1;
+                CUSTOMERS_DATA.forEach(c => {
+                    const cName = (c.nama || '').trim();
+                    if (cName.toLowerCase() === baseName.toLowerCase()) {
+                        highestSuffix = Math.max(highestSuffix, 1);
+                    } else {
+                        const m = cName.match(new RegExp('^' + baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+(\\d+)$', 'i'));
+                        if (m) {
+                            highestSuffix = Math.max(highestSuffix, parseInt(m[1], 10));
+                        }
+                    }
+                });
+                suggestedNewName = `${baseName} ${highestSuffix + 1}`;
+            }
+
+            let html = '';
+            if (matches.length > 0) {
+                html += `
+                    <div class="px-3 py-1.5 bg-[#F5F0E6] text-[10px] font-bold uppercase tracking-wider text-[#8E7E73] flex items-center justify-between">
+                        <span>Pelanggan Terdaftar (Maks. 5 Terdekat)</span>
+                        <span class="text-emerald-700 font-bold">Pelanggan Lama</span>
+                    </div>
+                `;
+                matches.forEach(c => {
+                    const custId = c.id_pelanggan || c.id || 0;
+                    html += `
+                        <div onclick="selectPosExistingCustomer(${custId})" class="p-2.5 hover:bg-[#F3EDE2] cursor-pointer flex items-center justify-between transition-colors">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-xs font-bold text-[#251A14] truncate">${escapeHtml(c.nama)}</p>
+                                <p class="text-[11px] text-[#8E7E73] truncate">${escapeHtml(c.no_wa || '-')} • ${escapeHtml(c.alamat || '-')}</p>
+                            </div>
+                            <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Pilih
+                            </span>
+                        </div>
+                    `;
+                });
+            }
+
+            // Option to use as new customer
+            if (q !== '') {
+                html += `
+                    <div onclick="selectPosNewCustomer('${escapeHtml(suggestedNewName)}')" class="p-2.5 bg-[#FFF8F0] hover:bg-[#FDEED9] cursor-pointer flex items-center justify-between transition-colors border-t border-[#EAE1D5]">
+                        <div class="min-w-0 pr-2">
+                            <p class="text-xs font-bold text-[#D46E15] flex items-center gap-1.5">
+                                <i class="fas fa-user-plus text-[11px]"></i>
+                                <span>Gunakan Sebagai Pelanggan Baru: <strong>${escapeHtml(suggestedNewName)}</strong></span>
+                            </p>
+                            <p class="text-[10px] text-[#8E7E73]">${exactMatch ? `(Nama kembar otomatis diberi akhiran '${escapeHtml(suggestedNewName)}')` : 'Daftarkan sebagai data pelanggan baru'}</p>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                            Baru
+                        </span>
+                    </div>
+                `;
+            }
+
+            dropdown.innerHTML = html;
+            dropdown.classList.remove('hidden');
         }
 
-        function syncPosCustomerInfo() {
-            const sel = document.getElementById('pos_id_pelanggan');
-            if (!sel) return;
-            const opt = sel.options[sel.selectedIndex];
-            if (opt) {
-                const fullName = opt.textContent.trim();
-                const name = fullName.includes('(') ? fullName.split('(')[0].trim() : fullName;
-                const wa = opt.getAttribute('data-wa') || '';
-                const address = opt.getAttribute('data-address') || '';
-                const hName = document.getElementById('pos_hidden_customer_name');
-                const hWa = document.getElementById('pos_hidden_customer_wa');
-                const hAddr = document.getElementById('pos_hidden_customer_address');
-                if (hName) hName.value = name;
-                if (hWa) hWa.value = wa;
-                if (hAddr) hAddr.value = address;
+        function selectPosExistingCustomer(id) {
+            const cust = CUSTOMERS_DATA.find(c => (c.id_pelanggan || c.id) == id);
+            if (!cust) return;
+
+            const nameInput = document.getElementById('posCustNameInput');
+            const idInput = document.getElementById('pos_id_pelanggan');
+            const isNewInput = document.getElementById('pos_is_pelanggan_baru');
+            const waInput = document.getElementById('pos_customer_wa');
+            const addrInput = document.getElementById('pos_customer_address');
+            const badge = document.getElementById('posCustTypeBadge');
+
+            if (nameInput) nameInput.value = cust.nama;
+            if (idInput) idInput.value = cust.id_pelanggan || cust.id;
+            if (isNewInput) isNewInput.value = '0';
+            if (waInput) waInput.value = cust.no_wa || '';
+            if (addrInput) addrInput.value = cust.alamat || '';
+            
+            if (badge) {
+                badge.textContent = 'Pelanggan Lama';
+                badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200';
             }
+
+            const dropdown = document.getElementById('posCustDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            showToast(`Data pelanggan "${cust.nama}" dipilih!`);
         }
+
+        function selectPosNewCustomer(name) {
+            const nameInput = document.getElementById('posCustNameInput');
+            const idInput = document.getElementById('pos_id_pelanggan');
+            const isNewInput = document.getElementById('pos_is_pelanggan_baru');
+            const badge = document.getElementById('posCustTypeBadge');
+            const waInput = document.getElementById('pos_customer_wa');
+
+            if (nameInput) nameInput.value = name;
+            if (idInput) idInput.value = '0';
+            if (isNewInput) isNewInput.value = '1';
+            
+            if (badge) {
+                badge.textContent = 'Pelanggan Baru';
+                badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300';
+            }
+
+            const dropdown = document.getElementById('posCustDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+
+            if (waInput) {
+                waInput.focus();
+            }
+            showToast(`Didaftarkan sebagai Pelanggan Baru: "${name}"`);
+        }
+
+        // Close posCustDropdown on outside click
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('posCustSearchWrapper');
+            const dd = document.getElementById('posCustDropdown');
+            if (wrap && dd && !wrap.contains(e.target)) {
+                dd.classList.add('hidden');
+            }
+        });
 
         function formatRupiahNumber(num) {
             return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

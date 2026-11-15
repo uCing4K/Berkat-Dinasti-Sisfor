@@ -274,10 +274,74 @@ $initial_products = [
 ];
 
 // Inisialisasi ke session dengan versioning agar selalu sinkron
-$catalog_version = '2026-10-26_berkat_dinasti_pricelist_v3';
+$catalog_version = '2026-11-15_berkat_dinasti_pricelist_official';
 if (!isset($_SESSION['product_list']) || !isset($_SESSION['catalog_ver']) || $_SESSION['catalog_ver'] !== $catalog_version) {
     $_SESSION['product_list'] = $initial_products;
     $_SESSION['catalog_ver'] = $catalog_version;
+}
+
+// -------------------------------------------------------------
+// 1b. BACKEND HANDLER: RESET KE PRODUK RESMI UMKM BERKAT DINASTI
+// -------------------------------------------------------------
+if (isset($_GET['action']) && $_GET['action'] === 'reset_official_products') {
+    $_SESSION['product_list'] = $initial_products;
+    $_SESSION['catalog_ver'] = $catalog_version;
+    $_SESSION['official_catalog_cleaned'] = 'v4';
+    
+    if ($db_connected && $pdo) {
+        try {
+            // Bersihkan data produk & varian testing di MySQL (hanya sisakan 6 produk resmi)
+            $pdo->exec("DELETE FROM varian_produk WHERE id_produk > 6 OR id_produk NOT IN (1,2,3,4,5,6)");
+            $pdo->exec("DELETE FROM produk WHERE id_produk > 6 OR id_produk NOT IN (1,2,3,4,5,6)");
+
+            // Re-seed kategori 1..3
+            $cats = [
+                1 => ['Roti Hajatan', 'Roti untuk acara hajatan, syukuran, khitanan, dan acara spesial'],
+                2 => ['Bolu Premium', 'Bolu premium lembut aneka rasa khas Berkat Dinasti'],
+                3 => ['Roti Manis', 'Berbagai macam roti manis bijian untuk konsumsi harian']
+            ];
+            foreach ($cats as $cId => $cData) {
+                $st = $pdo->prepare("INSERT INTO kategori (id_kategori, nama_kategori, deskripsi) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nama_kategori = VALUES(nama_kategori), deskripsi = VALUES(deskripsi)");
+                $st->execute([$cId, $cData[0], $cData[1]]);
+            }
+
+            // Re-seed master produk 1..6
+            $prods = [
+                1 => [1, 'Roti Hajatan (9 Pilihan Topping)', 'Roti hajatan bulat 7 kelopak lembut dengan 9 aneka topping (Coco Chip, Keju, Meses, Wijen, Sprinkle)', 7],
+                2 => [2, 'Bolu Pisang Premium', 'Bolu pisang premium bertekstur moist dengan aroma pisang harum khas Berkat Dinasti', 7],
+                3 => [2, 'Bolu Tanpa Pisang Premium', 'Bolu panggang klasik premium tanpa pisang, harum mentega lembut dan gurih manis pas', 7],
+                4 => [3, 'Roti Kopi', 'Roti manis dengan crust aroma kopi harum semerbak ala coffee bun', 7],
+                5 => [3, 'Roti Bijian Besar', 'Roti manis bijian ukuran besar, empuk dan mengenyangkan', 7],
+                6 => [3, 'Roti Bijian Kecil', 'Roti manis bijian ukuran kecil praktis untuk snack harian', 7]
+            ];
+            foreach ($prods as $pId => $pData) {
+                $st = $pdo->prepare("INSERT INTO produk (id_produk, id_kategori, nama_produk, deskripsi, shelf_life, status) VALUES (?, ?, ?, ?, ?, 'tersedia') ON DUPLICATE KEY UPDATE id_kategori = VALUES(id_kategori), nama_produk = VALUES(nama_produk), deskripsi = VALUES(deskripsi), status = 'tersedia'");
+                $st->execute([$pId, $pData[0], $pData[1], $pData[2], $pData[3]]);
+            }
+
+            // Re-seed varian produk 1..11
+            $vars = [
+                1  => [1, 'Kardus Putih', 10000.00, 1],
+                2  => [1, 'Kardus Coklat', 10000.00, 1],
+                3  => [1, 'Kardus Batik', 11000.00, 1],
+                4  => [1, 'Mika', 11000.00, 1],
+                5  => [6, 'Satuan', 3000.00, 50],
+                6  => [2, 'Kardus Coklat', 21000.00, 1],
+                7  => [2, 'Mika', 22000.00, 1],
+                8  => [3, 'Kardus Putih', 19000.00, 1],
+                9  => [3, 'Mika', 20000.00, 1],
+                10 => [4, 'Satuan', 4000.00, 50],
+                11 => [5, 'Satuan', 4000.00, 20]
+            ];
+            foreach ($vars as $vId => $vData) {
+                $st = $pdo->prepare("INSERT INTO varian_produk (id_varian, id_produk, nama_varian, harga, min_order, stok) VALUES (?, ?, ?, ?, ?, 100) ON DUPLICATE KEY UPDATE id_produk = VALUES(id_produk), nama_varian = VALUES(nama_varian), harga = VALUES(harga), min_order = VALUES(min_order)");
+                $st->execute([$vId, $vData[0], $vData[1], $vData[2], $vData[3]]);
+            }
+        } catch (Exception $e) {}
+    }
+    $_SESSION['toast_msg'] = 'Katalog produk berhasil dikembalikan ke 11 produk default resmi UMKM Berkat Dinasti!';
+    header("Location: produk.php");
+    exit();
 }
 
 // -------------------------------------------------------------
@@ -544,9 +608,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $products = $_SESSION['product_list'];
 if ($db_connected && $pdo) {
     try {
+        // Auto-cleanup produk testing: Pastikan produk uji coba dihapus dan hanya 6 produk master resmi yang ada
+        if (!isset($_SESSION['official_catalog_cleaned']) || $_SESSION['official_catalog_cleaned'] !== 'v4') {
+            $pdo->exec("DELETE FROM varian_produk WHERE id_produk > 6 OR id_produk NOT IN (1,2,3,4,5,6)");
+            $pdo->exec("DELETE FROM produk WHERE id_produk > 6 OR id_produk NOT IN (1,2,3,4,5,6)");
+            $_SESSION['official_catalog_cleaned'] = 'v4';
+        }
+
         // Auto-Sync: Pastikan produk resmi Berkat Dinasti tersimpan di MySQL
-        $chkSync = $pdo->query("SELECT COUNT(*) FROM produk WHERE nama_produk LIKE '%Bolu%'")->fetchColumn();
-        if ($chkSync == 0) {
+        $chkSync = $pdo->query("SELECT COUNT(*) FROM produk WHERE id_produk IN (1,2,3,4,5,6)")->fetchColumn();
+        if ($chkSync < 6) {
             // 1. Kategori
             $cats = [
                 1 => ['Roti Hajatan', 'Roti untuk acara hajatan, syukuran, khitanan, dan acara spesial'],
@@ -1009,11 +1080,18 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         </div>
                     </div>
 
-                    <!-- Right Buttons: Ekspor Data & Tambah Produk -->
-                    <div class="flex items-center gap-3 shrink-0">
+                    <!-- Right Buttons: Ekspor Data, Reset Default, & Tambah Produk -->
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <!-- Reset Default Produk Resmi UMKM -->
+                        <a href="produk.php?action=reset_official_products" onclick="return confirm('Kembalikan menu ke 11 produk default resmi UMKM Berkat Dinasti dan hapus data uji coba?');" title="Kembalikan menu produk ke default resmi UMKM Berkat Dinasti" 
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#544337] text-xs sm:text-sm font-medium px-3 sm:px-3.5 py-2.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs">
+                            <i class="fas fa-undo text-xs text-[#D46E15]"></i>
+                            <span class="hidden sm:inline">Reset Default</span>
+                        </a>
+
                         <!-- Ekspor Data (Live CSV Export) -->
                         <a href="produk.php?action=export_csv" title="Unduh katalog produk format CSV/Excel" 
-                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors shadow-2xs">
+                            class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs sm:text-sm font-medium px-3 sm:px-4 py-2.5 rounded-lg flex items-center gap-1.5 sm:gap-2 transition-colors shadow-2xs">
                             <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
                             <span>Ekspor Data</span>
                         </a>
@@ -1296,7 +1374,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                     <!-- Nama Produk -->
                     <div>
                         <label for="prod_nama" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Nama Produk <span class="text-[#EB5757]">*</span></label>
-                        <input type="text" id="prod_nama" name="nama_produk" required placeholder="Contoh: Roti Hajatan (9 Pilihan Topping) / Bolu Pisang" 
+                        <input type="text" id="prod_nama" name="nama_produk" required maxlength="70" placeholder="Contoh: Roti Hajatan (9 Pilihan Topping) / Bolu Pisang" 
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                     </div>
 
@@ -1322,7 +1400,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                             <label for="prod_harga" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Harga Jual Satuan <span class="text-[#EB5757]">*</span></label>
                             <div class="relative flex rounded-lg shadow-2xs">
                                 <span class="inline-flex items-center px-3.5 rounded-l-lg border border-r-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#3E2B21] text-xs font-semibold">Rp</span>
-                                <input type="text" inputmode="numeric" id="prod_harga" name="harga" required placeholder="15.000" onkeyup="formatCurrency(this)" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" 
+                                <input type="text" inputmode="numeric" id="prod_harga" name="harga" required maxlength="10" placeholder="15.000" onkeyup="formatCurrency(this)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-r-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                             </div>
                         </div>
@@ -1353,7 +1431,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                 <span class="text-[10px] font-medium text-[#D46E15] bg-[#EFE8DE] px-1.5 py-0.5 rounded border border-[#DDD3C5]">[Khusus Mika/Kardus]</span>
                             </div>
                             <div class="relative flex rounded-lg shadow-2xs">
-                                <input type="number" id="prod_isi" name="isi" value="12" min="1" 
+                                <input type="number" id="prod_isi" name="isi" value="12" min="1" max="500" 
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-l-lg px-3.5 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                 <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#544337] text-xs">pcs</span>
                             </div>
@@ -1365,7 +1443,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         <div>
                             <label for="prod_moq" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Minimal Order (MOQ)</label>
                             <div class="relative flex rounded-lg shadow-2xs">
-                                <input type="number" id="prod_moq" name="moq" value="1" min="1" 
+                                <input type="number" id="prod_moq" name="moq" value="1" min="1" max="1000" 
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-l-lg px-3.5 py-2.5 text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                 <span id="moq_unit" class="inline-flex items-center px-3.5 rounded-r-lg border border-l-0 border-[#DDD3C5] bg-[#E5DDD0] text-[#3E2B21] text-xs font-medium">mika</span>
                             </div>
@@ -1392,7 +1470,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                     <!-- Deskripsi Produk -->
                     <div>
                         <label for="prod_deskripsi" class="block text-xs font-semibold text-[#3E2B21] mb-1.5">Deskripsi Produk (Opsional)</label>
-                        <textarea id="prod_deskripsi" name="deskripsi" rows="3" placeholder="Tuliskan keterangan rasa, komposisi utama, atau instruksi simpan..." 
+                        <textarea id="prod_deskripsi" name="deskripsi" rows="3" maxlength="300" placeholder="Tuliskan keterangan rasa, komposisi utama, atau instruksi simpan..." 
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-lg px-3.5 py-2.5 text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors"></textarea>
                     </div>
 
@@ -1560,9 +1638,9 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
     <!-- MODAL POPOUT: KATALOG FOTO 9 PILIHAN TOPPING ROTI HAJATAN      -->
     <!-- ============================================================== -->
     <div id="toppingCatalogModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity">
-        <div class="bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <!-- Header -->
-            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#E2D7C8] border-t-4 border-t-[#D46E15] flex items-center justify-between">
+        <div class="bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header (Stripe oranye dihilangkan, border cokelat gelap khas Berkat Dinasti) -->
+            <div class="px-5 py-4 bg-[#F3EDE2] border-b border-[#544337]/20 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center">
                         <i class="fas fa-cookie-bite text-sm"></i>

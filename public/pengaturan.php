@@ -751,15 +751,15 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label for="storePhoneInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">No. Telepon Toko</label>
-                                            <input type="tel" inputmode="numeric" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" 
-                                                oninput="this.value = this.value.replace(/[^0-9+]/g, ''); updateReceiptPreview()"
+                                            <input type="tel" inputmode="numeric" id="storePhoneInput" name="store_phone" value="<?= htmlspecialchars($store['phone']) ?>" maxlength="15" 
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateReceiptPreview()"
                                                 class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
 
                                         <div>
                                             <label for="storeWaInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">WhatsApp Bisnis</label>
-                                            <input type="tel" inputmode="numeric" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" 
-                                                oninput="this.value = this.value.replace(/[^0-9+]/g, ''); updateReceiptPreview()"
+                                            <input type="tel" inputmode="numeric" id="storeWaInput" name="store_wa" value="<?= htmlspecialchars($store['wa']) ?>" maxlength="15" 
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateReceiptPreview()"
                                                 class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none transition-colors">
                                         </div>
                                     </div>
@@ -797,7 +797,8 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label for="storePostalInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Kode Pos</label>
-                                            <input type="text" id="storePostalInput" name="store_postal" value="<?= htmlspecialchars($store['postal']) ?>" 
+                                            <input type="text" inputmode="numeric" id="storePostalInput" name="store_postal" value="<?= htmlspecialchars($store['postal']) ?>" maxlength="6" 
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                                                 class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none transition-colors">
                                         </div>
 
@@ -1181,20 +1182,21 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                 <div>
                     <label for="userNameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Nama Lengkap <span class="text-[#EB5757]">*</span></label>
-                    <input type="text" id="userNameInput" name="nama" required placeholder="Contoh: Budi Prasetyo" 
+                    <input type="text" id="userNameInput" name="nama" required maxlength="70" placeholder="Contoh: Budi Prasetyo" 
                         class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
                         <label for="userUsernameInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Username Login <span class="text-[#EB5757]">*</span></label>
-                        <input type="text" id="userUsernameInput" name="username" required placeholder="Contoh: budi.p" 
+                        <input type="text" id="userUsernameInput" name="username" required maxlength="30" placeholder="Contoh: budi.p" 
+                            oninput="this.value = this.value.replace(/[^a-zA-Z0-9._-]/g, '');"
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                     </div>
 
                     <div>
                         <label for="userSubtextInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Keterangan / Posisi</label>
-                        <input type="text" id="userSubtextInput" name="subtext" placeholder="Contoh: Kasir Shift Pagi" 
+                        <input type="text" id="userSubtextInput" name="subtext" maxlength="50" placeholder="Contoh: Kasir Shift Pagi" 
                             class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                     </div>
                 </div>
@@ -1219,7 +1221,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                 <div>
                     <label for="userPasswordInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Password Akun</label>
-                    <input type="password" id="userPasswordInput" name="password" placeholder="Kosongkan jika tidak diubah / Default: dinasti123" 
+                    <input type="password" id="userPasswordInput" name="password" maxlength="50" placeholder="Kosongkan jika tidak diubah / Default: dinasti123" 
                         class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] placeholder-[#8E7E73] focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] focus:outline-none">
                     <p class="text-[10px] text-[#8E7E73] mt-1">Default password staf baru: <span class="text-[#D46E15] font-semibold">dinasti123</span></p>
                 </div>

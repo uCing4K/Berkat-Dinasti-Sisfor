@@ -1868,80 +1868,146 @@ if ($db_connected && $pdo) {
                                 <div>Sab</div>
                             </div>
 
-                            <!-- Calendar Dates Grid -->
-                            <div id="miniCalGrid" class="grid grid-cols-7 gap-y-2 text-center text-xs">
+                            <!-- Calendar Dates Grid (Uniform Symmetric Cells, Every Date Clickable) -->
+                            <div id="miniCalGrid" class="grid grid-cols-7 gap-y-1 text-center text-xs">
                                 
                                 <!-- Week 1 -->
-                                <div class="text-[#B5A89E] py-1">31</div>
-                                <div class="text-[#251A14] font-medium py-1">1</div>
-                                <div class="text-[#251A14] font-medium py-1">2</div>
-                                <div class="text-[#251A14] font-medium py-1">3</div>
-                                <div class="text-[#251A14] font-medium py-1">4</div>
-                                <div class="text-[#251A14] font-medium py-1">5</div>
-                                <div class="text-[#251A14] font-medium py-1">6</div>
+                                <div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">31</div>
+                                <div onclick="openDeliveryScheduleModal(1)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 1">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">1</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(2)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 2">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">2</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(3)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 3">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">3</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(4)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 4">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">4</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(5)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 5">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">5</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(6)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 6">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">6</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
 
                                 <!-- Week 2 -->
-                                <div class="text-[#251A14] font-medium py-1">7</div>
-                                <div class="text-[#251A14] font-medium py-1">8</div>
-                                <div class="text-[#251A14] font-medium py-1">9</div>
-                                <div class="text-[#251A14] font-medium py-1">10</div>
-                                <div class="text-[#251A14] font-medium py-1">11</div>
-                                <div class="text-[#251A14] font-medium py-1">12</div>
-                                <div class="text-[#251A14] font-medium py-1">13</div>
+                                <div onclick="openDeliveryScheduleModal(7)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 7">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">7</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(8)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 8">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">8</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(9)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 9">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">9</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(10)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 10">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">10</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(11)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 11">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">11</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(12)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 12">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">12</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(13)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 13">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">13</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
 
                                 <!-- Week 3 -->
-                                <div class="text-[#251A14] font-medium py-1">14</div>
-                                <div class="text-[#251A14] font-medium py-1">15</div>
-                                <div class="text-[#251A14] font-medium py-1">16</div>
-                                <div class="text-[#251A14] font-medium py-1">17</div>
-                                <div class="text-[#251A14] font-medium py-1">18</div>
-                                <div class="text-[#251A14] font-medium py-1">19</div>
-                                <!-- 20 has delivery dot -->
-                                <div onclick="openDeliveryScheduleModal(20)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 20">
-                                    <span class="text-[#251A14] font-medium">20</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(14)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 14">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">14</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(15)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 15">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">15</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(16)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 16">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">16</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(17)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 17">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">17</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(18)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 18">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">18</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(19)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 19">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">19</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(20)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 20">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">20</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
                                 </div>
 
                                 <!-- Week 4 -->
-                                <div onclick="openDeliveryScheduleModal(21)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">21</div>
-                                <div onclick="openDeliveryScheduleModal(22)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">22</div>
-                                <div onclick="openDeliveryScheduleModal(23)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">23</div>
-                                <!-- 24 has delivery dot -->
-                                <div onclick="openDeliveryScheduleModal(24)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 24">
-                                    <span class="text-[#251A14] font-medium">24</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(21)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 21">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">21</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
                                 </div>
-                                <!-- 25 past highlight -->
-                                <div onclick="openDeliveryScheduleModal(25)" class="flex items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 25">
-                                    <span class="w-7 h-7 rounded-full bg-[#EFE8DE] text-[#5E4D42] font-medium flex items-center justify-center">25</span>
+                                <div onclick="openDeliveryScheduleModal(22)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 22">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">22</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
                                 </div>
-                                <!-- 26 TODAY ACTIVE HIGHLIGHT (Signature Espresso Circle) -->
-                                <div onclick="openDeliveryScheduleModal(26)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Jadwal Hari Ini (Tgl 26)">
-                                    <span class="w-7 h-7 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">26</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(23)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 23">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">23</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
                                 </div>
-                                <!-- 27 has delivery dot -->
-                                <div onclick="openDeliveryScheduleModal(27)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 27">
-                                    <span class="text-[#251A14] font-medium">27</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(24)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 24">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">24</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(25)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 25">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">25</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(26)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg bg-[#3E2B21] text-[#FAF8F5] font-bold shadow-xs hover:bg-[#4E372B] transition-colors relative" title="Jadwal Hari Ini: Tgl 26">
+                                    <span class="text-xs leading-none">26</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(27)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 27">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">27</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
                                 </div>
 
                                 <!-- Week 5 -->
-                                <!-- 28 has delivery dot -->
-                                <div onclick="openDeliveryScheduleModal(28)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 28">
-                                    <span class="text-[#251A14] font-medium">28</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(28)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 28">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">28</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
                                 </div>
-                                <div onclick="openDeliveryScheduleModal(29)" class="text-[#251A14] font-medium py-1 p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors">29</div>
-                                <!-- 30 has delivery dot -->
-                                <div onclick="openDeliveryScheduleModal(30)" class="flex flex-col items-center justify-center p-1 rounded-lg cursor-pointer hover:bg-[#EFE8DE] transition-colors" title="Lihat Jadwal Kirim Tgl 30">
-                                    <span class="text-[#251A14] font-medium">30</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                                <div onclick="openDeliveryScheduleModal(29)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 29">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">29</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
                                 </div>
-                                <div class="text-[#B5A89E] py-1">1</div>
-                                <div class="text-[#B5A89E] py-1">2</div>
-                                <div class="text-[#B5A89E] py-1">3</div>
-                                <div class="text-[#B5A89E] py-1">4</div>
+                                <div onclick="openDeliveryScheduleModal(30)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl 30">
+                                    <span class="text-xs font-semibold text-[#251A14] leading-none">30</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
+                                </div>
+                                <div onclick="openDeliveryScheduleModal(31)" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl 31">
+                                    <span class="text-xs font-medium text-[#251A14] leading-none">31</span>
+                                    <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                                </div>
+                                <div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">1</div>
+                                <div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">2</div>
+                                <div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">3</div>
                             </div>
                         </div>
 
@@ -3609,6 +3675,7 @@ if ($db_connected && $pdo) {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            renderMiniCalendar();
             if (localStorage.getItem('berkat_dinasti_notif_read') === 'true') {
                 const dot = document.getElementById('notifDot');
                 const badge = document.getElementById('notifBadge');
@@ -3670,30 +3737,33 @@ if ($db_connected && $pdo) {
 
             let html = '';
             for (let i = firstDay - 1; i >= 0; i--) {
-                html += `<div class="text-[#828282]/40 py-1">${prevMonthDays - i}</div>`;
+                html += `<div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">${prevMonthDays - i}</div>`;
             }
             for (let day = 1; day <= totalDays; day++) {
                 const isToday = isThisMonth && today.getDate() === day;
-                const hasDelivery = [2, 5, 9, 14, 18, 22, 26, 28, 30].includes(day) || Boolean(SCHEDULE_BY_DATE[day]);
+                const hasDelivery = Boolean(SCHEDULE_BY_DATE[day] && SCHEDULE_BY_DATE[day].length > 0) || [2, 5, 9, 14, 18, 22, 26, 28, 30].includes(day);
 
                 if (isToday) {
-                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform p-0.5" title="Klik untuk lihat jadwal pengiriman">
-                        <span class="w-6 h-6 rounded-full bg-[#3E2B21] text-[#FAF8F5] font-bold flex items-center justify-center shadow-xs">${day}</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg bg-[#3E2B21] text-[#FAF8F5] font-bold shadow-xs hover:bg-[#4E372B] transition-colors relative" title="Jadwal Hari Ini: Tgl ${day}">
+                        <span class="text-xs leading-none">${day}</span>
+                        ${hasDelivery ? '<span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>' : '<span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>'}
                     </div>`;
                 } else if (hasDelivery) {
-                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform p-0.5" title="Klik untuk lihat jadwal pengiriman">
-                        <span class="text-[#251A14] font-medium">${day}</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-0.5"></span>
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Kirim Tgl ${day}">
+                        <span class="text-xs font-semibold text-[#251A14] leading-none">${day}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#D46E15] mt-1 shrink-0"></span>
                     </div>`;
                 } else {
-                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="text-[#1B1C1B] font-medium py-1 cursor-pointer hover:text-[#D46E15] transition-colors">${day}</div>`;
+                    html += `<div onclick="openDeliveryScheduleModal(${day})" class="h-9 w-full flex flex-col items-center justify-center cursor-pointer rounded-lg hover:bg-[#EFE8DE] transition-colors relative" title="Lihat Jadwal Tgl ${day}">
+                        <span class="text-xs font-medium text-[#251A14] leading-none">${day}</span>
+                        <span class="w-1.5 h-1.5 mt-1 opacity-0 shrink-0"></span>
+                    </div>`;
                 }
             }
             const currentCells = firstDay + totalDays;
             const remainingCells = (currentCells <= 35 ? 35 : 42) - currentCells;
             for (let nextDay = 1; nextDay <= remainingCells; nextDay++) {
-                html += `<div class="text-[#828282]/40 py-1">${nextDay}</div>`;
+                html += `<div class="h-9 w-full flex items-center justify-center text-[#B5A89E]/60 text-xs pointer-events-none">${nextDay}</div>`;
             }
 
             grid.innerHTML = html;

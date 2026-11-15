@@ -95,11 +95,11 @@ $items = [];
 $isTest = empty($orderParam) || strtolower($orderParam) === 'test' || strtolower($orderParam) === 'uji_coba';
 
 if ($isTest) {
-    // Dataset Uji Coba (Test Print)
+    // Dataset Uji Coba (Test Print - Rekomendasi Compact)
     $minH4 = date('d M Y', strtotime('+4 days'));
     $order = [
         'id' => 999,
-        'no_invoice' => 'INV-TEST-' . date('md') . '-0001',
+        'no_invoice' => 'INV-' . date('md') . '-0001',
         'tgl_pesan' => date('Y-m-d H:i:s'),
         'tgl_kirim' => date('Y-m-d', strtotime('+4 days')),
         'waktu_kirim' => '09:00:00',
@@ -109,12 +109,12 @@ if ($isTest) {
         'status_bayar' => 'lunas',
         'metode_bayar' => 'cash',
         'grand_total' => 144000,
-        'catatan' => 'Uji coba cetak thermal printer Bluetooth & tuning teks jernih.'
+        'catatan' => 'Acara jam 10 pagi'
     ];
 
     $items = [
         [
-            'product_name' => 'Roti Hajatan (9 Topping)',
+            'product_name' => 'Roti Hajatan',
             'packaging' => 'Kardus Putih',
             'topping' => 'Meses + Keju',
             'qty' => 10,
@@ -447,82 +447,71 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
     // 2. Set Print Density (GS ( K - Level 5: Pekat & Tajam)
     $c[] = 0x1D; $c[] = 0x28; $c[] = 0x4B; $c[] = 0x02; $c[] = 0x00; $c[] = 0x31; $c[] = 0x05;
 
-    // 3. Header Toko (Center)
+    // 3. Header Toko (Compact 3 Baris)
     appendAlign($c, 1); // Center
     appendBold($c, true);
 
-    $storeName = strtoupper(trim($store['name'] ?? 'BERKAT DINASTI'));
-    // Penanganan font header agar tidak terpotong acak di kertas 58mm (32 col)
-    if ($colWidth <= 32) {
-        if (strlen($storeName) <= 16) {
-            appendDoubleSize($c, true);
-            appendText($c, $storeName . "\n");
-            appendDoubleSize($c, false);
-        } else {
-            // Jika nama panjang seperti 'BERKAT DINASTI BAKERY', split per kata dengan batas 16 char
-            $words = explode(' ', $storeName);
-            $l1 = [];
-            $l2 = [];
-            $curLen = 0;
-            foreach ($words as $w) {
-                if ($curLen + strlen($w) <= 16) {
-                    $l1[] = $w;
-                    $curLen += strlen($w) + 1;
-                } else {
-                    $l2[] = $w;
-                }
-            }
-            appendDoubleSize($c, true);
-            appendText($c, implode(' ', $l1) . "\n");
-            if (!empty($l2)) {
-                appendText($c, implode(' ', $l2) . "\n");
-            }
-            appendDoubleSize($c, false);
-        }
+    $rawStoreName = trim($store['name'] ?? 'BERKAT DINASTI BAKERY');
+    if (stripos($rawStoreName, 'BAKERY') === false) {
+        $rawStoreName .= ' BAKERY';
+    }
+    $storeName = strtoupper($rawStoreName);
+
+    // Gunakan Double Height (Tinggi tebal, 1 baris di 58mm / 32 kolom)
+    if (strlen($storeName) <= $colWidth) {
+        appendDoubleHeight($c, true);
+        appendText($c, $storeName . "\n");
+        appendDoubleHeight($c, false);
     } else {
-        appendDoubleSize($c, true);
-        appendWrappedLine($c, $storeName, 24);
-        appendDoubleSize($c, false);
+        appendWrappedLine($c, $storeName, $colWidth);
     }
     appendBold($c, false);
 
-    // Alamat Toko (Wrapped per kata agar tidak terpotong di tengah kata seperti 'Ng' & 'aglik')
-    if (!empty($store['address'])) {
-        appendWrappedLine($c, $store['address'], $colWidth);
+    // Alamat Toko Ringkas (misal: Jl. Panglima Sudirman 42, Batu)
+    $addrClean = $store['address'] ?? 'Jl. Panglima Sudirman 42, Batu';
+    $addrClean = str_ireplace(['No. ', ', Ngaglik', 'Ngaglik, '], ['', '', ''], $addrClean);
+    if (!str_contains($addrClean, 'Batu') && !str_contains($addrClean, 'Kota Batu')) {
+        $addrClean .= ', Batu';
     }
-    $waVal = !empty($store['wa']) ? $store['wa'] : '0812-3456-7890';
-    appendWrappedLine($c, "Kota Batu - WA: " . $waVal, $colWidth);
+    appendWrappedLine($c, $addrClean, $colWidth);
 
-    // Garis Separator Tepat 32 Karakter (atau 48 untuk 80mm)
+    // No WA Toko
+    $waVal = !empty($store['wa']) ? $store['wa'] : '0812-3456-7890';
+    appendText($c, "WA: " . $waVal . "\n");
+
+    // Separator 1: Tepat 32 Karakter
     appendSeparator($c, '-', $colWidth);
 
-    // 4. Meta Order (Struktur Bersih, Anti-Wrap Angka & Tanggal)
+    // 4. Meta Order (Compact: No Nota & Waktu Cetak 1 Baris)
     appendAlign($c, 0); // Left
     $invVal = $order['no_invoice'] ?? ('INV-' . ($order['id'] ?? '0001'));
+    // Ringkas format invoice untuk struk thermal jika panjang
+    $invDisplay = str_replace('INV-TEST-', 'INV-', $invVal);
     $tglVal = !empty($order['tgl_pesan']) ? date('d/m/y H:i', strtotime($order['tgl_pesan'])) : date('d/m/y H:i');
 
-    // Baris 1: Nomor Nota
-    appendWrappedLine($c, "Nota: " . $invVal, $colWidth);
+    // Baris 1: No. Nota (kiri) & Tanggal Jam (kanan)
+    if (strlen($invDisplay) + strlen($tglVal) + 1 <= $colWidth) {
+        appendRow2Col($c, $invDisplay, $tglVal, $colWidth);
+    } else {
+        appendWrappedLine($c, $invDisplay, $colWidth);
+        appendRow2Col($c, "Tgl: " . date('d/m/y', strtotime($tglVal)), date('H:i', strtotime($tglVal)), $colWidth);
+    }
 
-    // Baris 2: Kasir di kiri, Tanggal Transaksi di kanan (Dynamic Spacing)
-    appendRow2Col($c, "Kasir: Admin", $tglVal, $colWidth);
-
-    // Baris 3: Pelanggan
+    // Baris 2: Pelanggan
     $custVal = !empty($order['customer_name']) ? $order['customer_name'] : ($order['customer'] ?? 'Ibu Sari Dewi');
     appendWrappedLine($c, "Plg  : " . $custVal, $colWidth);
 
-    // Baris 4: Jadwal Pengiriman (Jika Pesanan Khusus / PO)
+    // Baris 3: Jadwal Pengiriman (Jika Ada)
     if (!empty($order['tgl_kirim'])) {
         $tglKirimStr = date('d/m/y', strtotime($order['tgl_kirim']));
         $wktKirimStr = !empty($order['waktu_kirim']) ? substr($order['waktu_kirim'], 0, 5) : '09:00';
         appendRow2Col($c, "Kirim: " . $tglKirimStr, "Jam: " . $wktKirimStr, $colWidth);
     }
 
+    // Separator 2: Tepat 32 Karakter
     appendSeparator($c, '-', $colWidth);
 
-    // 5. Items Ordered (Pola 2 Baris Standar Thermal POS)
-    // Baris 1 = Nama Item & Varian Kemasan
-    // Baris 2 = Qty x Harga di kiri & Subtotal di kanan (Dynamic Spacing)
+    // 5. Items Ordered (Pola 2 Baris Bersih, Tanpa Pengulangan Qty di Nama Item)
     $totalCalculated = 0;
     foreach ($items as $it) {
         $pName = $it['product_name'] ?? 'Roti Pesanan';
@@ -533,9 +522,9 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
         $pSub = floatval($it['subtotal'] ?? ($pQty * $pHrg));
         $totalCalculated += $pSub;
 
-        // Baris 1: Nama Produk & Kemasan (Full width wrapped)
-        $fullName = $pQty . "x " . $pName . $pPkg;
-        appendWrappedLine($c, $fullName, $colWidth);
+        // Baris 1: Nama Produk & Kemasan (tanpa "10x" di depan agar bersih & hemat ruang)
+        $titleLine = $pName . $pPkg;
+        appendWrappedLine($c, $titleLine, $colWidth);
 
         // Baris 1b (Opsional): Topping
         if (!empty($pTop)) {
@@ -548,14 +537,19 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
         appendRow2Col($c, $leftQtyHrg, $rightSub, $colWidth);
     }
 
+    // Separator 3: Tepat 32 Karakter
     appendSeparator($c, '-', $colWidth);
 
-    // 6. Totals Calculation
+    // 6. Totals & Catatan (Hilangkan Subtotal jika nilainya sama dengan Total Akhir)
     $grandTotal = $order['grand_total'] ?? $totalCalculated;
-    appendRow2Col($c, "Subtotal:", "Rp " . number_format($totalCalculated, 0, ',', '.'), $colWidth);
+    $hasOngkir = !empty($order['ongkir']) && floatval($order['ongkir']) > 0;
+    $hasDiscount = ($grandTotal < $totalCalculated);
 
-    if (!empty($order['ongkir']) && floatval($order['ongkir']) > 0) {
-        appendRow2Col($c, "Ongkir:", "Rp " . number_format(floatval($order['ongkir']), 0, ',', '.'), $colWidth);
+    if ($hasOngkir || $hasDiscount) {
+        appendRow2Col($c, "Subtotal:", "Rp " . number_format($totalCalculated, 0, ',', '.'), $colWidth);
+        if ($hasOngkir) {
+            appendRow2Col($c, "Ongkir:", "Rp " . number_format(floatval($order['ongkir']), 0, ',', '.'), $colWidth);
+        }
     }
 
     // TOTAL AKHIR (Bold + Double Height)
@@ -574,23 +568,21 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
 
     // Catatan Pesanan (Jika Ada)
     if (!empty($order['catatan'])) {
-        appendSeparator($c, '-', $colWidth);
-        appendBold($c, true);
-        appendText($c, "Catatan:\n");
-        appendBold($c, false);
-        appendWrappedLine($c, $order['catatan'], $colWidth);
+        appendWrappedLine($c, "Catatan: " . $order['catatan'], $colWidth);
     }
 
+    // Separator 4: Tepat 32 Karakter
     appendSeparator($c, '-', $colWidth);
 
-    // 7. Footer Message (Center)
+    // 7. Footer Message (Singkat & Manis)
     appendAlign($c, 1); // Center
-    $footerText = !empty($store['footer']) ? $store['footer'] : 'Terima kasih telah berbelanja di Berkat Dinasti! Simpan struk ini sebagai bukti pembayaran yang sah.';
-    appendWrappedLine($c, '"' . $footerText . '"', $colWidth);
-    appendText($c, "Berkat Dinasti - Kota Batu\n");
+    $footerText = !empty($store['footer']) ? $store['footer'] : 'Terima kasih atas pesanan Anda';
+    if (str_contains($footerText, 'Simpan struk ini')) {
+        $footerText = 'Terima kasih atas pesanan Anda';
+    }
+    appendWrappedLine($c, '"' . trim($footerText, '" ') . '"', $colWidth);
 
-    // 8. Feed Kertas (3 baris) & Auto-Cut
-    $c[] = 0x0A;
+    // 8. Feed Kertas (2 baris) & Auto-Cut
     $c[] = 0x0A;
     $c[] = 0x0A;
     $c[] = 0x1D; $c[] = 0x56; $c[] = 0x42; $c[] = 0x00; // GS V 66 0 (Cut with feed)

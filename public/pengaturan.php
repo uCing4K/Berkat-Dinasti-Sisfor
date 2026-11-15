@@ -895,24 +895,24 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     </span>
                                 </div>
 
-                                <!-- Receipt Paper Preview (1:1 Sama Persis Kertas Cetak Fisik 58mm / 80mm) -->
+                                <!-- Receipt Paper Preview (1:1 Rekomendasi Compact 58mm / 80mm) -->
                                 <?php
                                     $isPaper58 = ($store['paper_size'] === '58');
                                     $paperClass = $isPaper58 ? 'thermal-paper-58' : 'thermal-paper-80';
                                     $cutWidth = $isPaper58 ? 'calc(32ch + 28px)' : 'calc(48ch + 28px)';
                                     $dashSep = $isPaper58 ? '--------------------------------' : '------------------------------------------------';
                                     
-                                    // Format nama toko agar 2 baris jika ada Bakery
+                                    // Format nama toko 1 baris (21 karakter)
                                     $dispStoreName = htmlspecialchars($store['name']);
-                                    if (stripos($dispStoreName, 'BAKERY') !== false && !str_contains($dispStoreName, '<br>')) {
-                                        $dispStoreName = preg_replace('/BAKERY/i', '<br>BAKERY', $dispStoreName);
+                                    if (stripos($dispStoreName, 'BAKERY') === false) {
+                                        $dispStoreName .= ' BAKERY';
                                     }
 
-                                    // Format alamat agar membungkus kata dengan rapi
+                                    // Format alamat toko ringkas (Jl. Panglima Sudirman 42, Batu)
                                     $dispStoreAddress = htmlspecialchars($store['address']);
-                                    if (strlen($dispStoreAddress) > 28 && str_contains($dispStoreAddress, ',')) {
-                                        $addrParts = explode(',', $dispStoreAddress);
-                                        $dispStoreAddress = $addrParts[0] . ',<br>' . trim(implode(',', array_slice($addrParts, 1)));
+                                    $dispStoreAddress = str_ireplace(['No. ', ', Ngaglik', 'Ngaglik, '], ['', '', ''], $dispStoreAddress);
+                                    if (!str_contains($dispStoreAddress, 'Batu') && !str_contains($dispStoreAddress, 'Kota Batu')) {
+                                        $dispStoreAddress .= ', Batu';
                                     }
                                 ?>
                                 <div class="thermal-paper-wrapper mx-auto flex flex-col items-center">
@@ -921,7 +921,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
 
                                     <div id="actualReceiptSlip" class="thermal-paper <?= $paperClass ?> text-[#111111] bg-white border-x border-[#E5E0D8]">
                                         
-                                        <!-- Store Header (Center) -->
+                                        <!-- Store Header (Center, 1 Baris Double Height) -->
                                         <div class="text-center font-bold text-xs uppercase tracking-tight" id="previewReceiptName">
                                             <?= $dispStoreName ?>
                                         </div>
@@ -929,17 +929,16 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                             <?= $dispStoreAddress ?>
                                         </div>
                                         <div class="text-center text-[10px] text-neutral-800 leading-tight">
-                                            Kota Batu - WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span>
+                                            WA: <span id="previewReceiptWa"><?= htmlspecialchars($store['wa']) ?></span>
                                         </div>
 
                                         <!-- Separator 1 (Tepat 32 Karakter) -->
                                         <div class="thermal-sep text-center" id="previewSep1"><?= $dashSep ?></div>
 
-                                        <!-- Meta Order (Clean 2-Kolom, Anti-Wrap) -->
+                                        <!-- Meta Order (Compact 3 Baris) -->
                                         <div class="text-[11px] leading-tight space-y-0.5">
-                                            <div class="font-bold" id="previewReceiptInv">Nota: INV-TEST-<?= date('md') ?>-0001</div>
-                                            <div class="flex justify-between">
-                                                <span>Kasir: Admin</span>
+                                            <div class="flex justify-between font-bold" id="previewReceiptInvRow">
+                                                <span id="previewReceiptInv">INV-<?= date('md') ?>-0001</span>
                                                 <span id="previewReceiptDate"><?= date('d/m/y H:i') ?></span>
                                             </div>
                                             <div class="truncate" id="previewReceiptCust">Plg  : Ibu Sari Dewi</div>
@@ -952,13 +951,12 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <!-- Separator 2 (Tepat 32 Karakter) -->
                                         <div class="thermal-sep text-center" id="previewSep2"><?= $dashSep ?></div>
 
-                                        <!-- Items Ordered (Strict Pola 2 Baris Sesuai Standar Thermal POS) -->
+                                        <!-- Items Ordered (Pola 2 Baris Bersih) -->
                                         <div class="text-[11px] leading-tight space-y-1.5" id="previewReceiptItems">
                                             <!-- Item 1 -->
                                             <div>
-                                                <div class="font-bold">10x Roti Hajatan (9 Topping)</div>
-                                                <div class="text-neutral-700 pl-1.5">(Kardus Putih)</div>
-                                                <div class="text-neutral-600 pl-1.5 text-[10px]">* Top: Meses + Keju</div>
+                                                <div class="font-bold">Roti Hajatan (Kardus Putih)</div>
+                                                <div class="text-neutral-600 pl-2 text-[10px]">* Top: Meses + Keju</div>
                                                 <div class="flex justify-between font-semibold mt-0.5">
                                                     <span>  10x @10.000</span>
                                                     <span>Rp 100.000</span>
@@ -966,10 +964,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                             </div>
                                             <!-- Item 2 -->
                                             <div>
-                                                <div class="font-bold">2x Bolu Pisang Premium</div>
-                                                <div class="text-neutral-700 pl-1.5">(Mika)</div>
+                                                <div class="font-bold">Bolu Pisang Premium (Mika)</div>
                                                 <div class="flex justify-between font-semibold mt-0.5">
-                                                    <span>  2x @22.000</span>
+                                                    <span>   2x @22.000</span>
                                                     <span>Rp 44.000</span>
                                                 </div>
                                             </div>
@@ -978,13 +975,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                         <!-- Separator 3 (Tepat 32 Karakter) -->
                                         <div class="thermal-sep text-center" id="previewSep3"><?= $dashSep ?></div>
 
-                                        <!-- Totals Calculation -->
+                                        <!-- Totals & Status (Compact Tanpa Duplikasi Subtotal) -->
                                         <div class="text-[11px] leading-tight space-y-0.5">
-                                            <div class="flex justify-between text-neutral-800">
-                                                <span>Subtotal:</span>
-                                                <span>Rp 144.000</span>
-                                            </div>
-                                            <div class="flex justify-between font-bold text-xs pt-0.5">
+                                            <div class="flex justify-between font-bold text-xs">
                                                 <span>TOTAL AKHIR:</span>
                                                 <span class="text-[#000000]">Rp 144.000</span>
                                             </div>
@@ -992,30 +985,17 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                                 <span>Status:</span>
                                                 <span>LUNAS (CASH)</span>
                                             </div>
-                                        </div>
-
-                                        <!-- Catatan Section (Persis Hasil Cetak Fisik) -->
-                                        <div id="previewReceiptNotesSection">
-                                            <div class="thermal-sep text-center" id="previewSepNotes"><?= $dashSep ?></div>
-                                            <div class="text-[11px] leading-tight">
-                                                <div class="font-bold">Catatan:</div>
-                                                <div class="text-neutral-800 break-words" id="previewReceiptCatatan">
-                                                    Uji coba cetak thermal printer Bluetooth & tuning teks jernih.
-                                                </div>
+                                            <div class="text-neutral-800 break-words pt-0.5" id="previewReceiptCatatan">
+                                                Catatan: Acara jam 10 pagi
                                             </div>
                                         </div>
 
                                         <!-- Separator 4 (Tepat 32 Karakter) -->
                                         <div class="thermal-sep text-center" id="previewSep4"><?= $dashSep ?></div>
 
-                                        <!-- Footer Message (Center) -->
-                                        <div class="text-center text-[10px] leading-tight space-y-1">
-                                            <div class="italic text-neutral-800 leading-tight" id="previewReceiptFooter">
-                                                "<?= htmlspecialchars($store['footer']) ?>"
-                                            </div>
-                                            <div class="text-neutral-700 text-[9px] font-semibold tracking-wide">
-                                                Berkat Dinasti - Kota Batu
-                                            </div>
+                                        <!-- Footer Message (1 Baris Ringkas & Manis) -->
+                                        <div class="text-center text-[10px] leading-tight" id="previewReceiptFooter">
+                                            "Terima kasih atas pesanan Anda"
                                         </div>
 
                                     </div>
@@ -1302,17 +1282,16 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                 <?= $dispStoreAddress ?>
                             </div>
                             <div class="text-center text-[10px] text-neutral-800 leading-tight">
-                                Kota Batu - WA: <span id="mPreWa"><?= htmlspecialchars($store['wa']) ?></span>
+                                WA: <span id="mPreWa"><?= htmlspecialchars($store['wa']) ?></span>
                             </div>
 
                             <!-- Separator 1 -->
                             <div class="thermal-sep text-center" id="mSep1"><?= $dashSep ?></div>
 
-                            <!-- Meta Order -->
+                            <!-- Meta Order (Compact 3 Baris) -->
                             <div class="text-[11px] leading-tight space-y-0.5">
-                                <div class="font-bold">Nota: INV-TEST-<?= date('md') ?>-0001</div>
-                                <div class="flex justify-between">
-                                    <span>Kasir: Admin</span>
+                                <div class="flex justify-between font-bold">
+                                    <span>INV-<?= date('md') ?>-0001</span>
                                     <span><?= date('d/m/y H:i') ?></span>
                                 </div>
                                 <div>Plg  : Ibu Sari Dewi</div>
@@ -1325,22 +1304,20 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <!-- Separator 2 -->
                             <div class="thermal-sep text-center" id="mSep2"><?= $dashSep ?></div>
 
-                            <!-- Items -->
+                            <!-- Items (Pola 2 Baris Bersih) -->
                             <div class="text-[11px] leading-tight space-y-1.5">
                                 <div>
-                                    <div class="font-bold">10x Roti Hajatan (9 Topping)</div>
-                                    <div class="text-neutral-700 pl-1.5">(Kardus Putih)</div>
-                                    <div class="text-neutral-600 pl-1.5 text-[10px]">* Top: Meses + Keju</div>
+                                    <div class="font-bold">Roti Hajatan (Kardus Putih)</div>
+                                    <div class="text-neutral-600 pl-2 text-[10px]">* Top: Meses + Keju</div>
                                     <div class="flex justify-between font-semibold mt-0.5">
                                         <span>  10x @10.000</span>
                                         <span>Rp 100.000</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold">2x Bolu Pisang Premium</div>
-                                    <div class="text-neutral-700 pl-1.5">(Mika)</div>
+                                    <div class="font-bold">Bolu Pisang Premium (Mika)</div>
                                     <div class="flex justify-between font-semibold mt-0.5">
-                                        <span>  2x @22.000</span>
+                                        <span>   2x @22.000</span>
                                         <span>Rp 44.000</span>
                                     </div>
                                 </div>
@@ -1349,13 +1326,9 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                             <!-- Separator 3 -->
                             <div class="thermal-sep text-center" id="mSep3"><?= $dashSep ?></div>
 
-                            <!-- Totals -->
+                            <!-- Totals & Status (Compact Tanpa Duplikasi Subtotal) -->
                             <div class="text-[11px] leading-tight space-y-0.5">
-                                <div class="flex justify-between text-neutral-800">
-                                    <span>Subtotal:</span>
-                                    <span>Rp 144.000</span>
-                                </div>
-                                <div class="flex justify-between font-bold text-xs pt-0.5">
+                                <div class="flex justify-between font-bold text-xs">
                                     <span>TOTAL AKHIR:</span>
                                     <span class="text-[#000000]">Rp 144.000</span>
                                 </div>
@@ -1363,28 +1336,17 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <span>Status:</span>
                                     <span>LUNAS (CASH)</span>
                                 </div>
-                            </div>
-
-                            <!-- Catatan Section -->
-                            <div class="thermal-sep text-center" id="mSepNotes"><?= $dashSep ?></div>
-                            <div class="text-[11px] leading-tight">
-                                <div class="font-bold">Catatan:</div>
-                                <div class="text-neutral-800 break-words">
-                                    Uji coba cetak thermal printer Bluetooth & tuning teks jernih.
+                                <div class="text-neutral-800 break-words pt-0.5">
+                                    Catatan: Acara jam 10 pagi
                                 </div>
                             </div>
 
                             <!-- Separator 4 -->
                             <div class="thermal-sep text-center" id="mSep4"><?= $dashSep ?></div>
 
-                            <!-- Footer -->
-                            <div class="text-center text-[10px] leading-tight space-y-1">
-                                <div class="italic text-neutral-800 leading-tight" id="mPreFooter">
-                                    "<?= htmlspecialchars($store['footer']) ?>"
-                                </div>
-                                <div class="text-neutral-700 text-[9px] font-semibold tracking-wide">
-                                    Berkat Dinasti - Kota Batu
-                                </div>
+                            <!-- Footer (1 Baris Ringkas & Manis) -->
+                            <div class="text-center text-[10px] leading-tight" id="mPreFooter">
+                                "Terima kasih atas pesanan Anda"
                             </div>
                         </div>
                         <div class="thermal-paper-cut-bottom" id="modalBottomCut" style="width: <?= $cutWidth ?>;"></div>
@@ -1679,7 +1641,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             }
         }
 
-        // Live Receipt Preview (1:1 Thermal Grid)
+        // Live Receipt Preview (1:1 Rekomendasi Compact)
         function updateReceiptPreview() {
             const nameInput = document.getElementById('storeNameInput');
             const addressInput = document.getElementById('storeAddressInput');
@@ -1691,26 +1653,25 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             const wa = waInput ? waInput.value.trim() : '';
             const footer = footerInput ? footerInput.value.trim() : '';
 
-            // Format Nama Toko: jika ada kata BAKERY atau panjang > 16 karakter, pisahkan dengan baris baru agar estetik
-            let formattedName = name;
-            if (formattedName.toUpperCase().includes('BAKERY') && !formattedName.includes('<br>')) {
-                formattedName = formattedName.replace(/BAKERY/i, '<br>BAKERY');
+            // Format Nama Toko: 1 baris double height (misal: BERKAT DINASTI BAKERY)
+            let formattedName = name.toUpperCase();
+            if (!formattedName.includes('BAKERY')) {
+                formattedName += ' BAKERY';
             }
             const nameEl = document.getElementById('previewReceiptName');
             const mPreName = document.getElementById('mPreName');
-            if (nameEl) nameEl.innerHTML = formattedName;
-            if (mPreName) mPreName.innerHTML = formattedName;
+            if (nameEl) nameEl.textContent = formattedName;
+            if (mPreName) mPreName.textContent = formattedName;
 
-            // Format Alamat: potong per koma jika panjang > 28 karakter agar membungkus dengan rapi
-            let formattedAddr = address;
-            if (formattedAddr.length > 28 && formattedAddr.includes(',')) {
-                const parts = formattedAddr.split(',');
-                formattedAddr = parts[0] + ',<br>' + parts.slice(1).join(',').trim();
+            // Format Alamat: ringkas (Jl. Panglima Sudirman 42, Batu)
+            let formattedAddr = address.replace(/No\.\s*/i, '').replace(/,\s*Ngaglik/i, '').replace(/Ngaglik,\s*/i, '');
+            if (!formattedAddr.toLowerCase().includes('batu')) {
+                formattedAddr += ', Batu';
             }
             const addrEl = document.getElementById('previewReceiptAddress');
             const mPreAddr = document.getElementById('mPreAddr');
-            if (addrEl) addrEl.innerHTML = formattedAddr;
-            if (mPreAddr) mPreAddr.innerHTML = formattedAddr;
+            if (addrEl) addrEl.textContent = formattedAddr;
+            if (mPreAddr) mPreAddr.textContent = formattedAddr;
 
             // Nomor WhatsApp
             const waEl = document.getElementById('previewReceiptWa');
@@ -1718,11 +1679,15 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
             if (waEl) waEl.textContent = wa;
             if (mPreWa) mPreWa.textContent = wa;
 
-            // Footer Pesan
+            // Footer Pesan (Compact)
+            let cleanFooter = footer;
+            if (cleanFooter.includes('Simpan struk ini')) {
+                cleanFooter = 'Terima kasih atas pesanan Anda';
+            }
             const footEl = document.getElementById('previewReceiptFooter');
             const mPreFooter = document.getElementById('mPreFooter');
-            if (footEl) footEl.textContent = `"${footer}"`;
-            if (mPreFooter) mPreFooter.textContent = `"${footer}"`;
+            if (footEl) footEl.textContent = `"${cleanFooter.replace(/^"|"$/g, '')}"`;
+            if (mPreFooter) mPreFooter.textContent = `"${cleanFooter.replace(/^"|"$/g, '')}"`;
         }
 
         // Logo Upload Preview

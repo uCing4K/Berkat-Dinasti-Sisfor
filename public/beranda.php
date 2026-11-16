@@ -7,6 +7,16 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Sinkronisasi: Alihkan akses tambah_pesanan langsung ke halaman POS resmi di pesanan.php
+if ((isset($_GET['view']) && $_GET['view'] === 'tambah_pesanan') || (isset($_GET['action']) && $_GET['action'] === 'tambah_pesanan')) {
+    $targetUrl = 'pesanan.php?view=tambah_pesanan';
+    if (!empty($_GET['date'])) {
+        $targetUrl .= '&date=' . urlencode($_GET['date']);
+    }
+    header("Location: " . $targetUrl);
+    exit();
+}
+
 // Waktu & Tanggal Dinamis (Bahasa Indonesia)
 $hariIndonesia = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
 $bulanIndonesia = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'];
@@ -112,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $minDeliveryDate = date('Y-m-d', strtotime('+4 days'));
     if (strtotime($tgl_kirim) < strtotime($minDeliveryDate)) {
         $_SESSION['flash_error'] = "Tanggal pengiriman (" . date('d M Y', strtotime($tgl_kirim)) . ") tidak valid! Sistem bakery Berkat Dinasti berbasis Pre-Order (PO) paling cepat 4 hari sebelum pengiriman (minimal tanggal " . date('d M Y', strtotime($minDeliveryDate)) . ").";
-        header("Location: beranda.php?view=tambah_pesanan");
+        header("Location: pesanan.php?view=tambah_pesanan");
         exit();
     }
     
@@ -153,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     if (empty($processed_items)) {
         $_SESSION['flash_error'] = "Gagal menyimpan pesanan: Belum ada produk yang dipilih! Silakan pilih minimal 1 produk dari katalog.";
-        header("Location: beranda.php?view=tambah_pesanan");
+        header("Location: pesanan.php?view=tambah_pesanan");
         exit();
     }
     
@@ -1425,8 +1435,8 @@ if ($db_connected && $pdo) {
                             <span>Lihat Pesanan</span>
                         </a>
 
-                        <!-- Tambah Pesanan Baru Button -->
-                        <a href="beranda.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
+                        <!-- Tambah Pesanan Baru Button (Tersinkronisasi ke POS Pesanan) -->
+                        <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan Baru</span>
                         </a>
@@ -3346,6 +3356,11 @@ if ($db_connected && $pdo) {
                 </div>
             ` : '';
 
+            const curY = new Date().getFullYear();
+            const curM = String(new Date().getMonth() + 1).padStart(2, '0');
+            const dayFormatted = String(dayNum).padStart(2, '0');
+            const dateStr = `${curY}-${curM}-${dayFormatted}`;
+
             if (items.length === 0) {
                 body.innerHTML = `
                     <div class="p-6 text-center text-xs text-[#8E7E73]">
@@ -3354,9 +3369,10 @@ if ($db_connected && $pdo) {
                         </div>
                         <p class="font-bold text-[#251A14]">Belum Ada Pengiriman Terjadwal</p>
                         <p class="mt-1 max-w-xs mx-auto">Tidak ada jadwal pengiriman roti untuk tanggal ${dayNum}. Semua armada kurir stand-by.</p>
-                        <button type="button" onclick="closeDeliveryScheduleModal(); openAddOrderForDate(${dayNum});" class="mt-4 craft-btn-primary px-4 py-2 text-xs">
-                            Tambah Pesanan untuk Tanggal Ini
-                        </button>
+                        <a href="pesanan.php?view=tambah_pesanan&date=${dateStr}" class="mt-4 bg-[#D46E15] hover:bg-[#B85207] text-white text-xs font-semibold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 shadow-button-orange transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Tambah Pesanan Tanggal ${dayNum}</span>
+                        </a>
                     </div>
                 `;
             } else {

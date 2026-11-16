@@ -2177,15 +2177,6 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                             </div>
                         </div>
-                                    <span class="w-3 h-3 rounded-md bg-[#27AE60] border border-[#1E8449]"></span>
-                                    <span class="text-[#544337] font-medium">Semua Selesai</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-md border-2 border-[#D46E15] bg-[#FFF8F0]"></span>
-                                    <span class="text-[#544337] font-medium">Hari Ini</span>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Day Names Header (SEN - MIN) -->
                         <div class="grid grid-cols-7 text-center text-xs font-bold text-[#8E7E73] uppercase tracking-wider py-2 border-b border-[#E2D7C8]">

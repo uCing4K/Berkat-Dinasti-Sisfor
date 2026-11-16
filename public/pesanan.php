@@ -832,6 +832,19 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 overflow: hidden !important;
             }
         }
+        @media (max-width: 1023px) {
+            html, body {
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                height: auto !important;
+                min-height: 100% !important;
+            }
+            .pos-main-container {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+        }
         <?php endif; ?>
     </style>
 </head>
@@ -1146,7 +1159,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                     <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
                     <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
-                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden">
+                        <form id="posOrderForm" method="POST" action="pesanan.php" class="flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden lg:h-full">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
                             <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream with Smooth Rounded Top (Item 32) -->
@@ -1167,7 +1180,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </div>
 
                             <!-- 2. SCROLLABLE MIDDLE BODY (Form Pelanggan First, then Cart Items) -->
-                            <div class="flex-1 lg:overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar overscroll-contain bg-[#FAF6F0]">
+                            <div class="flex-1 overflow-visible lg:overflow-y-auto divide-y divide-[#E2D7C8] craft-scrollbar bg-[#FAF6F0]">
                                 
                                 <!-- FORM DATA PELANGGAN (PROMINENT AT TOP, ALWAYS VISIBLE FIRST) -->
                                 <div class="p-3 sm:p-3.5 space-y-3 bg-[#F5F0E6] text-xs" id="posCustomerSection">
@@ -1724,7 +1737,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E7E73] text-xs"></i>
-                                <input type="text" id="tableSearchInput" oninput="filterTableOrders()" 
+                                <input type="text" id="tableSearchInput" oninput="tableCurrentPage = 1; filterTableOrders()" 
                                     placeholder="Cari invoice, nama pelanggan, no telepon, atau alamat..." 
                                     class="w-full bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl pl-9 pr-3.5 py-2 text-xs text-[#251A14] placeholder-[#A89C92] focus:outline-none transition-colors">
                             </div>
@@ -1741,7 +1754,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <!-- Mobile Baris 1: 3 Dropdowns (Status, Pembayaran, Pengiriman) -->
                             <div class="grid grid-cols-3 gap-2 flex-1">
                                 <!-- Filter Status -->
-                                <select id="tableStatusFilter" onchange="filterTableOrders()" 
+                                <select id="tableStatusFilter" onchange="tableCurrentPage = 1; filterTableOrders()" 
                                     class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
                                     <option value="">Status</option>
                                     <option value="menunggu">Menunggu</option>
@@ -1751,7 +1764,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </select>
 
                                 <!-- Filter Pembayaran -->
-                                <select id="tablePayFilter" onchange="filterTableOrders()" 
+                                <select id="tablePayFilter" onchange="tableCurrentPage = 1; filterTableOrders()" 
                                     class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
                                     <option value="">Pembayaran</option>
                                     <option value="lunas">Lunas</option>
@@ -1760,7 +1773,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </select>
 
                                 <!-- Filter Pengiriman -->
-                                <select id="tableCourierFilter" onchange="filterTableOrders()" 
+                                <select id="tableCourierFilter" onchange="tableCurrentPage = 1; filterTableOrders()" 
                                     class="bg-[#FDFBF7] border border-[#DDD3C5] focus:border-[#D46E15] rounded-xl px-2 md:px-3 py-2 text-[11px] md:text-xs text-[#251A14] font-medium focus:outline-none cursor-pointer truncate">
                                     <option value="">Pengiriman</option>
                                     <option value="ambil">Take Away</option>
@@ -1772,13 +1785,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:w-auto">
                                 <div class="flex items-center gap-1.5 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl px-2.5 py-1.5">
                                     <span class="text-[10px] text-[#8E7E73] font-medium">Dari:</span>
-                                    <input type="date" id="tableDateFrom" onchange="filterTableOrders()" 
+                                    <input type="date" id="tableDateFrom" onchange="tableCurrentPage = 1; filterTableOrders()" 
                                         title="Dari Tanggal"
                                         class="bg-transparent text-[11px] md:text-xs text-[#251A14] focus:outline-none cursor-pointer w-full">
                                 </div>
                                 <div class="flex items-center gap-1.5 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl px-2.5 py-1.5">
                                     <span class="text-[10px] text-[#8E7E73] font-medium">Sampai:</span>
-                                    <input type="date" id="tableDateTo" onchange="filterTableOrders()" 
+                                    <input type="date" id="tableDateTo" onchange="tableCurrentPage = 1; filterTableOrders()" 
                                         title="Sampai Tanggal"
                                         class="bg-transparent text-[11px] md:text-xs text-[#251A14] focus:outline-none cursor-pointer w-full">
                                 </div>
@@ -2103,10 +2116,12 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </button>
                         </div>
 
-                        <!-- Footer -->
-                        <div class="px-5 py-3 border-t border-[#E2D7C8] bg-[#FDFBF7] flex items-center justify-between text-xs text-[#8E7E73]">
-                            <span id="tableShowingText">Menampilkan <?= count($master_orders) ?> dari <?= count($master_orders) ?> pesanan</span>
-                            <span class="text-[11px] font-mono text-[#A89C92]">Sistem POS Berkat Dinasti</span>
+                        <!-- Footer with Pagination (Akurat & Dinamis - Item 34) -->
+                        <div class="px-5 py-3.5 border-t border-[#E2D7C8] bg-[#FDFBF7] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#8E7E73]">
+                            <span id="tableShowingText">Menampilkan 1-<?= min(20, count($master_orders)) ?> dari <?= count($master_orders) ?> pesanan</span>
+                            <div class="flex items-center gap-1.5" id="tablePaginationControls">
+                                <!-- Rendered dynamically by renderTablePaginationControls() in JS -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2352,7 +2367,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                                 <input type="text" id="custSearchInput" name="customer_name" placeholder="Ketik nama atau No. WhatsApp pelanggan..." autocomplete="off"
                                     oninput="handleCustomerSearch(this.value)" onfocus="handleCustomerSearchFocus()"
-                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?>"
+                                    value=""
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-9 py-2 text-xs text-[#251A14] font-medium placeholder-[#8E7E73] focus:border-[#D46E15] focus:outline-none transition-colors">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8E7E73] pointer-events-none">
                                     <i class="fas fa-chevron-down text-[10px]"></i>
@@ -2363,7 +2378,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <div id="custSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl shadow-xl max-h-48 overflow-y-auto z-40 divide-y divide-[#EFE8DE]">
                                 <!-- Populated dynamically by JS -->
                             </div>
-                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="<?= $customers_for_select[0]['id'] ?? 1 ?>">
+                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="">
                         </div>
 
                         <!-- New Customer Custom Inputs (Toggleable) -->
@@ -2383,15 +2398,15 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
+                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">Belum dipilih</span></p>
                             </div>
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
+                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">-</span></p>
                             </div>
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">-</span></p>
                             </div>
                         </div>
                     </div>
@@ -2695,18 +2710,24 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
     <div id="deliveryScheduleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div onclick="closeDeliveryScheduleModal()" class="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-200"></div>
         <div class="max-w-lg w-full relative z-10 bg-[#FDFBF7] border-2 border-[#544337] rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <!-- Header -->
-            <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center">
+            <!-- Header (Item 35: Dedicated Date Badge separated from title) -->
+            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center shrink-0">
                         <i class="far fa-calendar-alt text-sm"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-[#251A14]" id="delivModalTitle">Jadwal Pengiriman Roti</h3>
-                        <p class="text-xs text-[#8E7E73]" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-base font-bold text-[#251A14] leading-tight" id="delivModalTitle">Jadwal Pengiriman</h3>
+                            <span id="delivModalDateBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#D46E15]/15 text-[#D46E15] border border-[#D46E15]/30 shadow-2xs">
+                                <i class="far fa-calendar-check text-[10px]"></i>
+                                <span id="delivModalDateText">2 Nov 2026</span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-[#8E7E73] mt-0.5" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
                     </div>
                 </div>
-                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors" title="Tutup Modal">
+                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors shrink-0" title="Tutup Modal">
                     <i class="fas fa-times text-base"></i>
                 </button>
             </div>
@@ -3394,8 +3415,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         }
 
         // =========================================================================
-        // DATA TABLE CONTROLLER (SEARCH, FILTER, BULK ACTIONS & EXPORT)
+        // DATA TABLE CONTROLLER (SEARCH, FILTER, PAGINATION & EXPORT - ITEM 34)
         // =========================================================================
+        let tableCurrentPage = 1;
+        const TABLE_PAGE_SIZE = 20;
+
         function filterTableOrders() {
             const q = (document.getElementById('tableSearchInput')?.value || '').toLowerCase().trim();
             const statusF = document.getElementById('tableStatusFilter')?.value || '';
@@ -3404,8 +3428,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             const dateFrom = document.getElementById('tableDateFrom')?.value || '';
             const dateTo = document.getElementById('tableDateTo')?.value || '';
 
-            const rows = document.querySelectorAll('#ordersDataTable tbody tr.order-table-row');
-            let visibleCount = 0;
+            const rows = Array.from(document.querySelectorAll('#ordersDataTable tbody tr.order-table-row'));
+            const matchingRows = [];
 
             rows.forEach(tr => {
                 const id = tr.getAttribute('data-id')?.toLowerCase() || '';
@@ -3427,15 +3451,14 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (dateTo && date > dateTo) matchDate = false;
 
                 if (matchQ && matchStatus && matchPay && matchCourier && matchDate) {
-                    tr.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    tr.classList.add('hidden');
+                    matchingRows.push(tr);
                 }
             });
 
             // Filter Mobile Cards
-            const mobileCards = document.querySelectorAll('#ordersDataMobileList .order-mobile-card');
+            const mobileCards = Array.from(document.querySelectorAll('#ordersDataMobileList .order-mobile-card'));
+            const matchingCards = [];
+
             mobileCards.forEach(card => {
                 const id = card.getAttribute('data-id')?.toLowerCase() || '';
                 const customer = card.getAttribute('data-customer') || '';
@@ -3456,28 +3479,105 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 if (dateTo && date > dateTo) matchDate = false;
 
                 if (matchQ && matchStatus && matchPay && matchCourier && matchDate) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
+                    matchingCards.push(card);
                 }
             });
 
+            // Functional Pagination (PAGE_SIZE = 20)
+            const totalRows = matchingRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
+            if (tableCurrentPage > totalPages) tableCurrentPage = totalPages;
+            if (tableCurrentPage < 1) tableCurrentPage = 1;
+
+            const startIdx = (tableCurrentPage - 1) * TABLE_PAGE_SIZE;
+            const endIdx = Math.min(startIdx + TABLE_PAGE_SIZE, totalRows);
+
+            // Hide all rows & cards initially
+            rows.forEach(tr => tr.classList.add('hidden'));
+            mobileCards.forEach(card => card.classList.add('hidden'));
+
+            // Show current page slice
+            for (let i = startIdx; i < endIdx; i++) {
+                if (matchingRows[i]) matchingRows[i].classList.remove('hidden');
+                if (matchingCards[i]) matchingCards[i].classList.remove('hidden');
+            }
+
             const countBadge = document.getElementById('tableOrdersCount');
-            if (countBadge) countBadge.textContent = visibleCount;
+            if (countBadge) countBadge.textContent = totalRows;
 
             const showingText = document.getElementById('tableShowingText');
-            if (showingText) showingText.textContent = `Menampilkan ${visibleCount} dari ${rows.length} pesanan`;
+            if (showingText) {
+                if (totalRows === 0) {
+                    showingText.textContent = 'Menampilkan 0 dari 0 pesanan';
+                } else {
+                    showingText.textContent = `Menampilkan ${startIdx + 1}-${endIdx} dari ${totalRows} pesanan`;
+                }
+            }
 
             const emptyState = document.getElementById('tableEmptyState');
             if (emptyState) {
-                if (visibleCount === 0) emptyState.classList.remove('hidden');
+                if (totalRows === 0) emptyState.classList.remove('hidden');
                 else emptyState.classList.add('hidden');
             }
 
+            renderTablePaginationControls(totalPages);
             updateSelectedCount();
         }
 
+        function renderTablePaginationControls(totalPages) {
+            const controls = document.getElementById('tablePaginationControls');
+            if (!controls) return;
+            controls.innerHTML = '';
+
+            // Previous Button (‹)
+            const prevBtn = document.createElement('button');
+            prevBtn.type = 'button';
+            prevBtn.className = `w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs transition-colors ${tableCurrentPage > 1 ? 'hover:bg-[#E5DDD0] text-[#544337] cursor-pointer' : 'text-[#8E7E73] opacity-40 cursor-not-allowed'}`;
+            prevBtn.innerHTML = '‹';
+            prevBtn.title = 'Halaman Sebelumnya';
+            if (tableCurrentPage > 1) {
+                prevBtn.onclick = () => {
+                    tableCurrentPage--;
+                    filterTableOrders();
+                };
+            }
+            controls.appendChild(prevBtn);
+
+            // Numbered Page Buttons
+            for (let p = 1; p <= totalPages; p++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.type = 'button';
+                if (p === tableCurrentPage) {
+                    pageBtn.className = 'w-7 h-7 rounded-md bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shadow-xs cursor-pointer';
+                } else {
+                    pageBtn.className = 'w-7 h-7 rounded-md bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] font-bold text-xs flex items-center justify-center border border-[#DDD3C5] cursor-pointer transition-colors';
+                }
+                pageBtn.textContent = p;
+                pageBtn.title = `Halaman ${p}`;
+                pageBtn.onclick = () => {
+                    tableCurrentPage = p;
+                    filterTableOrders();
+                };
+                controls.appendChild(pageBtn);
+            }
+
+            // Next Button (›)
+            const nextBtn = document.createElement('button');
+            nextBtn.type = 'button';
+            nextBtn.className = `w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs transition-colors ${tableCurrentPage < totalPages ? 'hover:bg-[#E5DDD0] text-[#544337] cursor-pointer' : 'text-[#8E7E73] opacity-40 cursor-not-allowed'}`;
+            nextBtn.innerHTML = '›';
+            nextBtn.title = 'Halaman Berikutnya';
+            if (tableCurrentPage < totalPages) {
+                nextBtn.onclick = () => {
+                    tableCurrentPage++;
+                    filterTableOrders();
+                };
+            }
+            controls.appendChild(nextBtn);
+        }
+
         function resetTableFilters() {
+            tableCurrentPage = 1;
             if (document.getElementById('tableSearchInput')) document.getElementById('tableSearchInput').value = '';
             if (document.getElementById('tableStatusFilter')) document.getElementById('tableStatusFilter').value = '';
             if (document.getElementById('tablePayFilter')) document.getElementById('tablePayFilter').value = '';
@@ -4181,7 +4281,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
             const monthTitle = document.getElementById('calendarGridTitle')?.textContent || '';
             const modalTitleEl = document.getElementById('delivModalTitle');
-            if (modalTitleEl) modalTitleEl.textContent = `Jadwal Pengiriman: ${dayNum} ${monthTitle}`;
+            if (modalTitleEl) modalTitleEl.textContent = 'Jadwal Pengiriman';
+            const dateBadgeText = document.getElementById('delivModalDateText');
+            if (dateBadgeText) dateBadgeText.textContent = `${dayNum} ${monthTitle}`;
             
             const body = document.getElementById('delivModalBody');
             if (!body) return;
@@ -4607,6 +4709,19 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 const now = new Date();
                 timeEl.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             }
+            // Ensure Customer fields start completely empty (Item 36)
+            const nameInput = document.getElementById('posCustNameInput');
+            if (nameInput) nameInput.value = '';
+            const waInput = document.getElementById('pos_customer_wa');
+            if (waInput) waInput.value = '';
+            const addrInput = document.getElementById('pos_customer_address');
+            if (addrInput) addrInput.value = '';
+            const idInput = document.getElementById('pos_id_pelanggan');
+            if (idInput) idInput.value = '';
+            const isNewInput = document.getElementById('pos_is_pelanggan_baru');
+            if (isNewInput) isNewInput.value = '0';
+            const badge = document.getElementById('posCustTypeBadge');
+            if (badge) badge.classList.add('hidden');
         }
 
         function updatePosCategoryCounts() {

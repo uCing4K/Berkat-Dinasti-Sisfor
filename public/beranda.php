@@ -2229,7 +2229,7 @@ if ($db_connected && $pdo) {
                                 </div>
                                 <input type="text" id="custSearchInput" placeholder="Ketik nama atau No. WhatsApp pelanggan..." autocomplete="off"
                                     oninput="handleCustomerSearch(this.value)" onfocus="handleCustomerSearchFocus()"
-                                    value="<?= htmlspecialchars($customers_for_select[0]['nama'] ?? '') ?>"
+                                    value=""
                                     class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl pl-9 pr-9 py-2 text-xs text-[#251A14] font-medium placeholder-[#8E7E73] focus:border-[#D46E15] focus:outline-none transition-colors">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-[#8E7E73] pointer-events-none">
                                     <i class="fas fa-chevron-down text-[10px]"></i>
@@ -2240,7 +2240,7 @@ if ($db_connected && $pdo) {
                             <div id="custSearchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#FDFBF7] border border-[#DDD3C5] rounded-xl shadow-xl max-h-48 overflow-y-auto z-40 divide-y divide-[#EFE8DE]">
                                 <!-- Populated dynamically by JS -->
                             </div>
-                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="<?= $customers_for_select[0]['id'] ?? 1 ?>">
+                            <input type="hidden" name="id_pelanggan" id="selectedCustomerId" value="">
                         </div>
 
                         <!-- New Customer Custom Inputs (Toggleable) -->
@@ -2260,15 +2260,15 @@ if ($db_connected && $pdo) {
                         <div class="bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Nama Pelanggan</p>
-                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['nama'] ?? 'Ibu Sari Dewi') ?></p>
+                                <p id="previewCustName" class="font-bold text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">Belum dipilih</span></p>
                             </div>
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">No. WhatsApp</p>
-                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['no_wa'] ?? '0812-3456-7890') ?></p>
+                                <p id="previewCustWa" class="font-bold text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">-</span></p>
                             </div>
                             <div>
                                 <p class="text-[#8E7E73] uppercase text-[10px] font-semibold">Alamat Pengiriman</p>
-                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><?= htmlspecialchars($customers_for_select[0]['alamat'] ?? 'Komplek Melati No. 4, Blok B') ?></p>
+                                <p id="previewCustAddress" class="font-medium text-[#251A14] mt-0.5 truncate"><span class="text-[#8E7E73] font-normal italic">-</span></p>
                             </div>
                         </div>
                     </div>
@@ -2502,18 +2502,24 @@ if ($db_connected && $pdo) {
     <div id="deliveryScheduleModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div onclick="closeDeliveryScheduleModal()" class="fixed inset-0 craft-modal-overlay"></div>
         <div class="craft-modal-dialog max-w-lg w-full relative z-10 bg-[#FDFBF7] border border-[#E2D7C8] rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <!-- Header -->
-            <div class="px-6 py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center">
+            <!-- Header (Item 35: Dedicated Date Badge separated from title) -->
+            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#E2D7C8] flex items-center justify-between bg-[#FDFBF7]">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-[#D46E15]/15 text-[#D46E15] flex items-center justify-center shrink-0">
                         <i class="far fa-calendar-alt text-sm"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-[#251A14]" id="delivModalTitle">Jadwal Pengiriman Roti</h3>
-                        <p class="text-xs text-[#8E7E73]" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-base font-bold text-[#251A14] leading-tight" id="delivModalTitle">Jadwal Pengiriman</h3>
+                            <span id="delivModalDateBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#D46E15]/15 text-[#D46E15] border border-[#D46E15]/30 shadow-2xs">
+                                <i class="far fa-calendar-check text-[10px]"></i>
+                                <span id="delivModalDateText">2 Nov 2026</span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-[#8E7E73] mt-0.5" id="delivModalSub">Informasi armada & pesanan tanggal terpilih</p>
                     </div>
                 </div>
-                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors">
+                <button onclick="closeDeliveryScheduleModal()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5 rounded-lg hover:bg-[#EFE8DE] transition-colors shrink-0" title="Tutup">
                     <i class="fas fa-times text-base"></i>
                 </button>
             </div>
@@ -3307,7 +3313,11 @@ if ($db_connected && $pdo) {
                     break;
                 }
             }
-            document.getElementById('delivModalTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${shortMonthYear}`;
+            // 1. Teks judul & Date Badge Terpisah (Item 35)
+            const titleEl = document.getElementById('delivModalTitle');
+            if (titleEl) titleEl.textContent = 'Jadwal Pengiriman';
+            const dateBadgeText = document.getElementById('delivModalDateText');
+            if (dateBadgeText) dateBadgeText.textContent = `${dayNum} ${shortMonthYear}`;
             const body = document.getElementById('delivModalBody');
             const items = SCHEDULE_BY_DATE[dayNum] || [];
 

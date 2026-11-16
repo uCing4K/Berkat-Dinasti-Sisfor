@@ -1231,11 +1231,11 @@ if ($db_connected && $pdo) {
 
                     <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
                     <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
-                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-visible lg:overflow-hidden">
+                        <form id="posOrderForm" method="POST" action="beranda.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
-                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream without brown stripe -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs">
+                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream with Smooth Rounded Top -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs rounded-t-[14px]">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center shrink-0 shadow-2xs">
                                         <i class="fas fa-shopping-basket text-xs"></i>
@@ -1324,7 +1324,7 @@ if ($db_connected && $pdo) {
                                         </div>
                                         <div>
                                             <label class="block font-bold text-[#544337] text-[10px] mb-1">Waktu Kirim</label>
-                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
+                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="<?= date('H:i') ?>" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
                                     </div>
@@ -1357,8 +1357,8 @@ if ($db_connected && $pdo) {
                                 </div>
                             </div>
 
-                            <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Elevated Total Ticket Card -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-t-2 border-[#E2D7C8] space-y-3 shrink-0 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                            <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Smooth Rounded Bottom (Item 32) -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-t-2 border-[#E2D7C8] space-y-3 shrink-0 shadow-[0_-2px_8px_rgba(0,0,0,0.03)] rounded-b-[14px]">
                                 <div class="space-y-1.5 text-xs">
                                     <div class="flex justify-between text-[#7A695D]">
                                         <span>Subtotal:</span>
@@ -1435,33 +1435,33 @@ if ($db_connected && $pdo) {
 
                 <!-- MOBILE ONLY: SHORTCUTS & 2-CARD KPI GRID (RODEO POS PATTERN) -->
                 <div class="block md:hidden mb-6 space-y-3.5">
-                    <!-- Quick Page Shortcuts (2 Columns) - Dark Brown Borders Khas Berkat Dinasti (Item 23) -->
+                    <!-- Quick Page Shortcuts (2 Columns) - Subtle Refined Borders Khas Berkat Dinasti (Item 30) -->
                     <div class="grid grid-cols-2 gap-2.5">
-                        <a href="pesanan.php?tab=kalender" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FFF6ED] border-2 border-[#544337] text-[#924C00] font-semibold text-xs shadow-2xs hover:bg-[#FFEEDD] active:scale-95 transition-all">
+                        <a href="pesanan.php?tab=kalender" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FFF6ED] border border-[#544337]/35 text-[#924C00] font-semibold text-xs shadow-2xs hover:bg-[#FFEEDD] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#D46E15] text-white flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="far fa-calendar-alt"></i>
                             </div>
                             <span class="truncate font-bold">Jadwal Kirim</span>
                         </a>
-                        <a href="pesanan.php?tab=tabel" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="pesanan.php?tab=tabel" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#544337]/35 text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-search"></i>
                             </div>
                             <span class="truncate font-bold">Cari Pesanan</span>
                         </a>
-                        <a href="produk.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="produk.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#544337]/35 text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-bread-slice"></i>
                             </div>
                             <span class="truncate font-bold">Produk Bakery</span>
                         </a>
-                        <a href="pelanggan.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="pelanggan.php" class="flex items-center gap-2.5 p-3 rounded-xl bg-[#FAF7F2] border border-[#544337]/35 text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-8 h-8 rounded-lg bg-[#FAF0E6] text-[#D46E15] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-users"></i>
                             </div>
                             <span class="truncate font-bold">Pelanggan</span>
                         </a>
-                        <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border-2 border-[#544337] text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
+                        <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border border-[#544337]/35 text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-6 h-6 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-chart-pie"></i>
                             </div>
@@ -3293,7 +3293,21 @@ if ($db_connected && $pdo) {
             const modal = document.getElementById('deliveryScheduleModal');
             if (!modal) return;
 
-            document.getElementById('delivModalTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${document.getElementById('miniCalTitle').textContent}`;
+            // 1. Teks judul dipersingkat rapi 1 baris (Item 31)
+            const rawTitle = document.getElementById('miniCalTitle')?.textContent || '';
+            const shortMonthMap = {
+                'Januari': 'Jan', 'Februari': 'Feb', 'Maret': 'Mar', 'April': 'Apr',
+                'Mei': 'Mei', 'Juni': 'Jun', 'Juli': 'Jul', 'Agustus': 'Agu',
+                'September': 'Sep', 'Oktober': 'Okt', 'November': 'Nov', 'Desember': 'Des'
+            };
+            let shortMonthYear = rawTitle;
+            for (const [fullM, sM] of Object.entries(shortMonthMap)) {
+                if (shortMonthYear.includes(fullM)) {
+                    shortMonthYear = shortMonthYear.replace(fullM, sM);
+                    break;
+                }
+            }
+            document.getElementById('delivModalTitle').textContent = `Jadwal Pengiriman: ${dayNum} ${shortMonthYear}`;
             const body = document.getElementById('delivModalBody');
             const items = SCHEDULE_BY_DATE[dayNum] || [];
 
@@ -3306,9 +3320,11 @@ if ($db_connected && $pdo) {
             });
             const isOverload = totalPcsDay > 150;
             const extraTrips = Math.ceil(totalPcsDay / 150);
+            
+            // 3. Teks kapasitas dipersingkat (Item 31)
             const capacityBadge = isOverload
                 ? `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-200 text-amber-900 border border-amber-300">⚠️ Overload: ${totalPcsDay}/150 pcs (Butuh ${extraTrips} Trip)</span>`
-                : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">✓ Kapasitas Aman (${totalPcsDay}/150 pcs)</span>`;
+                : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#27AE60]/15 text-[#1B7A43]">✓ Kapasitas ${totalPcsDay}/150 pcs</span>`;
 
             const overloadBanner = isOverload ? `
                 <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 text-xs text-amber-900 flex items-center gap-2.5 shadow-2xs">
@@ -3336,7 +3352,8 @@ if ($db_connected && $pdo) {
             } else {
                 body.innerHTML = `
                     <div class="flex items-center justify-between pb-2 border-b border-[#E2D7C8] text-xs">
-                        <span class="font-semibold text-[#544337]"><i class="fas fa-boxes mr-1 text-[#D46E15]"></i> Total: ${items.length} Pesanan Terjadwal</span>
+                        <!-- 2. Teks Total tanpa kata Terjadwal (Item 31) -->
+                        <span class="font-semibold text-[#544337]"><i class="fas fa-boxes mr-1 text-[#D46E15]"></i> Total: ${items.length} Pesanan</span>
                         ${capacityBadge}
                     </div>
                     ${overloadBanner}
@@ -3350,9 +3367,10 @@ if ($db_connected && $pdo) {
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${it.status === 'Selesai' ? 'bg-[#27AE60]/15 text-[#1B7A43]' : (it.status === 'Siap Kirim' ? 'bg-[#2F80ED]/15 text-[#2F80ED]' : 'bg-[#E2B93B]/20 text-[#886C12]')}">${escapeHtml(it.status)}</span>
                                 </div>
                                 <div>
+                                    <!-- 4. Fokus pada nama pelanggan tanpa nomor HP (Item 31) -->
                                     <p class="font-bold text-[#251A14] flex items-center justify-between">
-                                        <span>${escapeHtml(it.cust)} <span class="text-[#8E7E73] font-normal text-[11px]">(${escapeHtml(it.phone)})</span></span>
-                                        <span class="text-[10px] text-[#D46E15] font-semibold flex items-center gap-0.5">Buka <i class="fas fa-chevron-right text-[8px]"></i></span>
+                                        <span class="truncate">${escapeHtml(it.cust)}</span>
+                                        <span class="text-[10px] text-[#D46E15] font-semibold flex items-center gap-0.5 shrink-0 ml-2">Buka <i class="fas fa-chevron-right text-[8px]"></i></span>
                                     </p>
                                     <p class="text-[#544337] mt-0.5 font-medium truncate">${escapeHtml(it.items)}</p>
                                 </div>
@@ -3811,6 +3829,11 @@ if ($db_connected && $pdo) {
             renderPosProducts();
             renderPosCart();
             syncPosCustomerInfo();
+            const timeEl = document.getElementById('pos_waktu_kirim');
+            if (timeEl) {
+                const now = new Date();
+                timeEl.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            }
         }
 
         function updatePosCategoryCounts() {

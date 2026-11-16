@@ -1146,11 +1146,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                     <!-- RIGHT: KERANJANG PESANAN (ON MOBILE DISPLAYED FIRST BEFORE PRODUCTS) -->
                     <div id="posCartContainer" class="w-full lg:w-[380px] xl:w-[410px] lg:h-full flex flex-col shrink-0 order-first lg:order-last">
-                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-visible lg:overflow-hidden">
+                        <form id="posOrderForm" method="POST" action="pesanan.php" class="h-full flex flex-col bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] shadow-sm overflow-hidden">
                             <input type="hidden" name="action" value="tambah_pesanan">
                             
-                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream without brown stripe -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs">
+                            <!-- 1. ARTISANAL BAKERY HEADER: Clean Oat Cream with Smooth Rounded Top (Item 32) -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-b border-[#E2D7C8] flex items-center justify-between shrink-0 shadow-2xs rounded-t-[14px]">
                                 <div class="flex items-center gap-2.5">
                                     <div class="w-8 h-8 rounded-xl bg-[#D46E15]/10 text-[#D46E15] border border-[#D46E15]/20 flex items-center justify-center shrink-0 shadow-2xs">
                                         <i class="fas fa-shopping-basket text-xs"></i>
@@ -1240,7 +1240,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                         </div>
                                         <div>
                                             <label class="block font-bold text-[#544337] text-[10px] mb-1">Waktu Kirim</label>
-                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="09:00" required
+                                            <input type="time" id="pos_waktu_kirim" name="waktu_kirim" value="<?= date('H:i') ?>" required
                                                 class="w-full bg-white border border-[#DDD3C5] rounded-xl px-2.5 py-1.5 text-xs text-[#251A14] focus:border-[#D46E15] focus:outline-none">
                                         </div>
                                     </div>
@@ -1281,8 +1281,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 <div id="posHiddenItemsInputs"></div>
                             </div>
 
-                            <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Elevated Total Ticket Card -->
-                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-t-2 border-[#E2D7C8] space-y-3 shrink-0 shadow-[0_-2px_8px_rgba(0,0,0,0.03)]">
+                            <!-- 3. ARTISANAL BAKERY FOOTER: Soft Oat Cream with Smooth Rounded Bottom (Item 32) -->
+                            <div class="p-3.5 sm:p-4 bg-[#F3EDE2] border-t-2 border-[#E2D7C8] space-y-3 shrink-0 shadow-[0_-2px_8px_rgba(0,0,0,0.03)] rounded-b-[14px]">
                                 <div class="space-y-1.5 text-xs">
                                     <div class="flex justify-between text-[#7A695D]">
                                         <span>Subtotal:</span>
@@ -1407,42 +1407,52 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
                 </div>
 
-                <!-- TAB SWITCHER & ACTION TOOLBAR (SEJAJAR & RAPI - Item 18) -->
+                <!-- TAB SWITCHER & ACTION TOOLBAR (SEJAJAR & RAPI - Item 18 & Item 27) -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                    <!-- Left: View Tabs (Kanban, Tabel, Kalender) -->
-                    <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-1.5 md:gap-2 shadow-2xs max-w-fit">
-                        <!-- Tab 1: Kanban Board (Hidden on mobile) -->
-                        <button onclick="switchTab('kanban')" id="tabBtnKanban" 
-                            class="hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
-                            <i class="fas fa-columns text-xs"></i>
-                            <span>Kanban Board</span>
-                        </button>
+                    <!-- Left: View Tabs (Kanban, Tabel, Kalender) & Mobile Unduh Rekap Icon -->
+                    <div class="flex items-center justify-between w-full sm:w-auto gap-2">
+                        <div class="bg-[#EFE8DE] rounded-xl border border-[#DDD3C5] p-1.5 flex items-center gap-1.5 md:gap-2 shadow-2xs">
+                            <!-- Tab 1: Kanban Board (Hidden on mobile) -->
+                            <button onclick="switchTab('kanban')" id="tabBtnKanban" 
+                                class="hidden md:flex px-4 py-2 rounded-lg text-sm font-semibold items-center gap-2 transition-all <?= $active_tab === 'kanban' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                                <i class="fas fa-columns text-xs"></i>
+                                <span>Kanban Board</span>
+                            </button>
 
-                        <!-- Tab 2: Tabel Pesanan (Highlighted as default on mobile) -->
-                        <button onclick="switchTab('tabel')" id="tabBtnTabel" 
-                            class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= ($active_tab === 'tabel') ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : (($active_tab === 'kanban') ? 'bg-[#D46E15] text-white shadow-sm font-semibold md:bg-transparent md:text-[#544337] md:shadow-none hover:text-[#251A14] hover:bg-[#E5DDD0]' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]') ?>">
-                            <i class="fas fa-table-list text-xs"></i>
-                            <span class="whitespace-nowrap">Tabel Pesanan</span>
-                        </button>
+                            <!-- Tab 2: Tabel Pesanan (Highlighted as default on mobile) -->
+                            <button onclick="switchTab('tabel')" id="tabBtnTabel" 
+                                class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= ($active_tab === 'tabel') ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : (($active_tab === 'kanban') ? 'bg-[#D46E15] text-white shadow-sm font-semibold md:bg-transparent md:text-[#544337] md:shadow-none hover:text-[#251A14] hover:bg-[#E5DDD0]' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]') ?>">
+                                <i class="fas fa-table-list text-xs"></i>
+                                <span class="whitespace-nowrap">Tabel Pesanan</span>
+                            </button>
 
-                        <!-- Tab 3: Kalender Pengiriman -->
-                        <button onclick="switchTab('kalender')" id="tabBtnKalender" 
-                            class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
-                            <i class="far fa-calendar-alt text-xs"></i>
-                            <span class="whitespace-nowrap">Kalender Pengiriman</span>
+                            <!-- Tab 3: Kalender Pengiriman -->
+                            <button onclick="switchTab('kalender')" id="tabBtnKalender" 
+                                class="px-3.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-1.5 md:gap-2 transition-all <?= $active_tab === 'kalender' ? 'bg-[#D46E15] text-white shadow-sm font-semibold' : 'text-[#544337] hover:text-[#251A14] hover:bg-[#E5DDD0]' ?>">
+                                <i class="far fa-calendar-alt text-xs"></i>
+                                <span class="whitespace-nowrap">Kalender Pengiriman</span>
+                            </button>
+                        </div>
+
+                        <!-- Tombol Unduh Rekap Khusus Mobile (Pure Icon, Sejajar di sisi kanan Tab Kalender - Item 27) -->
+                        <button onclick="handleDownloadRecap()" 
+                            class="sm:hidden bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] p-2.5 rounded-xl flex items-center justify-center transition-colors shadow-2xs shrink-0 cursor-pointer"
+                            title="Unduh Rekap"
+                            aria-label="Unduh Rekap">
+                            <i class="fas fa-file-download text-sm text-[#D46E15]"></i>
                         </button>
                     </div>
 
-                    <!-- Right: Action Buttons (Sejajar dengan Tab Switcher) -->
-                    <div class="flex items-center gap-2.5 self-end sm:self-auto">
-                        <!-- Tombol Unduh Rekap (Ekspor CSV Riil) -->
-                        <button onclick="handleDownloadRecap()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2 md:py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs">
+                    <!-- Right: Action Buttons (Desktop & Tablet) -->
+                    <div class="hidden sm:flex items-center gap-2.5">
+                        <!-- Tombol Unduh Rekap (Ekspor CSV Riil Desktop) -->
+                        <button onclick="handleDownloadRecap()" class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#3E2B21] text-xs md:text-sm font-semibold px-3.5 py-2 md:py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-2xs cursor-pointer">
                             <i class="fas fa-file-download text-xs text-[#D46E15]"></i>
                             <span>Unduh Rekap</span>
                         </button>
 
                         <!-- Tombol Tambah Pesanan (Desktop & Tablet) -->
-                        <a href="pesanan.php?view=tambah_pesanan" class="hidden sm:inline-flex bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2 md:py-2.5 rounded-xl items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
+                        <a href="pesanan.php?view=tambah_pesanan" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-button-orange active:scale-95 shrink-0">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Pesanan</span>
                         </a>
@@ -2106,17 +2116,17 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                 <!-- ============================================================== -->
                 <div id="calendarView" class="<?= $active_tab === 'kalender' ? '' : 'hidden' ?>">
                     
-                    <!-- Controls Row: Month Manual Fixed Navigation & Capacity (Item 15) -->
+                    <!-- Controls Row: Month Manual Fixed Navigation & Capacity (Item 15 & Item 28) -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-                        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                        <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap w-full sm:w-auto">
                             <!-- Navigasi Manual Bulan: < Sebelumnya (Bulan Tahun Fixed) Berikutnya > -->
-                            <div class="flex items-center gap-1 bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-1 shadow-2xs">
+                            <div class="flex items-center gap-1 bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl p-1 shadow-2xs shrink-0">
                                 <button type="button" onclick="navigateCalendarMonth(-1)" 
                                     class="px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-[#E2D7C8] text-[#544337] hover:text-[#251A14] text-xs font-bold transition-all flex items-center gap-1 active:scale-95 cursor-pointer">
                                     <i class="fas fa-chevron-left text-xs"></i>
                                     <span class="hidden sm:inline">Sebelumnya</span>
                                 </button>
-                                <div id="calendarMonthDisplay" class="w-36 sm:w-44 text-center font-bold text-xs sm:text-sm text-[#251A14] select-none truncate">
+                                <div id="calendarMonthDisplay" class="w-32 sm:w-44 text-center font-bold text-xs sm:text-sm text-[#251A14] select-none truncate">
                                     <!-- Dynamic month text rendered here (e.g. Oktober 2026) -->
                                 </div>
                                 <button type="button" onclick="navigateCalendarMonth(1)" 
@@ -2126,10 +2136,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </button>
                             </div>
 
-                            <!-- Badge Kapasitas Trip Obrok -->
-                            <span class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5]">
+                            <!-- Badge Kapasitas Lebih Compact di Sebelah Kanan Switch Bulan (Item 28) -->
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-[#EFE8DE] text-[#D46E15] border border-[#DDD3C5] whitespace-nowrap shadow-2xs">
                                 <i class="fas fa-motorcycle text-xs"></i>
-                                <span>Kapasitas: Maks. 150 pcs/Trip</span>
+                                <span>Maks. 150 pcs/Trip</span>
                             </span>
                         </div>
 
@@ -2141,28 +2151,32 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </div>
 
                     <!-- Main Big Calendar Card (With signature border-[#544337]) -->
-                    <div class="bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] p-6 shadow-sm mb-6">
-                        <!-- Calendar Header: Month Title & Legend -->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#E2D7C8] mb-4">
-                            <div class="flex items-center gap-3">
-                                <h3 class="text-[#251A14] font-bold text-lg" id="calendarGridTitle"><?= $currentMonthIndo ?></h3>
-                                <div class="flex items-center gap-1">
-                                    <button onclick="prevCalendarMonth()" class="p-1.5 hover:bg-[#EFE8DE] rounded-lg text-[#8E7E73] hover:text-[#251A14] transition-colors" title="Bulan Sebelumnya">
-                                        <i class="fas fa-chevron-left text-xs"></i>
-                                    </button>
-                                    <button onclick="nextCalendarMonth()" class="p-1.5 hover:bg-[#EFE8DE] rounded-lg text-[#8E7E73] hover:text-[#251A14] transition-colors" title="Bulan Berikutnya">
-                                        <i class="fas fa-chevron-right text-xs"></i>
-                                    </button>
-                                </div>
+                    <div class="bg-[#FDFBF7] rounded-2xl border-2 border-[#544337] p-4 sm:p-6 shadow-sm mb-6">
+                        <!-- Calendar Header: Month Title & Legend (Clean layout without redundant title - Item 28) -->
+                        <div class="flex items-center justify-between pb-3.5 border-b border-[#E2D7C8] mb-4">
+                            <!-- Hidden Title & Duplicate Buttons for JS textContent compatibility (Item 28) -->
+                            <div class="hidden" aria-hidden="true">
+                                <h3 id="calendarGridTitle"><?= $currentMonthIndo ?></h3>
+                                <button onclick="prevCalendarMonth()" id="btnPrevCalHidden"></button>
+                                <button onclick="nextCalendarMonth()" id="btnNextCalHidden"></button>
                             </div>
 
-                            <!-- Legend Pills -->
-                            <div class="flex items-center gap-4 text-xs">
+                            <!-- Legend Pills (Prominent & Clean at Header) -->
+                            <div class="flex items-center gap-3 sm:gap-4 text-xs flex-wrap w-full justify-between sm:justify-start">
                                 <div class="flex items-center gap-1.5">
                                     <span class="w-3 h-3 rounded-md bg-[#3E2B21] border border-[#251A14]"></span>
-                                    <span class="text-[#544337] font-medium">Ada Pesanan</span>
+                                    <span class="text-[#544337] font-medium text-[11px] sm:text-xs">Ada Pesanan</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-md bg-[#27AE60] border border-[#1E8449]"></span>
+                                    <span class="text-[#544337] font-medium text-[11px] sm:text-xs">Semua Selesai</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-md border-2 border-[#D46E15] bg-[#FFF8F0]"></span>
+                                    <span class="text-[#544337] font-medium text-[11px] sm:text-xs">Hari Ini</span>
+                                </div>
+                            </div>
+                        </div>
                                     <span class="w-3 h-3 rounded-md bg-[#27AE60] border border-[#1E8449]"></span>
                                     <span class="text-[#544337] font-medium">Semua Selesai</span>
                                 </div>
@@ -2280,9 +2294,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
                 </div>
 
-                <?php endif; ?>
-
-                <!-- Floating Action Button (FAB) for Mobile (Item 22) -->
+                <!-- Floating Action Button (FAB) for Mobile (Item 22 & Item 29: Only shown on order list views, hidden on tambah pesanan) -->
                 <button type="button" 
                     id="mobileFabAddOrder"
                     onclick="openOrderModal()" 
@@ -2291,6 +2303,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     aria-label="Tambah Pesanan Baru">
                     <i class="fas fa-plus text-xl"></i>
                 </button>
+
+                <?php endif; ?>
 
             </main>
         </div>
@@ -4597,6 +4611,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             updatePosCategoryCounts();
             renderPosProducts();
             renderPosCart();
+            const timeEl = document.getElementById('pos_waktu_kirim');
+            if (timeEl) {
+                const now = new Date();
+                timeEl.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            }
         }
 
         function updatePosCategoryCounts() {

@@ -276,10 +276,49 @@ $remember_checked = !empty($username_val) || isset($_COOKIE['dinasti_remember'])
         </div>
     </div>
 
-    <!-- RIGHT PANEL: Login Form (Item 42: Warm Orange Bakery Background with Signature Berkat Dinasti Atmosphere) -->
+    <!-- RIGHT PANEL: Login Form (Item 42 & 43: Warm Orange Bakery Background with Signature Elements) -->
     <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-transparent relative overflow-y-auto">
-        <!-- Subtle warm orange backdrop aura for right panel -->
-        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(212,110,21,0.08)_0%,transparent_75%)]"></div>
+        <!-- Background Decorative Elements Behind Login Card (Item 43) -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+            <!-- Warm orange backdrop aura -->
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(212,110,21,0.12)_0%,rgba(248,236,225,0)_75%)]"></div>
+            
+            <!-- Concentric Circular Arcs (Top Right Cluster) - Crisp & Visible on Light Background -->
+            <div class="absolute w-[560px] h-[560px] -right-[160px] -top-[160px] rounded-full border border-[#D46E15]/30"></div>
+            <div class="absolute w-[420px] h-[420px] -right-[90px] -top-[90px] rounded-full border border-[#C27329]/25"></div>
+            <div class="absolute w-[280px] h-[280px] -right-[20px] -top-[20px] rounded-full border border-dashed border-[#D46E15]/35"></div>
+            <div class="absolute w-[150px] h-[150px] right-[45px] top-[45px] rounded-full border border-[#964B1E]/20"></div>
+
+            <!-- Concentric Circular Arcs (Bottom Left Cluster) - Crisp & Visible on Light Background -->
+            <div class="absolute w-[640px] h-[640px] -left-[180px] -bottom-[180px] rounded-full border border-[#D46E15]/30"></div>
+            <div class="absolute w-[480px] h-[480px] -left-[100px] -bottom-[100px] rounded-full border border-[#C27329]/25"></div>
+            <div class="absolute w-[320px] h-[320px] -left-[20px] -bottom-[20px] rounded-full border border-dashed border-[#D46E15]/35"></div>
+            <div class="absolute w-[180px] h-[180px] left-[50px] bottom-[50px] rounded-full border border-[#964B1E]/20"></div>
+
+            <!-- Accent Sweeping Center Arcs (SVG) & Delicate Bakery Flourish Nodes -->
+            <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="warmArcGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#D46E15" stop-opacity="0.45" />
+                        <stop offset="60%" stop-color="#C27329" stop-opacity="0.25" />
+                        <stop offset="100%" stop-color="#964B1E" stop-opacity="0.05" />
+                    </linearGradient>
+                    <linearGradient id="warmArcGrad2" x1="100%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" stop-color="#D46E15" stop-opacity="0.4" />
+                        <stop offset="50%" stop-color="#E07A1E" stop-opacity="0.2" />
+                        <stop offset="100%" stop-color="#FAF1E6" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+                <!-- Wide Sweeping Orbit Arcs crossing behind card -->
+                <circle cx="80%" cy="20%" r="520" fill="none" stroke="url(#warmArcGrad1)" stroke-width="1.5" />
+                <circle cx="20%" cy="80%" r="580" fill="none" stroke="url(#warmArcGrad2)" stroke-width="1.5" />
+                <!-- Orbit Nodes / Sparkles on Arc Intersections -->
+                <circle cx="78%" cy="35%" r="3.5" fill="#D46E15" opacity="0.45" />
+                <circle cx="22%" cy="65%" r="3.5" fill="#D46E15" opacity="0.45" />
+                <circle cx="82%" cy="65%" r="2.5" fill="#C27329" opacity="0.35" />
+                <circle cx="18%" cy="35%" r="2.5" fill="#C27329" opacity="0.35" />
+            </svg>
+        </div>
         <div class="w-full max-w-[420px] bg-[#3E2B21] border border-[#544337] shadow-[0_20px_50px_rgba(0,0,0,0.35)] rounded-2xl p-8 lg:p-10 my-auto relative overflow-hidden z-10">
             
             <!-- Abstract Glow Subtle Effect -->

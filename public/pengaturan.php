@@ -14,6 +14,8 @@ if (isset($_SESSION['role']) && strtolower($_SESSION['role']) !== 'admin') {
     exit();
 }
 
+$is_admin = (!isset($_SESSION['role']) || strtolower($_SESSION['role']) === 'admin' || strtolower($_SESSION['role']) === 'pemilik');
+
 // Inisialisasi Database Connection (PDO) & Handler Backend
 $db_connected = false;
 $pdo = null;
@@ -67,14 +69,14 @@ if ($db_connected && $pdo) {
     } catch (Exception $e) {}
 }
 
-// Inisialisasi Users List
+// Inisialisasi Users List Default (2-Role: Pemilik & Staf Operasional)
 if (!isset($_SESSION['users_list'])) {
     $_SESSION['users_list'] = [
         [
             'id' => 1,
             'nama' => 'Admin Utama',
             'subtext' => 'admin@berkatdinasti.id',
-            'avatar' => 'AU',
+            'avatar' => 'AD',
             'avatar_bg' => 'bg-[#3E2B21]',
             'username' => 'admin',
             'role' => 'Pemilik (Owner)',
@@ -86,13 +88,13 @@ if (!isset($_SESSION['users_list'])) {
         ],
         [
             'id' => 2,
-            'nama' => 'Andi Susanto',
-            'subtext' => 'Kasir Shift Pagi',
-            'avatar' => 'AS',
-            'avatar_bg' => 'bg-[#FF9B45]',
-            'username' => 'andi.s',
-            'role' => 'Karyawan',
-            'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
+            'nama' => 'Kasir & Staf Operasional',
+            'subtext' => 'kasir@berkatdinasti.id',
+            'avatar' => 'KS',
+            'avatar_bg' => 'bg-[#D46E15]',
+            'username' => 'kasir',
+            'role' => 'Staf Operasional',
+            'role_class' => 'bg-[#D46E15]/15 text-[#D46E15]',
             'status' => 'Aktif',
             'status_class' => 'text-[#27AE60]',
             'dot_class' => 'bg-[#27AE60]',
@@ -105,8 +107,8 @@ if (!isset($_SESSION['users_list'])) {
             'avatar' => 'RD',
             'avatar_bg' => 'bg-[#828282]',
             'username' => 'rina.d',
-            'role' => 'Karyawan',
-            'role_class' => 'bg-[#FF9B45]/15 text-[#924C00]',
+            'role' => 'Staf Operasional',
+            'role_class' => 'bg-[#D46E15]/15 text-[#D46E15]',
             'status' => 'Nonaktif',
             'status_class' => 'text-[#828282]',
             'dot_class' => 'bg-[#828282]',
@@ -260,6 +262,14 @@ $store = $_SESSION['store_settings'];
 // Sinkronisasi User Riil dari Database MySQL jika terhubung
 if ($db_connected && $pdo) {
     try {
+        // Self-healing: Pastikan user admin dan kasir terdaftar di DB
+        $checkKasir = $pdo->query("SELECT id_user FROM pengguna WHERE username = 'kasir' LIMIT 1")->fetch();
+        if (!$checkKasir) {
+            $kasirHash = password_hash('dinasti123', PASSWORD_BCRYPT);
+            $insK = $pdo->prepare("INSERT INTO pengguna (nama_lengkap, username, password, role, status, email, no_hp) VALUES ('Staf Operasional', 'kasir', ?, 'kasir', 'aktif', 'kasir@berkatdinasti.id', '081234567891')");
+            $insK->execute([$kasirHash]);
+        }
+
         $stmtUsers = $pdo->query("SELECT id_user as id, nama_lengkap as nama, username, role, status, email, no_hp FROM pengguna ORDER BY id_user ASC");
         $uRows = $stmtUsers->fetchAll();
         if (!empty($uRows)) {
@@ -271,19 +281,19 @@ if ($db_connected && $pdo) {
                     if (!empty($w)) $av .= strtoupper(substr($w, 0, 1));
                     if (strlen($av) >= 2) break;
                 }
-                if (empty($av)) $av = 'ST';
+                if (empty($av)) $av = 'SO';
                 $isOwner = ($ur['id'] == 1 || strtolower($ur['role']) === 'admin');
-                $roleLabel = $isOwner ? 'Pemilik (Owner)' : 'Karyawan';
+                $roleLabel = $isOwner ? 'Pemilik (Owner)' : 'Staf Operasional';
                 $statusLabel = (strtolower($ur['status']) === 'aktif') ? 'Aktif' : 'Nonaktif';
                 $dbUsersList[] = [
                     'id' => intval($ur['id']),
                     'nama' => $ur['nama'],
-                    'subtext' => !empty($ur['email']) ? $ur['email'] : ($isOwner ? 'admin@berkatdinasti.id' : 'Staf Operasional Bakery'),
-                    'avatar' => $av,
-                    'avatar_bg' => $isOwner ? 'bg-[#3E2B21]' : 'bg-[#FF9B45]',
+                    'subtext' => !empty($ur['email']) ? $ur['email'] : ($isOwner ? 'admin@berkatdinasti.id' : 'kasir@berkatdinasti.id'),
+                    'avatar' => $isOwner ? 'AD' : $av,
+                    'avatar_bg' => $isOwner ? 'bg-[#3E2B21]' : 'bg-[#D46E15]',
                     'username' => $ur['username'],
                     'role' => $roleLabel,
-                    'role_class' => $isOwner ? 'bg-[#3E2B21] text-white' : 'bg-[#FF9B45]/15 text-[#924C00]',
+                    'role_class' => $isOwner ? 'bg-[#3E2B21] text-white' : 'bg-[#D46E15]/15 text-[#D46E15]',
                     'status' => $statusLabel,
                     'status_class' => ($statusLabel === 'Aktif') ? 'text-[#27AE60]' : 'text-[#828282]',
                     'dot_class' => ($statusLabel === 'Aktif') ? 'bg-[#27AE60]' : 'bg-[#828282]',
@@ -519,6 +529,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <span>Pelanggan</span>
                     </a>
 
+                    <?php if ($is_admin): ?>
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
@@ -530,6 +541,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <i class="fas fa-cog w-5 text-center text-sm"></i>
                         <span>Pengaturan</span>
                     </a>
+                    <?php endif; ?>
                 </nav>
             </div>
 
@@ -538,11 +550,11 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                 <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                            BD
+                            <?= $is_admin ? 'AD' : 'SO' ?>
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
@@ -617,9 +629,10 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Pemilik')) ?> @ Berkat Dinasti</p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
+                                <?php if ($is_admin): ?>
                                 <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
                                     <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun & Toko</span>
@@ -628,6 +641,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                                     <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
                                     <span>Manajemen User</span>
                                 </a>
+                                <?php endif; ?>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
@@ -1205,7 +1219,7 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     <div>
                         <label for="userRoleInput" class="block text-xs font-semibold text-[#251A14] mb-1.5">Role / Hak Akses</label>
                         <select id="userRoleInput" name="role" class="w-full bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3.5 py-2.5 text-xs md:text-sm text-[#251A14] focus:border-[#D46E15] focus:outline-none">
-                            <option value="Karyawan">Karyawan / Kasir</option>
+                            <option value="Staf Operasional">Staf Operasional (Kasir)</option>
                             <option value="Pemilik (Owner)">Pemilik (Owner)</option>
                         </select>
                     </div>
@@ -1728,12 +1742,13 @@ $todayFormatted = $dayName . ", " . $dayNum . " " . ($monthsIndo[$monthNum] ?? d
                     document.getElementById('userNameInput').value = user.nama;
                     document.getElementById('userUsernameInput').value = user.username;
                     document.getElementById('userSubtextInput').value = user.subtext;
-                    document.getElementById('userRoleInput').value = user.role;
+                    document.getElementById('userRoleInput').value = (user.role === 'Pemilik (Owner)' || user.role === 'admin') ? 'Pemilik (Owner)' : 'Staf Operasional';
                     document.getElementById('userStatusInput').value = user.status;
                 }
             } else {
                 title.textContent = 'Tambah User Baru';
                 document.getElementById('editUserId').value = '';
+                document.getElementById('userRoleInput').value = 'Staf Operasional';
             }
 
             modal.classList.remove('hidden');

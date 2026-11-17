@@ -7,6 +7,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+$is_admin = (!isset($_SESSION['role']) || strtolower($_SESSION['role']) === 'admin' || strtolower($_SESSION['role']) === 'pemilik');
+
 // Inisialisasi Database Connection (PDO) & Handler Backend
 $db_connected = false;
 $pdo = null;
@@ -284,6 +286,11 @@ if (!isset($_SESSION['product_list']) || !isset($_SESSION['catalog_ver']) || $_S
 // 1b. BACKEND HANDLER: RESET KE PRODUK RESMI UMKM BERKAT DINASTI
 // -------------------------------------------------------------
 if (isset($_GET['action']) && $_GET['action'] === 'reset_official_products') {
+    if (!$is_admin) {
+        $_SESSION['flash_error'] = "Akses ditolak: Hanya Administrator / Pemilik yang dapat mereset data produk.";
+        header("Location: produk.php");
+        exit();
+    }
     $_SESSION['product_list'] = $initial_products;
     $_SESSION['catalog_ver'] = $catalog_version;
     $_SESSION['official_catalog_cleaned'] = 'v4';
@@ -381,6 +388,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
 // 2. BACKEND HANDLER: TAMBAH PRODUK BARU
 // -------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_product') {
+    if (!$is_admin) {
+        $_SESSION['flash_error'] = "Akses ditolak: Hanya Administrator / Pemilik yang dapat menambah produk.";
+        header("Location: produk.php");
+        exit();
+    }
     $nama = trim($_POST['nama_produk'] ?? '');
     $kategori = trim($_POST['kategori'] ?? 'Roti');
     $harga_raw = preg_replace('/[^0-9]/', '', $_POST['harga'] ?? '0');
@@ -454,6 +466,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // 3. BACKEND HANDLER: EDIT / UPDATE PRODUK
 // -------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_product') {
+    if (!$is_admin) {
+        $_SESSION['flash_error'] = "Akses ditolak: Hanya Administrator / Pemilik yang dapat mengubah produk.";
+        header("Location: produk.php");
+        exit();
+    }
     $prod_id = intval($_POST['product_id'] ?? 0);
     $nama = trim($_POST['nama_produk'] ?? '');
     $kategori = trim($_POST['kategori'] ?? 'Roti');
@@ -529,6 +546,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // 4. BACKEND HANDLER: HAPUS PRODUK
 // -------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_product') {
+    if (!$is_admin) {
+        $_SESSION['flash_error'] = "Akses ditolak: Hanya Administrator / Pemilik yang dapat menghapus produk.";
+        header("Location: produk.php");
+        exit();
+    }
     $prod_id = intval($_POST['product_id'] ?? 0);
     $deleted_name = 'Produk';
 
@@ -578,6 +600,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // 5. BACKEND HANDLER: QUICK TOGGLE STATUS PRODUK
 // -------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_status') {
+    if (!$is_admin) {
+        $_SESSION['flash_error'] = "Akses ditolak: Hanya Administrator / Pemilik yang dapat mengubah status produk.";
+        header("Location: produk.php");
+        exit();
+    }
     $prod_id = intval($_POST['product_id'] ?? 0);
     $new_status_label = 'Aktif';
 
@@ -848,6 +875,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         <span>Pelanggan</span>
                     </a>
 
+                    <?php if ($is_admin): ?>
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
@@ -859,6 +887,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
+                    <?php endif; ?>
                 </nav>
             </div>
 
@@ -867,11 +896,11 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                 <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                            BD
+                            <?= $is_admin ? 'AD' : 'SO' ?>
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
@@ -948,9 +977,10 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> @ Berkat Dinasti</p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
+                                <?php if ($is_admin): ?>
                                 <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
                                     <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun & Toko</span>
@@ -959,6 +989,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                     <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
                                     <span>Manajemen User</span>
                                 </a>
+                                <?php endif; ?>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">
@@ -973,6 +1004,19 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
 
             <!-- MAIN CONTENT CONTAINER -->
             <main class="flex-1 p-4 md:p-8 w-full min-w-0">
+                
+                <?php if (isset($_SESSION['flash_error'])): ?>
+                    <div id="flashErrorAlert" class="mb-6 bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-exclamation-triangle text-rose-600 text-base"></i>
+                            <span class="text-sm font-medium"><?= htmlspecialchars($_SESSION['flash_error']) ?></span>
+                        </div>
+                        <button onclick="document.getElementById('flashErrorAlert').remove()" class="text-rose-700 hover:text-rose-900 p-1">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    <?php unset($_SESSION['flash_error']); ?>
+                <?php endif; ?>
                 
                 <!-- Notifikasi Toast Sukses Tambah Produk -->
                 <?php if (!empty($toast_message)): ?>
@@ -1082,12 +1126,14 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
 
                     <!-- Right Buttons: Ekspor Data, Reset Default, & Tambah Produk -->
                     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <?php if ($is_admin): ?>
                         <!-- Reset Default Produk Resmi UMKM -->
                         <a href="produk.php?action=reset_official_products" onclick="return confirm('Kembalikan menu ke 11 produk default resmi UMKM Berkat Dinasti dan hapus data uji coba?');" title="Kembalikan menu produk ke default resmi UMKM Berkat Dinasti" 
                             class="bg-[#EFE8DE] hover:bg-[#E5DDD0] border border-[#DDD3C5] text-[#544337] text-xs sm:text-sm font-medium px-3 sm:px-3.5 py-2.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs">
                             <i class="fas fa-undo text-xs text-[#D46E15]"></i>
                             <span class="hidden sm:inline">Reset Default</span>
                         </a>
+                        <?php endif; ?>
 
                         <!-- Ekspor Data (Live CSV Export) -->
                         <a href="produk.php?action=export_csv" title="Unduh katalog produk format CSV/Excel" 
@@ -1096,11 +1142,13 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                             <span>Ekspor Data</span>
                         </a>
 
+                        <?php if ($is_admin): ?>
                         <!-- Tambah Produk Button (Triggers Modal) -->
                         <button onclick="openProductModal()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-button-orange active:scale-95">
                             <i class="fas fa-plus text-xs"></i>
                             <span>Tambah Produk</span>
                         </button>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -1191,16 +1239,24 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
 
                                         <!-- Status dengan Quick Interactive Toggle -->
                                         <td class="px-3.5 py-3 text-center whitespace-nowrap border-r border-[#E2D7C8]/60">
+                                            <?php if ($is_admin): ?>
                                             <button type="button" onclick="toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
                                                 title="Klik untuk ubah status ke <?= $prod['status'] === 'Aktif' ? 'Nonaktif' : 'Aktif' ?>"
                                                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60] hover:bg-[#27AE60]/25' : 'bg-[#8E7E73]/15 text-[#8E7E73] hover:bg-[#8E7E73]/25' ?>">
                                                 <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
                                                 <span><?= htmlspecialchars($prod['status']) ?></span>
                                             </button>
+                                            <?php else: ?>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60]' : 'bg-[#8E7E73]/15 text-[#8E7E73]' ?>">
+                                                <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
+                                                <span><?= htmlspecialchars($prod['status']) ?></span>
+                                            </span>
+                                            <?php endif; ?>
                                         </td>
 
                                         <!-- Aksi (Edit & Delete) -->
                                         <td class="px-3.5 py-3 text-center whitespace-nowrap">
+                                            <?php if ($is_admin): ?>
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- Edit Button -->
                                                 <button onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)" class="p-1.5 text-[#D46E15] hover:bg-[#D46E15]/10 rounded-md transition-colors cursor-pointer" title="Edit Produk">
@@ -1211,6 +1267,9 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                                     <i class="fas fa-trash-alt text-sm"></i>
                                                 </button>
                                             </div>
+                                            <?php else: ?>
+                                            <span class="text-[11px] text-[#8E7E73] italic">Katalog Cepat</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -1237,13 +1296,12 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                     <!-- Mobile Products Card List (Rodeo POS Pattern: Click Card to Edit, Dedicated Delete Button) -->
                     <div class="block md:hidden p-3 space-y-2.5" id="productsMobileList">
                         <?php foreach ($products as $idx => $prod): ?>
-                            <div class="product-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all cursor-pointer"
+                            <div class="product-mobile-card bg-[#FAF7F2] border border-[#E2D7C8] rounded-xl p-3.5 shadow-2xs hover:border-[#D46E15] active:scale-[0.99] transition-all <?= $is_admin ? 'cursor-pointer' : '' ?>"
                                  data-name="<?= strtolower(htmlspecialchars($prod['name'])) ?>"
                                  data-sku="<?= strtolower(htmlspecialchars($prod['sku'])) ?>"
                                  data-category="<?= htmlspecialchars($prod['category']) ?>"
                                  data-status="<?= htmlspecialchars($prod['status']) ?>"
-                                 onclick="editProductRow(<?= htmlspecialchars(json_encode($prod)) ?>)"
-                                 title="Klik untuk edit produk">
+                                 <?= $is_admin ? 'onclick="editProductRow(' . htmlspecialchars(json_encode($prod)) . ')" title="Klik untuk edit produk"' : '' ?>>
                                 
                                 <!-- Top Bar: SKU, Category & Status Badge -->
                                 <div class="flex items-center justify-between pb-2 border-b border-[#EAE1D5]">
@@ -1251,11 +1309,18 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                         <span class="font-mono text-xs font-bold text-[#D46E15]"><?= htmlspecialchars($prod['sku']) ?></span>
                                         <span class="text-[10px] text-[#8E7E73]">• <?= htmlspecialchars($prod['category']) ?></span>
                                     </div>
+                                    <?php if ($is_admin): ?>
                                     <button type="button" onclick="event.stopPropagation(); toggleProductStatus(<?= $prod['id'] ?>, '<?= $prod['status'] ?>')" 
                                         class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60]' : 'bg-[#8E7E73]/15 text-[#8E7E73]' ?>">
                                         <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
                                         <span><?= htmlspecialchars($prod['status']) ?></span>
                                     </button>
+                                    <?php else: ?>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]/15 text-[#27AE60]' : 'bg-[#8E7E73]/15 text-[#8E7E73]' ?>">
+                                        <span class="w-1.5 h-1.5 rounded-full <?= $prod['status'] === 'Aktif' ? 'bg-[#27AE60]' : 'bg-[#8E7E73]' ?>"></span>
+                                        <span><?= htmlspecialchars($prod['status']) ?></span>
+                                    </span>
+                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Middle: Product Name & Packaging -->
@@ -1290,6 +1355,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                         <span class="text-sm font-bold text-[#251A14]">Rp <?= number_format($prod['price'], 0, ',', '.') ?></span>
                                         <span class="text-[10px] text-[#8E7E73]">/ <?= htmlspecialchars($prod['price_unit']) ?></span>
                                     </div>
+                                    <?php if ($is_admin): ?>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="event.stopPropagation(); confirmDeleteProduct(<?= $prod['id'] ?>, '<?= addslashes($prod['name']) ?>')" 
                                             class="w-7 h-7 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center justify-center transition-colors active:scale-95" 
@@ -1297,6 +1363,7 @@ $todayFormatted = $hariArr[date('l')] . ', ' . date('d') . ' ' . $bulanArr[(int)
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </button>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

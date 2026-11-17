@@ -7,6 +7,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+$is_admin = (!isset($_SESSION['role']) || strtolower($_SESSION['role']) === 'admin' || strtolower($_SESSION['role']) === 'pemilik');
+
 // Sinkronisasi: Alihkan akses tambah_pesanan langsung ke halaman POS resmi di pesanan.php
 if ((isset($_GET['view']) && $_GET['view'] === 'tambah_pesanan') || (isset($_GET['action']) && $_GET['action'] === 'tambah_pesanan')) {
     $targetUrl = 'pesanan.php?view=tambah_pesanan';
@@ -996,6 +998,7 @@ if ($db_connected && $pdo) {
                         <span>Pelanggan</span>
                     </a>
 
+                    <?php if ($is_admin): ?>
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
@@ -1007,6 +1010,7 @@ if ($db_connected && $pdo) {
                         <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
+                    <?php endif; ?>
                 </nav>
             </div>
 
@@ -1015,11 +1019,11 @@ if ($db_connected && $pdo) {
                 <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                            BD
+                            <?= $is_admin ? 'AD' : 'SO' ?>
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
@@ -1115,13 +1119,15 @@ if ($db_connected && $pdo) {
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="font-semibold text-[#251A14]"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Administrator') ?></p>
-                                <p class="text-[#8E7E73] text-[11px] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'admin')) ?> @ Berkat Dinasti</p>
+                                <p class="text-[#8E7E73] text-[11px] mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
+                                <?php if ($is_admin): ?>
                                 <a href="pengaturan.php" class="craft-dropdown-item">
                                     <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun & Toko</span>
                                 </a>
+                                <?php endif; ?>
                                 <a href="reset-password.php" class="craft-dropdown-item">
                                     <i class="fas fa-key text-xs text-[#8E7E73]"></i>
                                     <span>Ganti Password</span>
@@ -1471,12 +1477,14 @@ if ($db_connected && $pdo) {
                             </div>
                             <span class="truncate font-bold">Pelanggan</span>
                         </a>
+                        <?php if ($is_admin): ?>
                         <a href="laporan.php" class="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#FAF7F2] border border-[#544337]/35 text-[#544337] font-semibold text-xs shadow-2xs hover:bg-[#F2ECE1] active:scale-95 transition-all">
                             <div class="w-6 h-6 rounded-lg bg-[#EAE2D5] text-[#544337] flex items-center justify-center shrink-0 text-xs shadow-xs">
                                 <i class="fas fa-chart-pie"></i>
                             </div>
                             <span class="font-bold">Laporan Penjualan</span>
                         </a>
+                        <?php endif; ?>
                     </div>
 
                     <!-- 1-Row 2-Card KPI Grid: Total Pemasukan & Pesanan Antrean -->

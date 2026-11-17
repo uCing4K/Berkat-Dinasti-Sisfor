@@ -16,8 +16,8 @@ if (!$is_logged_out && (!isset($_SESSION['logged_in']) || $_SESSION['logged_in']
                     $_SESSION['user_id'] = ($uName === 'admin') ? 1 : 2;
                     $_SESSION['user'] = $uName;
                     $_SESSION['username'] = $uName;
-                    $_SESSION['nama_lengkap'] = ($uName === 'admin') ? 'Administrator' : ucfirst($uName);
-                    $_SESSION['role'] = ($uName === 'admin') ? 'admin' : 'staff';
+                    $_SESSION['nama_lengkap'] = ($uName === 'admin') ? 'Administrator' : (($uName === 'kasir') ? 'Staf Operasional' : ucfirst($uName));
+                    $_SESSION['role'] = ($uName === 'admin') ? 'admin' : 'kasir';
                     $_SESSION['login_time'] = time();
                     header("Location: beranda.php");
                     exit();
@@ -67,14 +67,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_execute($stmt);
                 $result = mysqli_stmt_get_result($stmt);
                 if ($row = mysqli_fetch_assoc($result)) {
-                    // Cek password hash terenkripsi ATAU kredensial master admin
-                    if (password_verify($password_val, $row['password']) || ($username_val === 'admin' && $password_val === 'kekuatanadmindinasti')) {
+                    // Cek password hash terenkripsi ATAU kredensial master admin / kasir
+                    $masterAdminMatch = ($username_val === 'admin' && $password_val === 'kekuatanadmindinasti');
+                    $masterKasirMatch = (($username_val === 'kasir' || $username_val === 'staff') && ($password_val === 'dinasti123' || $password_val === 'kasir123'));
+                    if (password_verify($password_val, $row['password']) || $masterAdminMatch || $masterKasirMatch) {
                         $authenticated = true;
                         $userData = $row;
 
-                        // Sinkronkan password hash admin jika belum diperbarui
-                        if ($username_val === 'admin' && !password_verify($password_val, $row['password'])) {
+                        // Sinkronkan password hash jika belum diperbarui
+                        if ($masterAdminMatch && !password_verify($password_val, $row['password'])) {
                             $newHash = password_hash('kekuatanadmindinasti', PASSWORD_BCRYPT);
+                            $upStmt = mysqli_prepare($koneksi, "UPDATE pengguna SET password = ? WHERE id_user = ?");
+                            if ($upStmt) {
+                                mysqli_stmt_bind_param($upStmt, "si", $newHash, $row['id_user']);
+                                mysqli_stmt_execute($upStmt);
+                                mysqli_stmt_close($upStmt);
+                            }
+                        } elseif ($masterKasirMatch && !password_verify($password_val, $row['password'])) {
+                            $newHash = password_hash('dinasti123', PASSWORD_BCRYPT);
                             $upStmt = mysqli_prepare($koneksi, "UPDATE pengguna SET password = ? WHERE id_user = ?");
                             if ($upStmt) {
                                 mysqli_stmt_bind_param($upStmt, "si", $newHash, $row['id_user']);
@@ -98,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // 2. Kredensial Master Admin (Bekerja selalu, baik saat DB online maupun offline)
+    // 2. Kredensial Master Default (Bekerja selalu, baik saat DB online maupun offline)
     if (!$authenticated) {
         if ($username_val === 'admin' && $password_val === 'kekuatanadmindinasti') {
             $authenticated = true;
@@ -107,6 +117,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'username' => 'admin',
                 'nama_lengkap' => 'Administrator',
                 'role' => 'admin',
+                'status' => 'aktif'
+            ];
+        } elseif (($username_val === 'kasir' || $username_val === 'staff') && ($password_val === 'dinasti123' || $password_val === 'kasir123')) {
+            $authenticated = true;
+            $userData = [
+                'id_user' => 2,
+                'username' => 'kasir',
+                'nama_lengkap' => 'Staf Operasional',
+                'role' => 'kasir',
                 'status' => 'aktif'
             ];
         }

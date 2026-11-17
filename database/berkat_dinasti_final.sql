@@ -636,7 +636,8 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_user`, `username`, `password`, `nama_lengkap`, `email`, `no_hp`, `role`, `status`, `last_login`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$ZXTnSmkxhA/90O3bJnjame2j6WU5.WgNzRgNUJaupBc.cbsmVWT8q', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 23:10:43', '2026-04-24 23:10:43');
+(1, 'admin', '$2y$10$ZXTnSmkxhA/90O3bJnjame2j6WU5.WgNzRgNUJaupBc.cbsmVWT8q', 'Administrator', NULL, NULL, 'admin', 'aktif', NULL, '2026-04-24 23:10:43', '2026-04-24 23:10:43'),
+(2, 'kasir', '$2y$10$GEGB62f2c/adv9OlrjLZlus3vZMiy6Li5HiHnfXiZqdSrUGMpDwVy', 'Staf Kasir & Operasional', 'kasir@berkatdinasti.id', '081234567891', 'kasir', 'aktif', NULL, '2026-11-17 09:00:00', '2026-11-17 09:00:00');
 
 -- --------------------------------------------------------
 

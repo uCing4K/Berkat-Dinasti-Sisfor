@@ -7,6 +7,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+$is_admin = (!isset($_SESSION['role']) || strtolower($_SESSION['role']) === 'admin' || strtolower($_SESSION['role']) === 'pemilik');
+
 // Inisialisasi Database Connection (PDO) & Handler Backend
 $db_connected = false;
 $pdo = null;
@@ -493,6 +495,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         <span>Pelanggan</span>
                     </a>
 
+                    <?php if ($is_admin): ?>
                     <!-- Laporan -->
                     <a href="laporan.php" class="text-white/80 hover:text-white hover:bg-white/10 rounded-lg px-4 py-3 flex items-center gap-3 font-medium text-sm transition-colors">
                         <i class="fas fa-chart-line w-5 text-center text-sm opacity-90"></i>
@@ -504,6 +507,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         <i class="fas fa-cog w-5 text-center text-sm opacity-90"></i>
                         <span>Pengaturan</span>
                     </a>
+                    <?php endif; ?>
                 </nav>
             </div>
 
@@ -512,11 +516,11 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                 <div class="bg-black/25 border border-white/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div class="flex items-center gap-3 overflow-hidden">
                         <div class="w-9 h-9 rounded-full bg-[#D46E15] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                            BD
+                            <?= $is_admin ? 'AD' : 'SO' ?>
                         </div>
                         <div class="truncate">
                             <p class="text-white font-semibold text-sm leading-tight truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?></p>
+                            <p class="text-[#D8C7B8] text-xs leading-tight mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?></p>
                         </div>
                     </div>
                     <button type="button" onclick="openLogoutModal()" title="Keluar / Logout" class="p-1.5 text-white/70 hover:text-white transition-colors shrink-0">
@@ -602,9 +606,10 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                         <div id="userDropdown" class="hidden absolute right-0 mt-2.5 w-56 craft-dropdown py-1.5 z-50 text-xs">
                             <div class="px-4 py-2.5 border-b border-[#ECE5DD]">
                                 <p class="text-xs font-semibold text-[#251A14] truncate"><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['user'] ?? 'Admin') ?></p>
-                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= htmlspecialchars(ucfirst($_SESSION['role'] ?? 'Admin')) ?> @ Berkat Dinasti</p>
+                                <p class="text-[11px] text-[#8E7E73] mt-0.5"><?= $is_admin ? 'Pemilik (Owner)' : 'Staf Operasional' ?> @ Berkat Dinasti</p>
                             </div>
                             <div class="py-1">
+                                <?php if ($is_admin): ?>
                                 <a href="pengaturan.php" class="craft-dropdown-item flex items-center gap-2">
                                     <i class="fas fa-cog text-xs text-[#8E7E73]"></i>
                                     <span>Pengaturan Akun & Toko</span>
@@ -613,6 +618,7 @@ $totalHutang = count(array_filter($pelanggan_list, fn($c) => in_array($c['tagiha
                                     <i class="fas fa-users-cog text-xs text-[#8E7E73]"></i>
                                     <span>Manajemen User</span>
                                 </a>
+                                <?php endif; ?>
                             </div>
                             <div class="border-t border-[#ECE5DD] pt-1">
                                 <button type="button" onclick="openLogoutModal()" class="w-full text-left craft-dropdown-item text-[#991B1B] hover:text-[#7F1D1D] hover:bg-rose-50/70 flex items-center gap-2">

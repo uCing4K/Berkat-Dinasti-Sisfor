@@ -474,14 +474,8 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             <input type="date" id="filterEndDate" onchange="onCustomDateChanged()" class="bg-transparent border border-[#DDD3C5] rounded-md px-1.5 py-0.5 text-xs text-[#251A14] font-bold focus:outline-none focus:border-[#D46E15] cursor-pointer">
                         </div>
 
-                        <!-- Date Range Display Box -->
-                        <div class="hidden xl:flex bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl px-3 py-2 text-xs md:text-sm text-[#3E2B21] font-semibold items-center gap-1.5 shadow-2xs">
-                            <i class="fas fa-check-circle text-[#D46E15] text-xs"></i>
-                            <span id="dateRangeText">01/<?= date('m/Y') ?> — <?= date('d/m/Y') ?></span>
-                        </div>
-
-                        <!-- Button Terapkan Filter -->
-                        <button onclick="applyPeriodFilter()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0">
+                        <!-- Button Terapkan Filter (Item 38: Mereplace tampilan tanggal redundan) -->
+                        <button onclick="applyPeriodFilter()" class="bg-[#D46E15] hover:bg-[#B85207] text-white text-xs md:text-sm font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-button-orange active:scale-95 shrink-0" title="Terapkan filter rentang tanggal">
                             <i class="fas fa-check text-xs"></i>
                             <span class="hidden sm:inline">Terapkan Filter</span>
                             <span class="sm:hidden">Terapkan</span>

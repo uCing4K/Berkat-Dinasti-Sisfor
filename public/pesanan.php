@@ -947,13 +947,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                     </button>
 
                     <div>
-                        <!-- Breadcrumbs -->
-                        <div class="flex items-center gap-1.5 text-xs">
+                        <!-- Breadcrumbs (Item 36: 1 Baris Rapi & Teks Dipersingkat) -->
+                        <div class="flex items-center gap-1.5 text-xs whitespace-nowrap flex-nowrap overflow-x-auto">
                             <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
                             <span class="text-[#D8C7B8]">/</span>
                             <a href="pesanan.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Pesanan</a>
                             <span class="text-[#D8C7B8]">/</span>
-                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb"><?= $is_tambah_view ? 'Tambah Pesanan Baru' : ($active_tab === 'tabel' ? 'Tabel' : ($active_tab === 'kalender' ? 'Kalendar' : 'Manajemen')) ?></span>
+                            <span class="text-[#3E2B21] font-semibold" id="headerBreadcrumb"><?= $is_tambah_view ? 'Pesanan Baru' : ($active_tab === 'tabel' ? 'Tabel' : ($active_tab === 'kalender' ? 'Kalendar' : 'Manajemen')) ?></span>
                         </div>
                         <!-- Section Heading -->
                         <div class="flex items-center gap-2 mt-0.5">
@@ -963,7 +963,7 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                             </a>
                             <?php endif; ?>
                             <h1 class="text-[#251A14] font-bold text-base md:text-lg leading-tight" id="headerTitle">
-                                <?= $is_tambah_view ? 'Tambah Pesanan Baru' : ($active_tab === 'tabel' ? 'Daftar Pesanan' : ($active_tab === 'kalender' ? 'Pengiriman' : 'Manage Pesanan')) ?>
+                                <?= $is_tambah_view ? 'Pesanan Baru' : ($active_tab === 'tabel' ? 'Daftar Pesanan' : ($active_tab === 'kalender' ? 'Pengiriman' : 'Manage Pesanan')) ?>
                             </h1>
                         </div>
                     </div>
@@ -1535,9 +1535,10 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                 </div>
                             </div>
 
+                            <!-- Tombol Tambah Pesanan Baru (Item 37: Sebelumnya Tambah Kartu) -->
                             <a href="pesanan.php?view=tambah_pesanan" class="w-full py-2.5 mt-4 border border-dashed border-[#DDD3C5] hover:border-[#D46E15] text-[#8E7E73] hover:text-[#D46E15] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
                                 <i class="fas fa-plus text-xs"></i>
-                                <span>Tambah Kartu</span>
+                                <span>Tambah Pesanan Baru</span>
                             </a>
                         </div>
 

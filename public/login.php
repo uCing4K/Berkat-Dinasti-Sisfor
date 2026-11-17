@@ -1,6 +1,32 @@
 <?php
 session_start();
 
+// Cek auto-login via Cookie 'dinasti_remember' jika belum login dan bukan setelah logout eksplisit (Item 39.2)
+$is_logged_out = (isset($_GET['status']) && $_GET['status'] === 'logged_out');
+if (!$is_logged_out && (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true)) {
+    if (isset($_COOKIE['dinasti_remember'])) {
+        $token = $_COOKIE['dinasti_remember'];
+        $parts = explode(':', $token);
+        if (count($parts) === 3) {
+            list($uName, $expiry, $sig) = $parts;
+            if (intval($expiry) > time()) {
+                $expectedSig = hash_hmac('sha256', $uName . '|' . $expiry, 'berkat_dinasti_auth_key_2026');
+                if (hash_equals($expectedSig, $sig)) {
+                    $_SESSION['logged_in'] = true;
+                    $_SESSION['user_id'] = ($uName === 'admin') ? 1 : 2;
+                    $_SESSION['user'] = $uName;
+                    $_SESSION['username'] = $uName;
+                    $_SESSION['nama_lengkap'] = ($uName === 'admin') ? 'Administrator' : ucfirst($uName);
+                    $_SESSION['role'] = ($uName === 'admin') ? 'admin' : 'staff';
+                    $_SESSION['login_time'] = time();
+                    header("Location: beranda.php");
+                    exit();
+                }
+            }
+        }
+    }
+}
+
 // Jika sudah login sebelumnya, langsung arahkan ke beranda.php
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header("Location: beranda.php");
@@ -17,7 +43,7 @@ $error_message = '';
 $success_message = '';
 $username_val = '';
 
-if (isset($_GET['status']) && $_GET['status'] === 'logged_out' && empty($error_message)) {
+if ($is_logged_out && empty($error_message)) {
     $success_message = 'Anda telah berhasil keluar dari sistem.';
 }
 
@@ -97,9 +123,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['role'] = $userData['role'] ?? 'admin';
         $_SESSION['login_time'] = time();
 
+        // Fitur Ingat Saya: 1 Minggu (Item 39.2)
         if ($remember) {
-            setcookie('remember_user', $username_val, time() + (30 * 24 * 60 * 60), "/");
+            $remember_duration = 7 * 24 * 60 * 60; // 7 hari = 1 minggu
+            $remember_expiry = time() + $remember_duration;
+            $remember_sig = hash_hmac('sha256', $username_val . '|' . $remember_expiry, 'berkat_dinasti_auth_key_2026');
+            $remember_token = $username_val . ':' . $remember_expiry . ':' . $remember_sig;
+
+            setcookie('dinasti_remember', $remember_token, $remember_expiry, "/");
+            setcookie('remember_user', $username_val, $remember_expiry, "/");
         } else {
+            if (isset($_COOKIE['dinasti_remember'])) {
+                setcookie('dinasti_remember', '', time() - 3600, "/");
+            }
             if (isset($_COOKIE['remember_user'])) {
                 setcookie('remember_user', '', time() - 3600, "/");
             }
@@ -116,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username_val = $_COOKIE['remember_user'];
     }
 }
+$remember_checked = !empty($username_val) || isset($_COOKIE['dinasti_remember']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -216,22 +253,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <!-- RIGHT PANEL: Login Form -->
+    <!-- RIGHT PANEL: Login Form (Item 39: Background Coklat Gelap Khas Berkat Dinasti) -->
     <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#F5F1EB] overflow-y-auto">
-        <div class="w-full max-w-[420px] bg-[#FDFBF7] border border-[#E2D7C8] shadow-[0_12px_32px_rgba(37,26,20,0.06),0_2px_4px_rgba(37,26,20,0.02)] rounded-2xl p-8 lg:p-10 my-auto">
+        <div class="w-full max-w-[420px] bg-[#3E2B21] border border-[#544337] shadow-[0_20px_50px_rgba(0,0,0,0.35)] rounded-2xl p-8 lg:p-10 my-auto relative overflow-hidden">
             
-            <div class="mb-6">
-                <div class="w-10 h-10 bg-[#3E2B21] border border-white/10 rounded-xl flex items-center justify-center mb-4 text-[#D46E15]">
-                    <i class="fas fa-lock text-base"></i>
+            <!-- Abstract Glow Subtle Effect -->
+            <div class="absolute -right-20 -top-20 w-48 h-48 bg-[#D46E15]/15 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="mb-6 relative z-10">
+                <!-- Icon Box: Background Putih dengan Logo Berkat Dinasti (Item 39.4) -->
+                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4 p-2 shadow-sm border border-white/20">
+                    <img src="assets/images/logo.png" alt="Logo Berkat Dinasti" class="w-full h-full object-contain">
                 </div>
-                <h2 class="text-[28px] leading-[34px] font-bold text-[#251A14] tracking-tight mb-1.5">Selamat Datang</h2>
-                <p class="text-[#8E7E73] text-sm leading-[20px]">Masuk ke akun Anda untuk mengelola pesanan bakery</p>
+                <h2 class="text-[28px] leading-[34px] font-bold text-[#FAF8F5] tracking-tight mb-1.5">Selamat Datang</h2>
+                <p class="text-[#D8C7B8] text-sm leading-[20px]">Masuk ke akun Anda untuk mengelola pesanan bakery</p>
             </div>
 
             <!-- Pesan Sukses Logout -->
             <?php if (!empty($success_message)): ?>
-                <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
-                    <i class="fas fa-check-circle text-emerald-600 shrink-0 mt-0.5"></i>
+                <div class="mb-5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
+                    <i class="fas fa-check-circle text-emerald-400 shrink-0 mt-0.5"></i>
                     <div class="text-sm font-medium leading-relaxed">
                         <?= htmlspecialchars($success_message) ?>
                     </div>
@@ -240,8 +281,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Pesan Error Login -->
             <?php if (!empty($error_message)): ?>
-                <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
-                    <i class="fas fa-exclamation-triangle text-rose-500 shrink-0 mt-0.5"></i>
+                <div class="mb-5 bg-rose-950/60 border border-rose-500/40 text-rose-200 px-4 py-3 rounded-xl flex items-start gap-3 shadow-xs">
+                    <i class="fas fa-exclamation-triangle text-rose-400 shrink-0 mt-0.5"></i>
                     <div class="text-sm font-medium leading-relaxed">
                         <?= htmlspecialchars($error_message) ?>
                     </div>
@@ -249,53 +290,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Form -->
-            <form action="" method="POST" class="space-y-4">
+            <form action="" method="POST" class="space-y-4 relative z-10">
                 <!-- Username -->
                 <div class="space-y-1.5">
-                    <label for="username" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Username</label>
+                    <label for="username" class="block text-xs font-semibold text-[#D8C7B8] uppercase tracking-wider">Username</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#D8C7B8]/70">
                             <i class="fas fa-user text-xs"></i>
                         </div>
                         <input type="text" id="username" name="username" value="<?= htmlspecialchars($username_val) ?>" placeholder="Masukkan username" required autocomplete="username"
-                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
+                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#2D1E17] border border-[#544337] rounded-xl text-[#FAF8F5] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
                     </div>
                 </div>
 
                 <!-- Password -->
                 <div class="space-y-1.5">
-                    <label for="password" class="block text-xs font-semibold text-[#5E4D42] uppercase tracking-wider">Password</label>
+                    <label for="password" class="block text-xs font-semibold text-[#D8C7B8] uppercase tracking-wider">Password</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E7E73]">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#D8C7B8]/70">
                             <i class="fas fa-key text-xs"></i>
                         </div>
                         <input type="password" id="password" name="password" placeholder="Masukkan password" required autocomplete="current-password"
-                            class="w-full pl-10 pr-10 py-2.5 text-sm bg-[#EFE8DE] border border-[#DDD3C5] rounded-xl text-[#251A14] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#8E7E73] hover:text-[#251A14] transition-colors focus:outline-none" title="Lihat/Sembunyikan password">
+                            class="w-full pl-10 pr-10 py-2.5 text-sm bg-[#2D1E17] border border-[#544337] rounded-xl text-[#FAF8F5] placeholder-[#8E7E73] focus:outline-none focus:border-[#D46E15] focus:ring-1 focus:ring-[#D46E15] transition-all">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#D8C7B8]/70 hover:text-white transition-colors focus:outline-none" title="Lihat/Sembunyikan password">
                             <i id="eye-icon" class="fas fa-eye text-xs"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Remember Me & Lupa Password -->
+                <!-- Remember Me (Item 39.1: Lupa password dihilangkan, Item 39.2: Ingat saya aktif 1 minggu) -->
                 <div class="flex items-center justify-between pt-1 pb-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-[#DDD3C5] text-[#D46E15] focus:ring-[#D46E15]/30 cursor-pointer bg-[#EFE8DE]">
-                        <span class="text-xs text-[#5E4D42]">Ingat saya</span>
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" name="remember" id="rememberMe" value="1" <?= !empty($remember_checked) ? 'checked' : '' ?> 
+                            class="w-4 h-4 rounded border-[#544337] bg-[#2D1E17] text-[#D46E15] focus:ring-[#D46E15]/30 cursor-pointer">
+                        <span class="text-xs font-medium text-[#D8C7B8]">Ingat saya (1 minggu)</span>
                     </label>
-                    <a href="reset-password.php" class="text-xs font-medium text-[#D46E15] hover:text-[#B85207] transition-colors">Lupa Password?</a>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="w-full h-11 text-sm font-semibold rounded-xl bg-[#D46E15] hover:bg-[#B85207] text-white shadow-button-orange flex justify-center items-center gap-2 transition-all duration-200">
+                <button type="submit" class="w-full h-11 text-sm font-semibold rounded-xl bg-[#D46E15] hover:bg-[#B85207] text-white shadow-button-orange flex justify-center items-center gap-2 transition-all duration-200 active:scale-[0.98]">
                     <span>Masuk</span>
                     <i class="fas fa-arrow-right text-xs"></i>
                 </button>
             </form>
 
             <!-- Copyright -->
-            <div class="mt-8 pt-6 border-t border-[#E2D7C8] text-center">
-                <p class="text-[12px] text-[#8E7E73] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
+            <div class="mt-8 pt-6 border-t border-white/10 text-center relative z-10">
+                <p class="text-[12px] text-[#A69485] tracking-[0.3px]">© 2026 Berkat Dinasti. All rights reserved.</p>
             </div>
         </div>
     </div>

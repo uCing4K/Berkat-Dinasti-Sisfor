@@ -1043,10 +1043,10 @@ if ($db_connected && $pdo) {
 
                     <div>
                         <!-- Breadcrumbs -->
-                        <div class="flex items-center gap-1.5 text-xs">
+                        <div class="flex items-center gap-1.5 text-xs whitespace-nowrap flex-nowrap overflow-x-auto">
                             <a href="beranda.php" class="text-[#8E7E73] hover:text-[#D46E15] transition-colors">Beranda</a>
                             <span class="text-[#D8C7B8]">/</span>
-                            <span class="text-[#3E2B21] font-semibold"><?= $is_tambah_view ? 'Tambah Pesanan Baru' : 'Ringkasan' ?></span>
+                            <span class="text-[#3E2B21] font-semibold"><?= $is_tambah_view ? 'Pesanan Baru' : 'Ringkasan' ?></span>
                         </div>
                         <!-- Section Heading -->
                         <div class="flex items-center gap-2 mt-0.5">

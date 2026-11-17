@@ -13,6 +13,11 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
+// Hapus cookie remember me saat logout eksplisit (Item 39.2)
+if (isset($_COOKIE['dinasti_remember'])) {
+    setcookie('dinasti_remember', '', time() - 3600, "/");
+}
+
 // Hancurkan sesi
 session_destroy();
 

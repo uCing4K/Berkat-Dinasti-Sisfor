@@ -213,7 +213,11 @@ $remember_checked = !empty($username_val) || isset($_COOKIE['dinasti_remember'])
 
     <style>
         body {
-            background-color: #F5F1EB;
+            background-color: #F8ECE1;
+            background-image: 
+                radial-gradient(ellipse 90% 60% at 70% 40%, rgba(212, 110, 21, 0.12) 0%, rgba(212, 110, 21, 0.03) 60%, transparent 100%),
+                radial-gradient(circle at 15% 85%, rgba(255, 155, 69, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #FAF1E6 0%, #F5E5D3 50%, #EFE0CC 100%);
             font-family: 'Inter', sans-serif;
         }
         .logo-box {
@@ -221,7 +225,7 @@ $remember_checked = !empty($username_val) || isset($_COOKIE['dinasti_remember'])
         }
     </style>
 </head>
-<body class="h-screen w-full m-0 flex overflow-hidden bg-[#F5F1EB]">
+<body class="h-screen w-full m-0 flex overflow-hidden bg-[#F8ECE1]">
     
     <!-- LEFT PANEL: Branding (Disembunyikan saat di HP, muncul di layar besar) -->
     <div class="hidden md:flex w-[45%] max-w-[512px] bg-[#3E2B21] border-r border-[#2C1E17] relative flex-col justify-between items-center p-8 lg:p-16 overflow-hidden">
@@ -272,9 +276,11 @@ $remember_checked = !empty($username_val) || isset($_COOKIE['dinasti_remember'])
         </div>
     </div>
 
-    <!-- RIGHT PANEL: Login Form (Item 39: Background Coklat Gelap Khas Berkat Dinasti) -->
-    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-[#F5F1EB] overflow-y-auto">
-        <div class="w-full max-w-[420px] bg-[#3E2B21] border border-[#544337] shadow-[0_20px_50px_rgba(0,0,0,0.35)] rounded-2xl p-8 lg:p-10 my-auto relative overflow-hidden">
+    <!-- RIGHT PANEL: Login Form (Item 42: Warm Orange Bakery Background with Signature Berkat Dinasti Atmosphere) -->
+    <div class="flex-1 flex justify-center items-center p-6 lg:p-8 bg-transparent relative overflow-y-auto">
+        <!-- Subtle warm orange backdrop aura for right panel -->
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_50%,rgba(212,110,21,0.08)_0%,transparent_75%)]"></div>
+        <div class="w-full max-w-[420px] bg-[#3E2B21] border border-[#544337] shadow-[0_20px_50px_rgba(0,0,0,0.35)] rounded-2xl p-8 lg:p-10 my-auto relative overflow-hidden z-10">
             
             <!-- Abstract Glow Subtle Effect -->
             <div class="absolute -right-20 -top-20 w-48 h-48 bg-[#D46E15]/15 rounded-full blur-2xl pointer-events-none"></div>

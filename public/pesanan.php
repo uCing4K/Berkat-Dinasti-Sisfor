@@ -3329,6 +3329,9 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
 
         // Switch View Tabs (Kanban vs Tabel vs Kalender)
         function switchTab(tab) {
+            // Guard: Jika sedang di view Tambah Pesanan Baru, jangan switch tab tabel/kanban
+            if (<?= $is_tambah_view ? 'true' : 'false' ?>) return;
+
             const kanbanView = document.getElementById('kanbanView');
             const tableView = document.getElementById('tableView');
             const calendarView = document.getElementById('calendarView');
@@ -5373,25 +5376,29 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             if (typeof renderInteractiveCalendar === 'function') renderInteractiveCalendar();
             if (typeof filterTableOrders === 'function') filterTableOrders();
 
+            const isTambahView = <?= $is_tambah_view ? 'true' : 'false' ?>;
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
             const qParam = urlParams.get('q');
             const isMobile = window.innerWidth < 768;
 
-            if (tabParam === 'tabel' || tabParam === 'table') {
-                switchTab('tabel');
-            } else if (tabParam === 'kalender') {
-                switchTab('kalender');
-            } else if (tabParam === 'kanban') {
-                if (isMobile) {
+            // Inisialisasi tab hanya untuk view Manajemen Pesanan (bukan form Pesanan Baru)
+            if (!isTambahView) {
+                if (tabParam === 'tabel' || tabParam === 'table') {
                     switchTab('tabel');
+                } else if (tabParam === 'kalender') {
+                    switchTab('kalender');
+                } else if (tabParam === 'kanban') {
+                    if (isMobile) {
+                        switchTab('tabel');
+                    } else {
+                        switchTab('kanban');
+                    }
                 } else {
-                    switchTab('kanban');
-                }
-            } else {
-                // Default tanpa parameter ?tab=: di layar mobile langsung buka tabel pesanan (cards), di desktop buka kanban
-                if (isMobile) {
-                    switchTab('tabel');
+                    // Default tanpa parameter ?tab=: di layar mobile langsung buka tabel pesanan (cards), di desktop buka kanban
+                    if (isMobile) {
+                        switchTab('tabel');
+                    }
                 }
             }
 

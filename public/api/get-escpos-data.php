@@ -582,7 +582,17 @@ function buildReceiptESCPOS($store, $order, $items, $logoPath = '', $colWidth = 
     }
     appendWrappedLine($c, '"' . trim($footerText, '" ') . '"', $colWidth);
 
-    // 8. Feed Kertas (2 baris) & Auto-Cut
+    // 8. QR Code Nota Digital & Lacak Pesanan (Zero-Login)
+    $trackingToken = $order['tracking_token'] ?? '';
+    if (!empty($trackingToken)) {
+        require_once __DIR__ . '/../../app/Helpers/ReceiptHelper.php';
+        $digitalReceiptUrl = ReceiptHelper::getDigitalReceiptUrl($trackingToken);
+        $c[] = 0x0A;
+        appendQRCode($c, $digitalReceiptUrl, 3);
+        appendWrappedLine($c, 'Scan QR Nota Digital & Dapur', $colWidth);
+    }
+
+    // 9. Feed Kertas (2 baris) & Auto-Cut
     $c[] = 0x0A;
     $c[] = 0x0A;
     $c[] = 0x1D; $c[] = 0x56; $c[] = 0x42; $c[] = 0x00; // GS V 66 0 (Cut with feed)

@@ -15,6 +15,7 @@ $pdo = null;
 $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     require_once $configFile;
+    require_once __DIR__ . "/../app/Helpers/ReceiptHelper.php";
     try {
         if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER') && defined('DB_PASS')) {
             $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
@@ -31,6 +32,9 @@ if (file_exists($configFile)) {
                     $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN topping VARCHAR(150) NULL DEFAULT NULL AFTER id_varian");
                 } catch (Exception $eAlter) {}
             }
+
+            // Self-healing migration: Pastikan tracking_token untuk Nota Digital tersedia
+            ReceiptHelper::ensureTrackingTokenSupport($pdo);
         }
     } catch (Exception $e) {
         $db_connected = false;
@@ -75,6 +79,8 @@ if (!isset($_SESSION['kitchen_notes'])) {
 // POST Action Handlers (AJAX & Form)
 $toast_message = $_SESSION['flash_msg'] ?? null;
 unset($_SESSION['flash_msg']);
+$last_receipt = $_SESSION['last_created_receipt'] ?? null;
+unset($_SESSION['last_created_receipt']);
 $error_message = $_SESSION['flash_error'] ?? null;
 unset($_SESSION['flash_error']);
 
@@ -305,21 +311,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                $stmtOrder = $pdo->prepare("
-                    INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan)
-                    VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?)
-                ");
-                $stmtOrder->execute([
-                    $id_pelanggan,
-                    $no_invoice,
-                    $tglKirim,
-                    $waktuKirimSql,
-                    $grand_total,
-                    $grand_total,
-                    $dbStatusBayar,
-                    $metodeBayar,
-                    $catatan
-                ]);
+                $tracking_token = ReceiptHelper::generateTrackingToken();
+                try {
+                    $stmtOrder = $pdo->prepare("
+                        INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan, tracking_token)
+                        VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+                    ");
+                    $stmtOrder->execute([
+                        $id_pelanggan,
+                        $no_invoice,
+                        $tglKirim,
+                        $waktuKirimSql,
+                        $grand_total,
+                        $grand_total,
+                        $dbStatusBayar,
+                        $metodeBayar,
+                        $catatan,
+                        $tracking_token
+                    ]);
+                } catch (Exception $eOrder) {
+                    $stmtOrder = $pdo->prepare("
+                        INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan)
+                        VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?)
+                    ");
+                    $stmtOrder->execute([
+                        $id_pelanggan,
+                        $no_invoice,
+                        $tglKirim,
+                        $waktuKirimSql,
+                        $grand_total,
+                        $grand_total,
+                        $dbStatusBayar,
+                        $metodeBayar,
+                        $catatan
+                    ]);
+                }
                 $newOrderId = $pdo->lastInsertId();
 
                 $hasToppingCol = false;
@@ -391,7 +417,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status_bayar' => ucfirst(str_replace('_', ' ', $dbStatusBayar)),
             'bayar_class' => $bayarClass,
             'courier_info' => 'Kurir Siap Antar ' . substr($waktuKirim, 0, 5),
-            'total' => $grand_total
+            'total' => $grand_total,
+            'tracking_token' => $tracking_token
         ]);
 
         // Push to session_orders for beranda.php (Antrean & Pengiriman Hari Ini)
@@ -410,8 +437,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'payment_class' => $bayarClass,
             'total' => 'Rp ' . number_format($grand_total, 0, ',', '.'),
             'no_wa' => $custWa,
-            'alamat' => $custAddress
+            'alamat' => $custAddress,
+            'tracking_token' => $tracking_token
         ]);
+
+        $_SESSION['last_created_receipt'] = [
+            'id' => $no_invoice,
+            'token' => $tracking_token,
+            'customer' => $custName,
+            'phone' => $custWa,
+            'url' => ReceiptHelper::getDigitalReceiptUrl($tracking_token)
+        ];
 
         $_SESSION['flash_msg'] = "Pesanan baru #{$no_invoice} untuk {$custName} berhasil dibuat dan otomatis masuk ke antrean!";
         header("Location: pesanan.php");
@@ -591,7 +627,7 @@ if ($db_connected && $pdo) {
         $itemToppingExpr = $hasTopCol ? "IF(dp.topping IS NOT NULL AND dp.topping != '', CONCAT(' [Top: ', dp.topping, ']'), '')" : "''";
 
         $stmtOrders = $pdo->query("
-            SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.tgl_kirim, p.waktu_kirim, p.grand_total, p.status, p.status_bayar, p.catatan,
+            SELECT p.id_pesanan, p.no_invoice, p.tgl_pesan, p.tgl_kirim, p.waktu_kirim, p.grand_total, p.status, p.status_bayar, p.catatan, p.tracking_token,
                    pel.nama as nama_pelanggan, pel.no_wa, pel.alamat,
                    (SELECT GROUP_CONCAT(CONCAT(v.nama_varian, {$itemToppingExpr}, ' (', dp.qty, ' pcs)') SEPARATOR ', ')
                     FROM detail_pesanan dp 
@@ -632,7 +668,8 @@ if ($db_connected && $pdo) {
                 'status_bayar' => ucfirst(str_replace('_', ' ', $payStat)),
                 'bayar_class' => $bayarCls,
                 'courier_info' => 'Kurir Siap Antar ' . $wTime,
-                'total' => floatval($r['grand_total'])
+                'total' => floatval($r['grand_total']),
+                'tracking_token' => $r['tracking_token'] ?? ''
             ];
         }
     } catch (Exception $e) {}
@@ -1065,6 +1102,41 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
             <!-- MAIN CONTENT CONTAINER -->
             <main class="flex-1 p-4 md:p-6 w-full min-w-0 <?= $is_tambah_view ? 'pos-main-container flex flex-col' : 'md:p-8' ?>">
                 
+                <!-- Banner Nota Digital Baru Dibuat -->
+                <?php if ($last_receipt): ?>
+                    <div id="newReceiptBanner" class="mb-6 bg-gradient-to-r from-[#FAF5EE] to-[#FFF9F2] border-2 border-[#D46E15]/50 text-[#3E2B21] p-4 sm:p-5 rounded-2xl shadow-md animate-in fade-in">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#D46E15] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                                    <i class="fas fa-receipt text-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-[#D46E15]">Nota Digital Siap Dibagikan</span>
+                                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">Zero-Login</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-[#251A14] mt-0.5">Pesanan #<?= htmlspecialchars($last_receipt['id']) ?> (<?= htmlspecialchars($last_receipt['customer']) ?>)</h4>
+                                    <p class="text-xs text-[#786558] mt-0.5">Pelanggan dapat memantau status pesanan dan menyimpan nota resmi tanpa perlu login.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                                <a href="<?= htmlspecialchars($last_receipt['url']) ?>" target="_blank" class="py-2 px-3 bg-white hover:bg-gray-50 border border-[#D8C7B8] text-[#3E2B21] rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition active:scale-95">
+                                    <i class="fas fa-external-link-alt text-[#D46E15]"></i> Buka Nota
+                                </a>
+                                <button type="button" onclick="sendWhatsAppForOrder({id: '<?= htmlspecialchars($last_receipt['id']) ?>', customer: '<?= htmlspecialchars($last_receipt['customer']) ?>', phone: '<?= htmlspecialchars($last_receipt['phone']) ?>', tracking_token: '<?= htmlspecialchars($last_receipt['token']) ?>'})" class="py-2 px-3 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition active:scale-95">
+                                    <i class="fab fa-whatsapp text-sm"></i> Kirim WhatsApp
+                                </button>
+                                <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($last_receipt['url']) ?>').then(() => showToast('Tautan Nota disalin!'))" class="py-2 px-2.5 bg-[#EFE8DE] hover:bg-[#E5DDD0] text-[#544337] rounded-xl text-xs font-bold flex items-center gap-1 transition active:scale-95" title="Salin Tautan">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button type="button" onclick="document.getElementById('newReceiptBanner').remove()" class="text-[#8E7E73] hover:text-[#251A14] p-1.5">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Toast Notification Banner -->
                 <?php if ($toast_message): ?>
                     <div id="toastNotification" class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
@@ -1990,6 +2062,13 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                                     <i class="fas fa-tag text-xs"></i>
                                                 </button>
 
+                                                <!-- Kirim Nota via WhatsApp (Brand Green Icon) -->
+                                                <button type="button" onclick="sendQuickWhatsApp('<?= htmlspecialchars($ord['id']) ?>')" 
+                                                    class="w-8 h-8 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                                    title="Kirim Nota Digital via WhatsApp">
+                                                    <i class="fab fa-whatsapp text-sm"></i>
+                                                </button>
+
                                                 <!-- Ubah Status Cepat (Orange Check Icon matching Rodeo Laundry) -->
                                                 <button type="button" id="table-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
                                                     onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
@@ -2097,6 +2176,11 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                                             class="w-7 h-7 rounded-lg bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
                                             title="Cetak Struk Thermal Bluetooth">
                                             <i class="fas fa-tag text-[10px]"></i>
+                                        </button>
+                                        <button type="button" onclick="sendQuickWhatsApp('<?= htmlspecialchars($ord['id']) ?>')" 
+                                            class="w-7 h-7 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center shadow-xs transition-all active:scale-90" 
+                                            title="Kirim Nota Digital via WhatsApp">
+                                            <i class="fab fa-whatsapp text-xs"></i>
                                         </button>
                                         <button type="button" id="mobile-btn-advance-<?= htmlspecialchars($ord['id']) ?>" 
                                             onclick="quickAdvanceOrder('<?= htmlspecialchars($ord['id']) ?>', this)" 
@@ -2694,6 +2778,33 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
                         </button>
                         <button type="button" id="modalStatusBtn-selesai" onclick="changeModalOrderStatus('selesai')" class="py-2 px-1 text-center font-semibold rounded-lg border border-[#DDD3C5] text-[#544337] bg-white hover:bg-[#FAF7F2] text-[11px] transition-all">
                             Selesai
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NOTA DIGITAL & DISTRIBUSI WHATSAPP PELANGGAN (Zero-Login Capability) -->
+                <div class="bg-[#FAF5EE] p-3.5 rounded-xl border border-[#EADBCE] space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-[#3E2B21] text-xs flex items-center gap-1.5">
+                            <i class="fas fa-receipt text-[#D46E15]"></i> Nota Digital & Pelacakan Publik
+                        </span>
+                        <span class="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full font-bold">Zero-Login</span>
+                    </div>
+                    <p class="text-[11px] text-[#786558] leading-tight">
+                        Bagikan nota digital dengan pemantauan alur oven dan pengiriman ke pelanggan tanpa perlu registrasi/login.
+                    </p>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <button type="button" onclick="openSelectedDigitalReceipt()" class="py-2 px-2 bg-white hover:bg-gray-50 border border-[#DDD3C5] text-[#3E2B21] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95" title="Buka Nota Digital Pelanggan di Tab Baru">
+                            <i class="fas fa-external-link-alt text-xs text-[#D46E15]"></i>
+                            <span>Buka Nota</span>
+                        </button>
+                        <button type="button" onclick="sendSelectedWhatsAppReceipt()" class="py-2 px-2 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95" title="Kirim Tautan Nota Digital ke WhatsApp Pelanggan">
+                            <i class="fab fa-whatsapp text-sm"></i>
+                            <span>Kirim WA</span>
+                        </button>
+                        <button type="button" onclick="copySelectedReceiptLink()" class="py-2 px-2 bg-white hover:bg-gray-50 border border-[#DDD3C5] text-[#544337] rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95" title="Salin Tautan Nota ke Clipboard">
+                            <i class="fas fa-copy text-xs text-[#8E7E73]"></i>
+                            <span>Salin Link</span>
                         </button>
                     </div>
                 </div>
@@ -3989,6 +4100,84 @@ $currentMonthIndo = ($monthsIndoFull[$monthNum] ?? date('F')) . " " . $yearNum;
         function closeOrderDetailModal() {
             document.getElementById('orderDetailModal').classList.add('hidden');
             document.body.style.overflow = '';
+        }
+
+        // =========================================================================
+        // NOTA DIGITAL & WHATSAPP CAPABILITY ACTIONS
+        // =========================================================================
+        function getReceiptUrlForOrder(ord) {
+            const token = ord.tracking_token || ord.token || ord.id;
+            const origin = window.location.origin;
+            const pathParts = window.location.pathname.split('/');
+            pathParts.pop(); // Remove pesanan.php
+            const basePath = pathParts.join('/');
+            return origin + basePath + '/nota-digital.php?token=' + encodeURIComponent(token);
+        }
+
+        function openSelectedDigitalReceipt() {
+            if (!selectedDetailOrderId) return;
+            const ord = ordersData.find(o => o.id === selectedDetailOrderId || o.invoice === selectedDetailOrderId);
+            if (!ord) return;
+            window.open(getReceiptUrlForOrder(ord), '_blank');
+        }
+
+        function copySelectedReceiptLink() {
+            if (!selectedDetailOrderId) return;
+            const ord = ordersData.find(o => o.id === selectedDetailOrderId || o.invoice === selectedDetailOrderId);
+            if (!ord) return;
+            const url = getReceiptUrlForOrder(ord);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Tautan Nota Digital disalin!');
+                }).catch(() => {
+                    prompt('Salin tautan nota digital:', url);
+                });
+            } else {
+                prompt('Salin tautan nota digital:', url);
+            }
+        }
+
+        function sendSelectedWhatsAppReceipt() {
+            if (!selectedDetailOrderId) return;
+            const ord = ordersData.find(o => o.id === selectedDetailOrderId || o.invoice === selectedDetailOrderId);
+            if (!ord) return;
+            sendWhatsAppForOrder(ord);
+        }
+
+        function sendQuickWhatsApp(orderId) {
+            const ord = ordersData.find(o => o.id === orderId || o.invoice === orderId);
+            if (!ord) return;
+            sendWhatsAppForOrder(ord);
+        }
+
+        function sendWhatsAppForOrder(ord) {
+            const url = getReceiptUrlForOrder(ord);
+            const rawPhone = (ord.phone || '').replace(/[^0-9]/g, '');
+            const cust = ord.customer || 'Pelanggan';
+            const total = 'Rp ' + Number(ord.total || 0).toLocaleString('id-ID');
+            const invoice = ord.id || '-';
+            const statusBayar = ord.status_bayar || 'Belum Lunas';
+
+            const msg = `Halo Kak *${cust}*, salam hangat dari *Berkat Dinasti Bakery*! 🍞✨\n\n` +
+                        `Terima kasih telah memesan roti & pastry kami.\n` +
+                        `📋 *Detail Nota:* #${invoice}\n` +
+                        `• Total Belanja: *${total}*\n` +
+                        `• Status Bayar: *${statusBayar}*\n` +
+                        `• Bebas Ongkir (Malang & Batu Rp 0)\n\n` +
+                        `🧾 *Nota Digital & Pemantauan Dapur:*\n` +
+                        `Kakak dapat melihat rincian item, memantau proses oven/kurir, serta mengunduh struk melalui tautan resmi berikut:\n` +
+                        `👉 ${url}\n\n` +
+                        `Selamat menikmati roti hangat kami! 🙏❤️\n` +
+                        `_— Layanan Pelanggan Berkat Dinasti Bakery_`;
+
+            let cleanPhone = rawPhone;
+            if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+
+            if (cleanPhone.length >= 8) {
+                window.open('https://wa.me/' + cleanPhone + '?text=' + encodeURIComponent(msg), '_blank');
+            } else {
+                window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+            }
         }
 
         function changeModalOrderStatus(status) {

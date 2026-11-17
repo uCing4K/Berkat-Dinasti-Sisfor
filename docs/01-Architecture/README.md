@@ -60,8 +60,8 @@ Sistem menggunakan 13 tabel database fisik yang dipetakan ke kelompok Data Store
 | **T2** | `produk` | D1 | Master data produk (nama, masa simpan/shelf life, status). |
 | **T3** | `varian_produk` | D1 | Kemasan (Kardus, Mika, Satuan), harga, minimum order (MOQ). |
 | **T4** | `pelanggan` | D2 | Profil pelanggan retail & reseller, akumulasi `total_hutang`. |
-| **T5** | `pesanan` | D3 | Header transaksi (`INV-YYYYMMDD-XXXX`), tanggal kirim, grand total. |
-| **T6** | `detail_pesanan` | D3 | Rincian item roti dipesan, kuantitas, subtotal. |
+| **T5** | `pesanan` | D3 | Header transaksi (`INV-YYYYMMDD-XXXX`), tanggal kirim, grand total, `tracking_token` (Zero-Login capability). |
+| **T6** | `detail_pesanan` | D3 | Rincian item roti dipesan, kuantitas, subtotal, topping. |
 | **T7** | `pembayaran` | D4 | Log transaksi pembayaran (nominal, metode bayar, bukti). |
 | **T8** | `pengiriman` | D5 | Jadwal kurir & jam estimasi tiba (Gratis Malang & Batu). |
 | **T9** | `tracking_log` | D4 / D5 | Audit trail perubahan status pesanan & pengiriman. |
@@ -101,6 +101,30 @@ $$\text{Sisa Piutang} = \text{Grand Total} - \text{Total Dibayar}$$
 | **Jadwal Pengiriman & Status Kurir**| **Full Access (CRUD)** | Input Jadwal & Update Status |
 | **Laporan Keuangan & Arus Kas** | **Full Access (Export PDF/Excel)** | Terbatas (Rekap Kas Harian) |
 | **Pengaturan Akun & Manajemen User**| **Full Access (Kelola User)** | Akses Ditolak |
+
+---
+
+## 6. Arsitektur Nota Digital & Pelacakan Publik (Zero-Login Capability)
+
+Untuk memberikan transparansi kepada pelanggan tanpa mewajibkan registrasi/login akun, sistem mengadopsi **Zero-Login Capability URL Architecture**:
+
+```mermaid
+flowchart LR
+    A["Kasir/Admin Buat Pesanan"] -->|"Generate 128-bit CSPRNG (32 hex)"| B[("DB: pesanan.tracking_token")]
+    B --> C{"Kanal Distribusi"}
+    C -->|"1. Kirim WhatsApp Pelanggan"| D["Link: /public/nota-digital.php?token=..."]
+    C -->|"2. Salin Tautan Cepat"| D
+    C -->|"3. QR Code Struk Thermal ESC/POS"| D
+    D -->|"Akses Mandiri Pelanggan"| E["📱 Nota Digital & Live Progress Dapur"]
+    E -->|"Simpan Galeri"| F["Unduh Gambar PNG (html2canvas)"]
+    E -->|"Konfirmasi & Tanya"| G["Deep Link WhatsApp Admin"]
+```
+
+### Prinsip Keamanan & Proteksi Data:
+1. **Unguessable Capability Token (IDOR Protection):** Akses publik tidak pernah mengekspos `id_pesanan` numerik sekuensial, melainkan token 128-bit acak berkekuatan tinggi (`bin2hex(random_bytes(16))`).
+2. **PII Minimization (Perlindungan Privasi Pelanggan):** Nomor telepon dan alamat disanitasi otomatis pada halaman publik (misal: `0812-****-7890` dan hanya menampilkan nama kelurahan/kota).
+3. **Rate Limiting:** Enforce batas 60 request per 60 detik berbasis IP klien guna mencegah automated scraping.
+4. **Header Proteksi:** `X-Robots-Tag: noindex, nofollow` dan `Referrer-Policy: no-referrer` mencegah pengindeksan mesin pencari dan kebocoran token via HTTP Referer.
 
 ---
 *Dokumen ini merupakan bagian dari spesifikasi arsitektur final proyek Berkat Dinasti.*

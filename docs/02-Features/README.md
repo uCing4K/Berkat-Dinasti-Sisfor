@@ -95,4 +95,22 @@ sequenceDiagram
 4. Admin dapat langsung memperbarui status pengiriman dari kalender.
 
 ---
+
+## 4. Fitur Nota Digital Pelanggan & Pelacakan Mandiri
+
+Fitur ini memberikan transparansi penuh kepada pelanggan pemesan roti Berkat Dinasti:
+
+1. **Akses Nota Zero-Login (`public/nota-digital.php?token=...`):**
+   - Pelanggan cukup mengklik tautan tanpa perlu registrasi/login akun.
+   - Menampilkan identitas toko, nomor invoice, tanggal pesan, jadwal kirim, rincian roti, varian kemasan, topping, subtotal, dan status bayar (Lunas / DP).
+2. **Pemantauan Alur Dapur 4 Tahap:**
+   - Visualisasi progress bar real-time: `Diterima` ➔ `Diproses Dapur & Oven` ➔ `Siap Kirim / Kurir Obrok` ➔ `Selesai Diterima`.
+3. **Ekspor Gambar Struk PNG Bersih (html2canvas):**
+   - Tombol `Simpan Struk ke Galeri (PNG)` merender kartu struk menjadi gambar PNG tajam beresolusi tinggi tanpa tombol aksi.
+4. **Distribusi Cepat dari Dashboard POS:**
+   - Tombol **Kirim WhatsApp** langsung menyusun draf pesan WhatsApp lengkap dengan rincian total dan link nota.
+   - Tombol **Salin Tautan** untuk menyalin capability URL ke clipboard dalam 1 klik.
+   - Pencetakan QR Code langsung pada struk printer kasir thermal Bluetooth ESC/POS.
+
+---
 *Dokumen ini merupakan panduan spesifikasi fitur aplikasi Berkat Dinasti.*

@@ -685,6 +685,7 @@ CREATE TABLE `pesanan` (
   `status_bayar` enum('belum_bayar','dp','hutang','lunas') DEFAULT 'belum_bayar',
   `metode_bayar` enum('cash','transfer') DEFAULT 'cash',
   `catatan` text DEFAULT NULL,
+  `tracking_token` varchar(64) DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
@@ -1224,6 +1225,7 @@ ALTER TABLE `pengiriman`
 ALTER TABLE `pesanan`
   ADD PRIMARY KEY (`id_pesanan`),
   ADD UNIQUE KEY `no_invoice` (`no_invoice`),
+  ADD UNIQUE KEY `idx_tracking_token` (`tracking_token`),
   ADD KEY `idx_pelanggan` (`id_pelanggan`),
   ADD KEY `idx_no_invoice` (`no_invoice`),
   ADD KEY `idx_tgl_pesan` (`tgl_pesan`),

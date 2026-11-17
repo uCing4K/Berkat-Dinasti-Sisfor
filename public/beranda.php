@@ -36,6 +36,7 @@ $configFile = __DIR__ . "/../config/config.php";
 if (file_exists($configFile)) {
     try {
         @require_once $configFile;
+        @require_once __DIR__ . "/../app/Helpers/ReceiptHelper.php";
         if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER')) {
             $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4", DB_USER, DB_PASS, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
@@ -47,6 +48,11 @@ if (file_exists($configFile)) {
             try {
                 $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN IF NOT EXISTS topping VARCHAR(150) NULL AFTER id_varian");
             } catch (Exception $e) {}
+
+            // Self-healing migration: Pastikan kolom tracking_token tersedia
+            if (class_exists('ReceiptHelper')) {
+                ReceiptHelper::ensureTrackingTokenSupport($pdo);
+            }
         }
     } catch (Exception $e) {
         $db_connected = false;
@@ -231,22 +237,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 }
             }
             
-            // Insert Pesanan
-            $stmtOrder = $pdo->prepare("
-                INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan)
-                VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?)
-            ");
-            $stmtOrder->execute([
-                $id_pelanggan,
-                $no_invoice,
-                $tgl_kirim,
-                $waktu_kirim,
-                $grand_total,
-                $grand_total,
-                $status_bayar,
-                $metode_bayar,
-                $catatan
-            ]);
+            // Insert Pesanan dengan tracking_token
+            $tracking_token = class_exists('ReceiptHelper') ? ReceiptHelper::generateTrackingToken() : bin2hex(random_bytes(16));
+            try {
+                $stmtOrder = $pdo->prepare("
+                    INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan, tracking_token)
+                    VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+                ");
+                $stmtOrder->execute([
+                    $id_pelanggan,
+                    $no_invoice,
+                    $tgl_kirim,
+                    $waktu_kirim,
+                    $grand_total,
+                    $grand_total,
+                    $status_bayar,
+                    $metode_bayar,
+                    $catatan,
+                    $tracking_token
+                ]);
+            } catch (Exception $eIns) {
+                $stmtOrder = $pdo->prepare("
+                    INSERT INTO pesanan (id_pelanggan, no_invoice, tgl_pesan, tgl_kirim, waktu_kirim, total_harga, grand_total, status, status_bayar, metode_bayar, catatan)
+                    VALUES (?, ?, CURDATE(), ?, ?, ?, ?, 'pending', ?, ?, ?)
+                ");
+                $stmtOrder->execute([
+                    $id_pelanggan,
+                    $no_invoice,
+                    $tgl_kirim,
+                    $waktu_kirim,
+                    $grand_total,
+                    $grand_total,
+                    $status_bayar,
+                    $metode_bayar,
+                    $catatan
+                ]);
+            }
             $new_order_id = $pdo->lastInsertId();
             
             // Insert Detail Pesanan (dengan kolom topping dan fallback graceful)

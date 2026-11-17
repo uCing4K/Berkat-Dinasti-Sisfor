@@ -4,6 +4,32 @@ Seluruh perubahan rancangan, pembaruan fitur, serta revisi dokumentasi proyek **
 
 ---
 
+## [v1.3.0] - 2026-11-17
+
+### 🧾 Fitur Nota Digital Pelanggan & Pelacakan Pesanan Real-Time (Zero-Login Capability Architecture)
+- **Zero-Login Capability URL & Unguessable Token:**
+  - Penambahan kolom `tracking_token VARCHAR(64) UNIQUE NULL` pada tabel `pesanan` dengan indeks pencarian cepat.
+  - Implementasi generator token CSPRNG 128-bit (`bin2hex(random_bytes(16))`) di `app/Helpers/ReceiptHelper.php`.
+  - Mekanisme **self-healing migration** otomatis untuk pembuatan kolom dan backfill token pesanan eksisting di lingkungan hosting cPanel.
+  - Pembuatan file migrasi SQL `database/migration_add_tracking_token.sql` dan sinkronisasi ke baseline schema `database/berkat_dinasti_final.sql`.
+- **Halaman Nota Digital Mobile-First (`public/nota-digital.php` & alias `public/receipt-digital.php`):**
+  - Desain kanvas *warm bakery palette* (`#F8ECE1`, `#3E2B21`, `#D46E15`) dengan ornamen lengkung busur dan lingkaran orbital khas Berkat Dinasti.
+  - Tampilan rincian nomor invoice, waktu pemesanan, jadwal pengiriman, status pembayaran (Lunas / DP), dan rincian produk roti, varian kemasan, serta 9 pilihan topping.
+  - **Live Progress Milestone 4 Tahap:** `Diterima` ➔ `Diproses Dapur & Oven` ➔ `Siap Kirim / Kurir Obrok` ➔ `Selesai Diterima`.
+  - **Ekspor Gambar PNG Kualitas Tinggi:** Menggunakan `html2canvas` client-side renderer untuk mengunduh struk bersih (`#receipt-capture`) langsung ke galeri ponsel pelanggan.
+  - **Proteksi Keamanan & Privasi:** Sanitasi PII pelanggan (nomor telepon dimasking `0812-****-7890`), perlindungan rate limit IP (60 req/menit), `X-Robots-Tag: noindex, nofollow`, dan `Referrer-Policy: no-referrer`.
+- **Halaman Pelacakan Publik & API (`public/track-order.php` & `public/api/get-order-status.php`):**
+  - Antarmuka pencarian pesanan mandiri dengan validasi format token hex.
+  - Endpoint JSON status pesanan terisolasi dengan rate limiter.
+- **Integrasi Distribusi POS Admin (`public/pesanan.php` & `public/beranda.php`):**
+  - Penambahan tombol aksi cepat di tabel pesanan dan kartu mobile: **Kirim Nota via WhatsApp** (ikon WhatsApp hijau).
+  - Modal rincian pesanan (`orderDetailModal`) dilengkapi panel kontrol Nota Digital: **Buka Nota**, **Kirim WA**, dan **Salin Link**.
+  - Banner notifikasi nota siap kirim instan setelah kasir/admin membuat pesanan baru dari POS.
+- **Dukungan Struk Kasir Thermal Bluetooth ESC/POS (`public/api/get-escpos-data.php`):**
+  - Mesin ESC/POS kini secara otomatis mencetak **QR Code capability link** pada bagian bawah struk kasir thermal 58mm/80mm agar pelanggan dapat memindai nota digital secara langsung dari kertas struk.
+
+---
+
 ## [v1.2.0] - 2026-11-04
 
 ### 🧁 Fitur Pemilihan 9 Topping Roti Hajatan & Integrasi Cetak Struk Thermal ESC/POS

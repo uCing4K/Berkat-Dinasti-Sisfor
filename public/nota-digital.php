@@ -350,14 +350,14 @@ function renderErrorPage(string $title, string $message) {
         .font-mono-code {
             font-family: 'JetBrains Mono', monospace;
         }
-        /* Pulse Animation on Active Kitchen Milestone */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 0.3; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+        /* Sonar Ring Animation for Active Kitchen Milestone Outer Aura */
+        @keyframes sonar-pulse {
+            0% { transform: scale(0.95); opacity: 0.65; }
+            70% { transform: scale(1.32); opacity: 0; }
+            100% { transform: scale(1.32); opacity: 0; }
         }
-        .pulse-active {
-            animation: pulse-ring 2s infinite ease-in-out;
+        .sonar-ring {
+            animation: sonar-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
         }
         /* Custom Receipt Serrated Sawtooth Edge */
         .receipt-serrated-bottom {
@@ -468,67 +468,128 @@ function renderErrorPage(string $title, string $message) {
             </div>
 
             <!-- ========================================================================= -->
-            <!-- LIVE PROGRESS TRACKER: Alur 4 Milestone Dapur UMKM Berkat Dinasti        -->
+            <!-- LIVE PROGRESS TRACKER: Alur 4 Milestone Dapur UMKM Berkat Dinasti (v2)   -->
             <!-- ========================================================================= -->
             <?php if ($statusPesanan !== 'batal'): ?>
+            <?php
+                $stepsMeta = [
+                    1 => ['title' => 'Diterima',   'sub' => 'Antrean',  'icon' => 'fa-receipt'],
+                    2 => ['title' => 'Dapur Oven', 'sub' => 'Produksi', 'icon' => 'fa-fire-burner'],
+                    3 => ['title' => 'Siap Kirim', 'sub' => 'Kurir',    'icon' => 'fa-motorcycle'],
+                    4 => ['title' => 'Selesai',    'sub' => 'Diterima', 'icon' => 'fa-check-double'],
+                ];
+                $trackFillPercent = match($currentStep) {
+                    1 => '0%',
+                    2 => '33.3333%',
+                    3 => '66.6667%',
+                    4 => '100%',
+                    default => '0%'
+                };
+            ?>
             <div class="px-6 py-5 border-b border-[#F0E6DC] bg-white">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#786558] flex items-center gap-1.5">
-                        <i class="fas fa-tasks text-[#D46E15]"></i> Progres Pesanan Real-Time
+                <!-- Header Stepper -->
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full <?= $currentStep === 4 ? 'bg-emerald-500' : 'bg-[#D46E15] animate-pulse' ?>"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#3E2B21]">
+                            Progres Pesanan Real-Time
+                        </span>
+                    </div>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold font-mono-code px-2.5 py-0.5 rounded-md bg-[#FAF6F0] text-[#786558] border border-[#EADBCE] tabular-nums">
+                        Tahap <?= $currentStep ?>/4
                     </span>
-                    <span class="text-[11px] text-[#A8988D]">Tahap <?= $currentStep ?> dari 4</span>
                 </div>
 
-                <!-- Progress Steps Container -->
-                <div class="relative flex items-center justify-between">
-                    <!-- Progress Line Background -->
-                    <div class="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1 bg-[#EADBCE] z-0"></div>
-                    <!-- Active Progress Line -->
-                    <?php 
-                        $progressWidths = [1 => '0%', 2 => '33.3%', 3 => '66.6%', 4 => '100%'];
-                        $fillWidth = $progressWidths[$currentStep] ?? '0%';
+                <!-- 4-Step Modern Horizontal Grid Stepper -->
+                <div class="relative grid grid-cols-4 items-start">
+                    <!-- Connector Track: Spans exact center of Col 1 (12.5%) to Col 4 (87.5%) -->
+                    <div class="absolute top-[22px] left-[12.5%] right-[12.5%] h-1.5 bg-[#EFE6DC] rounded-full overflow-hidden z-0">
+                        <div class="h-full rounded-full transition-all duration-500 <?= $currentStep === 4 ? 'bg-emerald-500' : 'bg-gradient-to-r from-[#D46E15] to-[#F59E0B]' ?>" style="width: <?= $trackFillPercent ?>;"></div>
+                    </div>
+
+                    <?php foreach ($stepsMeta as $stepIdx => $meta): 
+                        $isDone = ($currentStep > $stepIdx) || ($currentStep === 4 && $stepIdx === 4);
+                        $isActive = ($currentStep === $stepIdx) && !($currentStep === 4 && $stepIdx === 4);
+                        $isFinalCompleted = ($currentStep === 4 && $stepIdx === 4);
+
+                        if ($isFinalCompleted) {
+                            $boxClass = 'bg-emerald-600 text-white border-2 border-white shadow-sm ring-2 ring-emerald-500/25';
+                            $titleClass = 'text-emerald-800 font-bold';
+                            $subClass = 'text-emerald-600 font-medium';
+                        } elseif ($isDone) {
+                            $boxClass = 'bg-[#D46E15] text-white border-2 border-white shadow-xs';
+                            $titleClass = 'text-[#3E2B21] font-semibold';
+                            $subClass = 'text-[#8E7E73]';
+                        } elseif ($isActive) {
+                            $boxClass = 'bg-[#3E2B21] text-[#F5A25D] border-2 border-white shadow-md ring-2 ring-[#D46E15]/40';
+                            $titleClass = 'text-[#D46E15] font-bold';
+                            $subClass = 'text-[#3E2B21] font-semibold';
+                        } else {
+                            $boxClass = 'bg-[#FAF6F0] text-[#B8A89D] border-2 border-[#E6D7C8]';
+                            $titleClass = 'text-[#A8988D] font-medium';
+                            $subClass = 'text-[#C2B3A7]';
+                        }
                     ?>
-                    <div class="absolute left-6 top-1/2 -translate-y-1/2 h-1 bg-[#D46E15] z-0 transition-all duration-500" style="width: calc(<?= $fillWidth ?> - 12px);"></div>
+                    <div class="relative z-10 flex flex-col items-center px-1">
+                        <div class="relative w-11 h-11 flex items-center justify-center">
+                            <?php if ($isActive): ?>
+                                <!-- Outer Sonar Aura (icon stays crisp & opaque) -->
+                                <span data-html2canvas-ignore="true" class="sonar-ring absolute inset-0 rounded-2xl bg-[#D46E15]/35 pointer-events-none"></span>
+                            <?php endif; ?>
+                            <div class="relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-200 <?= $boxClass ?>">
+                                <?php if ($isDone && !$isFinalCompleted): ?>
+                                    <i class="fas fa-check text-sm"></i>
+                                <?php else: ?>
+                                    <i class="fas <?= $meta['icon'] ?> text-sm"></i>
+                                <?php endif; ?>
 
-                    <!-- Step 1: Diterima -->
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all <?= $currentStep >= 1 ? 'bg-[#D46E15] text-white shadow-md' : 'bg-[#EADBCE] text-[#8E7E73]' ?> <?= $currentStep === 1 ? 'ring-4 ring-[#D46E15]/20 pulse-active' : '' ?>">
-                            <?php if ($currentStep > 1): ?><i class="fas fa-check text-xs"></i><?php else: ?><i class="fas fa-receipt text-xs"></i><?php endif; ?>
+                                <?php if ($isActive): ?>
+                                    <span class="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#D46E15] border-2 border-white"></span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <span class="text-[10px] font-semibold mt-1.5 <?= $currentStep >= 1 ? 'text-[#3E2B21]' : 'text-[#A8988D]' ?> text-center">Diterima</span>
-                    </div>
 
-                    <!-- Step 2: Dapur & Oven -->
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all <?= $currentStep >= 2 ? 'bg-[#D46E15] text-white shadow-md' : 'bg-[#EADBCE] text-[#8E7E73]' ?> <?= $currentStep === 2 ? 'ring-4 ring-[#D46E15]/20 pulse-active' : '' ?>">
-                            <?php if ($currentStep > 2): ?><i class="fas fa-check text-xs"></i><?php else: ?><i class="fas fa-fire-burner text-xs"></i><?php endif; ?>
+                        <div class="mt-2 text-center leading-tight">
+                            <span class="block text-[11px] <?= $titleClass ?> tracking-tight"><?= $meta['title'] ?></span>
+                            <span class="block text-[9px] <?= $subClass ?> mt-0.5"><?= $isActive ? 'Sedang Aktif' : ($isDone ? 'Selesai' : $meta['sub']) ?></span>
                         </div>
-                        <span class="text-[10px] font-semibold mt-1.5 <?= $currentStep >= 2 ? 'text-[#3E2B21]' : 'text-[#A8988D]' ?> text-center">Dapur Oven</span>
                     </div>
-
-                    <!-- Step 3: Siap Kirim / Kurir -->
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all <?= $currentStep >= 3 ? 'bg-[#D46E15] text-white shadow-md' : 'bg-[#EADBCE] text-[#8E7E73]' ?> <?= $currentStep === 3 ? 'ring-4 ring-[#D46E15]/20 pulse-active' : '' ?>">
-                            <?php if ($currentStep > 3): ?><i class="fas fa-check text-xs"></i><?php else: ?><i class="fas fa-motorcycle text-xs"></i><?php endif; ?>
-                        </div>
-                        <span class="text-[10px] font-semibold mt-1.5 <?= $currentStep >= 3 ? 'text-[#3E2B21]' : 'text-[#A8988D]' ?> text-center">Siap Kirim</span>
-                    </div>
-
-                    <!-- Step 4: Selesai Diterima -->
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all <?= $currentStep >= 4 ? 'bg-emerald-600 text-white shadow-md' : 'bg-[#EADBCE] text-[#8E7E73]' ?> <?= $currentStep === 4 ? 'ring-4 ring-emerald-500/20' : '' ?>">
-                            <i class="fas fa-heart text-xs"></i>
-                        </div>
-                        <span class="text-[10px] font-semibold mt-1.5 <?= $currentStep >= 4 ? 'text-emerald-800' : 'text-[#A8988D]' ?> text-center">Selesai</span>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
 
-                <!-- Keterangan Status Terkini -->
-                <div class="mt-4 bg-[#FBF7F2] border border-[#EEDBCE] rounded-xl p-3 flex items-start gap-2.5">
-                    <i class="fas fa-info-circle text-[#D46E15] shrink-0 mt-0.5 text-sm"></i>
-                    <p class="text-xs text-[#5D4B3E] leading-relaxed">
-                        <?= $currStatus['desc'] ?>
-                    </p>
+                <!-- Status Detail Callout Card -->
+                <div class="mt-4 bg-[#FAF6F0] border border-[#EADBCE] border-l-4 <?= $currentStep === 4 ? 'border-l-emerald-500' : 'border-l-[#D46E15]' ?> rounded-xl p-3.5 flex items-start gap-3">
+                    <div class="w-7 h-7 rounded-lg <?= $currentStep === 4 ? 'bg-emerald-100 text-emerald-700' : 'bg-[#D46E15]/15 text-[#D46E15]' ?> flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas <?= $stepsMeta[$currentStep]['icon'] ?? 'fa-info-circle' ?> text-xs"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-0.5">
+                            <span class="text-xs font-bold text-[#3E2B21]"><?= $currStatus['label'] ?></span>
+                            <?php if (!empty($tracking_logs)): 
+                                $lastLog = end($tracking_logs);
+                                $lastTime = !empty($lastLog['created_at']) ? date('d M, H:i', strtotime($lastLog['created_at'])) . ' WIB' : '';
+                            ?>
+                                <?php if ($lastTime): ?>
+                                    <span class="text-[10px] font-mono-code text-[#8E7E73]"><?= $lastTime ?></span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+                        <p class="text-xs text-[#5D4B3E] leading-relaxed">
+                            <?= $currStatus['desc'] ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <?php else: ?>
+            <div class="px-6 py-4 border-b border-rose-200 bg-rose-50/70">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <i class="fas fa-ban text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-rose-800 block">Pesanan Dibatalkan</span>
+                        <p class="text-xs text-rose-700 mt-0.5"><?= $currStatus['desc'] ?></p>
+                    </div>
                 </div>
             </div>
             <?php endif; ?>
